@@ -16,9 +16,10 @@ function [Q,x] = makeQsham( date_in,time_in,flag)
 
 %% Altitudes 
 % Note that Zret can be in a greater range that Zmes
-Q.Zmes = 30:3.75:56250;% Measurement grid
-Q.Zret = 30:3.75:56250;% Retrieval grid
-
+% Q.Zmes = 30:3.75:56250;% Measurement grid
+% Q.Zret = 30:3.75*20:56250;% Retrieval grid
+Q.Zmes = 1000:100:40000;% Measurement grid
+Q.Zret = 1000:1000:40000;
 %% All the constants
 kb = 1.38064852*10^-23;
 Rsp = 287;
@@ -37,7 +38,7 @@ Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
 Q.deadtime = 4e-9;
-Q.deltaT = 0; %2 K
+Q.deltaT = 30; %2 K
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% This is to find the calibration const, R and backgrounds from real measurements.
@@ -96,6 +97,9 @@ Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 Q.Treal = temp;
 x = [Q.Treal Q.BaJH Q.BaJL Q.CL]; % feed T_US to generate synthetic measurements
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,T_US]=forwardmodelTraman(Q,x);
+yy = [JH JL]';
+Q.yvar = diag(yy);
+
 JLreal = NoiseP(JL);
 JHreal = NoiseP(JH);
 
@@ -103,7 +107,7 @@ JLreal(JLreal==0)= 1;
 JHreal(JHreal==0)= 1;
 
 Q.y = [JHreal JLreal]';
-Q.yvar = diag(Q.y);
+
 % %  JLreal = JL+ sqrt(JL(Q.Zmes==4000))*randn(size(JL));%NoiseP(JL);
 % %  JHreal = JH +sqrt(JL(Q.Zmes==4000))*randn(size(JH));%NoiseP(JH);
 % %  figure;plot(JHreal,Q.Zmes./1000,'r',JHreal,Q.Zmes./1000,'b')
