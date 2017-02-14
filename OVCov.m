@@ -2,18 +2,18 @@
 
 % % % % % Input : US Temperatures
 % % % % % Output : Temperature covariance
-function [S_aT]=TestTempCov(Zj,Ta)
+function [S_OV]=OVCov(Zj,OV)
  
  
- m = length(Ta);
+ m = length(OV);
  n = m;
  
- lengthcT = 1000; % =3000; % only need m of these
- Tfac = 30;
- Tmodvar = (Tfac.*ones(size(Ta))).^2;
+ lengthcT = 6000; % =3000; % only need m of these
+ Tfac = 0.01;
+ Tmodvar = (Tfac.*ones(size(OV))).^2;
  vars2 = Tmodvar;
  lc = lengthcT.*ones(1,m);
- S_aT =zeros(n,n);
+S_OV =zeros(n,n);
 
 for i = 1:m
     for j = 1:m
@@ -27,7 +27,7 @@ for i = 1:m
             shape(3) = 0;
         end
         
-        S_aT(i,j) = sigprod.*shape(3);
+        S_OV(i,j) = sigprod.*shape(3);
 %         if i==j
 %          Sa_T(i,j) = Ta(i);
 %         end
@@ -38,7 +38,7 @@ end
 
 % Sa_T(n-2,n-2) = vars2(n-2);
 % Sa_T(n-1,n-1) = vars2(n-1);
- S_aT(n,n) = vars2(n);
+ S_OV(n,n) = vars2(n);
 %   figure;plot(S_aT,Zj)
 
         

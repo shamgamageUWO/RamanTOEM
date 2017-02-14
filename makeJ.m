@@ -6,6 +6,10 @@ m = length(Q.Zret);
 
 
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
+ CJL = x(end-Q.OVlength);
+ OV = x(end+1-(Q.OVlength):end);
+ % Note A_Zi has OV_Zi in it
+ 
 % figure;semilogx(JL,Q.Zmes./1000,JH,Q.Zmes./1000)
 
 if ~isempty(find(isnan(x)) == 1)
@@ -22,6 +26,7 @@ n = n1+n2;
 
 yf = [JH JL]';
 
+% Temperature Jacobian 
 J = zeros(n,m);
 
 for j = 1:m 
@@ -41,8 +46,10 @@ Kb_JL =  ((1-Q.deadtime.*JH).^2)'; %ones(n2,1).*
 
 % Jacobian for CL
 % Analytical Method Using R and the deadtime term should be included
+% OV = x(end+1-(Q.OVlength):end);
+%             KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);
             KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);
-            KCL22 = ((Q.R .*B_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JH).^2); %% Note I have applied the cutoff for JH here
+            KCL22 = ((Q.R.*A_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JH).^2); %% Note I have applied the cutoff for JH here
             KCL= [KCL22 KCL11];
 
 % Numerical
@@ -59,17 +66,39 @@ Kb_JL =  ((1-Q.deadtime.*JH).^2)'; %ones(n2,1).*
 % KCL = [KCL1';zeros(length(KCL2),1)];
 % KCH = [zeros(length(KCL1),1);KCL2'];
 
-% figure;plot(KCL
+
+%% OV jacobians Analytical --- Interpolation need to be added here
+
+% JOVJL = ((CJL.*B_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);
+% JOVJH = ((Q.R.*CJL.*B_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JL).^2);
+
+% OV analytical
+JOV = zeros(n,m);
+
+for j = 1:m 
+    [dOVJH,dOVJL] = deriCountsOV(j,Q,x,@forwardmodelTraman);
+    
+   JOV(1:n1,j) = dOVJH;
+   JOV(n1+1:n,j) = dOVJL;
+% j
+% disp('ok')
+end
 
 %% Final Jacobian
 % JJ = [ J(1:n,1:m) Kb_JL zeros(n,1);J(n+1:2*n,1:m) zeros(n,1) Kb_JH];last
 % working version
 JJ = [ J(1:n1,1:m) Kb_JH zeros(n1,1);J(n1+1:n,1:m) zeros(n2,1) Kb_JL];
 
-J = [JJ KCL'];
+ J = [JJ KCL' JOV];
 
 % figure;
 % subplot(1,2,1)
 % plot(J(1:n1,1:m),Q.Zmes./1000)
 % subplot(1,2,2)
 % plot(J(n1+1:end,1:m),Q.Zmes./1000)
+% 
+% figure;
+% subplot(1,2,1)
+% plot(JOV(1:n1,1:m),Q.Zmes./1000)
+% subplot(1,2,2)
+% plot(JOV(n1+1:end,1:m),Q.Zmes./1000)

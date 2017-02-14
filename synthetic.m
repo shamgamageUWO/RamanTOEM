@@ -1,6 +1,6 @@
 % This code is to create synthetic data using the US standard data
 
-function [Diff_JH_i,Diff_JL_i,A_Zi]=synthetic(temp,press,alt)
+function [Diff_JH_i,Diff_JL_i,A_Zi,B_Zi]=synthetic(temp,press,alt)
 
 
 % %  R = 0.1723.*4.5=0.77;
@@ -64,7 +64,7 @@ OV_Zi = NK;
 % Define the first part of the equation 
 
 A_Zi = (area .* OV_Zi .*R_tr_i .*Pressi)./(kb * Zi.^2);
-% B_Zi = (area .* OV_Zi .*R_tr_i .*Pressi)./(kb * Zi.^2);
+B_Zi = (area .*R_tr_i .*Pressi)./(kb * Zi.^2); % No overlap function
 
 
 [diff_O2Ls,diff_O2Las,deri_diff_O2Ls,deri_diff_O2Las] = RR_differentialO2_JL(J_lowO2,Ti); % JL Oxygen 

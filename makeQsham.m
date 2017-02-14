@@ -16,8 +16,8 @@ function [Q,x] = makeQsham( date_in,time_in,flag)
 
 %% Altitudes 
 % Note that Zret can be in a greater range that Zmes
-Q.Zmes = 30:3.75:56250;% Measurement grid
-Q.Zret = 30:3.75:56250;% Retrieval grid
+Q.Zmes = 1000:100: 40000;% Measurement grid
+Q.Zret = 1000:250: 40000;% Retrieval grid
 
 %% All the constants
 kb = 1.38064852*10^-23;
@@ -37,12 +37,12 @@ Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
 Q.deadtime = 4e-9;
-Q.deltaT = 0; %2 K
+Q.deltaT = 10; %2 K
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% This is to find the calibration const, R and backgrounds from real measurements.
 %% Note that R = CJH/CJL, (not the fitted value)
-[CJL, CJH, R,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length]  = calibration(Q);
+[CJL, CJH, R,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length,JHnew,JLnew,alt,OV] = calibration(Q);
 Q.CL = CJL;%(2.9e+18);%1.449192680052850e+18;%.*(1+1e-14);
 Q.R = R;%R;%0.17;
 Q.Bg_JH_real = Bg_JH_real; % revisit
@@ -66,6 +66,18 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% A priori 
+% Q.OV = OV; % this is from the real measurements
+% Model OV
+% Overlap
+[epsi,z] = Overlap(Q.Zret);
+% figure;plot(z,epsi)
+dis = length(Q.Zret)-length(z);
+NN = ones(1,dis);
+KK = (epsi);
+NK= [KK NN];
+Q.OV = NK;
+% Q.CovOV = (0.1 .* Q.OV).^2;
+Q.OVlength = length(Q.OV);
 
 %msis data for temperature
 % [Tmsis, pmsis,zmsis]= msisRALMO;
@@ -90,11 +102,13 @@ Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'linear');
 Q.rho = Q.Pressi./(Rsp.*Q.Ti);
 Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 
+% OV a priori 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% This section is to generate synthetic measurements using the forward model
 Q.Treal = temp;
-x = [Q.Treal Q.BaJH Q.BaJL Q.CL]; % feed T_US to generate synthetic measurements
+ x = [Q.Treal Q.BaJH Q.BaJL Q.CL Q.OV]; % feed T_US to generate synthetic measurements
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,T_US]=forwardmodelTraman(Q,x);
 JLreal = NoiseP(JL);
 JHreal = NoiseP(JH);

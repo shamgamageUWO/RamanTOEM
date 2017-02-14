@@ -16,23 +16,27 @@ if ~O.linear
     end
 end
 
+ CJL = X.x(end-Q.OVlength);
+ BJH = X.x(end-Q.OVlength-2);
+ BJL = X.x(end-Q.OVlength-1);
+  
 'X.cost'
 X.cost
 
 'OEM-BG-JH'
-X.x(end-2)
+BJH
 
 'real-BG-JH'
 Q.Bg_JH_real
 
 'OEM-BG-JL'
-X.x(end-1)
+BJL
 
 'real-BG-JL'
 Q.Bg_JL_real
 
 'OEM-CL'
-X.x(end)
+CJL
 
 % 'OEM-CH'
 % X.x(end)
@@ -109,6 +113,25 @@ ylabel('Altitude(km)')
  ylabel('Altitude(km)')%  ylabel('Altitude(km)')
 
 
+ 
+ figure;
+subplot(1,2,1)
+plot(Q.OV,Q.Zret./1000,'g',X.x(end+1-Q.OVlength:end),Q.Zret./1000,'r')
+
+xlabel('Temperature (K)')
+ylabel('Altitude(km)')
+legend('T a priori','T OEM')
+
+ 
+%  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
+
+ subplot(1,2,2)
+ plot(100.*(((Q.OV')-X.x(end+1-Q.OVlength:end) )./X.x(end+1-Q.OVlength:end)),Q.Zret./1000)
+ xlabel('OV residuals(OV OEM - OV a priori) (%)')
+%  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
+%  xlabel('Temperature Percent Error (%)')
+ ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+ 
 %  subplot(1,3,3)
 %  plot(Q.Ta - Treal,Q.Zret./1000)
 %  xlabel('Temperature residuals (T a priori - T real) (K)')
@@ -137,6 +160,6 @@ ylabel('Altitude(km)')
 
 %% Percent difference of background, lidar calibration constant retrievals and the true
 
-percent_BG_JH = ((Q.Bg_JH_real -X.x(end-2))./X.x(end-2)).*100
-percent_BG_JL = ((Q.Bg_JL_real -X.x(end-1))./X.x(end-1)).*100
-percent_CJL = ((Q.CL -X.x(end))./X.x(end)).*100
+percent_BG_JH = ((Q.Bg_JH_real -BJH)./BJH).*100
+percent_BG_JL = ((Q.Bg_JL_real -BJL)./BJL).*100
+percent_CJL = ((Q.CL -CJL)./CJL).*100
