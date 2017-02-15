@@ -16,8 +16,8 @@ function [Q,x] = makeQsham( date_in,time_in,flag)
 
 %% Altitudes 
 % Note that Zret can be in a greater range that Zmes
-Q.Zmes = 1000:100: 40000;% Measurement grid
-Q.Zret = 1000:250: 40000;% Retrieval grid
+Q.Zmes = 1000:100:40000;% Measurement grid
+Q.Zret = 1000:250:40000;% Retrieval grid
 
 %% All the constants
 kb = 1.38064852*10^-23;
@@ -108,8 +108,11 @@ Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% This section is to generate synthetic measurements using the forward model
 Q.Treal = temp;
- x = [Q.Treal Q.BaJH Q.BaJL Q.CL Q.OV]; % feed T_US to generate synthetic measurements
-[JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,T_US]=forwardmodelTraman(Q,x);
+Q.OVreal = Q.OV;
+Q.OVa = Q.OV.*1.1; % a priori
+
+ xreal = [Q.Treal Q.BaJH Q.BaJL Q.CL Q.OVreal]; % feed T_US to generate synthetic measurements
+[JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,T_US]=forwardmodelTraman(Q,xreal);
 JLreal = NoiseP(JL);
 JHreal = NoiseP(JH);
 

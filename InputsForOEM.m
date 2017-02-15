@@ -17,7 +17,7 @@ iter = 1;
 
 
 % %xa
- x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OV];
+ x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa];
  
 % S_a and S_ainv
 [S_aT]=TestTempCov(Q.Zret,Q.Ta);

@@ -75,6 +75,7 @@ subplot(1,2,1)
 set(gca,'fontsize',16)
 % hold on;
 plot(X.A(1:m,1:m),Q.Zret(1:m)./1000) 
+grid on;
 hold on;
 plot(response,Q.Zret./1000,'r') 
 % plot(X.A(1:m,1:m).*unit,Q.Zret./1000) 
@@ -84,6 +85,7 @@ ylabel('Altitude(km)')
 
 subplot(1,2,2)
 plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
+grid on;
 xlabel('Vertical Resolution (km)')
 ylabel('Altitude(km)')
 % 
@@ -94,6 +96,7 @@ lower =  X.x(1:m)-err;
 figure;
 subplot(1,2,1)
 plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Treal,Q.Zret./1000,'b')
+grid on;
  hold on
  [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
 %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
@@ -107,6 +110,7 @@ ylabel('Altitude(km)')
 
  subplot(1,2,2)
  plot(X.x(1:m) - (Q.Treal'),Q.Zret./1000)
+ grid on;
  xlabel('Temperature residuals(T OEM - T real) (K)')
 %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
 %  xlabel('Temperature Percent Error (%)')
@@ -116,18 +120,19 @@ ylabel('Altitude(km)')
  
  figure;
 subplot(1,2,1)
-plot(Q.OV,Q.Zret./1000,'g',X.x(end+1-Q.OVlength:end),Q.Zret./1000,'r')
-
+plot(Q.OVa,Q.Zret./1000,'g',X.x(end+1-Q.OVlength:end),Q.Zret./1000,'r',Q.OVreal,Q.Zret./1000,'b')
+grid on;
 xlabel('Temperature (K)')
 ylabel('Altitude(km)')
-legend('T a priori','T OEM')
+legend('OV a priori','OV OEM','OV real')
 
  
 %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
  subplot(1,2,2)
- plot(100.*(((Q.OV')-X.x(end+1-Q.OVlength:end) )./X.x(end+1-Q.OVlength:end)),Q.Zret./1000)
- xlabel('OV residuals(OV OEM - OV a priori) (%)')
+ plot((((-Q.OVreal')+X.x(end+1-Q.OVlength:end) )),Q.Zret./1000)
+ grid on;
+ xlabel('OV residuals(OV OEM - OV real) (%)')
 %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
 %  xlabel('Temperature Percent Error (%)')
  ylabel('Altitude(km)')%  ylabel('Altitude(km)')

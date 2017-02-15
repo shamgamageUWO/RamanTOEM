@@ -3,6 +3,7 @@ function [CJL, CJH, R,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length,JHnew,
 date_in = Q.date_in;
 time_in = Q.time_in;
 Zi = Q.Zmes ;
+
 ind = Zi>=4000 & Zi<=8000;
 % [JHnew,JLnew,alt,JLwithoutBG,JHwithoutBG,bkg_JL,bkg_JH]=rawcountsRALMOwithBG(date_in);
 [JHnew,JLnew,alt,JLwithoutBG,JHwithoutBG,bg_JL_mean,bg_JH_mean,bg_JL_std,bg_JH_std,Eb,bg_length]=rawcountsRALMOnew(date_in);
@@ -14,8 +15,18 @@ Bg_JH_obs =  (bg_JH_mean);
 
 Bg_JL_real = Bg_JL_obs/(1+Q.deadtime*Bg_JL_obs);
 Bg_JH_real = Bg_JH_obs/(1+Q.deadtime*Bg_JH_obs);
-SJH = (JHwithoutBG);% background removed
+
+
+% In calibration need to use the desaturated counts. in S3.mat files its
+% already taken into account.
+
+SJH = (JHwithoutBG);% background removed 
 SJL = (JLwithoutBG);
+
+% need to desaturate the real counts
+% 
+% SJH = desaturated (JHnew) - Bg_JH_real;
+% SJL = desaturated (JLnew) - Bg_JL_real;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % US model
