@@ -16,10 +16,10 @@
 
 function [epsi,z] = Overlap(Zi)
 dz = Zi(2)-Zi(1);
-z = Zi(1):dz:10000;
+z = Zi(1):dz:12000;
 
 T = 300*10^-3;%m
-g0 = 9*10^-3;%m
+g0 = 140*10^-3;%m
 delta = 100*10^-6;%rad
 phi = 0.2*10^-3;% rad
 f = 1;%m
@@ -39,10 +39,10 @@ SiR2 = 2*acos((eR.^2 + 4.*VR.^2-s^2)./(4.*VR.*eR));
 
 
 epsi = real((SiR1 - sin(SiR1))*s^2 + (SiR2 - sin(SiR2)).*eR.^2)./(2*pi*eR.^2);
-
+% 
 % figure;
 % plot(real(epsi),z,'r')
-% %  plot(z,SiR1,'r',z,SiR2,'b')
+% % %  plot(z,SiR1,'r',z,SiR2,'b')
 % %  plot(z,O,'r',z,eR,'b',z,VR,'g')
 % xlabel('Overlap Function') % x-axis label
 % ylabel('altitude(m)') % y-axis label

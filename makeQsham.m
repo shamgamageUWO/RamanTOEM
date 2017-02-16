@@ -1,4 +1,4 @@
-function [Q,x] = makeQsham( date_in,time_in,flag)
+function [Q] = makeQsham( date_in,time_in,flag)
 % makeQ(in)
 
 % -Usage-
@@ -14,10 +14,8 @@ function [Q,x] = makeQsham( date_in,time_in,flag)
 %   yvar - the data's variance
 
 
-%% Altitudes 
-% Note that Zret can be in a greater range that Zmes
-Q.Zmes = 1000:100:40000;% Measurement grid
-Q.Zret = 1000:250:40000;% Retrieval grid
+
+
 
 %% All the constants
 kb = 1.38064852*10^-23;
@@ -29,7 +27,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 20;
+Q.coaddalt = 25;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -39,10 +37,26 @@ Q.shots = 1800;
 Q.deadtime = 4e-9;
 Q.deltaT = 10; %2 K
 
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% This is to find the calibration const, R and backgrounds from real measurements.
 %% Note that R = CJH/CJL, (not the fitted value)
-[CJL, CJH, R,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length,JHnew,JLnew,alt,OV] = calibration(Q);
+%% Load raw measurements
+
+% Coadd counts in altitude
+[CJL, CJH, R,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length,JHnew,JLnew,Zi,Zret] = calibration(Q);
+
+%% Altitudes 
+% Note that Zret can be in a greater range that Zmes
+
+Q.Zmes = Zi;% Measurement grid
+% Q.ZmesRes = Zret;
+
+Q.Zret = Zret;% Retrieval grid
+
+
 Q.CL = CJL;%(2.9e+18);%1.449192680052850e+18;%.*(1+1e-14);
 Q.R = R;%R;%0.17;
 Q.Bg_JH_real = Bg_JH_real; % revisit
@@ -62,11 +76,21 @@ Q.CovBJL = (bg_JL_std/sqrt(bg_length)).^2;
 Q.CovBJH = (bg_JH_std/sqrt(bg_length)).^2;
 end 
 
-
+% real measurements
+JHreal = JHnew ;
+JLreal = JLnew;
+Q.y = [JHreal' JLreal']';
+Q.yvar = diag(Q.y);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% A priori 
-% Q.OV = OV; % this is from the real measurements
+% OV = interp1(Q.Zmes,OV(Q.ind),Q.Zret); % this is to smooth
+% OV(OV>=1)=1;
+% h = find(OV==1);
+% OV(h(1):end)=1;
+% Q.OVa = OV; % this is from the real measurements
+%  figure;plot(Q.OVa,Q.Zret)
+ 
 % Model OV
 % Overlap
 [epsi,z] = Overlap(Q.Zret);
@@ -75,9 +99,9 @@ dis = length(Q.Zret)-length(z);
 NN = ones(1,dis);
 KK = (epsi);
 NK= [KK NN];
-Q.OV = NK;
+Q.OVa = NK;
 % Q.CovOV = (0.1 .* Q.OV).^2;
-Q.OVlength = length(Q.OV);
+Q.OVlength = length(Q.OVa);
 
 %msis data for temperature
 % [Tmsis, pmsis,zmsis]= msisRALMO;
@@ -96,7 +120,7 @@ Q.OVlength = length(Q.OV);
 % US temperature model
  
  [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret); 
-Q.Ta = temp + Q.deltaT; % for now im adding 2K to test
+Q.Ta = temp; % for now im adding 2K to test
 Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
 Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'linear');
 Q.rho = Q.Pressi./(Rsp.*Q.Ti);
@@ -107,25 +131,23 @@ Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% This section is to generate synthetic measurements using the forward model
-Q.Treal = temp;
-Q.OVreal = Q.OV;
-Q.OVa = Q.OV.*1.1; % a priori
+% Q.Treal = temp;
+% Q.OVreal = Q.OV;
+% Q.OVa = Q.OV.*1.1; % a priori
+% 
+%  xreal = [Q.Treal Q.BaJH Q.BaJL Q.CL Q.OVreal]; % feed T_US to generate synthetic measurements
+% [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,T_US]=forwardmodelTraman(Q,xreal);
+% JLreal = NoiseP(JL);
+% JHreal = NoiseP(JH);
+% 
+% JLreal(JLreal==0)= 1;
+% JHreal(JHreal==0)= 1;
 
- xreal = [Q.Treal Q.BaJH Q.BaJL Q.CL Q.OVreal]; % feed T_US to generate synthetic measurements
-[JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,T_US]=forwardmodelTraman(Q,xreal);
-JLreal = NoiseP(JL);
-JHreal = NoiseP(JH);
-
-JLreal(JLreal==0)= 1;
-JHreal(JHreal==0)= 1;
-
-Q.y = [JHreal JLreal]';
-Q.yvar = diag(Q.y);
 % %  JLreal = JL+ sqrt(JL(Q.Zmes==4000))*randn(size(JL));%NoiseP(JL);
 % %  JHreal = JH +sqrt(JL(Q.Zmes==4000))*randn(size(JH));%NoiseP(JH);
 % %  figure;plot(JHreal,Q.Zmes./1000,'r',JHreal,Q.Zmes./1000,'b')
- Q.noiseJL = JLreal - JL;
- Q.noiseJH = JHreal - JH;
+%  Q.noiseJL = JLreal - JL;
+%  Q.noiseJH = JHreal - JH;
 % [JLreal,JHreal,T_US,CL,CH,Diff_JH_i,Diff_JL_i,A_Zi,Pressi,noisejl,noisejh]=realmeasurements(Q);
 % Q.Treal = T_US;
 % Q.noiseJL = noisejl;

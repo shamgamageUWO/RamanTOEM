@@ -12,7 +12,7 @@ function [S_OV]=OVCov(Zj,OV)
  lc = lengthcT.*ones(1,m);
  
  l = size(OV);
- Tfac = 1;
+ Tfac = 0.1;
  Tmodvar = (Tfac.*ones(l)).^2;
  
 %  ll = size(OV);

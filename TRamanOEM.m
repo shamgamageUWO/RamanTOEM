@@ -94,8 +94,8 @@ ylabel('Altitude(km)')
 lower =  X.x(1:m)-err;
 
 figure;
-subplot(1,2,1)
-plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Treal,Q.Zret./1000,'b')
+% subplot(1,2,1)
+plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r')
 grid on;
  hold on
  [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
@@ -103,39 +103,39 @@ grid on;
 % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
 xlabel('Temperature (K)')
 ylabel('Altitude(km)')
- legend('T a priori','T OEM','T Real')
+ legend('T a priori','T OEM')
  hold off;
  
-%  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
-
- subplot(1,2,2)
- plot(X.x(1:m) - (Q.Treal'),Q.Zret./1000)
- grid on;
- xlabel('Temperature residuals(T OEM - T real) (K)')
-%  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
-%  xlabel('Temperature Percent Error (%)')
- ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+% %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
+% 
+%  subplot(1,2,2)
+%  plot(X.x(1:m) - (Q.Treal'),Q.Zret./1000)
+%  grid on;
+%  xlabel('Temperature residuals(T OEM - T real) (K)')
+% %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
+% %  xlabel('Temperature Percent Error (%)')
+%  ylabel('Altitude(km)')%  ylabel('Altitude(km)')
 
 
  
  figure;
-subplot(1,2,1)
-plot(Q.OVa,Q.Zret./1000,'g',X.x(end+1-Q.OVlength:end),Q.Zret./1000,'r',Q.OVreal,Q.Zret./1000,'b')
+% subplot(1,2,1)
+plot(Q.OVa,Q.Zret./1000,'g',X.x(end+1-Q.OVlength:end),Q.Zret./1000,'r')
 grid on;
 xlabel('Temperature (K)')
 ylabel('Altitude(km)')
-legend('OV a priori','OV OEM','OV real')
+legend('OV a priori','OV OEM')
 
  
 %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
- subplot(1,2,2)
- plot((((-Q.OVreal')+X.x(end+1-Q.OVlength:end) )),Q.Zret./1000)
- grid on;
- xlabel('OV residuals(OV OEM - OV real) (%)')
-%  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
-%  xlabel('Temperature Percent Error (%)')
- ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+%  subplot(1,2,2)
+%  plot((((-Q.OVreal')+X.x(end+1-Q.OVlength:end) )),Q.Zret./1000)
+%  grid on;
+%  xlabel('OV residuals(OV OEM - OV real) (%)')
+% %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
+% %  xlabel('Temperature Percent Error (%)')
+%  ylabel('Altitude(km)')%  ylabel('Altitude(km)')
  
 %  subplot(1,3,3)
 %  plot(Q.Ta - Treal,Q.Zret./1000)

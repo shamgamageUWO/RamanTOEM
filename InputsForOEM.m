@@ -21,18 +21,18 @@ iter = 1;
  
 % S_a and S_ainv
 [S_aT]=TestTempCov(Q.Zret,Q.Ta);
-Sa_BG_JH = [zeros(1,length(S_aT)) Q.CovBJH  zeros(1,length(Q.OV)+2)]';
-Sa_BG_JL = [zeros(1,length(S_aT)+1) Q.CovBJL zeros(1,length(Q.OV)+1)]';
+Sa_BG_JH = [zeros(1,length(S_aT)) Q.CovBJH  zeros(1,length(Q.OVa)+2)]';
+Sa_BG_JL = [zeros(1,length(S_aT)+1) Q.CovBJL zeros(1,length(Q.OVa)+1)]';
 empTy= zeros(1,length(S_aT));
-B = repmat(empTy',1,length(Q.OV)+3);
+B = repmat(empTy',1,length(Q.OVa)+3);
 Sa_Tnew = [S_aT B];
 % Sa_Tnew = [S_aT empTy' empTy' empTy'];
-Sa_CL = [zeros(1,length(S_aT)+2) Q.CovCL zeros(1,length(Q.OV))];
+Sa_CL = [zeros(1,length(S_aT)+2) Q.CovCL zeros(1,length(Q.OVa))];
 % Sa_OV = [zeros(1,length(S_aT)+3) Q.CovOV ];
 % SaOV = diag(Q.CovOV);
 
 % Tent function for OV cov
-[Sa_OV]=OVCov(Q.Zret,Q.OV);
+[Sa_OV]=OVCov(Q.Zret,Q.OVa);
 % Sa_OV = eye(length(Q.OV));
 Sa_OV = [B Sa_OV];
 % Sa_CH = [zeros(1,length(S_aT)+3) Q.CovCH];
