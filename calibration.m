@@ -4,7 +4,7 @@ date_in = Q.date_in;
 time_in = Q.time_in;
 Zi = Q.Zmes ;
 
-ind = Zi>=4000 & Zi<=8000;
+ind = Zi>=8000 & Zi<10000;
 % [JHnew,JLnew,alt,JLwithoutBG,JHwithoutBG,bkg_JL,bkg_JH]=rawcountsRALMOwithBG(date_in);
 [JHnew,JLnew,alt,JLwithoutBG,JHwithoutBG,bg_JL_mean,bg_JH_mean,bg_JL_std,bg_JH_std,Eb,bg_length]=rawcountsRALMOnew(date_in);
 % Bg_JL_real =  (bg_JL_mean);%(nansum of bkg_JL, bkg_JL is the avg counts above 40km for each 1min profile)
@@ -33,7 +33,7 @@ SJL = (JLwithoutBG);
 [temp, press, dens, Alt] = US1976(date_in, time_in, Zi); 
 T = temp;
 P = press;
-[Diff_JH_i,Diff_JL_i,A_Zi,B_Zi]=synthetic(T,P,Zi);
+[Diff_JH_i,Diff_JL_i,A_Zi,B_Zi]=synthetic(T,P,Zi,Q.g0a);
 % B_Zi doesnt have OV
 
 
@@ -46,10 +46,10 @@ SSJH = interp1(alt,SJH,Zi,'linear');
 SSSJL = interp1(alt,JLnew,Zi,'linear');
 SSSJH = interp1(alt,JHnew,Zi,'linear');
 
-CJL = SSJL./JLN;
-CJH = SSJH./JHN;
-CJL = mean(CJL(ind));
-CJH = mean(CJH(ind));
+CJL = SSJL(ind)./JLN(ind);
+CJH = SSJH(ind)./JHN(ind);
+CJL = mean(CJL);
+CJH = mean(CJH);
 % figure;plot(CJL,Zi(ind),CJH,Zi(ind))
 R_real = (CJH/CJL);
 

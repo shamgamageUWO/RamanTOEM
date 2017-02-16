@@ -1,6 +1,6 @@
 % This code is to create synthetic data using the US standard data
 
-function [Diff_JH_i,Diff_JL_i,A_Zi,B_Zi]=synthetic(temp,press,alt)
+function [Diff_JH_i,Diff_JL_i,A_Zi,B_Zi]=synthetic(temp,press,alt,g0)
 
 
 % %  R = 0.1723.*4.5=0.77;
@@ -52,7 +52,7 @@ R_tr_i = Tr.^2;
 %  figure;plot(Ti,Zi./1000)
 % Overlap
 
-[epsi,z] = Overlap(Zi);
+[epsi,z] = Overlap(Zi,g0);
 % figure;plot(z,epsi)
 dis = length(Zi)-length(z);
 NN = ones(1,dis);

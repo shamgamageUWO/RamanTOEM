@@ -168,4 +168,4 @@ ylabel('Altitude(km)')
 percent_BG_JH = ((Q.Bg_JH_real -BJH)./BJH).*100
 percent_BG_JL = ((Q.Bg_JL_real -BJL)./BJL).*100
 percent_CJL = ((Q.CL -CJL)./CJL).*100
-% percent_CJLTrue = ((Q.CL*(1.05) -CJL)./CJL).*100
+percent_CJLTrue = ((Q.CL*(1.05) -CJL)./CJL).*100
