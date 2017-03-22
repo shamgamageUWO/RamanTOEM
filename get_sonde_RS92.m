@@ -1,6 +1,6 @@
 % This is to get the radiosonde files
 
-function [Tsonde,Zsonde,Psonde] = get_sonde_RS92(date,tin)
+function [Tsonde,Zsonde,Psonde] = get_sonde_RS92(date,time)
 % date =20110607;
 % tin=20110607110917; % format yyyymmddHHMMSS;
 % tfi=20110607181927;
@@ -17,14 +17,14 @@ yr = num2str(year);
 
 
 
-if tin>5 && tin<17
-time= 12;
-elseif tin == 0
-    time = 0;
-else
-day = day+1;
-time =0;
-end
+% if tin>5 && tin<17
+% time= 12;
+% elseif tin == 0
+%     time = 0;
+% else
+% day = day+1;
+% time =0;
+% end
 
 
 % here have to decide which sonde need to be used
@@ -80,6 +80,12 @@ else
     disp('No Sonde file found')
 end
 
+index1 = find(Psonde>0);
+index2 = find(Tsonde>0);
+Psonde = Psonde(index1);
+Tsonde = Tsonde(index2);
+Zsonde = Zsonde(index1);
+ 
 %     if exist(file, 'file')
 %         disp('ok')
 %         fid = fopen(file);

@@ -25,5 +25,5 @@ qc = reshape(q, layer, l/layer);
 zc = reshape(z, layer, l/layer);
 
 % find the mean of each layer
-qc = (mean(qc))';
+qc = (nansum(qc))';
 zc = (mean(zc))';

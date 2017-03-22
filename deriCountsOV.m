@@ -8,7 +8,7 @@
     end
 %     m=length(Q.Zret);
 %     xa=x(1:m);
-    dn = x(end-(Q.OVlength)+j).*1e-2; % this can go anything smaller than 0.1 even for higher temperatures works ok
+    dn = x(end-(Q.OVlength)+j).*1e-4; % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
     if x(j) == 0 % trap for tau's where tau(1) = 0
         dn = 1.e-8 .* x(j+1);

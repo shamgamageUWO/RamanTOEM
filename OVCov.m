@@ -12,7 +12,7 @@ function [S_OV]=OVCov(Zj,OV)
  lc = lengthcT.*ones(1,m);
  l = size(OV);
  
-  Tfac = 0.012;
+  Tfac = 0.01;
   Tmodvar = (Tfac.*ones(l)).^2;
 % %  
 %  ll = size(OV);
@@ -68,7 +68,7 @@ vars2 = Tmodvar ;
 
 for i = 1:m
     for j = 1:m
-%         if Zj<15000 % this is to force the ov to go to 1.
+         if Zj< 10000 % this is to force the ov to go to 1.
             
             sigprod = sqrt(vars2(i).*vars2(j));
             diffz = Zj(i) - Zj(j);
@@ -83,9 +83,9 @@ for i = 1:m
             %         if i==j
             %          Sa_T(i,j) = Ta(i);
             %         end
-%         else
-%             S_OV(i,i) = 1;
-%         end
+         else
+             S_OV(i,i) = 1e-3;
+         end
     end
 end
 

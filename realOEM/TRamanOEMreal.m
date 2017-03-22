@@ -1,6 +1,6 @@
-function [X,R,Q,O,S_a,Se,xa]=TRamanOEM( date_in,time_in,flag)
+function [X,R,Q,O,S_a,Se,xa]=TRamanOEMreal( date_in,time_in,flag)
 
-[O,Q,R,S_a,Se,xa] = InputsForOEM( date_in,time_in,flag);
+[O,Q,R,S_a,Se,xa] = InputsForOEMreal( date_in,time_in,flag);
 xa = xa';
 S_ainv=[];
 Seinv=[];
@@ -16,27 +16,23 @@ if ~O.linear
     end
 end
 
- CJL = X.x(end-Q.OVlength);
- BJH = X.x(end-Q.OVlength-2);
- BJL = X.x(end-Q.OVlength-1);
-  
 'X.cost'
 X.cost
 
 'OEM-BG-JH'
-BJH
+X.x(end-2)
 
 'real-BG-JH'
 Q.Bg_JH_real
 
 'OEM-BG-JL'
-BJL
+X.x(end-1)
 
 'real-BG-JL'
 Q.Bg_JL_real
 
 'OEM-CL'
-CJL
+X.x(end)
 
 % 'OEM-CH'
 % X.x(end)
@@ -75,7 +71,6 @@ subplot(1,2,1)
 set(gca,'fontsize',16)
 % hold on;
 plot(X.A(1:m,1:m),Q.Zret(1:m)./1000) 
-grid on;
 hold on;
 plot(response,Q.Zret./1000,'r') 
 % plot(X.A(1:m,1:m).*unit,Q.Zret./1000) 
@@ -85,7 +80,6 @@ ylabel('Altitude(km)')
 
 subplot(1,2,2)
 plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
-grid on;
 xlabel('Vertical Resolution (km)')
 ylabel('Altitude(km)')
 % 
@@ -93,55 +87,28 @@ ylabel('Altitude(km)')
  upper = err+ X.x(1:m);
 lower =  X.x(1:m)-err;
 
- [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
- lnQ = log(X.yf(1:Q.n1)./X.yf(Q.n1+1:end));
- Ttradi = real(Q.bb./(Q.aa-lnQ));
-
-Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
 figure;
 subplot(1,2,1)
-plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Ttradi(2000<=Q.Zmes<=20000),Q.Zmes(2000<=Q.Zmes<=20000)./1000,'black')
-grid on;
+plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r')
  hold on
  [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
 %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
 % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
 xlabel('Temperature (K)')
 ylabel('Altitude(km)')
- legend('T a priori','T OEM','T sonde')
+ legend('T a priori','T OEM')
  hold off;
  
 %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
  subplot(1,2,2)
- plot(X.x(1:m) - (Tsonde'),Q.Zret./1000)
- grid on;
- xlabel('Temperature residuals(T OEM - T sonde) (K)')
+ plot(X.x(1:m) - (Q.Ta'),Q.Zret./1000)
+ xlabel('Temperature residuals(T OEM - T a priori) (K)')
 %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
 %  xlabel('Temperature Percent Error (%)')
  ylabel('Altitude(km)')%  ylabel('Altitude(km)')
 
 
- 
- figure;
-subplot(1,2,1)
-plot(Q.OVa,Q.Zret./1000,'g',X.x(end+1-Q.OVlength:end),Q.Zret./1000,'r')
-grid on;
-xlabel('OV')
-ylabel('Altitude(km)')
-legend('OV a priori','OV OEM')
-
- 
-%  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
-
- subplot(1,2,2)
- plot((((-Q.OVa')+X.x(end+1-Q.OVlength:end) )./X.x(end+1-Q.OVlength:end)).*100,Q.Zret./1000)
- grid on;
- xlabel('OV residuals(OV OEM - OV a priori) (%)')
-%  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
-%  xlabel('Temperature Percent Error (%)')
- ylabel('Altitude(km)')%  ylabel('Altitude(km)')
- 
 %  subplot(1,3,3)
 %  plot(Q.Ta - Treal,Q.Zret./1000)
 %  xlabel('Temperature residuals (T a priori - T real) (K)')
@@ -170,7 +137,6 @@ ylabel('Altitude(km)')
 
 %% Percent difference of background, lidar calibration constant retrievals and the true
 
-percent_BG_JH = ((Q.Bg_JH_real -BJH)./BJH).*100
-percent_BG_JL = ((Q.Bg_JL_real -BJL)./BJL).*100
-percent_CJL = ((Q.CL -CJL)./CJL).*100
-% percent_CJLTrue = ((Q.CL*(1.05) -CJL)./CJL).*100
+percent_BG_JH = ((Q.Bg_JH_real -X.x(end-2))./X.x(end-2)).*100
+percent_BG_JL = ((Q.Bg_JL_real -X.x(end-1))./X.x(end-1)).*100
+percent_CJL = ((Q.CL -X.x(end))./X.x(end)).*100

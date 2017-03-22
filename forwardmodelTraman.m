@@ -100,9 +100,7 @@ CH = (Q.R).* CJL;
 JL = (CJL.*A_Zi .* Diff_JL_i)./(Ti);
 JH = (CH.* A_Zi .* Diff_JH_i)./(Ti);
 
-% Add background to the counts 
-JL = JL  + x(end-Q.OVlength-1);
-JH = JH  + x(end-Q.OVlength-2);
+
 % figure;semilogx(JL,Q.Zmes./1000,JH,Q.Zmes./1000)
 
 % apply the new cutoff
@@ -115,11 +113,17 @@ JH = JH  + x(end-Q.OVlength-2);
 % 
         %% Saturation correction
         % 1. Convert counts to Hz
-        JHnw = (JH.*Q.ScaleFactor)./Q.shots;
-        JLnw = (JL.*Q.ScaleFactor)./Q.shots;
+        JHnw = (JH.*Q.f);
+        JLnw = (JL.*Q.f);
  JL = JL ./ (1 + JLnw.*(Q.deadtime)); % non-paralyzable
 % JL = JL .* exp(-JLnw.*(4e-9)); % paralyzable %units is counts
  JH = JH ./ (1 + JHnw.*(Q.deadtime));
+ 
+ % Add background to the counts 
+JL = JL  + x(end-Q.OVlength-1);
+JH = JH  + x(end-Q.OVlength-2);
+ 
+ 
         % 2. Apply the correction
 
 %         JH = JH .* exp(-JHnw.*(Q.deadtime)); % paralyzable %units is counts
