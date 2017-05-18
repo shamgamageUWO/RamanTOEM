@@ -26,7 +26,7 @@ OVa = ones(1,length(Zsonde));
 Q.OVlength = length(OVa);
 Q.R =1;
 
-x = [Tsonde' 0 0 1 OVa];
+x = [Tsonde' 0 0 log(1) OVa];
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
 ind = Q.Zmes > 8000 & Q.Zmes< 10000;
 x = (JH(ind)./JL(ind));

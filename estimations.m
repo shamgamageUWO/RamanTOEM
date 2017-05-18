@@ -1,4 +1,4 @@
-function [CJL, CJH,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length,OV] = estimations(Q)
+function [CJL, CJH,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length1,bg_length2,OV] = estimations(Q)
 
 % [JHnew,JLnew,alt,JLwithoutBG,JHwithoutBG,bg_JL_mean,bg_JH_mean,bg_JL_std,bg_JH_std,Eb,bg_length]=rawcountsRALMOnew(Q);
 [Y]= makeY(Q);
@@ -9,7 +9,8 @@ bg_JL_mean=  Y.bgJL;
 bg_JH_mean = Y.bgJH;
 bg_JL_std = Y.bg_JL_std;
 bg_JH_std = Y.bg_JH_std;
-bg_length = Y.bg_length;
+bg_length1 = Y.bg_length1;
+bg_length2 = Y.bg_length2;
 JHnew= JHnew(alt>=500);
 JLnew= JLnew(alt>=500);
 alt = alt(alt>=500);
@@ -35,7 +36,7 @@ SJL = JLnew - Bg_JL_real;
 
 OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(OVa);
-x = [Q.Ta 0 0 1 OVa];
+x = [Q.Ta 0 0 log(1) OVa];
 % run the FM with backgrounds = 1; OV = 1; 
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
 
@@ -46,10 +47,14 @@ CJH = nanmean(SJH(ind)./JH(ind)');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Overlap estimation
-JLwoOV = ((CJL.*JL))+ Bg_JL_real;
-JHwoOV = ((Q.R.*CJL.*JH))+ Bg_JH_real;
+% % JLwoOV = ((CJL.*JL))+ Bg_JL_real;
+% % JHwoOV = ((Q.R.*CJL.*JH))+ Bg_JH_real;
+% % 
+% %  OVz = (JLnew + JHnew)./(JLwoOV + JHwoOV)';
+JLwoOV = ((CJL.*JL));
+JHwoOV = ((Q.R.*CJL.*JH));
 
- OVz = (JLnew + JHnew)./(JLwoOV + JHwoOV)';
+ OVz = (JLnew + JHnew- Bg_JL_real- Bg_JH_real)./(JLwoOV + JHwoOV)';
 % figure;plot(Q.Zmes./1000,OVz,'b'); hold on;
 OV = interp1(Q.Zmes,OVz,Q.Zret); % this is to smooth
 % plot(Q.Zret./1000,OV,'r')

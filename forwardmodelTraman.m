@@ -43,9 +43,12 @@ exponent = 4+B+C*Lambda+D/Lambda;
 sigma_Rcm2 = A / Lambda^(exponent);
 sigmaNicolet = sigma_Rcm2*1e-4;%m2
 Nmol = (NA/M).* Q.rho ; % mol m-3
-Tr = exp(-cumtrapz(Q.Zmes,Nmol*sigmaNicolet));
+alpha_aero = 0;%2e-4; % m^-1 this is aerosol coefficient given in Povey etal
+Tr = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet+alpha_aero)); % Molecular transmission
 
-R_tr_i = Tr.^2;
+% Tr_aero = exp(-cumtrapz(Q.Zmes).*alpha_aero); % aerosol transmission
+
+R_tr_i = (Tr);
 
 % % Overlap
 % dz = Q.Zmes(2)-Q.Zmes(1);
@@ -93,7 +96,10 @@ Diff_JH_i =  Diff_JHO2 + Diff_JHN2;
 % CH=nanmean(CH);
 
 % Syntheic data for JL using US standard data
- CJL = x(end-Q.OVlength);
+%%
+logCJL = x(end-Q.OVlength);
+CJL = exp(logCJL); % here I change the FM to exp term as I'm retrieving log version
+ %%%%%
 % bgJL =x();
 % bgJH = x();
 CH = (Q.R).* CJL;
@@ -107,21 +113,39 @@ JH = (CH.* A_Zi .* Diff_JH_i)./(Ti);
 % JH = JH(Q.Ind);
 
 % figure;semilogx(JH,Q.Zmes,'r',JL,Q.Zmes,'b')
+%%%%%%%%%%%
+%% Unit conversion Counts to Hz
+% Q.F  = 1800.*(Y.binsize./150).* Q.coaddalt.* Q.deltatime ;  % this is the unit conversion constant between MHz to counts
+% Q.f = 1e-6./Q.F; % conversion 
 
+
+Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
 % hold on;
 % 
-        %% Saturation correction
-        % 1. Convert counts to Hz
+        %% Saturation correction is applied for the averaged count profile
+        % 1. Make the Co added counts to avg counts
+        JH = JH./(Q.deltatime.*Q.coaddalt);
+        JL = JL./(Q.deltatime.*Q.coaddalt);
+        
+        % 2. Convert counts to Hz
         JHnw = (JH.*Q.f);
         JLnw = (JL.*Q.f);
- JL = JL ./ (1 + JLnw.*(Q.deadtime)); % non-paralyzable
-% JL = JL .* exp(-JLnw.*(4e-9)); % paralyzable %units is counts
- JH = JH ./ (1 + JHnw.*(Q.deadtime));
- 
+        
+        % 3. Apply DT
+        JL_dtc = JLnw ./ (1 + JLnw.*(Q.deadtime)); % non-paralyzable
+        % JL = JL .* exp(-JLnw.*(4e-9)); % paralyzable %units is counts
+        JH_dtc = JHnw ./ (1 + JHnw.*(Q.deadtime));
+          % 4. Convert to counts
+           JL = JL_dtc.*(1./Q.f);
+           JH = JH_dtc.*(1./Q.f);
+       % 5. Scale bacl to coadded signal    
+       JL = JL.*(Q.deltatime.*Q.coaddalt);
+       JH = JH.*(Q.deltatime.*Q.coaddalt);
+       
  % Add background to the counts 
-JL = JL  + x(end-Q.OVlength-1);
-JH = JH  + x(end-Q.OVlength-2);
+JL = JL  + (x(end-Q.OVlength-1));
+JH = JH  + (x(end-Q.OVlength-2));
  
  
         % 2. Apply the correction

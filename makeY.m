@@ -175,12 +175,13 @@ alt = JHzc;
 %   ylabel('Alt (km)')
 %   legend('JL','JH')
 % Save in a new mat file
-bkg_ind = alt>56e3 & alt<60e3;
+bkg_ind1 = alt>54e3;% & alt<60e3;
+bkg_ind2 = alt>54e3;
 % [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
 % [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
 
-bkg_JL = JL(bkg_ind);
-bkg_JH = JH(bkg_ind);
+bkg_JL = JL(bkg_ind1);
+bkg_JH = JH(bkg_ind2);
 % JLnew = JL-bkg_JL;
 % JHnew = JH-bkg_JH;
 
@@ -193,8 +194,8 @@ bg_JH_v= var(bkg_JH);
 bg_JL_mean = nanmean(bkg_JL);
 bg_JH_mean = nanmean(bkg_JH);
 
-bg_length = length(bkg_JH);
-bg_JH_length = length(bkg_JH);
+bg_length1 = length(bkg_JH);
+bg_length2 = length(bkg_JL);
 
 
 JLwithoutBG = JL-bg_JL_mean;
@@ -216,7 +217,8 @@ Y.bgJL = bg_JL_mean ;
 Y.bgJH = bg_JH_mean ;
 Y.bg_JL_std = bg_JL_std ;
 Y.bg_JH_std = bg_JH_std ;
-Y.bg_length = bg_length;
+Y.bg_length1 = bg_length1;
+Y.bg_length2 = bg_length2;
 
 
 % save('data.mat','-struct','Y');

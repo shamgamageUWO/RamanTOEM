@@ -1,8 +1,8 @@
-function bobpoissontest(Counts,alt)
+function [VarA,go] =bobpoissontest(Counts,alt)
 lzDA = length(Counts);
-go = 10; %12; %24
+go = 4; %12; %24
 stop = go-1;
-j = 0;
+% j = 0;
 zCountsA = alt;
 N2ctsA = Counts;
 % WVctsD = X.yf(2*mchanA+1:2*mchanA+mchanD);
@@ -18,10 +18,11 @@ for i = go:lzDA-stop
 % h1(j) = kstest(xks1);
 end
 
+VarA =stdA.^2;
 
-figure
-semilogx(stdA.^2,zCountsA(go:lzDA-stop),Counts(go:lzDA-stop),alt(go:lzDA-stop),'r')
-legend('Variance', ' Counts')
+% figure
+% semilogx(stdA.^2,zCountsA(go:lzDA-stop),Counts(go:lzDA-stop),alt(go:lzDA-stop),'r')
+% legend('Variance', ' Counts')
 
 % figure;
 % plot((stdA.^2)./Counts,alt)

@@ -90,12 +90,14 @@ alt = JHzc;
 % semilogx(JH,alt,JL,alt);
 % hold off;
 %     
-bkg_ind = alt>55e3 & alt<58e3;
+bkg_ind1 = alt>57e3 & alt<58e3;
+bkg_ind2 = alt>57e3 & alt<58e3;
+
 % [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
 % [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
 
-bkg_JL = JL(bkg_ind);
-bkg_JH = JH(bkg_ind);
+bkg_JL = JL(bkg_ind2);
+bkg_JH = JH(bkg_ind1);
 % JLnew = JL-bkg_JL;
 % JHnew = JH-bkg_JH;
 

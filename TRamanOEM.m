@@ -16,9 +16,9 @@ if ~O.linear
     end
 end
 
- CJL = X.x(end-Q.OVlength);
- BJH = X.x(end-Q.OVlength-2);
- BJL = X.x(end-Q.OVlength-1);
+ logCJL = X.x(end-Q.OVlength);
+ BJH = (X.x(end-Q.OVlength-2));
+ BJL = (X.x(end-Q.OVlength-1));
   
 'X.cost'
 X.cost
@@ -36,7 +36,7 @@ BJL
 Q.Bg_JL_real
 
 'OEM-CL'
-CJL
+CJL = exp(logCJL)
 
 % 'OEM-CH'
 % X.x(end)
@@ -94,13 +94,13 @@ ylabel('Altitude(km)')
 lower =  X.x(1:m)-err;
 
  [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
- lnQ = log(X.yf(1:Q.n1)./X.yf(Q.n1+1:end));
+ lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
  Ttradi = real(Q.bb./(Q.aa-lnQ));
 
 Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
 figure;
 subplot(1,2,1)
-plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Ttradi(2000<=Q.Zmes<=20000),Q.Zmes(2000<=Q.Zmes<=20000)./1000,'black')
+plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Ttradi(Q.Zmes>=2000 & Q.Zmes<=20000),Q.Zmes(Q.Zmes>=2000 & Q.Zmes<=20000)./1000,'black')
 grid on;
  hold on
  [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
@@ -120,7 +120,6 @@ ylabel('Altitude(km)')
 %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
 %  xlabel('Temperature Percent Error (%)')
  ylabel('Altitude(km)')%  ylabel('Altitude(km)')
-
 
  
  figure;
@@ -174,3 +173,6 @@ percent_BG_JH = ((Q.Bg_JH_real -BJH)./BJH).*100
 percent_BG_JL = ((Q.Bg_JL_real -BJL)./BJL).*100
 percent_CJL = ((Q.CL -CJL)./CJL).*100
 % percent_CJLTrue = ((Q.CL*(1.05) -CJL)./CJL).*100
+
+% e = cputime
+

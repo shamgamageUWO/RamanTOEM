@@ -1,15 +1,15 @@
-function [R_real,R_esti,dR] = Rtest 
+function Rtest 
 dT = [-10,-5,-2,0,2,5,10];
 
-R_esti=[];
-% R_real=[];
-dR =[];
+% R_esti=[];
+% % R_real=[];
+% dR =[];
 date_in = 20110909;
 time_in = 23;
 Zi= 1000:100:40000;
 ind = Zi>=4000 & Zi<=8000;
 
-% real measurements
+% % real measurements
 [JHnew,JLnew,alt,JLwithoutBG,JHwithoutBG,bg_JL_mean,bg_JH_mean,bg_JL_std,bg_JH_std,Eb]=rawcountsRALMOnew(date_in);
 Bg_JL_real =  (bg_JL_mean);%(nansum of bkg_JL, bkg_JL is the avg counts above 40km for each 1min profile)
 Bg_JH_real =  (bg_JH_mean);
@@ -17,9 +17,9 @@ SJH = (JHwithoutBG);% background removed
 SJL = (JLwithoutBG);
 SSJL = interp1(alt,SJL,Zi,'linear');
 SSJH = interp1(alt,SJH,Zi,'linear');
-% y = SJH./SJL;
-% y = interp1(alt,y,Zi,'linear');
-% y = y(ind);
+y = SJH./SJL;
+y = interp1(alt,y,Zi,'linear');
+y = y(ind);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % US model
@@ -28,57 +28,60 @@ P = press;
 [Diff_JH_i,Diff_JL_i,A_Zi]=synthetic(temp,P,Zi);
 JLN = (A_Zi.* Diff_JL_i)./(temp);
 JHN = (A_Zi.* Diff_JH_i)./(temp);
-
-CJL = SSJL./JLN;
-CJH = SSJH./JHN;
-CJL = mean(CJL(ind));
-CJH = mean(CJH(ind));
+% 
+% CJL = SSJL./JLN;
+% CJH = SSJH./JHN;
+% CJL = mean(CJL(ind));
+% CJH = mean(CJH(ind));
 % figure;plot(CJL,Zi(ind),CJH,Zi(ind))
-R_real = (CJH/CJL);
+% R_real = (CJH/CJL);
 
-y = (CJH.*Diff_JH_i)./(CJL.*Diff_JL_i);
- 
-for i = 1:length(dT)
- T = temp+dT(i);
+ y = (CJH.*Diff_JH_i)./(CJL.*Diff_JL_i);
+ g0 = 9*10^-3;
+% for i = 1:length(dT)
+ T = temp+10;%+dT(i);
 % Synthetic
-[Diff_JH_i,Diff_JL_i,A_Zi]=synthetic(T,P,Zi);
+[Diff_JH_i,Diff_JL_i,A_Zi]=synthetic(T,P,Zi,g0);
 
 % 
 % Estimation of R 
 x = (Diff_JH_i)./(Diff_JL_i);
-% x=x(ind);
-f = fittype({'x'});
-fit3 = fit(x',y',f,'Robust','on');
-R_esti(i) = fit3(1);
-dR(i) = ((-R_real+R_esti(i))./R_real).*100;
-end 
+% figure;
+plot(Diff_JH_i,T,'m',Diff_JL_i,T,'y')
+% % x=x(ind);
+% f = fittype({'x'});
+% fit3 = fit(x',y',f,'Robust','on');
+% R_esti(i) = fit3(1);
+% dR(i) = ((-R_real+R_esti(i))./R_real).*100;
+% end 
 
 
 
 %% Residual plot
 % Create figure
-figure1 = figure;
+% figure1 = figure;
 
 % Create axes
-axes1 = axes('Parent',figure1);
-hold(axes1,'on');
+% axes1 = axes('Parent',figure1);
+% hold(axes1,'on');
 
 % Create plot
-plot(dT,dR);
+% plot(dT,dR);
+% plot(T,x,'r');
 
-% Create xlabel
-xlabel('Change in T from US model temperatures');
-
-% Create title
-title({'R % (esti-ratio)'});
-
-% Create ylabel
-ylabel('dR (%)');
-
-box(axes1,'on');
-% Set the remaining axes properties
-set(axes1,'FontSize',16,'XTickLabel',...
-    {'T_U_S -10','T_U_S -8','T_U_S -6','T_U_S -4','T_U_S -2','T_U_S ','T_U_S +2','T_U_S +4','T_U_S +6','T_U_S +8','T_U_S +10'});
+% % Create xlabel
+% xlabel('Change in T from US model temperatures');
+% 
+% % Create title
+% title({'R % (esti-ratio)'});
+% 
+% % Create ylabel
+% ylabel('dR (%)');
+% 
+% box(axes1,'on');
+% % Set the remaining axes properties
+% set(axes1,'FontSize',16,'XTickLabel',...
+%     {'T_U_S -10','T_U_S -8','T_U_S -6','T_U_S -4','T_U_S -2','T_U_S ','T_U_S +2','T_U_S +4','T_U_S +6','T_U_S +8','T_U_S +10'});
 % figure;plot(dT,dR)
 % xlabel('Change in T from US model temperatures','FontSize',16)
 % ylabel('dR (%)','FontSize',16)

@@ -7,13 +7,13 @@
 %
 % output: plots
 
-function checkPoissonStat(r,x_ph)
+function xs=checkPoissonStat(r,x_ph)
 
 % r = altitude
 % x - counts
 
 % bin size
-N = 8;
+N = 6;
 
 % reshape vectors
 ind = 1:length(r)-mod(length(r),N);

@@ -17,17 +17,17 @@ iter = 1;
 
 
 % %xa
- x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa];
+ x_a = [Q.Ta (Q.BaJH) (Q.BaJL) log(Q.CL) Q.OVa]; % now im retrieving log of CJL
  
 % S_a and S_ainv
 [S_aT]=TestTempCov(Q.Zret,Q.Ta);
-Sa_BG_JH = [zeros(1,length(S_aT)) Q.CovBJH  zeros(1,length(Q.OVa)+2)]';
-Sa_BG_JL = [zeros(1,length(S_aT)+1) Q.CovBJL zeros(1,length(Q.OVa)+1)]';
+Sa_BG_JH = [zeros(1,length(S_aT)) (Q.CovBJH)  zeros(1,length(Q.OVa)+2)]';
+Sa_BG_JL = [zeros(1,length(S_aT)+1) (Q.CovBJL) zeros(1,length(Q.OVa)+1)]';
 empTy= zeros(1,length(S_aT));
 B = repmat(empTy',1,length(Q.OVa)+3);
 Sa_Tnew = [S_aT B];
 % Sa_Tnew = [S_aT empTy' empTy' empTy'];
-Sa_CL = [zeros(1,length(S_aT)+2) Q.CovCL zeros(1,length(Q.OVa))];
+Sa_CL = [zeros(1,length(S_aT)+2) Q.CovCL zeros(1,length(Q.OVa))]; %% even here I have changed to the log version
 % Sa_OV = [zeros(1,length(S_aT)+3) Q.CovOV ];
 % SaOV = diag(Q.CovOV);
 

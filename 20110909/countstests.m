@@ -23,7 +23,7 @@ alt = S0.Channel(4).Range;
 % MHZ to Counts conversion constant 
 F = 1800.* (S0.Channel(12).BinSize./150);
 % Counts to Hz (This is what we need to when applying the DT 1/F gives MHz )
-f = 1e-6./F;
+f = 1./F;
 deadtime = 4e-9;
 
 
@@ -41,35 +41,57 @@ JL_scan = F.*JL; % single scans
 JH_scan = F.*JH;
 
 
-% coadding
+% coadding time
 JL_coadd = nansum(JL_scan');
 JH_coadd = nansum(JH_scan');
 
-% averaging
-JL_mean = nanmean(JL_scan');
-JH_mean = nanmean(JH_scan');
+% coadding alt
+[JH, JHzc] = coadd(JH_coadd, alt, 10);
+[JL, JLzc] = coadd(JL_coadd, alt, 10);
 
-% apply deadtime correction
+% conversion 
+JLnw = (JL.*f)./(30.*10);% Hz 
+JL_Co = JLnw./(1-(deadtime.*JLnw));
+JL =JL_Co .*(F*30*10);
 
-JL_Tr = JL_scan./(1-deadtime.*JL_scan.*f); % for single scans
-JH_Tr = JH_scan./(1-deadtime.*JH_scan.*f);
+JHnw = (JH.*f)./(30.*10);% Hz 
+JH_Co = JHnw./(1-(deadtime.*JHnw));
 
-% now average 
-JL_Tr = nanmean(JL_Tr');
-JH_Tr = nanmean(JH_Tr');
+JH =JH_Co .*(F*30*10);
+% 
+% figure;semilogx(JLdt,JLzc,'r',JL,JLzc,'b')
+% JL_Co = JL_coadd./(1-(deadtime.*JL_coadd.*f));
+% JH_Co = JH_coadd./(1-(deadtime.*JH_coadd.*f));
 
-% full profiles
-JL_Tr_Final = 30.*JL_Tr;
-JH_Tr_Final = 30.*JH_Tr;
+%  checkPoissonStat(JLzc,JL);
+%  checkPoissonStat(JHzc,JH);
+ bobpoissontest(JL,JLzc);
+ bobpoissontest(JH,JHzc);
+ % % averaging
+% JL_mean = nanmean(JL_scan');
+% JH_mean = nanmean(JH_scan');
+% 
+% % apply deadtime correction
+% 
+% JL_Tr = JL_scan./(1-deadtime.*JL_scan.*f); % for single scans
+% JH_Tr = JH_scan./(1-deadtime.*JH_scan.*f);
+% 
+% % now average 
+% JL_Tr = nanmean(JL_Tr');
+% JH_Tr = nanmean(JH_Tr');
+% 
+% % full profiles
+% JL_Tr_Final = 30.*JL_Tr;
+% JH_Tr_Final = 30.*JH_Tr;
+% 
+% 
+% 
+% % coadded signal deadtime correction
+% JL_Co = JL_coadd./(1-(deadtime.*JL_coadd.*f));
+% JH_Co = JH_coadd./(1-(deadtime.*JH_coadd.*f));
 
-
-
-% coadded signal deadtime correction
-JL_Co = JL_coadd./(1-(deadtime.*JL_coadd.*f));
-JH_Co = JH_coadd./(1-(deadtime.*JH_coadd.*f));
-
-JL_Av = JL_mean./(1-(deadtime.*JL_mean.*f));
-JH_Av = JH_mean./(1-(deadtime.*JH_mean.*f));
+% JL_Av = JL_mean./(1-(deadtime.*JL_mean.*f));
+% JH_Av = JH_mean./(1-(deadtime.*JH_mean.*f));
 
 % 
 % % ktest 

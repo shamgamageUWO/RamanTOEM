@@ -6,8 +6,10 @@ m = length(Q.Zret);
 
 
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
- CJL = x(end-Q.OVlength);
+ logCJL = x(end-Q.OVlength);
  OV = x(end+1-(Q.OVlength):end);
+%  B_JH = x(end-Q.OVlength-2);
+%  B_JL=x(end-Q.OVlength-1);
  % Note A_Zi has OV_Zi in it
  
 % figure;semilogx(JL,Q.Zmes./1000,JH,Q.Zmes./1000)
@@ -40,17 +42,18 @@ end
 
 %% BG jacobians Analytical 
 % ones need to be multiplied by the deadtime term: refer notes 
-Kb_JH = ((1-Q.deadtime.*JL).^2)'; %ones(n1,1).* 
-Kb_JL =  ((1-Q.deadtime.*JH).^2)'; %ones(n2,1).*
+Kb_JH = (((1-Q.deadtime.*JL).^2))'; %ones(n1,1).* 
+Kb_JL =  (((1-Q.deadtime.*JH).^2))'; %ones(n2,1).*
 %zeros(n-n2,1)]; % fix the lengths
 
 % Jacobian for CL
 % Analytical Method Using R and the deadtime term should be included
 % OV = x(end+1-(Q.OVlength):end);
 %             KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);
-            KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);
-            KCL22 = ((Q.R.*A_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JH).^2); %% Note I have applied the cutoff for JH here
+            KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2).*exp(logCJL);
+            KCL22 = ((Q.R.*A_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JH).^2).*exp(logCJL); %% Note I have applied the cutoff for JH here
             KCL= [KCL22 KCL11];
+%             KCL = KCL .* exp(logCJL); % this is done as I'm retrieving log of CJL now CJL 
 
 % Numerical
 

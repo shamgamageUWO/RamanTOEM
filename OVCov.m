@@ -68,8 +68,8 @@ vars2 = Tmodvar ;
 
 for i = 1:m
     for j = 1:m
-         if Zj< 10000 % this is to force the ov to go to 1.
-            
+         if Zj(i)< 6000 % this is to force the ov to go to 1.
+%             disp('ok')
             sigprod = sqrt(vars2(i).*vars2(j));
             diffz = Zj(i) - Zj(j);
             sumlc = lc(i) + lc(j);
@@ -90,7 +90,7 @@ for i = 1:m
 end
 
 
- S_OV(n,n) = vars2(n);
+%  S_OV(n,n) = vars2(n);
  
 %   figure;plot(S_OV,Zj)
 
