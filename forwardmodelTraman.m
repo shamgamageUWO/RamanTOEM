@@ -43,8 +43,9 @@ exponent = 4+B+C*Lambda+D/Lambda;
 sigma_Rcm2 = A / Lambda^(exponent);
 sigmaNicolet = sigma_Rcm2*1e-4;%m2
 Nmol = (NA/M).* Q.rho ; % mol m-3
-alpha_aero = 0;%2e-4; % m^-1 this is aerosol coefficient given in Povey etal
-Tr = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet+alpha_aero)); % Molecular transmission
+alpha_aero = 2e-4; % m^-1 this is aerosol coefficient given in Povey etal
+% sigma_tot=Nmol*sigmaNicolet+alpha_aero;
+Tr = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet)); % Molecular transmission
 
 % Tr_aero = exp(-cumtrapz(Q.Zmes).*alpha_aero); % aerosol transmission
 
@@ -96,12 +97,15 @@ Diff_JH_i =  Diff_JHO2 + Diff_JHN2;
 % CH=nanmean(CH);
 
 % Syntheic data for JL using US standard data
+
+
 %%
-logCJL = x(end-Q.OVlength);
-CJL = exp(logCJL); % here I change the FM to exp term as I'm retrieving log version
+% %                 logCJL = x(end-Q.OVlength);
+% %                 CJL = exp(logCJL); % here I change the FM to exp term as I'm retrieving log version
  %%%%%
 % bgJL =x();
 % bgJH = x();
+CJL = x(end-Q.OVlength);
 CH = (Q.R).* CJL;
 JL = (CJL.*A_Zi .* Diff_JL_i)./(Ti);
 JH = (CH.* A_Zi .* Diff_JH_i)./(Ti);

@@ -4,7 +4,11 @@ function [X,R,Q,O,S_a,Se,xa]=TRamanOEM( date_in,time_in,flag)
 xa = xa';
 S_ainv=[];
 Seinv=[];
+n1 = Q.n1;
 y = Q.y;
+yJH = smooth(y(1:n1),100);
+yJL = smooth(y(n1+1:end),100);
+% yvar = Q.yvar;
 
 [X,R] = oem(O,Q,R,@makeJ,S_a,Se,S_ainv,Seinv,xa,y);
 
@@ -16,7 +20,7 @@ if ~O.linear
     end
 end
 
- logCJL = X.x(end-Q.OVlength);
+CJL = X.x(end-Q.OVlength);
  BJH = (X.x(end-Q.OVlength-2));
  BJL = (X.x(end-Q.OVlength-1));
   
@@ -36,7 +40,8 @@ BJL
 Q.Bg_JL_real
 
 'OEM-CL'
-CJL = exp(logCJL)
+CJL
+%CJL = exp(logCJL)
 
 % 'OEM-CH'
 % X.x(end)
@@ -46,6 +51,16 @@ CJL = exp(logCJL)
 m = length(Q.Zret);
 n = Q.n1+Q.n2;
 % nmol = interp1(Q.Zmes,Q.Nmol,Q.Zret,'linear');
+
+figure;
+subplot(1,2,1)
+semilogx(Q.y(1:Q.n1),Q.Zmes./1000);
+xlabel('Raw Counts JH- Log scale')
+ylabel('Altitude(km)')
+subplot(1,2,2)
+semilogx(Q.y(Q.n1+1:end),Q.Zmes./1000);
+xlabel('Raw Counts JL- Log scale')
+ylabel('Altitude(km)')
 
 figure;
 subplot(1,2,1)
@@ -146,22 +161,23 @@ legend('OV a priori','OV OEM')
 %  xlabel('Temperature residuals (T a priori - T real) (K)')
 %  ylabel('Altitude(km)')
  
+
 figure;
 subplot(1,2,1)
 grid on;
 % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes(Q.ind)./1000)
-plot(((y(1:Q.n1) - X.yf(1:Q.n1))./X.yf(1:Q.n1)).*100 ,Q.Zmes./1000)
+plot(((y(1:n1) - X.yf(1:n1))./X.yf(1:n1)).*100 ,Q.Zmes./1000)
 hold on
-plot(-sqrt(y(1:Q.n1))./X.yf(1:Q.n1).*100,Q.Zmes./1000,'r',sqrt(y(1:Q.n1))./X.yf(1:Q.n1).*100,Q.Zmes./1000,'r');
+plot(-(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes./1000,'r',(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes./1000,'r');
 hold off
 xlabel('JH counts residual(%)')
 ylabel('Altitude(km)')
 
 subplot(1,2,2)
 grid on;
-plot(((y(Q.n1+1:end) - X.yf(Q.n1+1:end))./X.yf(Q.n1+1:end)).*100 ,Q.Zmes./1000)
+plot(((y(n1+1:end) - X.yf(n1+1:end))./X.yf(n1+1:end)).*100 ,Q.Zmes./1000)
 hold on;
-plot(-sqrt(y(Q.n1+1:end))./X.yf(Q.n1+1:end).*100,Q.Zmes./1000,'r',sqrt(y(Q.n1+1:end))./X.yf(Q.n1+1:end).*100,Q.Zmes./1000,'r');
+plot(-(sqrt(yJL)./X.yf(n1+1:end)).*100,Q.Zmes./1000,'r',(sqrt(yJL)./X.yf(n1+1:end)).*100,Q.Zmes./1000,'r');
 hold off
 xlabel('JL counts residual(%)')
 ylabel('Altitude(km)')

@@ -6,8 +6,8 @@ m = length(Q.Zret);
 
 
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
- logCJL = x(end-Q.OVlength);
- OV = x(end+1-(Q.OVlength):end);
+%  logCJL = x(end-Q.OVlength);
+%  OV = x(end+1-(Q.OVlength):end);
 %  B_JH = x(end-Q.OVlength-2);
 %  B_JL=x(end-Q.OVlength-1);
  % Note A_Zi has OV_Zi in it
@@ -50,8 +50,8 @@ Kb_JL =  (((1-Q.deadtime.*JH).^2))'; %ones(n2,1).*
 % Analytical Method Using R and the deadtime term should be included
 % OV = x(end+1-(Q.OVlength):end);
 %             KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);
-            KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2).*exp(logCJL);
-            KCL22 = ((Q.R.*A_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JH).^2).*exp(logCJL); %% Note I have applied the cutoff for JH here
+            KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);%.*exp(logCJL);
+            KCL22 = ((Q.R.*A_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
             KCL= [KCL22 KCL11];
 %             KCL = KCL .* exp(logCJL); % this is done as I'm retrieving log of CJL now CJL 
 
@@ -105,3 +105,6 @@ JJ = [ J(1:n1,1:m) Kb_JH zeros(n1,1);J(n1+1:n,1:m) zeros(n2,1) Kb_JL];
 % plot(JOV(1:n1,1:m),Q.Zmes./1000)
 % subplot(1,2,2)
 % plot(JOV(n1+1:end,1:m),Q.Zmes./1000)
+
+
+

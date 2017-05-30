@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 30;
+Q.coaddalt = 10;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -54,7 +54,7 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
 Q.Zmes = Q.alt';% Measurement grid
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*4:70000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*20:70000;% Retrieval grid
 disp('Defined grids ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -100,7 +100,9 @@ Q.Bg_JH_real = Bg_JH_real; % revisit
 Q.Bg_JL_real = Bg_JL_real;
 Q.BaJL = Q.Bg_JL_real;%0.297350746852139; % change later
 Q.BaJH = Q.Bg_JH_real;%4.998109499057194e-04;
-Q.CovCL = (0.01 .* log(Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (0.01 .* (Q.CL)).^2;%sqrt(Q.CL);
+
+            %%%Q.CovCL = (0.01 .* log(Q.CL)).^2;%sqrt(Q.CL);
 
 if flag ==1
 Q.CovBJL = ((bg_JL_std)).^2; % day time
@@ -119,12 +121,15 @@ JHreal(JHreal<=0)= rand();
 % JHreal(end) = JHreal(end-1);
 JLreal = Q.JLnew';
 JLreal(JLreal<=0)= rand();
-% smmohtenJH = smooth(JHreal,100);
-% smmohtenJL = smooth(JLreal,100);
-% ysmoothen= [smmohtenJH' smmohtenJL']';
 
+
+smmohtenJH = smooth(JHreal,100); % smoothing covariance to smooth the envelop cover
+smmohtenJL = smooth(JLreal,100);
+% ysmoothen= [smmohtenJH' smmohtenJL']';
 Q.y = [JHreal JLreal]';
 % Q.yvar = diag(ysmoothen);
+
+
 % Variance need to be fixed as below: 
 % below 2 km use the Var from the piecewise code
 % above 2 km use the counts
@@ -132,6 +137,14 @@ Q.y = [JHreal JLreal]';
 % Q.yvar = diag(Q.y);
             [JHv,go] =bobpoissontest(JHreal,Q.Zmes);
             [JLv,go] =bobpoissontest(JLreal,Q.Zmes);
+%             r1 = interp1(JHv, -3:0, 'linear', 'extrap');
+%             r2 = ones(1,go-1).* JHv(end);
+%             r3 = JLreal(1:go-1);
+%             r4 = ones(1,go-1).* JLv(end);
+% r1 = interp1(JHv, -(go-2):0, 'linear', 'extrap');
+% r2 = interp1(JHv, JHv(end):go-1, 'linear', 'extrap');
+% r3 = interp1(JLv, -(go-2):0, 'linear', 'extrap');
+% r4 = interp1(JLv, JLv(end):go-1, 'linear', 'extrap');
             r1 = ones(1,go-1).* JHv(1);
             r2 = ones(1,go-1).* JHv(end);
             r3 = ones(1,go-1).* JLv(1);
@@ -171,7 +184,7 @@ Q.y = [JHreal JLreal]';
             if Q.Zmes(i) <= 7000
                 YY(i) = Q.JLv(i);
             else
-                YY(i) = JLreal(i);
+                YY(i) = smmohtenJL(i);
             end
         end
 
@@ -179,12 +192,13 @@ Q.y = [JHreal JLreal]';
             if  Q.Zmes(i) <= 7000
                 YYY(i) = Q.JHv(i);
             else
-                YYY(i) = JHreal(i);
+                YYY(i) = smmohtenJH(i);
             end
         end
 
         Q.Yvar =[YYY YY];
-        Q.yvar = diag(Q.Yvar);
+%         Q.Yvar =[JHreal JLreal];
+      Q.yvar = diag(Q.Yvar);
 % figure;semilogx(Q.Yvar(length(Q.JLv)+1:end),Q.Zmes./1000,'r',JLreal,Q.Zmes./1000,'b')
 % xlabel('Log of Variance')
 % ylabel('Alt(km)')

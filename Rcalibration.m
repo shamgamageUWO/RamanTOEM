@@ -25,8 +25,10 @@ Q.Zret = Zsonde';
 OVa = ones(1,length(Zsonde));
 Q.OVlength = length(OVa);
 Q.R =1;
+x = [Tsonde' 0 0 1 OVa];
 
-x = [Tsonde' 0 0 log(1) OVa];
+
+                %x = [Tsonde' 0 0 log(1) OVa];
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
 ind = Q.Zmes > 8000 & Q.Zmes< 10000;
 x = (JH(ind)./JL(ind));
@@ -43,7 +45,7 @@ yy = yy(Q.Zmes>=2000 & Q.Zmes<=20000);
 xx = lnQ;
 xx = xx(Q.Zmes>=2000 & Q.Zmes<=20000);
 g = fittype('b/(a-x)','coeff',{'a','b'});
-fit34 = fit(xx,yy',g,'Robust','on');
+fit34 = fit(xx,yy',g,'Robust','on','Startpoint', [0 0]);
 s= coeffvalues(fit34);
 aa = s(1);
 bb = s(2);

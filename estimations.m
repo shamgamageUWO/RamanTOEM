@@ -25,7 +25,7 @@ Bg_JH_real =  (bg_JH_mean);
 % Bg_JH_real = Bg_JH_obs/(1+Q.deadtime*Bg_JH_obs);
 
 Zi = alt;
-ind = Zi>=8000 & Zi< 10000;
+    ind = Zi>=8000 & Zi< 10000;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -36,7 +36,10 @@ SJL = JLnew - Bg_JL_real;
 
 OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(OVa);
-x = [Q.Ta 0 0 log(1) OVa];
+
+x = [Q.Ta 0 0 1 OVa];
+
+%          x = [Q.Ta 0 0 log(1) OVa];
 % run the FM with backgrounds = 1; OV = 1; 
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
 
