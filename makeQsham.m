@@ -18,8 +18,8 @@ function [Q,x] = makeQsham( date_in,time_in,flag)
 % Note that Zret can be in a greater range that Zmes
 % Q.Zmes = 30:3.75:56250;% Measurement grid
 % Q.Zret = 30:3.75*20:56250;% Retrieval grid
-Q.Zmes = 1000:100:40000;% Measurement grid
-Q.Zret = 1000:1000:40000;
+Q.Zmes = 1000:100:60000;% Measurement grid
+Q.Zret = 1000:500:60000;
 %% All the constants
 kb = 1.38064852*10^-23;
 Rsp = 287;
@@ -38,7 +38,7 @@ Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
 Q.deadtime = 4e-9;
-Q.deltaT = 30; %2 K
+Q.deltaT = 10; %2 K
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% This is to find the calibration const, R and backgrounds from real measurements.
@@ -50,7 +50,7 @@ Q.Bg_JH_real = Bg_JH_real; % revisit
 Q.Bg_JL_real = Bg_JL_real;
 Q.BaJL = Q.Bg_JL_real;%0.297350746852139; % change later
 Q.BaJH = Q.Bg_JH_real;%4.998109499057194e-04;
-Q.CovCL = (0.1 .* Q.CL).^2;%sqrt(Q.CL);
+Q.CovCL = (0.01 .* Q.CL).^2;%sqrt(Q.CL);
 % Q.CovCH = 100;%sqrt(Q.CH);
 % Q.CovBJL = (0.1.*bg_JL_mean).^2;
 % Q.CovBJH = (0.1*bg_JH_mean).^2;
@@ -107,7 +107,7 @@ JLreal(JLreal==0)= 1;
 JHreal(JHreal==0)= 1;
 
 Q.y = [JHreal JLreal]';
-
+% Q.yvar = diag(Q.y);
 % %  JLreal = JL+ sqrt(JL(Q.Zmes==4000))*randn(size(JL));%NoiseP(JL);
 % %  JHreal = JH +sqrt(JL(Q.Zmes==4000))*randn(size(JH));%NoiseP(JH);
 % %  figure;plot(JHreal,Q.Zmes./1000,'r',JHreal,Q.Zmes./1000,'b')
