@@ -44,13 +44,13 @@ Q.g0real=100*10^-3;%m % this is to create real overlap
 %% This is to find the calibration const, R and backgrounds from real measurements.
 %% Note that R = CJH/CJL, (not the fitted value)
 [CJL, CJH, R,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length,JHnew,JLnew,alt,OV] = calibration(Q);
-Q.CL = 10*CJL;%(2.9e+18);%1.449192680052850e+18;%.*(1+1e-14);
+Q.CL = CJL;%(2.9e+18);%1.449192680052850e+18;%.*(1+1e-14);
 Q.R = R;%R;%0.17;
 Q.Bg_JH_real = Bg_JH_real; % revisit
 Q.Bg_JL_real = Bg_JL_real;
 Q.BaJL = Q.Bg_JL_real;%0.297350746852139; % change later
 Q.BaJH = Q.Bg_JH_real;%4.998109499057194e-04;
-Q.CovCL = (0.02 .* Q.CL).^2;%sqrt(Q.CL);
+Q.CovCL = (0.01 .* Q.CL).^2;%sqrt(Q.CL);
 % Q.CovCH = 100;%sqrt(Q.CH);
 % Q.CovBJL = (0.1.*bg_JL_mean).^2;
 % Q.CovBJH = (0.1*bg_JH_mean).^2;
@@ -119,6 +119,8 @@ Q.Treal = temp;
 
  xreal = [Q.Treal Q.BaJH Q.BaJL Q.CL Q.OVreal]; % feed T_US to generate synthetic measurements
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,T_US]=forwardmodelTraman(Q,xreal);
+% Q.yy = [JH JL]';
+% Q.yvar = diag(Q.yy);
 JLreal = NoiseP(JL);
 JHreal = NoiseP(JH);
 
@@ -126,7 +128,7 @@ JLreal(JLreal==0)= 1;
 JHreal(JHreal==0)= 1;
 
 Q.y = [JHreal JLreal]';
-Q.yvar = diag(Q.y);
+ Q.yvar = diag(Q.y);
 % %  JLreal = JL+ sqrt(JL(Q.Zmes==4000))*randn(size(JL));%NoiseP(JL);
 % %  JHreal = JH +sqrt(JL(Q.Zmes==4000))*randn(size(JH));%NoiseP(JH);
 % %  figure;plot(JHreal,Q.Zmes./1000,'r',JHreal,Q.Zmes./1000,'b')

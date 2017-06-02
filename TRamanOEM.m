@@ -50,13 +50,13 @@ n = Q.n1+Q.n2;
 figure;
 subplot(1,2,1)
 plot(X.J(1:Q.n1,1:m),Q.Zmes./1000)
-xlabel('Jacobian-JH')
-ylabel('Altitude(km)')
+xlabel('Jacobian-JH','fontsize',18)
+ylabel('Altitude ( km )','fontsize',18)
 
 subplot(1,2,2)
 plot(X.J(Q.n1+1:n,1:m),Q.Zmes./1000)
-xlabel('Jacobian-JL')
-ylabel('Altitude(km)')
+xlabel('Jacobian-JL','fontsize',18)
+ylabel('Altitude ( km )','fontsize',18)
 
 response = sum(X.A(1:m,1:m));
 % Vertical resolution
@@ -80,14 +80,14 @@ hold on;
 plot(response,Q.Zret./1000,'r') 
 % plot(X.A(1:m,1:m).*unit,Q.Zret./1000) 
 hold off;
-xlabel('Avgeraging Kernels')
-ylabel('Altitude(km)')
+xlabel('Avgeraging Kernels','fontsize',18)
+ylabel('Altitude ( km )','fontsize',18)
 
 subplot(1,2,2)
 plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
 grid on;
-xlabel('Vertical Resolution (km)')
-ylabel('Altitude(km)')
+xlabel('Vertical Resolution ( km )','fontsize',18)
+ylabel('Altitude ( km )','fontsize',18)
 % 
  err = X.e(1:m);
  upper = err+ X.x(1:m);
@@ -101,8 +101,8 @@ grid on;
  [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
 %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
 % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
-xlabel('Temperature (K)')
-ylabel('Altitude(km)')
+xlabel('Temperature (K)','fontsize',18)
+ylabel('Altitude ( km )','fontsize',18)
  legend('T a priori','T OEM','T Real')
  hold off;
  
@@ -111,10 +111,10 @@ ylabel('Altitude(km)')
  subplot(1,2,2)
  plot(X.x(1:m) - (Q.Treal'),Q.Zret./1000)
  grid on;
- xlabel('Temperature residuals(T OEM - T real) (K)')
+ xlabel('Temperature residuals(T OEM - T real) (K)','fontsize',18)
 %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
 %  xlabel('Temperature Percent Error (%)')
- ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+ ylabel('Altitude ( km )','fontsize',18)%  ylabel('Altitude(km)')
 
 
  
@@ -122,8 +122,8 @@ ylabel('Altitude(km)')
 subplot(1,2,1)
 plot(Q.OVa,Q.Zret./1000,'g',X.x(end+1-Q.OVlength:end),Q.Zret./1000,'r',Q.OVreal,Q.Zret./1000,'b')
 grid on;
-xlabel('OV')
-ylabel('Altitude(km)')
+xlabel('OV','fontsize',18)
+ylabel('Altitude ( km )','fontsize',18)
 legend('OV a priori','OV OEM','OV real')
 
  
@@ -132,10 +132,10 @@ legend('OV a priori','OV OEM','OV real')
  subplot(1,2,2)
  plot((((-Q.OVreal')+X.x(end+1-Q.OVlength:end) )./X.x(end+1-Q.OVlength:end)).*100,Q.Zret./1000)
  grid on;
- xlabel('OV residuals(OV OEM - OV real) (%)')
+ xlabel('OV residuals(OV OEM - OV real) (%)','fontsize',18)
 %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
 %  xlabel('Temperature Percent Error (%)')
- ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+ ylabel('Altitude ( km )','fontsize',18)%  ylabel('Altitude(km)')
  
 %  subplot(1,3,3)
 %  plot(Q.Ta - Treal,Q.Zret./1000)
@@ -148,19 +148,19 @@ grid on;
 % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes(Q.ind)./1000)
 plot(((y(1:Q.n1) - X.yf(1:Q.n1))./X.yf(1:Q.n1)).*100 ,Q.Zmes./1000)
 hold on
-plot(-sqrt(y(1:Q.n1))./X.yf(1:Q.n1).*100,Q.Zmes./1000,'r',sqrt(y(1:Q.n1))./X.yf(1:Q.n1).*100,Q.Zmes./1000,'r');
+plot(-sqrt(smooth(y(1:Q.n1),100))./X.yf(1:Q.n1).*100,Q.Zmes./1000,'r',sqrt(smooth(y(1:Q.n1),100))./X.yf(1:Q.n1).*100,Q.Zmes./1000,'r');
 hold off
-xlabel('JH counts residual(%)')
-ylabel('Altitude(km)')
+xlabel('JH counts residual (%)','fontsize',18)
+ylabel('Altitude ( km )','fontsize',18)
 
 subplot(1,2,2)
 grid on;
 plot(((y(Q.n1+1:end) - X.yf(Q.n1+1:end))./X.yf(Q.n1+1:end)).*100 ,Q.Zmes./1000)
 hold on;
-plot(-sqrt(y(Q.n1+1:end))./X.yf(Q.n1+1:end).*100,Q.Zmes./1000,'r',sqrt(y(Q.n1+1:end))./X.yf(Q.n1+1:end).*100,Q.Zmes./1000,'r');
+plot(-sqrt(smooth(y(Q.n1+1:end),100))./X.yf(Q.n1+1:end).*100,Q.Zmes./1000,'r',sqrt(smooth(y(Q.n1+1:end),100))./X.yf(Q.n1+1:end).*100,Q.Zmes./1000,'r');
 hold off
-xlabel('JL counts residual(%)')
-ylabel('Altitude(km)')
+xlabel('JL counts residual (%)','fontsize',18)
+ylabel('Altitude ( km )','fontsize',18)
 
 
 %% Percent difference of background, lidar calibration constant retrievals and the true
