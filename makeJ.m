@@ -1,41 +1,36 @@
 function [R,yf,J] = makeJ(Q, R, x, iter)
 
-m = length(Q.Zret);
-% m1 = m+ 2; % background terms are retrieved too
-% n = length(Q.Zmes);
 
+[JL,JH,JLa,JHa,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
 
-[JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
-%  logCJL = x(end-Q.OVlength);
-%  OV = x(end+1-(Q.OVlength):end);
-%  B_JH = x(end-Q.OVlength-2);
-%  B_JL=x(end-Q.OVlength-1);
- % Note A_Zi has OV_Zi in it
- 
-% figure;semilogx(JL,Q.Zmes./1000,JH,Q.Zmes./1000)
 
 if ~isempty(find(isnan(x)) == 1)
     'after FM: Nans in retrieval vector (FMwv(n).m)'
     iter
     stop
 end
-% These are defined as there is a cutoff alitude for JH
-% n1=length(JL);
-% n2=length(JH);
+
+
+
 n1=Q.n1; %length JH
 n2=Q.n2; %length JL
-n = n1+n2;
+n3 =Q.n3;
+n4 =Q.n4;
 
-yf = [JH JL]';
+n = n1+n2+n3+n4;
+m = length(Q.Zret);
+yf = [JH JL JHa JLa]';
 
 % Temperature Jacobian 
 J = zeros(n,m);
 
 for j = 1:m 
-    [dJH,dJL] = deriCountsOEM(j,Q,x,@forwardmodelTraman);
+    [dJH,dJL,dJHa,dJLa] = deriCountsOEM(j,Q,x,@forwardmodelTraman);
     
    J(1:n1,j) = dJH;
-   J(n1+1:n,j) = dJL;
+   J(n1+1:n1+n2,j) = dJL;
+   J(n1+n2+1:n1+n2+n3,j) = dJHa;
+   J(n1+n2+n3+1:n,j) = dJLa;
 % j
 % disp('ok')
 end
@@ -44,15 +39,24 @@ end
 % ones need to be multiplied by the deadtime term: refer notes 
 Kb_JH = (((1-Q.deadtime.*JL).^2))'; %ones(n1,1).* 
 Kb_JL =  (((1-Q.deadtime.*JH).^2))'; %ones(n2,1).*
+Kb_JHa =  ones(n3,1); 
+Kb_JLa =  ones(n4,1);
 %zeros(n-n2,1)]; % fix the lengths
 
 % Jacobian for CL
+
 % Analytical Method Using R and the deadtime term should be included
 % OV = x(end+1-(Q.OVlength):end);
 %             KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);
             KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);%.*exp(logCJL);
             KCL22 = ((Q.R.*A_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
             KCL= [KCL22 KCL11];
+            
+            
+            
+            KCLa11 = ((A_Zi.*Diff_JL_i)./Ti);%.*exp(logCJL);
+            KCLa22 = ((Q.Ra.*A_Zi.*Diff_JH_i)./Ti);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
+            KCLa= [KCLa22 KCLa11];
 %             KCL = KCL .* exp(logCJL); % this is done as I'm retrieving log of CJL now CJL 
 
 % Numerical
@@ -79,10 +83,12 @@ Kb_JL =  (((1-Q.deadtime.*JH).^2))'; %ones(n2,1).*
 JOV = zeros(n,m);
 
 for j = 1:m 
-    [dOVJH,dOVJL] = deriCountsOV(j,Q,x,@forwardmodelTraman);
+    [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(j,Q,x,@forwardmodelTraman);
     
    JOV(1:n1,j) = dOVJH;
-   JOV(n1+1:n,j) = dOVJL;
+   JOV(n1+1:n1+n2,j) = dOVJL;
+   JOV(n1+n2+1:n1+n2+n3,j) = dOVJHa;
+   JOV(n1+n2+n3+1:n,j) = dOVJLa;
 % j
 % disp('ok')
 end
@@ -90,9 +96,14 @@ end
 %% Final Jacobian
 % JJ = [ J(1:n,1:m) Kb_JL zeros(n,1);J(n+1:2*n,1:m) zeros(n,1) Kb_JH];last
 % working version
-JJ = [ J(1:n1,1:m) Kb_JH zeros(n1,1);J(n1+1:n,1:m) zeros(n2,1) Kb_JL];
+JJJH = [ J(1:n1,1:m) Kb_JH zeros(n1,1) KCL22' JOV(1:n1,1:m) zeros(n1,3)];
+JJJL = [J(n1+1:n1+n2,1:m) zeros(n2,1) Kb_JL KCL11' JOV(n1+1:n1+n2,1:m) zeros(n1,3) ];
+JJJHa = [ J(n1+n2+1:n1+n2+n3,1:m) zeros(n2,3) JOV(n1+n2+1:n1+n2+n3,1:m) Kb_JHa zeros(n1,1) KCLa22'];
+JJJLa = [J(n1+n2+n3+1:n,1:m) zeros(n3,3) JOV(n1+n2+n3+1:n,1:m) zeros(n1,1) Kb_JLa KCLa11'];
 
- J = [JJ KCL' JOV];
+J = [JJJH;JJJL;JJJHa;JJJLa];
+
+
 
 % figure;
 % subplot(1,2,1)

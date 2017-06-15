@@ -1,6 +1,6 @@
-    function [dJH,dJL] = deriCountsOEM(j,Q,x,forwardmodelTraman)
+    function [dJH,dJL,dJHa,dJLa] = deriCountsOEM(j,Q,x,forwardmodelTraman)
 
-    [y_JL,y_JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,x);
+    [y_JL,y_JH,y_JLa,y_JHa,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,x);
 
     if ~isempty(find(isnan(x)) == 1)
         'after FM: Nans in retrieval vector derivCounts'
@@ -16,11 +16,12 @@
     xpert(j) = x(j) + dn;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];
 
-    [y_JL_dT,y_JH_dT,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,xpert);
+    [y_JL_dT,y_JH_dT,y_JLa_dT,y_JHa_dT,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,xpert);
 
-    dJL = (y_JL_dT - y_JL)./dn;
-    dJH = (y_JH_dT - y_JH)./dn;
-
+        dJL = (y_JL_dT - y_JL)./dn;
+        dJH = (y_JH_dT - y_JH)./dn;
+        dJLa = (y_JLa_dT - y_JLa)./dn;
+        dJHa = (y_JHa_dT - y_JHa)./dn;
     return
 
 

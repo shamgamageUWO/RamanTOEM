@@ -44,7 +44,7 @@ B1 = repmat(empTya',1,m);
 B2 = repmat(empTyb',1,m);
 % Tent function for OV cov
 Sa_OV = Q.COVa;
-Sa_OV = [B1;Sa_OV;B2];
+Sa_OV = [Sa_OV;B];
 
 S_a = [Sa_Tnew Sa_BG_JH Sa_BG_JL Sa_CL' Sa_OV Sa_BG_JHa Sa_BG_JLa Sa_CLa'];% S_ainv = S_a^(-1);
 

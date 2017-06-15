@@ -79,12 +79,21 @@ endtime =  [g(end) Minute(end)];
 % endtime;
 
 % pick the measurements from 11-11.30
+%% Digital Channels
 JL=[];
 JH=[];
-% Eb=[];
+Eb =[];
+
+%% Analog Channels
+JL_an=[];
+JH_an =[];
+Eb_an =[];
+
+
+
 alt = S0.Channel(4).Range;
 Alt = S0.Channel(2).Range ; % for Eb channel they have a different binzise
-
+alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 %% Load the analog channel measurements too 
 % figure;
 %   hold on;
@@ -93,6 +102,13 @@ Alt = S0.Channel(2).Range ; % for Eb channel they have a different binzise
 JL = S0.Channel(12).Signal(:,961:990);
 JH = S0.Channel(4).Signal(:,961:990);
 Eb= S0.Channel(10).Signal(:,961:990);
+
+
+
+JL_an = S0.Channel(11).Signal(:,961:990);
+JH_an = S0.Channel(3).Signal(:,961:990);
+Eb_an = S0.Channel(9).Signal(:,961:990);
+
 
 % for i = 1: length(g)
 %     if g(i)== 23 && (00 <= Minute(i)<=30)
@@ -150,15 +166,20 @@ Eb = F.*Eb; % single scans
 
 
 % figure;plot(nanmean(JL'),alt,'b',nanmean(JH'),alt,'r')
-
+ %% coaddding 30mints
 JL = nansum(JL');
 JH = nansum(JH');
 Eb = nansum(Eb');
 
-%    figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r')%,Eb,Ebzc./1000,'g') 
-%   xlabel('30min Coadded signal (Counts/bin/time)')
-%   ylabel('Alt (km)')
-%   legend('JL','JH')
+JL_an = nansum(JL_an');
+JH_an = nansum(JH_an');
+Eb_an = nansum(Eb_an');
+
+% 
+%             figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r',JL_an,alt./1000,'g',JH_an,alt./1000,'y')%,Eb,Ebzc./1000,'g')
+%             xlabel('30min Coadded signal (Counts/bin/time)')
+%             ylabel('Alt (km)')
+%             legend('JL','JH','JL an','JH an')
 
 % Coadd in alt
 
@@ -168,6 +189,10 @@ Eb = nansum(Eb');
 [JL, JLzc] = coadd(JL, alt, Q.coaddalt);
 [Eb, Ebzc] = coadd(Eb, Alt, Q.coaddalt);
 
+[JH_an, JHazc] = coadd(JH_an, alt, Q.coaddalt);
+[JL_an, JLazc] = coadd(JL_an, alt, Q.coaddalt);
+[Eb_an, Ebazc] = coadd(Eb_an, Alt, Q.coaddalt);
+
 alt = JHzc;
 
 %    figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r')%,Eb,Ebzc./1000,'g') 
@@ -176,33 +201,52 @@ alt = JHzc;
 %   legend('JL','JH')
 % Save in a new mat file
 bkg_ind1 = alt>40e3;% & alt<60e3;
-bkg_ind2 = alt>40e3;
+bkg_ind2 = alt>20e3;
 % [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
 % [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
 
+% BAckground
 bkg_JL = JL(bkg_ind1);
-bkg_JH = JH(bkg_ind2);
+bkg_JH = JH(bkg_ind1);
 bkg_Eb = Eb(bkg_ind1);
+
+
+bkg_JLan = JL_an(bkg_ind2);
+bkg_JHan = JH_an(bkg_ind2);
+bkg_Eban = Eb_an(bkg_ind2);
+
 % JLnew = JL-bkg_JL;
 % JHnew = JH-bkg_JH;
 
 
-%%
+%% Digital
 bg_JL_std = std(bkg_JL);
 bg_JH_std = std(bkg_JH);
 bg_JL_v = var(bkg_JL);
 bg_JH_v= var(bkg_JH);
-bg_JL_mean = nanmean(bkg_JL);
-bg_JH_mean = nanmean(bkg_JH);
-bg_Eb_mean = nanmean(bkg_Eb);
+bg_JL = nanmean(bkg_JL);
+bg_JH = nanmean(bkg_JH);
+bg_Eb = nanmean(bkg_Eb);
 
 bg_length1 = length(bkg_JH);
 bg_length2 = length(bkg_JL);
 
+%% Analog
+bg_JLan_std = std(bkg_JLan);
+bg_JHan_std = std(bkg_JHan);
+bg_JLan_v = var(bkg_JLan);
+bg_JHan_v= var(bkg_JHan);
+bg_JLan = nanmean(bkg_JLan);
+bg_JHan = nanmean(bkg_JHan);
+bg_Eban= nanmean(bkg_Eban);
 
-JLwithoutBG = JL-bg_JL_mean;
-JHwithoutBG = JH-bg_JH_mean;
-EbwithoutBG = Eb-bg_Eb_mean;
+bg_length1an = length(bkg_JHan);
+bg_length2an = length(bkg_JLan);
+%%
+
+% JLanwithoutBG = JL_an-bg_JLan;
+% JHanwithoutBG = JH_an-bg_JHan;
+% EbanwithoutBG = Eb_an-bg_Eban;
 % 
 %   figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r')%,Eb,Ebzc./1000,'g') 
 %   xlabel('Photon Counts')
@@ -210,18 +254,29 @@ EbwithoutBG = Eb-bg_Eb_mean;
 %   legend('JL','JH')
 % hold on;
 
-
+%% Digital
 Y.JL = JL ;
 Y.JH = JH ;
 Y.Eb = Eb;
 Y.Ebalt = Ebzc;
 Y.alt = alt;
-Y.bgJL = bg_JL_mean ;
-Y.bgJH = bg_JH_mean ;
+Y.bgJL = bg_JL;
+Y.bgJH = bg_JH;
 Y.bg_JL_std = bg_JL_std ;
 Y.bg_JH_std = bg_JH_std ;
 Y.bg_length1 = bg_length1;
 Y.bg_length2 = bg_length2;
+
+%% analog
+Y.JLa = JL_an ;
+Y.JHa = JH_an ;
+Y.Eba = Eb_an;
+Y.bgJLa = bg_JLan;
+Y.bgJHa = bg_JHan;
+Y.bg_JL_stda = bg_JLan_std ;
+Y.bg_JH_stda = bg_JHan_std ;
+Y.bg_length1a = bg_length1an;
+Y.bg_length2a = bg_length2an;
 
 
 % save('data.mat','-struct','Y');

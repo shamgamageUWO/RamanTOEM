@@ -1,19 +1,23 @@
 function [X,R,Q,O,S_a,Se,xa]=TRamanOEM( date_in,time_in,flag)
 tic
 [O,Q,R,S_a,Se,xa] = InputsForOEM( date_in,time_in,flag);
+
 xa = xa';
 S_ainv=[];
 Seinv=[];
 n1 = Q.n1;
 y = Q.y;
+
 yJH = smooth(y(1:n1),100);
 yJL = smooth(y(n1+1:end),100);
 % yvar = Q.yvar;
+
+
 disp('starting oem.m ')
 [X,R] = oem(O,Q,R,@makeJ,S_a,Se,S_ainv,Seinv,xa,y);
 disp('Done running oem.m ')
 
-R =bparameterjacobians (Q,X);
+% R =bparameterjacobians (Q,X);
 
 if ~O.linear
     if X.converged ~= 1
@@ -23,10 +27,13 @@ if ~O.linear
     end
 end
 
-CJL = X.x(end-Q.OVlength);
- BJH = (X.x(end-Q.OVlength-2));
- BJL = (X.x(end-Q.OVlength-1));
-  
+CJL = X.x(Q.OVlength+3);
+BJH = (X.x(Q.OVlength+1));
+BJL = (X.x(Q.OVlength+2));
+CJLa = X.x(end);
+BJHa = (X.x(end-2));
+BJLa = (X.x(end-1));
+
 'X.cost'
 X.cost
 
