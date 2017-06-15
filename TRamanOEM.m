@@ -1,5 +1,5 @@
 function [X,R,Q,O,S_a,Se,xa]=TRamanOEM( date_in,time_in,flag)
-
+tic
 [O,Q,R,S_a,Se,xa] = InputsForOEM( date_in,time_in,flag);
 xa = xa';
 S_ainv=[];
@@ -9,8 +9,11 @@ y = Q.y;
 yJH = smooth(y(1:n1),100);
 yJL = smooth(y(n1+1:end),100);
 % yvar = Q.yvar;
-
+disp('starting oem.m ')
 [X,R] = oem(O,Q,R,@makeJ,S_a,Se,S_ainv,Seinv,xa,y);
+disp('Done running oem.m ')
+
+R =bparameterjacobians (Q,X);
 
 if ~O.linear
     if X.converged ~= 1
@@ -115,7 +118,7 @@ lower =  X.x(1:m)-err;
 Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
 figure;
 subplot(1,2,1)
-plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Ttradi(Q.Zmes>=2000 & Q.Zmes<=20000),Q.Zmes(Q.Zmes>=2000 & Q.Zmes<=20000)./1000,'black')
+plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Ttradi(Q.Zmes<=25000),Q.Zmes(Q.Zmes<=25000)./1000,'black')
 grid on;
  hold on
  [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
@@ -168,7 +171,9 @@ grid on;
 % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes(Q.ind)./1000)
 plot(((y(1:n1) - X.yf(1:n1))./X.yf(1:n1)).*100 ,Q.Zmes./1000)
 hold on
-plot(-(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes./1000,'r',(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes./1000,'r');
+% plot(-(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes./1000,'r',(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes./1000,'r');
+plot(-(1./sqrt(yJH)).*100,Q.Zmes./1000,'r',(1./sqrt(yJH)).*100,Q.Zmes./1000,'r');
+
 hold off
 xlabel('JH counts residual(%)')
 ylabel('Altitude(km)')
@@ -177,7 +182,9 @@ subplot(1,2,2)
 grid on;
 plot(((y(n1+1:end) - X.yf(n1+1:end))./X.yf(n1+1:end)).*100 ,Q.Zmes./1000)
 hold on;
-plot(-(sqrt(yJL)./X.yf(n1+1:end)).*100,Q.Zmes./1000,'r',(sqrt(yJL)./X.yf(n1+1:end)).*100,Q.Zmes./1000,'r');
+% plot(-(sqrt(yJL)./X.yf(n1+1:end)).*100,Q.Zmes./1000,'r',(sqrt(yJL)./X.yf(n1+1:end)).*100,Q.Zmes./1000,'r');
+plot(-(1./sqrt(yJL)).*100,Q.Zmes./1000,'r',(1./sqrt(yJL)).*100,Q.Zmes./1000,'r');
+
 hold off
 xlabel('JL counts residual(%)')
 ylabel('Altitude(km)')
@@ -189,6 +196,38 @@ percent_BG_JH = ((Q.Bg_JH_real -BJH)./BJH).*100
 percent_BG_JL = ((Q.Bg_JL_real -BJL)./BJL).*100
 percent_CJL = ((Q.CL -CJL)./CJL).*100
 % percent_CJLTrue = ((Q.CL*(1.05) -CJL)./CJL).*100
-
+Degree_of_freedom_Temperature = trace(X.A(1:m,1:m))
 % e = cputime
+toc
 
+
+% %  %%
+% % % calculate error matrices
+% % dfacP = 0.1; % ISSI recommend
+% % dfacR = 0.1; % ISSI recommend
+% % dfacAir = 0.01; % BOb code
+% % dfacaero = 0.01; 
+% % dfacDT = 0.1; 
+% % 
+% % SP = (dfacP.*Q.Pressi).^2;
+% % SP = [SP SP];
+% % SP = diag(SP);
+% % 
+% % SR = (dfacR.*Q.R).^2;
+% % 
+% % Sair = (dfacAir.*Q.Nmol).^2;
+% % Sair = [Sair Sair];
+% % Sair = diag(Sair);
+% % 
+% % Saero = (dfacaero.*Q.alpha_aero').^2;
+% % Saero = [Saero Saero];
+% % Saero = diag(Saero);
+% % 
+% % SDT = (dfacDT.*Q.deadtime).^2;
+% % 
+% % 
+% % SxP = X.G*R.JPress*SP*R.JPress'*X.G';
+% % SxR = X.G*R.JR*SR*R.JR'*X.G';
+% % SxAir = X.G*R.Jnair*Sair*R.Jnair'*X.G';
+% % Sxaero = X.G*R.Jaero*Saero*R.Jaero'*X.G';
+% % SxDT = X.G*R.JDT*SDT*R.JDT'*X.G';

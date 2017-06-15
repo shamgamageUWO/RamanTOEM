@@ -92,7 +92,7 @@ Alt = S0.Channel(2).Range ; % for Eb channel they have a different binzise
 
 JL = S0.Channel(12).Signal(:,961:990);
 JH = S0.Channel(4).Signal(:,961:990);
-Eb= S0.Channel(2).Signal(:,961:990);
+Eb= S0.Channel(10).Signal(:,961:990);
 
 % for i = 1: length(g)
 %     if g(i)== 23 && (00 <= Minute(i)<=30)
@@ -141,7 +141,7 @@ F = 1800.* (Y.binsize./150);
 
 
 % Coadd in time
-Eb= S0.Channel(2).Signal; % this is over night signal
+% Eb= S0.Channel(2).Signal; % this is over night signal
 JL = F.*JL; % single scans
 JH = F.*JH;
 Eb = F.*Eb; % single scans
@@ -182,6 +182,7 @@ bkg_ind2 = alt>40e3;
 
 bkg_JL = JL(bkg_ind1);
 bkg_JH = JH(bkg_ind2);
+bkg_Eb = Eb(bkg_ind1);
 % JLnew = JL-bkg_JL;
 % JHnew = JH-bkg_JH;
 
@@ -193,6 +194,7 @@ bg_JL_v = var(bkg_JL);
 bg_JH_v= var(bkg_JH);
 bg_JL_mean = nanmean(bkg_JL);
 bg_JH_mean = nanmean(bkg_JH);
+bg_Eb_mean = nanmean(bkg_Eb);
 
 bg_length1 = length(bkg_JH);
 bg_length2 = length(bkg_JL);
@@ -200,6 +202,7 @@ bg_length2 = length(bkg_JL);
 
 JLwithoutBG = JL-bg_JL_mean;
 JHwithoutBG = JH-bg_JH_mean;
+EbwithoutBG = Eb-bg_Eb_mean;
 % 
 %   figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r')%,Eb,Ebzc./1000,'g') 
 %   xlabel('Photon Counts')

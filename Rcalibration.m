@@ -9,8 +9,9 @@ JHnew = Q.JHnew;
 JLnew = Q.JLnew;
 alt = Q.alt;
 
+
 Zi= alt';
-Q.Zmes = Zi(Zi>500);
+Q.Zmes = Zi(Zi>1000);
 % Sonde profile is needed here
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(date_in,time_in);
 % T = interp1(Zsonde,Tsonde,Q.Zmes,'linear');

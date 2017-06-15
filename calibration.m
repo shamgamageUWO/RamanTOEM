@@ -16,7 +16,7 @@ Bg_JH_obs =  (bg_JH_mean);
 Bg_JL_real = Bg_JL_obs/(1+Q.deadtime*Bg_JL_obs);
 Bg_JH_real = Bg_JH_obs/(1+Q.deadtime*Bg_JH_obs);
 
-Zi = alt(alt>500);
+Zi = alt(alt>1500);
 ind = Zi>=8000 & Zi< 10000;
 % In calibration need to use the desaturated counts. in S3.mat files its
 % already taken into account.

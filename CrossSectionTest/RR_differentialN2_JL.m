@@ -1,4 +1,4 @@
-function [diff_N2s,diff_N2as,deri_diff_N2s,deri_diff_N2as]= RR_differentialN2_JL(J,T)
+function [diff_N2s,diff_N2as]= RR_differentialN2_JL(J,T)
 % Note:- the differential cross section here is not the real diff cross. it
 % is the summation over nitrogen term in 10.23 equation
 
@@ -43,11 +43,15 @@ Const_N2 = (112* pi^4* h*c*r_N2*n_N2 )/((2*I_N2+1)^2 * kb *15);
                            Eas(k) = (B_N2*J(k) *(J(k)+1) - D_N2*(J(k)^2)*(J(k)+1)^2)*h*c;
 %                            shift_N2_as(k) = B_N2 * 2 * (2*(J(k)-2)-1) - D_N2 * (3 * (2*(J(k)-2)-1) + (2*(J(k)-2)-1)^3);
 %                            Xas(k) = ((J(k)-2)*((J(k)-2)-1))/(2*(J(k)-2)-1);    
-shift_N2_as(k) = B_N2 * 2 * (2*(J(k)+2)-1) - D_N2 * (3 * (2*(J(k)+2)-1) + (2*(J(k)+2)-1)^3);
-                           Xas(k) = ((J(k)+2)*((J(k)+2)-1))/(2*(J(k)+2)-1);
-                           diff_N2as(i,k) = ((effi_anti(k) .* Const_N2*gi*B_N2*(v0+shift_N2_as(k))^4 * Xas(k)* exp(-Eas(k)/ (kb*T(i))))./T(i)).* (10^-4);% convert the units to SI
-                           deri_diff_N2as(i,k) = (diff_N2as(i,k).* (Eas(k)./kb -T(i)))./(T(i).^2);
-
+            shift_N2_as(k) = B_N2 * 2 * (2*(J(k)+2)-1) - D_N2 * (3 * (2*(J(k)+2)-1) + (2*(J(k)+2)-1)^3);
+            Xas(k) = ((J(k)+2)*((J(k)+2)-1))/(2*(J(k)+2)-1);
+            diff_N2as(i,k) = ((effi_anti(k) .* Const_N2*gi*B_N2*(v0+shift_N2_as(k))^4 * Xas(k)* exp(-Eas(k)/ (kb*T(i))))./T(i)).* (10^-4);% convert the units to SI
+            %                            deri_diff_N2as(i,k) = (diff_N2as(i,k).* (Eas(k)./kb -T(i)))./(T(i).^2);
+            Es(k) = (B_N2*J(k) *(J(k)+1) - D_N2*(J(k))^2*(J(k)+1)^2)*h*c;
+            shift_N2_s(k) = - B_N2 * 2 * (2*J(k)+3) + D_N2 * (3 * (2*J(k)+3) + (2*J(k)+3)^3);
+            Xs(k) = ((J(k)+1)*(J(k)+2))/(2*J(k)+3);
+            diff_N2s(i,k) = ((effi_stoke(k).* Const_N2*gi*B_N2*(v0+shift_N2_s(k))^4 * Xs(k)* exp(-Es(k)/ (kb*T(i))))./T(i)).*(10^-4);
+%                            deri_diff_N2s(i,k) = (diff_N2s(i,k).* (Es(k)./kb -T(i)))./(T(i).^2);
                         end
                         
                     end
@@ -57,22 +61,22 @@ shift_N2_as(k) = B_N2 * 2 * (2*(J(k)+2)-1) - D_N2 * (3 * (2*(J(k)+2)-1) + (2*(J(
 
                     % For  N2 / Stokes / diff_cros
 
-
-                    for i =1: length(T)
-                        for k = 1: length(J)
-                           if mod(J(k),2) == 0
-                               gi = 6;
-                           else 
-                               gi = 3;
-                           end
-
-                           Es(k) = (B_N2*J(k) *(J(k)+1) - D_N2*(J(k))^2*(J(k)+1)^2)*h*c;
-                           shift_N2_s(k) = - B_N2 * 2 * (2*J(k)+3) + D_N2 * (3 * (2*J(k)+3) + (2*J(k)+3)^3);
-                           Xs(k) = ((J(k)+1)*(J(k)+2))/(2*J(k)+3);
-                           diff_N2s(i,k) = ((effi_stoke(k).* Const_N2*gi*B_N2*(v0+shift_N2_s(k))^4 * Xs(k)* exp(-Es(k)/ (kb*T(i))))./T(i)).*(10^-4);
-                           deri_diff_N2s(i,k) = (diff_N2s(i,k).* (Es(k)./kb -T(i)))./(T(i).^2);
-                        end                      
-                    end
+% 
+%                     for i =1: length(T)
+%                         for k = 1: length(J)
+%                            if mod(J(k),2) == 0
+%                                gi = 6;
+%                            else 
+%                                gi = 3;
+%                            end
+% 
+%                            Es(k) = (B_N2*J(k) *(J(k)+1) - D_N2*(J(k))^2*(J(k)+1)^2)*h*c;
+%                            shift_N2_s(k) = - B_N2 * 2 * (2*J(k)+3) + D_N2 * (3 * (2*J(k)+3) + (2*J(k)+3)^3);
+%                            Xs(k) = ((J(k)+1)*(J(k)+2))/(2*J(k)+3);
+%                            diff_N2s(i,k) = ((effi_stoke(k).* Const_N2*gi*B_N2*(v0+shift_N2_s(k))^4 * Xs(k)* exp(-Es(k)/ (kb*T(i))))./T(i)).*(10^-4);
+% %                            deri_diff_N2s(i,k) = (diff_N2s(i,k).* (Es(k)./kb -T(i)))./(T(i).^2);
+%                         end                      
+%                     end
 
                      newwavelength_s = 10^7./(shift_N2_s + v0);
 
