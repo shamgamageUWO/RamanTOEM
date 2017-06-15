@@ -71,7 +71,7 @@ if exist(file, 'file')
         
         
         Tsonde = rs92.T;
-        Zsonde = rs92.z;
+        Zsonde = rs92.z- 491; % RALMO height correction
         Psonde = rs92.P;
         Psonde = Psonde.*100; % unit conversion hetaPas to Pascal
         fclose(fid);

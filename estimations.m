@@ -11,9 +11,9 @@ bg_JL_std = Y.bg_JL_std;
 bg_JH_std = Y.bg_JH_std;
 bg_length1 = Y.bg_length1;
 bg_length2 = Y.bg_length2;
-JHnew= JHnew(alt>=1000);
-JLnew= JLnew(alt>=1000);
-alt = alt(alt>=1000);
+JHnew= JHnew(alt>=50);
+JLnew= JLnew(alt>=50);
+alt = alt(alt>=50);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % HEre I'm trying to make an estimation of true background
 Bg_JL_real =  (bg_JL_mean); % this is an estimation of obs background
