@@ -3,16 +3,16 @@
 % % % % % Input : US Temperatures
 % % % % % Output : Temperature covariance
 function [S_OV]=OVCov(Zj,OV)
- 
+ Zj = Zj';
 % ind = Zj<15000;
  m = length(OV);
  n = m;
  S_OV =zeros(n,n);
- lengthcT = 1000; % =3000; % only need m of these
+ lengthcT = 500; % =3000; % only need m of these
  lc = lengthcT.*ones(1,m);
  l = size(OV);
  
-  Tfac = 0.5;
+  Tfac = 0.8;
   Tmodvar = (Tfac.*ones(l)).^2;
 % %  
 %  ll = size(OV);
@@ -68,7 +68,7 @@ vars2 = Tmodvar ;
 
 for i = 1:m
     for j = 1:m
-         if Zj(i)< 6000 % this is to force the ov to go to 1.
+         if Zj(i)< 8000 % this is to force the ov to go to 1.
 %             disp('ok')
             sigprod = sqrt(vars2(i).*vars2(j));
             diffz = Zj(i) - Zj(j);

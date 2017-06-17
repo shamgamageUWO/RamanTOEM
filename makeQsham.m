@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 20;
+Q.coaddalt = 5;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -42,27 +42,37 @@ disp('All the constants are ready')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load raw measurements
 [Y] = makeY(Q);
-% Digital measurements
+% Digital measurements 2km above
 JHnew = Y.JH;
 JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=1000);
+Q.Eb = Eb(alt>=4000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=50);
-Q.JLnew= JLnew(alt>=50);
-Q.alt = alt(alt>=50);
+Q.JHnew= JHnew(alt>=4000);
+Q.JLnew= JLnew(alt>=4000);
+Q.alt = alt(alt>=4000);
+Q.Zmes2 = Q.alt';
 
 % Analog measurements
 JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
-Q.Eba = Eba(alt>=50);
+ANalt = Y.alt_an;
+% Q.Eba = Eba(alt>=50 & alt<6000);
+% Q.Eba(Q.Eba <=0)= rand();
+% Q.JHnewa= JHnewa(alt>=50 & alt<5000);
+% Q.JLnewa= JLnewa(alt>=50 & alt<5000);
+% % Q.ANalt = ANalt(alt>=50 & alt<5000);
+Q.Eba = Eba(ANalt>=60 & ANalt <= 12000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(alt>=50);
-Q.JLnewa= JLnewa(alt>=50);
-
+Q.JHnewa= JHnewa(ANalt>=60 & ANalt <= 12000);
+Q.JLnewa= JLnewa(ANalt>=60 & ANalt <= 12000);
+Q.ANalt = ANalt(ANalt>=60);
+Q.Zmes = Q.ANalt';
+Q.Zmes1 = ANalt(ANalt>=60 & ANalt <= 12000);
+Q.Zmes1 = Q.Zmes1';
 
 Q.BaJL = Y.bgJH;%0.297350746852139; % change later
 Q.BaJH = Y.bgJL;%4.998109499057194e-04;
@@ -71,12 +81,32 @@ Q.BaJHa = Y.bgJLa;%4.998109499057194e-04;
 disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% N = length(JHnew);
+% 
+% % %% Fix off set 
+% zAoffset = 10; % bins ie 10*3.75 = 37.5m 
+% Q.JHnew= Q.JHnew(1:N-zAoffset); % already in counts ./ (y2HzRaw./1e6);
+% Q.JLnew = Q.JLnew(1:N-zAoffset); % ./ (y2HzRaw./1e6);
+% Q.JHnewa = Q.JHnewa(1+zAoffset:end);
+% Q.JLnewa = Q.JLnewa(1+zAoffset:end);
+
+Q.n1=length(Q.JHnew);
+Q.n2=length(Q.JLnew);
+Q.n3=length(Q.JHnewa);
+Q.n4=length(Q.JLnewa);
+
 %% Define grid sizes
-Q.Zmes = Q.alt';% Measurement grid
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*20:70000;% Retrieval grid
+% Q.Zmes1 = Q.ANalt';
+Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
+% Q.Zmes1 = Q.Zmes1(1+zAoffset:end);
+% Q.Zmes2 = Q.Zmes2(1:Q.n1-zAoffset);
+% Q.Zmes = Q.Zmes1;%[Q.Zmes1 Q.Zmes2];% Measurement grid
+% Q.Zmes = Q.Zmes(1:N-zAoffset);
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:70000;% Retrieval grid
 disp('Defined grids ')
-
-
+% Yc = [Q.JHnewa;Q.JHnew]
+% figure;semilogx(Yc,Q.Zmes./1000)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  a priori temperatures
@@ -128,19 +158,19 @@ Q.Ra = Ra;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
-[CJL,CJLa, OV] = estimations(Q);
+[CJL, CJLa,OV] = estimations(Q);
 
-Q.OVa = OV;
+Q.OVa = OV;%ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (0.01 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (0.8 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = CJLa;
-Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CovCLa = (0.5 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
                            Q.CovBJLa = ((Y.bg_JL_stda)).^2; % day time
-                                        Q.CovBJHa = ((Y.bg_JH_stda)).^2;
+                           Q.CovBJHa = ((Y.bg_JH_stda)).^2;
 
 
                                         if flag ==1
@@ -174,8 +204,11 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
                         smmohtenJLa = smooth(JLrealan,100);
                         % ysmoothen= [smmohtenJH' smmohtenJL']';
 
+ Q.JHnew =JHreal;  Q.JLnew=JLreal ;  Q.JHnewa =JHrealan ;   Q.JLnewa= JLrealan;
 
-                        Q.y = [JHreal JLreal JHrealan JLrealan]';
+                        Q.y = [Q.JHnew Q.JLnew Q.JHnewa Q.JLnewa]';
+                        
+                        
 % Q.yvar = diag(ysmoothen);
 
 
@@ -184,9 +217,9 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 % above 2 km use the counts
 
 % Q.yvar = diag(Q.y);
-%             [JHv,go] =bobpoissontest(JHreal,Q.Zmes);
-%             [JLv,go] =bobpoissontest(JLreal,Q.Zmes);
-
+%             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2);
+%             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2);
+% 
 % 
 %             
 %             r1 = ones(1,go-1).* JHv(1);
@@ -197,8 +230,9 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %             Q.JLv = [r3 JLv r4];
 
 
-[JHav,go] =bobpoissontest(JHrealan,Q.Zmes);
-[JLav,go] =bobpoissontest(JLrealan,Q.Zmes);
+[JHav,go] =bobpoissontest(Q.JHnewa,Q.Zmes1);
+[JLav,go] =bobpoissontest(Q.JLnewa,Q.Zmes1);
+
             ar1 = ones(1,go-1).* JHav(1);
             ar2 = ones(1,go-1).* JHav(end);
             ar3 = ones(1,go-1).* JLav(1);
@@ -223,17 +257,14 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %             end
 %         end
 
-%         Q.Yvar =[YYY YY JHav JLav];
-%         Q.Yvar =[JHreal JLreal];
-                Q.Yvar =[JHreal JLreal Q.JHav Q.JLav];
+% %         Q.Yvar =[YYY YY JHav JLav];
+% %         Q.Yvar =[JHreal JLreal];
+        
+                Q.Yvar =[Q.JHnew  Q.JLnew Q.JHav Q.JLav];
                 Q.yvar = diag(Q.Yvar);
                 
                 
 
-Q.n1=length(JHrealan);
-Q.n2=length(JLrealan);
-Q.n3=length(JHrealan);
-Q.n4=length(JLrealan);
 
 
 disp('Estimations for CJL, backgrounds and overlap done ')

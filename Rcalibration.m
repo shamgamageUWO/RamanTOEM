@@ -1,4 +1,4 @@
-function [R,Ra,aa,bb] = Rcalibration(Q)
+function [R,Ra,aa,bb,aa1,bb1] = Rcalibration(Q)
 
 date_in = Q.date_in;
 time_in = Q.time_in;
@@ -40,7 +40,7 @@ fit3 = fit(x',y,f,'Robust','on');
 R = fit3(1);
 
 %% analog
-ind2 = Q.Zmes > 4000 & Q.Zmes< 5000;
+ind2 = Q.Zmes >= 2000 & Q.Zmes< 4000;
 xa = (JHa(ind2)./JLa(ind2));
 ya = JHnewa(ind2)./JLnewa(ind2);
 
@@ -54,12 +54,23 @@ Ra = fit3a(1);
 % % %%%%%% Calibration for traditional method Digital channel
 lnQ = log(JHnew./JLnew);
 yy = Ti;
-yy = yy(Q.Zmes>=2000 & Q.Zmes<=20000);
+yy = yy(Q.Zmes>=8000 & Q.Zmes<=10000);
 xx = lnQ;
-xx = xx(Q.Zmes>=2000 & Q.Zmes<=20000);
+xx = xx(Q.Zmes>=8000 & Q.Zmes<=10000);
 g = fittype('b/(a-x)','coeff',{'a','b'});
 fit34 = fit(xx,yy',g,'Robust','on','Startpoint', [0 0]);
 s= coeffvalues(fit34);
 aa = s(1);
 bb = s(2);
 %  ff = fittype({'a*x+b'},);
+% % %%%%%% Calibration for traditional method Digital channel
+lnQ1 = log(JHnewa./JLnewa);
+yy1 = Ti;
+yy1 = yy1(Q.Zmes>=2000 & Q.Zmes<5000);
+xx1 = lnQ1;
+xx1 = xx1(Q.Zmes>=2000 & Q.Zmes<5000);
+g1 = fittype('b/(a-x)','coeff',{'a','b'});
+fit341 = fit(xx1,yy1',g1,'Robust','on','Startpoint', [0 0]);
+s1= coeffvalues(fit341);
+aa1 = s1(1);
+bb1 = s1(2);

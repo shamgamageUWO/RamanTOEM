@@ -20,7 +20,7 @@ asr =AerosolScatteringRatio03(S3,config );
 %% 
 % Load beta molecular values here 
 % Max's Codes ( all are now in the same directory as QpackSham)
-zN = Q.alt;
+zN = Q.Zmes;
 P = Q.Pressi;
 T = Q.Ti;
 lambda_rec= 354.7; % nm
@@ -101,7 +101,7 @@ asrDATAnew = asrDATAs./fneg;
 % % fneg = find(asrDATAs < 1);
     % asrDATAs(fneg) = 1;
 
-alphaAer = LR .* (beta_mol .* (asrDATAnew-1));
+alphaAer = LR' .* (beta_mol .* (asrDATAnew-1));
 % znoAer = find(zN > 15000); % was 3000 for 20130122
 znoAer = find( asrDATAnew ==1);
 alphaAer(znoAer) = 1e-12;

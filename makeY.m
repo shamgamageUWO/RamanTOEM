@@ -92,7 +92,7 @@ Eb_an =[];
 
 
 alt = S0.Channel(4).Range;
-Alt = S0.Channel(2).Range ; % for Eb channel they have a different binzise
+Alte = S0.Channel(2).Range ; % for Eb channel they have a different binzise
 alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 %% Load the analog channel measurements too 
 % figure;
@@ -175,6 +175,18 @@ JL_an = nansum(JL_an');
 JH_an = nansum(JH_an');
 Eb_an = nansum(Eb_an');
 
+N = length(JH);
+
+% %% Fix off set 
+zAoffset = 10; % bins ie 10*3.75 = 37.5m 
+JH= JH(1:N-zAoffset); % already in counts ./ (y2HzRaw./1e6);
+JL =JL(1:N-zAoffset); % ./ (y2HzRaw./1e6);
+Eb= Eb(1:N-zAoffset); % already in counts ./ (y2HzRaw./1e6);
+JH_an = JH_an(1+zAoffset:end);
+JL_an = JL_an(1+zAoffset:end);
+Eb_an = Eb_an(1+zAoffset:end);
+alt = alt(1:N-zAoffset);
+alt_an = alt_an(1:N-zAoffset);
 % 
 %             figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r',JL_an,alt./1000,'g',JH_an,alt./1000,'y')%,Eb,Ebzc./1000,'g')
 %             xlabel('30min Coadded signal (Counts/bin/time)')
@@ -187,21 +199,22 @@ Eb_an = nansum(Eb_an');
 
 [JH, JHzc] = coadd(JH, alt, Q.coaddalt);
 [JL, JLzc] = coadd(JL, alt, Q.coaddalt);
-[Eb, Ebzc] = coadd(Eb, Alt, Q.coaddalt);
+[Eb, Ebzc] = coadd(Eb, alt, Q.coaddalt);
 
-[JH_an, JHazc] = coadd(JH_an, alt, Q.coaddalt);
-[JL_an, JLazc] = coadd(JL_an, alt, Q.coaddalt);
-[Eb_an, Ebazc] = coadd(Eb_an, Alt, Q.coaddalt);
+[JH_an, JHazc] = coadd(JH_an, alt_an, Q.coaddalt);
+[JL_an, JLazc] = coadd(JL_an, alt_an, Q.coaddalt);
+[Eb_an, Ebazc] = coadd(Eb_an, alt_an, Q.coaddalt);
 
 alt = JHzc;
+Alt = JHazc;
 
 %    figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r')%,Eb,Ebzc./1000,'g') 
 %   xlabel('30min and 40bin  Coadded signal (Counts/bin/time)')
 %   ylabel('Alt (km)')
 %   legend('JL','JH')
 % Save in a new mat file
-bkg_ind1 = alt>40e3;% & alt<60e3;
-bkg_ind2 = alt>20e3;
+bkg_ind1 = alt>50e3;% & alt<60e3;
+bkg_ind2 = Alt>8e3 & Alt< 10e3;
 % [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
 % [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
 
@@ -277,6 +290,7 @@ Y.bg_JL_stda = bg_JLan_std ;
 Y.bg_JH_stda = bg_JHan_std ;
 Y.bg_length1a = bg_length1an;
 Y.bg_length2a = bg_length2an;
+Y.alt_an = Alt;
 
 
 % save('data.mat','-struct','Y');

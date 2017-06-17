@@ -1,6 +1,6 @@
 % This code is to create synthetic data using the US standard data
 
-function [JL,JH,JLa,JHa,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x)
+function [JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x)
 
 m = length(Q.Zret);
 % temperature
@@ -26,10 +26,19 @@ area = pi * (0.3^2);
 R_tr_i = (Q.Tr);
 
 % Define the first part of the equation 
+N1 = length(Q.JHnewa);
+% NN1 = length();
+% N2 = length(Q.JHnew); fr=OV_Zi(Q.d_alti_Diff+1:end);
 
-A_Zi = (area .* OV_Zi .*R_tr_i .*Q.Pressi)./(kb * Q.Zmes .^2);
-B_Zi = (area .*R_tr_i .*Q.Pressi)./(kb * Q.Zmes .^2); % No overlap
+A_Zi_an = (area .* OV_Zi(1:N1) .*R_tr_i(1:N1) .*Q.Pressi(1:N1))./(kb * Q.Zmes1 .^2);
+% B_Zi_an = (area .*R_tr_i(1:N1) .*Q.Pressi(1:N1))./(kb * Q.Zmes1 .^2); % No overlap
 
+A_Zi_d = (area .* OV_Zi(Q.d_alti_Diff+1:end) .*R_tr_i(Q.d_alti_Diff+1:end) .*Q.Pressi(Q.d_alti_Diff+1:end))./(kb * Q.Zmes2 .^2);
+% % A_Zi_an = (area .* OV_Zi(1:N1) .*R_tr_i(1:N1) .*Q.Pressi(1:N1))./(kb * Q.Zmes1 .^2);
+% % % B_Zi_an = (area .*R_tr_i(1:N1) .*Q.Pressi(1:N1))./(kb * Q.Zmes1 .^2); % No overlap
+% % 
+% % A_Zi_d = (area .* OV_Zi(N1+1:end) .*R_tr_i(N1+1:end) .*Q.Pressi(N1+1:end))./(kb * Q.Zmes2 .^2);
+% B_Zi_d = (area .*R_tr_i(N1+1:end) .*Q.Pressi(N1+1:end))./(kb * Q.Zmes2 .^2); % No overlap
 
 %% loading cross sections
 load('DiffCrossSections.mat');
@@ -41,11 +50,11 @@ Diff_JL_i = interp1(T,Diff_JL,Ti,'linear');
 CH = (Q.R).* CJL;
 CHa = (Q.Ra).* CJLa;
 
-JL = (CJL.*A_Zi .* Diff_JL_i)./(Ti);
-JH = (CH.* A_Zi .* Diff_JH_i)./(Ti);
+JL = (CJL.*A_Zi_d .* Diff_JL_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
+JH = (CH.* A_Zi_d .* Diff_JH_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
 
-JLa = (CJLa.*A_Zi .* Diff_JL_i)./(Ti);
-JHa = (CHa.* A_Zi .* Diff_JH_i)./(Ti);
+JLa = (CJLa.*A_Zi_an .* Diff_JL_i(1:N1) )./(Ti(1:N1) );
+JHa = (CHa.* A_Zi_an .* Diff_JH_i(1:N1) )./(Ti(1:N1) );
 
 
 
