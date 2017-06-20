@@ -3,7 +3,18 @@
 function [JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x)
 
 m = length(Q.Zret);
-% temperature
+% %     % retrieve CJH independtly 
+% % 
+% %     x_a = x(1:m);
+% %     BJH = x(m+1);
+% %     BJL = x(m+2);
+% %     CJL = x(m+3);
+% %     OV = x(m+4:end-4);
+% %     BJHa = x(end-3);
+% %     BJLa = x(end-2);
+% %     CJHa = x(end-1);
+% %     CJLa = x(end);
+
 x_a = x(1:m);
 BJH = x(m+1);
 BJL = x(m+2);
@@ -47,13 +58,13 @@ Diff_JL_i = interp1(T,Diff_JL,Ti,'linear');
 % toc
 
 
-CH = (Q.R).* CJL;
+CJH = (Q.R).* CJL;
 CHa = (Q.Ra).* CJLa;
 
-JL = (CJL.*A_Zi_d .* Diff_JL_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
-JH = (CH.* A_Zi_d .* Diff_JH_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
+JL = (CJL.* A_Zi_d .* Diff_JL_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
+JH = (CJH.* A_Zi_d .* Diff_JH_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
 
-JLa = (CJLa.*A_Zi_an .* Diff_JL_i(1:N1) )./(Ti(1:N1) );
+JLa = (CJLa.* A_Zi_an .* Diff_JL_i(1:N1) )./(Ti(1:N1) );
 JHa = (CHa.* A_Zi_an .* Diff_JH_i(1:N1) )./(Ti(1:N1) );
 
 
@@ -89,6 +100,8 @@ JH = JH  + BJH;
 
 JLa = JLa  + BJLa;
 JHa = JHa  + BJHa;
+
+return
 
  
 

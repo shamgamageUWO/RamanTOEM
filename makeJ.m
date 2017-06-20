@@ -72,7 +72,8 @@ Kb_JLa =  ones(n4,1);
             
 %% Analog            
             KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
-            KCLa22 = ((Q.Ra.*A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL); %% Note I have applied the cutoff for JH here
+            KCLa22 = ((Q.Ra.* A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
+%             KCHa = ((A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL); %% Note I have applied the cutoff for JH here
 %             KCLa = [KCLa22 KCLa11];
 %             KCL = KCL .* exp(logCJL); % this is done as I'm retrieving log of CJL now CJL 
 
@@ -122,6 +123,44 @@ end
 % 
 % J = [JJJH;JJJL;JJJHa;JJJLa];
 
+
+ % When retrieving CJH independtly
+ 
+% % % %     J_counts = Jc;
+% % % % 
+% % % %     J_JH = [Kb_JH;zeros(n2+n3+n4,1)];
+% % % % 
+% % % %     J_JL = [zeros(n1,1);Kb_JL;zeros(n3+n4,1)];
+% % % % 
+% % % %     KCL1 = [KCL22 KCL11];
+% % % %     KCL = [KCL1 zeros(1,n3+n4)];
+% % % % 
+% % % %     J_OV = JOV;
+% % % % 
+% % % %     J_JHa = [zeros(n1+n2,1);Kb_JHa;zeros(n4,1)];
+% % % % 
+% % % %     J_JLa = [zeros(n1+n2+n3,1);Kb_JLa];
+% % % % 
+% % % %     % KCLa1 = [KCLa22 KCLa11];
+% % % % 
+% % % %     KCHa = [zeros(1,n1+n2) KCHa zeros(1,n4)];
+% % % %     KCLa = [zeros(1,n1+n2+n3) KCLa];
+% % % % 
+% % % %     J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCHa' KCLa'];
+
+% figure;
+% subplot(1,2,1)
+% plot(J(1:n1,1:m),Q.Zmes./1000)
+% subplot(1,2,2)
+% plot(J(n1+1:end,1:m),Q.Zmes./1000)
+% 
+% figure;
+% subplot(1,2,1)
+% plot(JOV(1:n1,1:m),Q.Zmes./1000)
+% subplot(1,2,2)
+% plot(JOV(n1+1:end,1:m),Q.Zmes./1000)
+
+%% coupled analog
 J_counts = Jc;
 
 J_JH = [Kb_JH;zeros(n2+n3+n4,1)];
@@ -140,19 +179,8 @@ J_JLa = [zeros(n1+n2+n3,1);Kb_JLa];
 KCLa1 = [KCLa22 KCLa11];
 KCLa = [zeros(1,n1+n2) KCLa1];
 
+
+ 
 J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa'];
-
-% figure;
-% subplot(1,2,1)
-% plot(J(1:n1,1:m),Q.Zmes./1000)
-% subplot(1,2,2)
-% plot(J(n1+1:end,1:m),Q.Zmes./1000)
-% 
-% figure;
-% subplot(1,2,1)
-% plot(JOV(1:n1,1:m),Q.Zmes./1000)
-% subplot(1,2,2)
-% plot(JOV(n1+1:end,1:m),Q.Zmes./1000)
-
 
 

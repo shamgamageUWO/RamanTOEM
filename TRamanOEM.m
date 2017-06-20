@@ -39,6 +39,7 @@ end
 CJL = X.x(Q.OVlength+3);
 BJH = (X.x(Q.OVlength+1));
 BJL = (X.x(Q.OVlength+2));
+% CJHa = X.x(end-1);
 CJLa = X.x(end);
 BJHa = (X.x(end-2));
 BJLa = (X.x(end-1));
@@ -76,6 +77,9 @@ Q.BaJLa
 
 'OEM-CLa'
 CJLa
+
+'OEM-CHa'
+answ = (Q.Ra * CJLa)
 %CJL = exp(logCJL)
 
 % 'OEM-CH'
@@ -224,54 +228,56 @@ CJLa
 %                     %  ylabel('Altitude(km)')
 % 
 % %% Residual plots
-%                     figure;
-%                     subplot(2,1,1)
-%                     grid on;
-%                     % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes2(Q.ind)./1000)
-%                     plot(((y(1:n1) - X.yf(1:n1))./X.yf(1:n1)).*100 ,Q.Zmes2./1000)
-%                     hold on
-%                     plot(-(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r',(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r');
-%                     %plot(-(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r');
-% 
-%                     hold off
-%                     xlabel('JH digital counts residual(%)')
-%                     ylabel('Altitude (km)')
-% 
-%                     subplot(2,1,2)
-%                     grid on;
-%                     plot(((y(n1+1:end) - X.yf(n1+1:end))./X.yf(n1+1:end)).*100 ,Q.Zmes2./1000)
-%                     hold on;
-%                     plot(-(sqrt(yJL)./X.yf(n1+1:end)).*100,Q.Zmes2./1000,'r',(sqrt(yJL)./X.yf(n1+1:end)).*100,Q.Zmes2./1000,'r');
-%                     %plot(-(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r');
-% 
-%                     hold off
-%                     xlabel('JL digital counts residual(%)')
-%                     ylabel('Altitude (km)')
+                    figure;
+                    subplot(2,2,1)
+                    grid on;
+                    % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes2(Q.ind)./1000)
+                    plot(((y(1:n1) - X.yf(1:n1))./X.yf(1:n1)).*100 ,Q.Zmes2./1000)
+                    hold on
+                    plot(-(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r',(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r');
+                    %plot(-(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r');
 
-% 
-%                     subplot(2,2,1)
-%                     grid on;
-%                     % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes1(Q.ind)./1000)
-%                     plot(((y(n1+n2+1:n1+n2+n3) - X.yf(n1+n2+1:n1+n2+n3))./X.yf(n1+n2+1:n1+n2+n3)).*100 ,Q.Zmes1./1000)
-%                     hold on
-%                     plot(-(sqrt(yJHa)./X.yf(1:n1)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(1:n1)).*100,Q.Zmes1./1000,'r');
-%                     %plot(-(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r');
-% 
-%                     hold off
-%                     xlabel('JH - analog counts residual(%)')
-%                     ylabel('Altitude (km)')
-% 
-%                     subplot(2,2,2)
-%                     grid on;
-%                     plot(((y(n1+1:end) - X.yf(n1+1:end))./X.yf(n1+1:end)).*100 ,Q.Zmes1./1000)
-%                     hold on;
-%                     plot(-(sqrt(yJLa)./X.yf(n1+1:end)).*100,Q.Zmes1./1000,'r',(sqrt(yJLa)./X.yf(n1+1:end)).*100,Q.Zmes1./1000,'r');
-%                     %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
-% 
-%                     hold off
-%                     xlabel('JL - analog counts residual(%)')
-%                     ylabel('Altitude (km)')
-% 
+                    hold off
+                    xlabel('JH digital counts residual(%)')
+                    ylabel('Altitude (km)')
+
+                    subplot(2,2,2)
+                    grid on;
+                    plot(((y(n1+1:n1+n2) - X.yf(n1+1:n1+n2))./X.yf(n1+1:n1+n2)).*100 ,Q.Zmes2./1000)
+                    hold on;
+                    plot(-(sqrt(yJL)./X.yf(n1+1:n1+n2)).*100,Q.Zmes2./1000,'r',(sqrt(yJL)./X.yf(n1+1:n1+n2)).*100,Q.Zmes2./1000,'r');
+                    %plot(-(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r');
+
+                    hold off
+                    xlabel('JL digital counts residual(%)')
+                    ylabel('Altitude (km)')
+
+
+                    subplot(2,2,3)
+                    grid on;
+                    % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes1(Q.ind)./1000)
+                    plot(((y(n1+n2+1:n1+n2+n3) - X.yf(n1+n2+1:n1+n2+n3))./X.yf(n1+n2+1:n1+n2+n3)).*100 ,Q.Zmes1./1000)
+                    hold on
+%                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+                    plot(-(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+                    
+%plot(-(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r');
+
+                    hold off
+                    xlabel('JH - analog counts residual(%)')
+                    ylabel('Altitude (km)')
+
+                    subplot(2,2,4)
+                    grid on;
+                    plot(((y(n1+n2+n3+1:end) - X.yf(n1+n2+n3+1:end))./X.yf(n1+n2+n3+1:end)).*100 ,Q.Zmes1./1000)
+                    hold on;
+                    plot(-(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
+                    %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
+
+                    hold off
+                    xlabel('JL - analog counts residual(%)')
+                    ylabel('Altitude (km)')
+% (mchanA+1:2*mchanA))./y(mchanA+1:2*mchanA)
 %                     %% Percent difference of background, lidar calibration constant retrievals and the true
 % 
 %                     percent_BG_JH = ((Q.Bg_JH_real -BJH)./BJH).*100

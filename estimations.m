@@ -4,7 +4,8 @@ function [CJL, CJLa,OV] = estimations(Q)
 
 Zi = Q.Zmes;
 ind1 = Zi>=8000 & Zi< 10000;
-ind2 = Zi>=2500 & Zi< 4000;
+ind2 = Zi>=3000 & Zi< 3100;
+% ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Removing true background from the desaturated signal
@@ -12,11 +13,15 @@ SJH = Q.JHnew - Q.BaJH;
 SJL = Q.JLnew - Q.BaJL;
 SJHa = Q.JHnewa - Q.BaJHa;
 SJLa = Q.JLnewa - Q.BaJLa;
+% SJHa = Q.JHnewa;
+% SJLa = Q.JLnewa;
 
     OVa = ones(1,length(Q.Ta));
     Q.OVlength = length(OVa);
 
-    x = [Q.Ta 0 0 1 OVa 0 0 1];
+%     x = [Q.Ta 0 0 1 OVa 0 0 1 1]; Run this to retrieve CJH independently
+    x = [Q.Ta 0 0 1 OVa 0 0 1]; % coupled analog channels
+
 
     [JL,JH,JLa,JHa]=forwardmodelTraman(Q,x);
 
@@ -40,6 +45,8 @@ SJLa = Q.JLnewa - Q.BaJLa;
 %     
     JLawoOV = ((CJLa.*JLa));
     JHawoOV = ((Q.Ra.*CJLa.*JHa));
+%    JHawoOV = ((CJHa.*JHa));
+
 %     
 %     % It is now mean of the overlap as the a priori
 %     OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
@@ -51,15 +58,16 @@ SJLa = Q.JLnewa - Q.BaJLa;
 %     OVzd = (OVz1d+OVz2d)./2;
 %     OVzd = smooth(OVzd,5);
 %     
-%     OVza = (OVz1a+OVz2a)./2;
-    OVz1a = smooth(OVz1a,100);
+    OVza = (OVz1a+OVz2a)./2;
+    OVza = smooth(OVza,100);
 %     
 %     OVz = [OVza;OVzd]; 
-     OV = interp1(Q.Zmes1,OVz1a,Q.Zret); % this is to smooth
+     OV = interp1(Q.Zmes1,OVza,Q.Zret); % this is to smooth
      OV(isnan(OV))=1;
     OV(OV>=1)=1;
-    h = find(OV==1);
-    OV(h(1):end)=1;
+%     h = find(Q.Zret>=4500);
+% %     h = find(OV==1);
+%     OV(h(1):end)=1;
 %  plot(Q.Zret./1000,OV,'y')
 % hold off;
 % legend('Before interpolation','After interpolation','Final OV smoothed')

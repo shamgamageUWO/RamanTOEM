@@ -214,7 +214,8 @@ Alt = JHazc;
 %   legend('JL','JH')
 % Save in a new mat file
 bkg_ind1 = alt>50e3;% & alt<60e3;
-bkg_ind2 = Alt>8e3 & Alt< 10e3;
+bkg_ind2 = Alt>3.5e3 & Alt<4e3;
+bkg_ind3 = Alt>3.5e3 & Alt<4e3;
 % [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
 % [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
 
@@ -225,7 +226,7 @@ bkg_Eb = Eb(bkg_ind1);
 
 
 bkg_JLan = JL_an(bkg_ind2);
-bkg_JHan = JH_an(bkg_ind2);
+bkg_JHan = JH_an(bkg_ind3);
 bkg_Eban = Eb_an(bkg_ind2);
 
 % JLnew = JL-bkg_JL;
@@ -245,13 +246,13 @@ bg_length1 = length(bkg_JH);
 bg_length2 = length(bkg_JL);
 
 %% Analog
-bg_JLan_std = std(bkg_JLan);
-bg_JHan_std = std(bkg_JHan);
-bg_JLan_v = var(bkg_JLan);
-bg_JHan_v= var(bkg_JHan);
-bg_JLan = nanmean(bkg_JLan);
-bg_JHan = nanmean(bkg_JHan);
-bg_Eban= nanmean(bkg_Eban);
+bg_JLan_std = std(bkg_JLan-10);
+bg_JHan_std = std(bkg_JHan-10);
+bg_JLan_v = var(bkg_JLan-10);
+bg_JHan_v= var(bkg_JHan-10);
+bg_JLan = nanmean(bkg_JLan-10);
+bg_JHan = nanmean(bkg_JHan-10);
+bg_Eban= nanmean(bkg_Eban-10);
 
 bg_length1an = length(bkg_JHan);
 bg_length2an = length(bkg_JLan);
