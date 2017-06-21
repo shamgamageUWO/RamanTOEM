@@ -47,11 +47,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=100);
+Q.Eb = Eb(alt>=1000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=100);
-Q.JLnew= JLnew(alt>=100);
-Q.alt = alt(alt>=100);
+Q.JHnew= JHnew(alt>=1000);
+Q.JLnew= JLnew(alt>=1000);
+Q.alt = alt(alt>=1000);
 disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
