@@ -47,11 +47,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=60);
+Q.Eb = Eb(alt>=100);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=60);
-Q.JLnew= JLnew(alt>=60);
-Q.alt = alt(alt>=60);
+Q.JHnew= JHnew(alt>=100);
+Q.JLnew= JLnew(alt>=100);
+Q.alt = alt(alt>=100);
 disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -117,7 +117,7 @@ Q.Bg_JH_real = Bg_JH_real; % revisit
 Q.Bg_JL_real = Bg_JL_real;
 Q.BaJL = Q.Bg_JL_real;%0.297350746852139; % change later
 Q.BaJH = Q.Bg_JH_real;%4.998109499057194e-04;
-Q.CovCL = (0.01 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (0.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
             %%%Q.CovCL = (0.01 .* log(Q.CL)).^2;%sqrt(Q.CL);
 
@@ -198,7 +198,7 @@ Q.y = [JHreal JLreal]';
 % % h2 = Q.Zmes(indi2)
 
         for i = 1: length(Q.JLv)
-            if Q.Zmes(i) <= 6000
+            if Q.Zmes(i) <= 8000
                 YY(i) = Q.JLv(i);
             else
                 YY(i) = smmohtenJL(i);
@@ -206,7 +206,7 @@ Q.y = [JHreal JLreal]';
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes(i) <= 6000
+            if  Q.Zmes(i) <= 8000
                 YYY(i) = Q.JHv(i);
             else
                 YYY(i) = smmohtenJH(i);

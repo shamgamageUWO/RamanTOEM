@@ -11,7 +11,7 @@ alt = Q.alt;
 
 
 Zi= alt';
-Q.Zmes = Zi(Zi>60);
+Q.Zmes = Zi(Zi>100);
 % Sonde profile is needed here
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(date_in,time_in);
 % T = interp1(Zsonde,Tsonde,Q.Zmes,'linear');

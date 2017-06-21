@@ -74,7 +74,7 @@ ylabel('Altitude(km)')
 subplot(1,2,2)
 plot(X.J(Q.n1+1:n,1:m),Q.Zmes./1000)
 xlabel('Jacobian-JL')
-ylabel('Altitude(km)')
+ylabel('Altitude (km)')
 
 response = sum(X.A(1:m,1:m));
 % Vertical resolution
@@ -99,13 +99,13 @@ plot(response,Q.Zret./1000,'r')
 % plot(X.A(1:m,1:m).*unit,Q.Zret./1000) 
 hold off;
 xlabel('Avgeraging Kernels')
-ylabel('Altitude(km)')
+ylabel('Altitude (km)')
 
 subplot(1,2,2)
 plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
 grid on;
 xlabel('Vertical Resolution (km)')
-ylabel('Altitude(km)')
+ylabel('Altitude (km)')
 % 
  err = X.e(1:m);
  upper = err+ X.x(1:m);
