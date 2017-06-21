@@ -214,8 +214,8 @@ Alt = JHazc;
 %   legend('JL','JH')
 % Save in a new mat file
 bkg_ind1 = alt>50e3;% & alt<60e3;
-bkg_ind2 = Alt>3.5e3 & Alt<4e3;
-bkg_ind3 = Alt>3.5e3 & Alt<4e3;
+bkg_ind2 = Alt>8e3 & Alt<12e3;
+bkg_ind3 = Alt>8e3 & Alt<12e3;
 % [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
 % [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
 
@@ -225,9 +225,9 @@ bkg_JH = JH(bkg_ind1);
 bkg_Eb = Eb(bkg_ind1);
 
 
-bkg_JLan = JL_an(bkg_ind2);
-bkg_JHan = JH_an(bkg_ind3);
-bkg_Eban = Eb_an(bkg_ind2);
+bkg_JLan = JL_an(bkg_ind1);
+bkg_JHan = JH_an(bkg_ind1);
+bkg_Eban = Eb_an(bkg_ind1);
 
 % JLnew = JL-bkg_JL;
 % JHnew = JH-bkg_JH;
@@ -246,10 +246,10 @@ bg_length1 = length(bkg_JH);
 bg_length2 = length(bkg_JL);
 
 %% Analog
-bg_JLan_std = std(bkg_JLan-10);
-bg_JHan_std = std(bkg_JHan-10);
-bg_JLan_v = var(bkg_JLan-10);
-bg_JHan_v= var(bkg_JHan-10);
+bg_JLan_std = std(bkg_JLan)-10;
+bg_JHan_std = std(bkg_JHan)-10;
+bg_JLan_v = var(bkg_JLan);
+bg_JHan_v= var(bkg_JHan);
 bg_JLan = nanmean(bkg_JLan-10);
 bg_JHan = nanmean(bkg_JHan-10);
 bg_Eban= nanmean(bkg_Eban-10);
@@ -257,7 +257,19 @@ bg_Eban= nanmean(bkg_Eban-10);
 bg_length1an = length(bkg_JHan);
 bg_length2an = length(bkg_JLan);
 %%
-
+%    findBH = find(zzN > zHback);
+%     backHA = mean(SHcoaddA(findBH(1):end)-in.Aoffset);
+%     findBN = find(zzN > zNback);
+%     backNA = mean(SNcoaddA(findBN(1):end)-in.Aoffset);
+%     if in.varAVA
+%         backVarHA = (std(SHcoaddA(findBH(1):end)-in.Aoffset)...
+%          ./ sqrt(length(SHcoaddA(findBH(1):end)))).^2;
+%         backVarNA = (std(SNcoaddA(findBN(1):end)-in.Aoffset)...
+%          ./ sqrt(length(SNcoaddA(findBN(1):end)))).^2;
+%     else
+%         backVarHA = (std(SHcoaddA(findBH(1):end)-in.Aoffset)).^2;
+%         backVarNA = (std(SNcoaddA(findBN(1):end)-in.Aoffset)).^2;
+%     end
 % JLanwithoutBG = JL_an-bg_JLan;
 % JHanwithoutBG = JH_an-bg_JHan;
 % EbanwithoutBG = Eb_an-bg_Eban;

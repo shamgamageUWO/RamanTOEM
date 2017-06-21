@@ -4,9 +4,9 @@ function [CJL, CJLa,OV] = estimations(Q)
 
 Zi = Q.Zmes;
 ind1 = Zi>=8000 & Zi< 10000;
-ind2 = Zi>=3000 & Zi< 3100;
+ind2 = Zi>=1500 & Zi< 1700;
 % ind3 = Zi
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Removing true background from the desaturated signal
 SJH = Q.JHnew - Q.BaJH;
@@ -60,7 +60,7 @@ SJLa = Q.JLnewa - Q.BaJLa;
 %     
     OVza = (OVz1a+OVz2a)./2;
     OVza = smooth(OVza,100);
-%     
+     OVza(OVza>=1)=1;
 %     OVz = [OVza;OVzd]; 
      OV = interp1(Q.Zmes1,OVza,Q.Zret); % this is to smooth
      OV(isnan(OV))=1;

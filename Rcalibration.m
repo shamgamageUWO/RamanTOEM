@@ -31,8 +31,10 @@ x = [Tsonde' 0 0 1 OVa 0 0 1]; % coupled analog
 
 %% Digital
 [JL,JH,JLa,JHa,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
+% altitude corrected for the sonde
+Alt = Q.Zmes2 + 491;
+ind1 = Alt >= 8000 & Alt< 10000;
 
-ind1 = Q.Zmes2 >= 8000 & Q.Zmes2< 10000;
 x = (JH(ind1)./JL(ind1));
 y = JHnew(ind1)./JLnew(ind1);
 
@@ -41,7 +43,8 @@ fit3 = fit(x',y,f,'Robust','on');
 R = fit3(1);
 
 % %% analog
-ind2 = Q.Zmes1 >= 2000 & Q.Zmes1 <= 2100;
+Alt2 = Q.Zmes1 + 491;
+ind2 = Alt2 >= 2000 & Alt2 <= 2100;
 xa = (JHa(ind2)./JLa(ind2));
 ya = JHnewa(ind2)./JLnewa(ind2);
 

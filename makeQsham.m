@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 5;
+Q.coaddalt = 2;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -48,11 +48,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=4000);
+Q.Eb = Eb(alt>=5000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=4000);
-Q.JLnew= JLnew(alt>=4000);
-Q.alt = alt(alt>=4000);
+Q.JHnew= JHnew(alt>=5000);
+Q.JLnew= JLnew(alt>=5000);
+Q.alt = alt(alt>=5000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -65,13 +65,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=80 & ANalt <= 4000);
+Q.Eba = Eba(ANalt>=80 & ANalt <= 5000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=80 & ANalt <= 4000);
-Q.JLnewa= JLnewa(ANalt>=80 & ANalt <= 4000);
+Q.JHnewa= JHnewa(ANalt>=80 & ANalt <= 5000);
+Q.JLnewa= JLnewa(ANalt>=80 & ANalt <= 5000);
 Q.ANalt = ANalt(ANalt>=80);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=80 & ANalt <= 4000);
+Q.Zmes1 = ANalt(ANalt>=80 & ANalt <= 5000);
 Q.Zmes1 = Q.Zmes1';
 
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -162,16 +162,18 @@ Q.Ra = 1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM 
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
-% load('estimated_overlap_and_Cvalues.mat');
- [CJL, CJLa,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+
+[CJL, CJLa,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+%  load('ovmodeldata.mat');
+%  OVnw = interp1(Q.Zmes,ov,Q.Zret,'linear');
 Q.OVa = OV;%ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (0.5 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (0.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = CJLa;
-Q.CovCLa = (0.5 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
 % Q.CovCHa = (0.5 .* (Q.CHa)).^2;%sqrt(Q.CL);
 
@@ -250,7 +252,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             Q.JLav = [ar3 JLav ar4];
             
             for i = 1: length(Q.JLav)
-                if Q.Zmes2(i) <= 4000
+                if Q.Zmes2(i) <= 6000
                     Q.YYa(i) = Q.JLav(i);
                 else
                     Q.YYa(i) = 30.*Q.JLav(i);
@@ -258,7 +260,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             end
             
             for i = 1: length(Q.JHav)
-                if  Q.Zmes2(i) <= 4000
+                if  Q.Zmes2(i) <= 6000
                     Q.YYYa(i) = Q.JHav(i);
                 else
                     Q.YYYa(i) = 30.*Q.JHav(i);
@@ -268,7 +270,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 4000
+            if Q.Zmes2(i) <= 6000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = smmohtenJL(i);
@@ -276,7 +278,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 4000
+            if  Q.Zmes2(i) <= 6000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = smmohtenJH(i);
