@@ -34,7 +34,9 @@ Sa_CL = [zeros(1,length(S_aT)+2) Q.CovCL zeros(1,length(Q.OVa))]; %% even here I
 % SaOV = diag(Q.CovOV);
 
 % Tent function for OV cov
-[Sa_OV]=OVCov(Q.Zret,Q.OVa);
+ [Sa_OV]=OVCov(Q.Zret,Q.OVa);
+%  SOV = (0.01* Q.OVa).^2;
+%  Sa_OV = diag(SOV);
 % Sa_OV = eye(length(Q.OV));
 Sa_OV = [B Sa_OV];
 % Sa_CH = [zeros(1,length(S_aT)+3) Q.CovCH];

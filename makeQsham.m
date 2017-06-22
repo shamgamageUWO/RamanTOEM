@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 2;
+Q.coaddalt = 4;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -47,17 +47,17 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=1000);
+Q.Eb = Eb(alt>=1500);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=1000);
-Q.JLnew= JLnew(alt>=1000);
-Q.alt = alt(alt>=1000);
+Q.JHnew= JHnew(alt>=1500);
+Q.JLnew= JLnew(alt>=1500);
+Q.alt = alt(alt>=1500);
 disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
 Q.Zmes = Q.alt';% Measurement grid
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:70000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*40:70000;% Retrieval grid
 disp('Defined grids ')
 
 
@@ -102,22 +102,25 @@ Q.alpha_aero = alphaAer;
 Q.Tr = Total_Transmission(Q);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-[R,aa,bb] = Rcalibration(Q); 
-Q.aa= aa;
-Q.bb =bb;
-Q.R = R;%R;%0.17;
+% [R,aa,bb] = Rcalibration(Q); 
+% Q.aa= aa;
+% Q.bb =bb;
+% Q.R = R;%R;%0.17;
+Q.aa= 0.4981;
+Q.bb =408.6183;
+Q.R = 0.7913;%R;%0.17;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 [CJL, CJH,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length1,bg_length2,OV] = estimations(Q);
-Q.OVa = OV;
+Q.OVa = ones(1,length(OV));%OV;
 Q.OVlength = length(Q.OVa);
 Q.CL = CJL;%(2.9e+18);
 Q.Bg_JH_real = Bg_JH_real; % revisit
 Q.Bg_JL_real = Bg_JL_real;
 Q.BaJL = Q.Bg_JL_real;%0.297350746852139; % change later
 Q.BaJH = Q.Bg_JH_real;%4.998109499057194e-04;
-Q.CovCL = (0.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (0.5 .* (Q.CL)).^2;%sqrt(Q.CL);
 
             %%%Q.CovCL = (0.01 .* log(Q.CL)).^2;%sqrt(Q.CL);
 
@@ -142,32 +145,33 @@ JLreal(JLreal<=0)= rand();
 
 smmohtenJH = smooth(JHreal,100); % smoothing covariance to smooth the envelop cover
 smmohtenJL = smooth(JLreal,100);
-% ysmoothen= [smmohtenJH' smmohtenJL']';
+ysmoothen= [smmohtenJH' smmohtenJL']';
 Q.y = [JHreal JLreal]';
-% Q.yvar = diag(ysmoothen);
+
+Q.yvar = diag(ysmoothen);
 
 
 % Variance need to be fixed as below: 
 % below 2 km use the Var from the piecewise code
 % above 2 km use the counts
 
-% Q.yvar = diag(Q.y);
-            [JHv,go] =bobpoissontest(JHreal,Q.Zmes);
-            [JLv,go] =bobpoissontest(JLreal,Q.Zmes);
-%             r1 = interp1(JHv, -3:0, 'linear', 'extrap');
+% % Q.yvar = diag(Q.y);
+%             [JHv,go] =bobpoissontest(JHreal,Q.Zmes);
+%             [JLv,go] =bobpoissontest(JLreal,Q.Zmes);
+% %             r1 = interp1(JHv, -3:0, 'linear', 'extrap');
+% %             r2 = ones(1,go-1).* JHv(end);
+% %             r3 = JLreal(1:go-1);
+% %             r4 = ones(1,go-1).* JLv(end);
+% % r1 = interp1(JHv, -(go-2):0, 'linear', 'extrap');
+% % r2 = interp1(JHv, JHv(end):go-1, 'linear', 'extrap');
+% % r3 = interp1(JLv, -(go-2):0, 'linear', 'extrap');
+% % r4 = interp1(JLv, JLv(end):go-1, 'linear', 'extrap');
+%             r1 = ones(1,go-1).* JHv(1);
 %             r2 = ones(1,go-1).* JHv(end);
-%             r3 = JLreal(1:go-1);
+%             r3 = ones(1,go-1).* JLv(1);
 %             r4 = ones(1,go-1).* JLv(end);
-% r1 = interp1(JHv, -(go-2):0, 'linear', 'extrap');
-% r2 = interp1(JHv, JHv(end):go-1, 'linear', 'extrap');
-% r3 = interp1(JLv, -(go-2):0, 'linear', 'extrap');
-% r4 = interp1(JLv, JLv(end):go-1, 'linear', 'extrap');
-            r1 = ones(1,go-1).* JHv(1);
-            r2 = ones(1,go-1).* JHv(end);
-            r3 = ones(1,go-1).* JLv(1);
-            r4 = ones(1,go-1).* JLv(end);
-            Q.JHv = [r1 JHv r2];
-            Q.JLv = [r3 JLv r4];
+%             Q.JHv = [r1 JHv r2];
+%             Q.JLv = [r3 JLv r4];
 % figure;plot(Q.JLv,Q.Zmes./1000,'r',JLreal,Q.Zmes./1000,'b')
 % xlabel('Log of Variance')
 % ylabel('Alt(km)')
@@ -197,25 +201,34 @@ Q.y = [JHreal JLreal]';
 % % indi2 = k2(1);
 % % h2 = Q.Zmes(indi2)
 
-        for i = 1: length(Q.JLv)
-            if Q.Zmes(i) <= 8000
-                YY(i) = Q.JLv(i);
-            else
-                YY(i) = smmohtenJL(i);
-            end
-        end
+%         for i = 1: length(Q.JLv)
+%             if Q.Zmes(i) <= 4000
+%                 YY(i) = Q.JLv(i);
+%             else
+%                 YY(i) = smmohtenJL(i);
+%             end
+%         end
+% 
+%         for i = 1: length(Q.JHv)
+%             if  Q.Zmes(i) <= 4000
+%                 YYY(i) = Q.JHv(i);
+% %             else
+% %                 YYY(i) = smmohtenJH(i);
+% %             end
+% %         end
+% 
+       
 
-        for i = 1: length(Q.JHv)
-            if  Q.Zmes(i) <= 8000
-                YYY(i) = Q.JHv(i);
-            else
-                YYY(i) = smmohtenJH(i);
-            end
-        end
-
-        Q.Yvar =[YYY YY];
+%           Q.Yvar =[smmohtenJH;smmohtenJL];
+% %         for ii = 1:length(Q.y)
+% %             if Q.y(ii) <= 15
+% %                 Q.Yvar(ii)=15;
+% %                 Q.y(ii)=Q.y(ii)+randn(1)*sqrt(Q.Yvar(ii));
+% %             end
+% %         end
+%     Q.yvar = diag(Q.Yvar);    
 %         Q.Yvar =[JHreal JLreal];
-      Q.yvar = diag(Q.Yvar);
+%     Q.yvar = diag(Q.Yvar);
 % figure;semilogx(Q.Yvar(length(Q.JLv)+1:end),Q.Zmes./1000,'r',JLreal,Q.Zmes./1000,'b')
 % xlabel('Log of Variance')
 % ylabel('Alt(km)')

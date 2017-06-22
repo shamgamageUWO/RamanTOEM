@@ -54,8 +54,8 @@ R_tr_i = (Q.Tr);
 
 % Define the first part of the equation 
 
-A_Zi = (area .* OV_Zi .*R_tr_i .*Q.Pressi)./(kb * Q.Zmes .^2);
-B_Zi = (area .*R_tr_i .*Q.Pressi)./(kb * Q.Zmes .^2); % No overlap
+A_Zi = ( OV_Zi .*R_tr_i .*Q.Pressi)./(kb * Q.Zmes .^2);
+B_Zi = ( R_tr_i .*Q.Pressi)./(kb * Q.Zmes .^2); % No overlap
 
 % % Differential cross section term 
 

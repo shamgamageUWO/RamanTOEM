@@ -1,6 +1,6 @@
 function [VarA,go] =bobpoissontest(Counts,alt)
 lzDA = length(Counts);
-go = 8; %12; %24
+go = 4; %12; %24
 stop = go-1;
 % j = 0;
 zCountsA = alt;

@@ -11,7 +11,9 @@ alt = Q.alt;
 
 
 Zi= alt';
-Q.Zmes = Zi(Zi>1000);
+
+Znew = Zi+ 491;% sonde alti correction
+
 % Sonde profile is needed here
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(date_in,time_in);
 % T = interp1(Zsonde,Tsonde,Q.Zmes,'linear');
@@ -31,7 +33,7 @@ x = [Tsonde' 0 0 1 OVa];
 
                 %x = [Tsonde' 0 0 log(1) OVa];
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
-ind = Q.Zmes > 8000 & Q.Zmes< 10000;
+ind = Znew > 8000 & Znew < 10000;
 x = (JH(ind)./JL(ind));
 y = JHnew(ind)./JLnew(ind);
 
@@ -42,9 +44,9 @@ R = fit3(1);
 % % %%%%%% Calibration for traditional method
 lnQ = log(JHnew./JLnew);
 yy = Ti;
-yy = yy(Q.Zmes>=2000 & Q.Zmes<=20000);
+yy = yy(Znew>=2000 & Znew<=20000);
 xx = lnQ;
-xx = xx(Q.Zmes>=2000 & Q.Zmes<=20000);
+xx = xx(Znew>=2000 & Znew<=20000);
 g = fittype('b/(a-x)','coeff',{'a','b'});
 fit34 = fit(xx,yy',g,'Robust','on','Startpoint', [0 0]);
 s= coeffvalues(fit34);
