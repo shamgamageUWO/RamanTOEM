@@ -25,7 +25,7 @@ end
 n1=Q.n1; %length JH
 n2=Q.n2; %length JL
 n = n1+n2;
-
+N = 2*m + 4;
 yf = [JH JL]';
 
 % Temperature Jacobian 
@@ -42,16 +42,16 @@ end
 
 %% BG jacobians Analytical 
 % ones need to be multiplied by the deadtime term: refer notes 
-Kb_JH = (((1-Q.deadtime.*JL).^2))'; %ones(n1,1).* 
-Kb_JL =  (((1-Q.deadtime.*JH).^2))'; %ones(n2,1).*
+Kb_JH = (((1-x(end).*JL).^2))'; %ones(n1,1).* 
+Kb_JL =  (((1-x(end).*JH).^2))'; %ones(n2,1).*
 %zeros(n-n2,1)]; % fix the lengths
 
 % Jacobian for CL
 % Analytical Method Using R and the deadtime term should be included
 % OV = x(end+1-(Q.OVlength):end);
 %             KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);
-            KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);%.*exp(logCJL);
-            KCL22 = ((Q.R.*A_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
+            KCL11 = ((A_Zi.*Diff_JL_i)./Ti).*((1-x(end).*JL).^2);%.*exp(logCJL);
+            KCL22 = ((Q.R.*A_Zi.*Diff_JH_i)./Ti).*((1-x(end).*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
             KCL= [KCL22 KCL11];
 %             KCL = KCL .* exp(logCJL); % this is done as I'm retrieving log of CJL now CJL 
 
@@ -77,9 +77,9 @@ Kb_JL =  (((1-Q.deadtime.*JH).^2))'; %ones(n2,1).*
 
 % OV analytical
 JOV = zeros(n,m);
-
+% [dSHdxA,dSNdxA,dSHdx,dSNdx] = derivSHSN2(Q,x,n-5,@forwardModelWV);
 for j = 1:m 
-    [dOVJH,dOVJL] = deriCountsOV(j,Q,x,@forwardmodelTraman);
+    [dOVJH,dOVJL] = deriCountsOV(N-1,Q,x,@forwardmodelTraman);
     
    JOV(1:n1,j) = dOVJH;
    JOV(n1+1:n,j) = dOVJL;
@@ -87,12 +87,23 @@ for j = 1:m
 % disp('ok')
 end
 
+%% Deadtime jacobian
+% JDT = zeros(n,m);
+% 
+% for j = 1:m 
+  [dDTJH,dDTJL] = deriCountsDT(N,Q,x,@forwardmodelTraman);
+  JDT= [dDTJH dDTJL];
+%    JDT(1:n1,j) = dDTJH;
+%    JDT(n1+1:n,j) = dDTJL;
+% j
+% disp('ok')
+% end
 %% Final Jacobian
 % JJ = [ J(1:n,1:m) Kb_JL zeros(n,1);J(n+1:2*n,1:m) zeros(n,1) Kb_JH];last
 % working version
 JJ = [ J(1:n1,1:m) Kb_JH zeros(n1,1);J(n1+1:n,1:m) zeros(n2,1) Kb_JL];
 
- J = [JJ KCL' JOV];
+ J = [JJ KCL' JOV JDT'];
 
 % figure;
 % subplot(1,2,1)

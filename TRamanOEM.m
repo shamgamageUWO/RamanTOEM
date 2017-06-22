@@ -23,9 +23,10 @@ if ~O.linear
     end
 end
 
-CJL = X.x(end-Q.OVlength);
- BJH = (X.x(end-Q.OVlength-2));
- BJL = (X.x(end-Q.OVlength-1));
+CJL = X.x(end-Q.OVlength-1);
+BJH = (X.x(end-Q.OVlength-3));
+BJL = (X.x(end-Q.OVlength-2));
+DT = (X.x(end));
   
 'X.cost'
 X.cost
@@ -44,6 +45,9 @@ Q.Bg_JL_real
 
 'OEM-CL'
 CJL
+
+'Dead Time'
+DT
 %CJL = exp(logCJL)
 
 % 'OEM-CH'
@@ -142,7 +146,7 @@ ylabel('Altitude(km)')
  
  figure;
 subplot(1,2,1)
-plot(Q.OVa,Q.Zret./1000,'g',X.x(end+1-Q.OVlength:end),Q.Zret./1000,'r')
+plot(Q.OVa,Q.Zret./1000,'g',X.x(end-Q.OVlength:end-1),Q.Zret./1000,'r')
 grid on;
 xlabel('OV')
 ylabel('Altitude(km)')
@@ -152,7 +156,7 @@ legend('OV a priori','OV OEM')
 %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
  subplot(1,2,2)
- plot((((-Q.OVa')+X.x(end+1-Q.OVlength:end) )./X.x(end+1-Q.OVlength:end)).*100,Q.Zret./1000)
+ plot((((-Q.OVa')+X.x(end-Q.OVlength:end-1) )./X.x(end-Q.OVlength:end-1)).*100,Q.Zret./1000)
  grid on;
  xlabel('OV residuals(OV OEM - OV a priori) (%)')
 %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)

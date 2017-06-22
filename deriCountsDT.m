@@ -1,4 +1,4 @@
-    function [dOVJH,dOVJL] = deriCountsOV(j,Q,x,forwardmodelTraman)
+    function [dDTJH,dDTJL] = deriCountsDT(j,Q,x,forwardmodelTraman)
 
     [y_JL,y_JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,x);
 
@@ -6,20 +6,15 @@
         'after FM: Nans in retrieval vector derivCounts'
         stop
     end
-%     m=length(Q.Zret);
-%     xa=x(1:m);
-    dn = x(j).*1e-4; % this can go anything smaller than 0.1 even for higher temperatures works ok
-    xpert = x;
-    if x(j) == 0 % trap for tau's where tau(1) = 0
-        dn = 1.e-4 .* x(j+1);
-    end
-    xpert(j) = x(j) + dn;
-%     Xpert= [xpert x(end-2) x(end-1) x(end)];
+    
+dn = 1e-4 .* x(j);
+xpert = x;
+xpert(j) = x(j) + dn;
 
     [y_JL_dT,y_JH_dT,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,xpert);
 
-    dOVJL = (y_JL_dT - y_JL)./dn;
-    dOVJH = (y_JH_dT - y_JH)./dn;
+    dDTJL = (y_JL_dT - y_JL)./dn;
+    dDTJH = (y_JH_dT - y_JH)./dn;
 
     return
 

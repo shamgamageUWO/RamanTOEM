@@ -3,13 +3,12 @@
 function [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x)
 % crosssection 
 % DiffInput  = Diff_cross_fun;
- m = length(Q.Zret);
- 
+m = length(Q.Zret);
  % temperature
  x_a = x(1:m);
- 
+ DT = x(end);
  % defining OV Q.OVlength  
- OV = x(end+1-(Q.OVlength):end);
+ OV = x(end-(Q.OVlength):end-1);
 % Ti = interp1(Q.Zret,x(1:m),Q.Zmes,'linear'); % T on data grid (digital)
 Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear'); % T on data grid (digital)
 OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
@@ -76,7 +75,7 @@ Diff_JH_i = interp1(T,Diff_JH,Ti,'linear');
 Diff_JL_i = interp1(T,Diff_JL,Ti,'linear');
 % toc
 
-CJL = x(end-Q.OVlength);
+CJL = x(end-(Q.OVlength+1));
 CH = (Q.R).* CJL;
 JL = (CJL.*A_Zi .* Diff_JL_i)./(Ti);
 JH = (CH.* A_Zi .* Diff_JH_i)./(Ti);
@@ -99,9 +98,9 @@ Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
         JLnw = (JL.*Q.f);
         
         % 3. Apply DT
-        JL_dtc = JLnw ./ (1 + JLnw.*(Q.deadtime)); % non-paralyzable
+        JL_dtc = JLnw ./ (1 + JLnw.*( DT )); % non-paralyzable
         % JL = JL .* exp(-JLnw.*(4e-9)); % paralyzable %units is counts
-        JH_dtc = JHnw ./ (1 + JHnw.*(Q.deadtime));
+        JH_dtc = JHnw ./ (1 + JHnw.*( DT ));
           % 4. Convert to counts
            JL = JL_dtc.*(1./Q.f);
            JH = JH_dtc.*(1./Q.f);
@@ -110,8 +109,8 @@ Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
        JH = JH.*(Q.deltatime.*Q.coaddalt);
        
  % Add background to the counts 
-JL = JL  + (x(end-Q.OVlength-1));
-JH = JH  + (x(end-Q.OVlength-2));
+JL = JL  + (x(end-Q.OVlength-2));
+JH = JH  + (x(end-Q.OVlength-3));
  
 
 

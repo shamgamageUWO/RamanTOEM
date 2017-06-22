@@ -19,17 +19,17 @@ iter = 1;
 % %xa
                    %%% x_a = [Q.Ta (Q.BaJH) (Q.BaJL) log(Q.CL) Q.OVa]; % now im retrieving log of CJL
 
- x_a = [Q.Ta (Q.BaJH) (Q.BaJL) (Q.CL) Q.OVa]; % now im retrieving log of CJL
+ x_a = [Q.Ta (Q.BaJH) (Q.BaJL) (Q.CL) Q.OVa Q.deadtime]; % now im retrieving log of CJL
  
 % S_a and S_ainv
 [S_aT]=TestTempCov(Q.Zret,Q.Ta);
-Sa_BG_JH = [zeros(1,length(S_aT)) (Q.CovBJH)  zeros(1,length(Q.OVa)+2)]';
-Sa_BG_JL = [zeros(1,length(S_aT)+1) (Q.CovBJL) zeros(1,length(Q.OVa)+1)]';
+Sa_BG_JH = [zeros(1,length(S_aT)) (Q.CovBJH)  zeros(1,length(Q.OVa)+3)]';
+Sa_BG_JL = [zeros(1,length(S_aT)+1) (Q.CovBJL) zeros(1,length(Q.OVa)+2)]';
 empTy= zeros(1,length(S_aT));
-B = repmat(empTy',1,length(Q.OVa)+3);
+B = repmat(empTy',1,length(Q.OVa)+4);
 Sa_Tnew = [S_aT B];
 % Sa_Tnew = [S_aT empTy' empTy' empTy'];
-Sa_CL = [zeros(1,length(S_aT)+2) Q.CovCL zeros(1,length(Q.OVa))]; %% even here I have changed to the log version
+Sa_CL = [zeros(1,length(S_aT)+2) Q.CovCL zeros(1,length(Q.OVa)+1)]; %% even here I have changed to the log version
 % Sa_OV = [zeros(1,length(S_aT)+3) Q.CovOV ];
 % SaOV = diag(Q.CovOV);
 
@@ -39,9 +39,15 @@ Sa_CL = [zeros(1,length(S_aT)+2) Q.CovCL zeros(1,length(Q.OVa))]; %% even here I
 %  Sa_OV = diag(SOV);
 % Sa_OV = eye(length(Q.OV));
 Sa_OV = [B Sa_OV];
+
+
+Cov_DT = (0.5.*Q.deadtime).^2; % deadtime covarriavce
+
+Sa_DT = [zeros(1,2*length(S_aT)+3) Cov_DT];
+
 % Sa_CH = [zeros(1,length(S_aT)+3) Q.CovCH];
 % Sa_CL = [zeros(1,length(S_aT)+2) Q.CovCsum];
-S_a = [Sa_Tnew' Sa_BG_JH Sa_BG_JL Sa_CL' Sa_OV'];
+S_a = [Sa_Tnew' Sa_BG_JH Sa_BG_JL Sa_CL' Sa_OV' Sa_DT'];
 % S_ainv = S_a^(-1);
 
 %Se and S_einv
@@ -54,7 +60,7 @@ Se = Q.yvar;
 %   [R,yf,J] = makeJ(Q, R, x_a, iter);
  
   
-% [R,yf,J]  = feval( @makeJ, Q, R, x_a, iter );
+  [R,yf,J]  = feval( @makeJ, Q, R, x_a, iter );
 
 disp('All inputs ready for OEM.m ')
 end 
