@@ -171,6 +171,9 @@ grid on;
 % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes(Q.ind)./1000)
 plot(((y(1:n1) - X.yf(1:n1))./X.yf(1:n1)).*100 ,Q.Zmes./1000)
 hold on
+% foo = find(yJH > 15);
+% pltfoo = yJH(foo);
+% zpltfoo = Q.Zmes(foo);
 % plot(-(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes./1000,'r',(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes./1000,'r');
 plot(-(1./sqrt(yJH)).*100,Q.Zmes./1000,'r',(1./sqrt(yJH)).*100,Q.Zmes./1000,'r');
 

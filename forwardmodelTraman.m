@@ -49,7 +49,7 @@ J_highO2 = [15,17,19,21];
 % % 
 % % % %  Tr_aero = exp(-cumtrapz(Q.Zmes).*alpha_aero); % aerosol transmission
 
-R_tr_i = (Q.Tr);
+R_tr_i = Q.Tr;
 
 
 % Define the first part of the equation 

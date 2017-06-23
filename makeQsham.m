@@ -148,7 +148,7 @@ smmohtenJL = smooth(JLreal,10);
 ysmoothen= [smmohtenJH' smmohtenJL']';
 Q.y = [JHreal JLreal]';
 
-Q.yvar = diag(ysmoothen);
+ Q.yvar = diag(ysmoothen);
 
 
 % Variance need to be fixed as below: 
@@ -220,13 +220,13 @@ Q.yvar = diag(ysmoothen);
        
 
 %           Q.Yvar =[smmohtenJH;smmohtenJL];
-% %         for ii = 1:length(Q.y)
-% %             if Q.y(ii) <= 15
-% %                 Q.Yvar(ii)=15;
-% %                 Q.y(ii)=Q.y(ii)+randn(1)*sqrt(Q.Yvar(ii));
-% %             end
-% %         end
-%     Q.yvar = diag(Q.Yvar);    
+%         for ii = 1:length(Q.y)
+%             if Q.y(ii) <= 15
+%                 Q.Yvar(ii)=15;
+%                 Q.y(ii)=Q.y(ii)+randn(1)*sqrt(Q.Yvar(ii));
+%             end
+%         end
+%         Q.yvar = diag(Q.Yvar);
 %         Q.Yvar =[JHreal JLreal];
 %     Q.yvar = diag(Q.Yvar);
 % figure;semilogx(Q.Yvar(length(Q.JLv)+1:end),Q.Zmes./1000,'r',JLreal,Q.Zmes./1000,'b')
