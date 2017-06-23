@@ -24,14 +24,14 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 4;
+Q.coaddalt = 20;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
-Q.deadtime = 4e-9; % 4ns
+Q.deadtime = 3.3e-9;% 4ns
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
@@ -57,7 +57,7 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
 Q.Zmes = Q.alt';% Measurement grid
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*40:70000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:70000;% Retrieval grid
 disp('Defined grids ')
 
 
@@ -113,7 +113,7 @@ disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 [CJL, CJH,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length1,bg_length2,OV] = estimations(Q);
-Q.OVa = ones(1,length(OV));%OV;
+Q.OVa = OV;%ones(1,length(OV));%
 Q.OVlength = length(Q.OVa);
 Q.CL = CJL;%(2.9e+18);
 Q.Bg_JH_real = Bg_JH_real; % revisit
@@ -143,8 +143,8 @@ JLreal = Q.JLnew';
 JLreal(JLreal<=0)= rand();
 
 
-smmohtenJH = smooth(JHreal,100); % smoothing covariance to smooth the envelop cover
-smmohtenJL = smooth(JLreal,100);
+smmohtenJH = smooth(JHreal,10); % smoothing covariance to smooth the envelop cover
+smmohtenJL = smooth(JLreal,10);
 ysmoothen= [smmohtenJH' smmohtenJL']';
 Q.y = [JHreal JLreal]';
 
