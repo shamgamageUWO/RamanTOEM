@@ -8,12 +8,12 @@
     end
 %     m=length(Q.Zret);
 %     xa=x(1:m);
-    dn = x(end-(Q.OVlength)+j).*1e-4; % this can go anything smaller than 0.1 even for higher temperatures works ok
+    dn = x(j).*1e-4; % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
     if x(j) == 0 % trap for tau's where tau(1) = 0
         dn = 1.e-8 .* x(j+1);
     end
-    xpert(end-(Q.OVlength)+j) = x(end-(Q.OVlength)+j) + dn;
+    xpert(j) = x(j) + dn;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];
 
     [y_JL_dT,y_JH_dT,y_JLa_dT,y_JHa_dT]=forwardmodelTraman(Q,xpert);

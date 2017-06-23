@@ -31,7 +31,7 @@ Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
-Q.deadtime = 4e-9; % 4ns
+Q.deadtime = 3.8e-9; % 4ns
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
@@ -48,11 +48,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=5000);
+Q.Eb = Eb(alt>=2000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=5000);
-Q.JLnew= JLnew(alt>=5000);
-Q.alt = alt(alt>=5000);
+Q.JHnew= JHnew(alt>=2000);
+Q.JLnew= JLnew(alt>=2000);
+Q.alt = alt(alt>=2000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -152,12 +152,12 @@ Q.alpha_aero = alphaAer;
 Q.Tr = Total_Transmission(Q);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-% % [R,Ra,aa,bb] = Rcalibration(Q); 
-Q.aa= 1.148467566403494;%aa;
-Q.bb =22.634605327641157;%bb;
+ [R,Ra,aa,bb] = Rcalibration(Q); 
+Q.aa= aa;%1.148467566403494;%aa;
+Q.bb =bb;%22.634605327641157;%bb;
 
-Q.R = 0.808780013344381;%R;%R;%0.17;
-Q.Ra = 1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
+Q.R = R;%0.808780013344381;%R;%R;%0.17;
+Q.Ra = Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
 
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -252,7 +252,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             Q.JLav = [ar3 JLav ar4];
             
             for i = 1: length(Q.JLav)
-                if Q.Zmes2(i) <= 6000
+                if Q.Zmes2(i) <= 2000
                     Q.YYa(i) = Q.JLav(i);
                 else
                     Q.YYa(i) = 30.*Q.JLav(i);
@@ -260,7 +260,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             end
             
             for i = 1: length(Q.JHav)
-                if  Q.Zmes2(i) <= 6000
+                if  Q.Zmes2(i) <= 2000
                     Q.YYYa(i) = Q.JHav(i);
                 else
                     Q.YYYa(i) = 30.*Q.JHav(i);

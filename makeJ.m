@@ -102,10 +102,11 @@ Kb_JLa =  ones(n4,1);
 
 % OV analytical
 JOV = zeros(n,m);
+N = 2*m+6 ;
 
 for j = 1:m 
    
-   [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(j,Q,x,@forwardmodelTraman);
+   [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(N-3,Q,x,@forwardmodelTraman);
    JOV(1:n1,j) = dOVJH;
    JOV(n1+1:n1+n2,j) = dOVJL;
    JOV(n1+n2+1:n1+n2+n3,j) = dOVJHa;

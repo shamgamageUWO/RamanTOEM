@@ -93,7 +93,7 @@ Se = Q.yvar;
 % x_i = interp1(Q.Zret,x_a,Q.Zmes,'linear');
 %   [R,yf,J] = makeJ(Q, R, x_a, iter);
  
-%  [R,yf,J]  = feval( @makeJ, Q, R, x_a, iter );
+ [R,yf,J]  = feval( @makeJ, Q, R, x_a, iter );
 
 disp('All inputs ready for OEM.m ')
 end 
