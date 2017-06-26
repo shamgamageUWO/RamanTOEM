@@ -48,11 +48,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=2000);
+Q.Eb = Eb(alt>3000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=2000);
-Q.JLnew= JLnew(alt>=2000);
-Q.alt = alt(alt>=2000);
+Q.JHnew= JHnew(alt>=3000);
+Q.JLnew= JLnew(alt>=3000);
+Q.alt = alt(alt>=3000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -65,13 +65,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=80 & ANalt <= 5000);
+Q.Eba = Eba(ANalt>=80 & ANalt <= 12000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=80 & ANalt <= 5000);
-Q.JLnewa= JLnewa(ANalt>=80 & ANalt <= 5000);
+Q.JHnewa= JHnewa(ANalt>=80 & ANalt <= 12000);
+Q.JLnewa= JLnewa(ANalt>=80 & ANalt <= 12000);
 Q.ANalt = ANalt(ANalt>=80);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=80 & ANalt <= 5000);
+Q.Zmes1 = ANalt(ANalt>=80 & ANalt <= 12000);
 Q.Zmes1 = Q.Zmes1';
 
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -155,10 +155,15 @@ Q.Tr = Total_Transmission(Q);
  [R,Ra,aa,bb] = Rcalibration(Q); 
 Q.aa= aa;%1.148467566403494;%aa;
 Q.bb =bb;%22.634605327641157;%bb;
+Q.aa_an = -2.1e2;
+Q.bb_an =1.2e2;
+Q.Ttraditional_an = Q.aa_an.*log((Q.JHnewa -Q.BaJHa) ./(Q.JLnewa -Q.BaJLa))+Q.bb_an; 
 
 Q.R = R;%0.808780013344381;%R;%R;%0.17;
 Q.Ra = Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
-
+Q.Ttraditional_digi = real(Q.bb./ (Q.aa-log((Q.JHnew -Q.BaJH) ./(Q.JLnew -Q.BaJL)))); 
+%      lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
+%                     Ttradi = real(Q.bb./(Q.aa-lnQ));
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
@@ -166,7 +171,7 @@ disp('R is calibrated ')
 [CJL, CJLa,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
 %  load('ovmodeldata.mat');
 %  OVnw = interp1(Q.Zmes,ov,Q.Zret,'linear');
-Q.OVa = OV;%ones(1,length(Q.Ta));
+Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
