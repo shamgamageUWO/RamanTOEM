@@ -246,13 +246,13 @@ bg_length1 = length(bkg_JH);
 bg_length2 = length(bkg_JL);
 
 %% Analog
-bg_JLan_std = std(bkg_JLan)-10;
-bg_JHan_std = std(bkg_JHan)-10;
+bg_JLan_std = std(bkg_JLan);
+bg_JHan_std = std(bkg_JHan);
 bg_JLan_v = var(bkg_JLan);
 bg_JHan_v= var(bkg_JHan);
-bg_JLan = nanmean(bkg_JLan-10);
-bg_JHan = nanmean(bkg_JHan-10);
-bg_Eban= nanmean(bkg_Eban-10);
+bg_JLan = nanmean(bkg_JLan);
+bg_JHan = nanmean(bkg_JHan);
+bg_Eban= nanmean(bkg_Eban);
 
 bg_length1an = length(bkg_JHan);
 bg_length2an = length(bkg_JLan);

@@ -31,9 +31,9 @@ lambda_em = 354.7;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% These from BOB- WVOEM.m
-in.LRfree = 35; % was 20 on 0305, 0308 50, 200905-6 50
-in.LRpbl = 70; % 50 on 0305; was 80 on otherwise
-in.LRtranHeight = 1000; % this is the height to the BL
+in.LRfree = 50; % was 20 on 0305, 0308 50, 200905-6 50
+in.LRpbl = 80; % 50 on 0305; was 80 on otherwise
+in.LRtranHeight = 2000; % this is the height to the BL
 % inputs for ralmo data
 in.go = 3; % plus/minus in.go points in pieceWise
 in.slope = 34; %30.14; %35; % 2015 37.88; 34 is adhoc, (30+38)/2

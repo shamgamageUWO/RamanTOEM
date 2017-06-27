@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 10;
+Q.coaddalt = 5;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -50,9 +50,9 @@ Eb = Y.Eb;
 Q.binzise = Y.binsize;
 Q.Eb = Eb(alt>3000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=3000);
-Q.JLnew= JLnew(alt>=3000);
-Q.alt = alt(alt>=3000);
+Q.JHnew= JHnew(alt>3000);
+Q.JLnew= JLnew(alt>3000);
+Q.alt = alt(alt>3000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -65,13 +65,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=80 & ANalt <= 12000);
+Q.Eba = Eba(ANalt>=50 & ANalt < 5000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=80 & ANalt <= 12000);
-Q.JLnewa= JLnewa(ANalt>=80 & ANalt <= 12000);
-Q.ANalt = ANalt(ANalt>=80);
+Q.JHnewa= JHnewa(ANalt>=50 & ANalt < 5000);
+Q.JLnewa= JLnewa(ANalt>=50 & ANalt < 5000);
+Q.ANalt = ANalt(ANalt>=50);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=80 & ANalt <= 12000);
+Q.Zmes1 = ANalt(ANalt>=50 & ANalt < 5000);
 Q.Zmes1 = Q.Zmes1';
 
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -105,7 +105,9 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 % Q.Zmes2 = Q.Zmes2(1:Q.n1-zAoffset);
 % Q.Zmes = Q.Zmes1;%[Q.Zmes1 Q.Zmes2];% Measurement grid
 % Q.Zmes = Q.Zmes(1:N-zAoffset);
+% Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:10000;% Retrieval grid
 Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:70000;% Retrieval grid
+% Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
 % Yc = [Q.JHnewa;Q.JHnew]
 % figure;semilogx(Yc,Q.Zmes./1000)
@@ -171,7 +173,7 @@ disp('R is calibrated ')
 [CJL, CJLa,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
 %  load('ovmodeldata.mat');
 %  OVnw = interp1(Q.Zmes,ov,Q.Zret,'linear');
-Q.OVa = ones(1,length(Q.Ta));
+Q.OVa = OV;%ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
@@ -233,17 +235,17 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 % above 2 km use the counts
 
 % Q.yvar = diag(Q.y);
-            [JHv,go] =bobpoissontest(JHreal,Q.Zmes2);
-            [JLv,go] =bobpoissontest(JLreal,Q.Zmes2);
-
-
-            
-            r1 = ones(1,go-1).* JHv(1);
-            r2 = ones(1,go-1).* JHv(end);
-            r3 = ones(1,go-1).* JLv(1);
-            r4 = ones(1,go-1).* JLv(end);
-            Q.JHv = [r1 JHv r2];
-            Q.JLv = [r3 JLv r4];
+%             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2);
+%             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2);
+% 
+% 
+%             
+%             r1 = ones(1,go-1).* JHv(1);
+%             r2 = ones(1,go-1).* JHv(end);
+%             r3 = ones(1,go-1).* JLv(1);
+%             r4 = ones(1,go-1).* JLv(end);
+%             Q.JHv = [r1 JHv r2];
+%             Q.JLv = [r3 JLv r4];
 
 
 [JHav,go] =bobpoissontest(smmohtenJHa',Q.Zmes1);
@@ -274,26 +276,26 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
             
             
-        for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
-                Q.YY(i) = Q.JLv(i);
-            else
-                Q.YY(i) = smmohtenJL(i);
-            end
-        end
-
-        for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
-                Q.YYY(i) = Q.JHv(i);
-            else
-                Q.YYY(i) = smmohtenJH(i);
-            end
-        end
+%         for i = 1: length(Q.JLv)
+%             if Q.Zmes2(i) <= 4000
+%                 Q.YY(i) = Q.JLv(i);
+%             else
+%                 Q.YY(i) = smmohtenJL(i);
+%             end
+%         end
+% 
+%         for i = 1: length(Q.JHv)
+%             if  Q.Zmes2(i) <= 4000
+%                 Q.YYY(i) = Q.JHv(i);
+%             else
+%                 Q.YYY(i) = smmohtenJH(i);
+%             end
+%         end
 
 %         Q.Yvar =[YYY YY JHav JLav];
 %         Q.Yvar =[JHreal JLreal];
         
-                Q.Yvar =[Q.YYY  Q.YY Q.YYYa Q.YYa];
+                Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa Q.YYa];
                 Q.yvar = diag(Q.Yvar);
                 
                 

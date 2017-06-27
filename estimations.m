@@ -53,12 +53,13 @@ SJLa = Q.JLnewa - Q.BaJLa;
 %     OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV )';
 %     
     OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
-    OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV )';
+%     OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV )';
 %     
 %     OVzd = (OVz1d+OVz2d)./2;
 %     OVzd = smooth(OVzd,5);
 %     
-    OVza = (OVz1a+OVz2a)./2;
+%     OVza = (OVz1a+OVz2a)./2;
+OVza = OVz1a;
     OVza = smooth(OVza,100);
      OVza(OVza>=1)=1;
 %     OVz = [OVza;OVzd]; 
@@ -68,7 +69,7 @@ SJLa = Q.JLnewa - Q.BaJLa;
 %     h = find(Q.Zret>=4500);
 % %     h = find(OV==1);
 %     OV(h(1):end)=1;
-%  plot(Q.Zret./1000,OV,'y')
+  plot(Q.Zret./1000,OV,'y')
 % hold off;
 % legend('Before interpolation','After interpolation','Final OV smoothed')
 
