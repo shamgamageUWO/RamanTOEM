@@ -31,8 +31,8 @@ lambda_em = 354.7;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% These from BOB- WVOEM.m
-in.LRfree = 20; % was 20 on 0305, 0308 50, 200905-6 50
-in.LRpbl = 50; % 50 on 0305; was 80 on otherwise
+in.LRfree = 50; % was 20 on 0305, 0308 50, 200905-6 50
+in.LRpbl = 80; % 50 on 0305; was 80 on otherwise
 in.LRtranHeight = 1600; % this is the height to the BL
 % inputs for ralmo data
 in.go = 3; % plus/minus in.go points in pieceWise
