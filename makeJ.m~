@@ -1,7 +1,7 @@
 function [R,yf,J] = makeJ(Q, R, x, iter)
 
 
-[JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
+[JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
 
 
 if ~isempty(find(isnan(x)) == 1)
@@ -96,25 +96,24 @@ Kb_JLa =  ones(n4,1);
 
 
 %% OV jacobians Analytical --- Interpolation need to be added here
-% % CJL = x(m+3);
-% % CJLa = x(end);
-% % JOVJL = ((CJL.*B_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtime.*JL).^2);
-% % JOVJH = ((Q.R.*CJL.*B_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtime.*JH).^2);
-% % JOVJL_an = ((CJLa.*B_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));
-% % JOVJH_an = ((Q.Ra.*CJLa.*B_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
+
+JOVJL = ((CJL.*A_Zi_an.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);
+JOVJH = ((Q.R.*CJL.*B_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JH).^2);
+JOVJL_an = ((CJLa.*B_Zi.*Diff_JL_i)./Ti);
+JOVJH_an = ((Q.Ra.*CJLa.*B_Zi.*Diff_JH_i)./Ti);
 % OV analytical
 JOV = zeros(n,m);
 N = 2*m+6 ;
-
-for j = 1:m 
-   
-   [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(j,Q,x,@forwardmodelTraman);
-   JOV(1:n1,j) = dOVJH;
-   JOV(n1+1:n1+n2,j) = dOVJL;
-   JOV(n1+n2+1:n1+n2+n3,j) = dOVJHa;
-   JOV(n1+n2+n3+1:n,j) = dOVJLa;
-
-end
+% 
+% for j = 1:m 
+%    
+%    [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(j,Q,x,@forwardmodelTraman);
+%    JOV(1:n1,j) = dOVJH;
+%    JOV(n1+1:n1+n2,j) = dOVJL;
+%    JOV(n1+n2+1:n1+n2+n3,j) = dOVJHa;
+%    JOV(n1+n2+n3+1:n,j) = dOVJLa;
+% 
+% end
 
 %% Final Jacobian
 % JJ = [ J(1:n,1:m) Kb_JL zeros(n,1);J(n+1:2*n,1:m) zeros(n,1) Kb_JH];last

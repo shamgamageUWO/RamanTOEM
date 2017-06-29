@@ -170,57 +170,58 @@ answ = (Q.Ra * CJLa)
 %                     xlabel('Vertical Resolution (km)')
 %                     ylabel('Altitude(km)')
 %                     %
-%                     err = X.e(1:m);
-%                     upper = err+ X.x(1:m);
-%                     lower =  X.x(1:m)-err;
+                    err = X.e(1:m);
+                    upper = err+ X.x(1:m);
+                    lower =  X.x(1:m)-err;
 % 
-%                     [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
+                     [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
+                     Zsonde = Zsonde-491; % altitude correction
 %                     lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
 %                     Ttradi = real(Q.bb./(Q.aa-lnQ));
 % 
-%                     Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
-%                     figure;
-%                     subplot(1,2,1)
-%                     plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Ttradi(Q.Zmes<=25000),Q.Zmes(Q.Zmes<=25000)./1000,'black')
-%                     grid on;
-%                     hold on
-%                     [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
-%                     %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
-%                     % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
-%                     xlabel('Temperature (K)')
-%                     ylabel('Altitude(km)')
-%                     legend('T a priori','T OEM','T sonde')
-%                     hold off;
+                    Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
+                    figure;
+                    subplot(1,2,1)
+                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b')
+                    grid on;
+                    hold on
+                    [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
+                    %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
+                    % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
+                    xlabel('Temperature (K)')
+                    ylabel('Altitude(km)')
+                    legend('T a priori','T OEM','T sonde')
+                    hold off;
 % 
 %                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 % 
-%                     subplot(1,2,2)
-%                     plot(X.x(1:m) - (Tsonde'),Q.Zret./1000)
-%                     grid on;
-%                     xlabel('Temperature residuals(T OEM - T sonde) (K)')
+                     subplot(1,2,2)
+                     plot(X.x(1:m) - (Tsonde'),Q.Zret./1000)
+                     grid on;
+                     xlabel('Temperature residuals(T OEM - T sonde) (K)')
 %                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
 %                     %  xlabel('Temperature Percent Error (%)')
-%                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
 % 
 % 
-%                     figure;
-%                     subplot(1,2,1)
-%                     plot(Q.OVa,Q.Zret./1000,'g',X.x(end+1-Q.OVlength:end),Q.Zret./1000,'r')
-%                     grid on;
-%                     xlabel('OV')
-%                     ylabel('Altitude(km)')
-%                     legend('OV a priori','OV OEM')
-% 
-% 
-%                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
-% 
-%                     subplot(1,2,2)
-%                     plot((((-Q.OVa')+X.x(end+1-Q.OVlength:end) )./X.x(end+1-Q.OVlength:end)).*100,Q.Zret./1000)
-%                     grid on;
-%                     xlabel('OV residuals(OV OEM - OV a priori) (%)')
-%                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
-%                     %  xlabel('Temperature Percent Error (%)')
-%                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+                    figure;
+                    subplot(1,2,1)
+                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-3),Q.Zret./1000,'r')
+                    grid on;
+                    xlabel('OV')
+                    ylabel('Altitude(km)')
+                    legend('OV a priori','OV OEM')
+
+
+                    %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
+
+                    subplot(1,2,2)
+                    plot((((-Q.OVa')+X.x(m+4:end-3) )./X.x(m+4:end-3)).*100,Q.Zret./1000)
+                    grid on;
+                    xlabel('OV residuals(OV OEM - OV a priori) (%)')
+                    %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
+                    %  xlabel('Temperature Percent Error (%)')
+                    ylabel('Altitude(km)')%  ylabel('Altitude(km)')
 % 
 %                     %  subplot(1,3,3)
 %                     %  plot(Q.Ta - Treal,Q.Zret./1000)
@@ -259,7 +260,7 @@ answ = (Q.Ra * CJLa)
                     plot(((y(n1+n2+1:n1+n2+n3) - X.yf(n1+n2+1:n1+n2+n3))./X.yf(n1+n2+1:n1+n2+n3)).*100 ,Q.Zmes1./1000)
                     hold on
 %                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
-                    plot(-(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+                    plot(-(Q.YYYa./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
                     
 %plot(-(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r');
 
@@ -271,7 +272,7 @@ answ = (Q.Ra * CJLa)
                     grid on;
                     plot(((y(n1+n2+n3+1:end) - X.yf(n1+n2+n3+1:end))./X.yf(n1+n2+n3+1:end)).*100 ,Q.Zmes1./1000)
                     hold on;
-                    plot(-(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
+                    plot(-(Q.YYa./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
                     %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
 
                     hold off

@@ -48,11 +48,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>3000);
+Q.Eb = Eb(alt>=3000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>3000);
-Q.JLnew= JLnew(alt>3000);
-Q.alt = alt(alt>3000);
+Q.JHnew= JHnew(alt>=3000);
+Q.JLnew= JLnew(alt>=3000);
+Q.alt = alt(alt>=3000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -65,13 +65,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=50 & ANalt < 5000);
+Q.Eba = Eba(ANalt>=80 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=50 & ANalt < 5000);
-Q.JLnewa= JLnewa(ANalt>=50 & ANalt < 5000);
-Q.ANalt = ANalt(ANalt>=50);
+Q.JHnewa= JHnewa(ANalt>=80 & ANalt <= 6000);
+Q.JLnewa= JLnewa(ANalt>=80 & ANalt <= 6000);
+Q.ANalt = ANalt(ANalt>=80);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=50 & ANalt < 5000);
+Q.Zmes1 = ANalt(ANalt>=80 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -171,8 +171,9 @@ disp('R is calibrated ')
 %% Estimating background and lidar constant wrt a priori 
 
 [CJL, CJLa,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-%  load('ovmodeldata.mat');
-%  OVnw = interp1(Q.Zmes,ov,Q.Zret,'linear');
+% load('ovmodeldata.mat');
+% OVnw = interp1(z,epsi,Q.Zret,'linear');
+% OVnw(isnan(OVnw))=1;
 Q.OVa = OV;%ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
@@ -235,67 +236,69 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 % above 2 km use the counts
 
 % Q.yvar = diag(Q.y);
-%             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2);
-%             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2);
+             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2);
+             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2);
 % 
 % 
 %             
-%             r1 = ones(1,go-1).* JHv(1);
-%             r2 = ones(1,go-1).* JHv(end);
-%             r3 = ones(1,go-1).* JLv(1);
-%             r4 = ones(1,go-1).* JLv(end);
-%             Q.JHv = [r1 JHv r2];
-%             Q.JLv = [r3 JLv r4];
+             r1 = ones(1,go-1).* JHv(1);
+             r2 = ones(1,go-1).* JHv(end);
+             r3 = ones(1,go-1).* JLv(1);
+             r4 = ones(1,go-1).* JLv(end);
+             Q.JHv = [r1 JHv r2];
+             Q.JLv = [r3 JLv r4];
 
 
-[JHav,go] =bobpoissontest(smmohtenJHa',Q.Zmes1);
-[JLav,go] =bobpoissontest(smmohtenJLa',Q.Zmes1);
-
-            ar1 = ones(1,go-1).* JHav(1);
-            ar2 = ones(1,go-1).* JHav(end);
-            ar3 = ones(1,go-1).* JLav(1);
-            ar4 = ones(1,go-1).* JLav(end);
-            Q.JHav = [ar1 JHav ar2];
-            Q.JLav = [ar3 JLav ar4];
-            
-            for i = 1: length(Q.JLav)
-                if Q.Zmes2(i) <= 2000
-                    Q.YYa(i) = Q.JLav(i);
-                else
-                    Q.YYa(i) = 30.*Q.JLav(i);
-                end
-            end
-            
-            for i = 1: length(Q.JHav)
-                if  Q.Zmes2(i) <= 2000
-                    Q.YYYa(i) = Q.JHav(i);
-                else
-                    Q.YYYa(i) = 30.*Q.JHav(i);
-                end
-            end
-
-            
-            
-%         for i = 1: length(Q.JLv)
-%             if Q.Zmes2(i) <= 4000
-%                 Q.YY(i) = Q.JLv(i);
-%             else
-%                 Q.YY(i) = smmohtenJL(i);
-%             end
-%         end
+% [JHav,go] =bobpoissontest(smmohtenJHa',Q.Zmes1);
+% [JLav,go] =bobpoissontest(smmohtenJLa',Q.Zmes1);
 % 
-%         for i = 1: length(Q.JHv)
-%             if  Q.Zmes2(i) <= 4000
-%                 Q.YYY(i) = Q.JHv(i);
-%             else
-%                 Q.YYY(i) = smmohtenJH(i);
+%             ar1 = ones(1,go-1).* JHav(1);
+%             ar2 = ones(1,go-1).* JHav(end);
+%             ar3 = ones(1,go-1).* JLav(1);
+%             ar4 = ones(1,go-1).* JLav(end);
+%             Q.JHav = [ar1 JHav ar2];
+%             Q.JLav = [ar3 JLav ar4];
+%             
+%             for i = 1: length(Q.JLav)
+%                 if Q.Zmes2(i) <= 2000
+%                     Q.YYa(i) = Q.JLav(i);
+%                 else
+%                     Q.YYa(i) = 30.*Q.JLav(i);
+%                 end
 %             end
-%         end
+%             
+%             for i = 1: length(Q.JHav)
+%                 if  Q.Zmes2(i) <= 2000
+%                     Q.YYYa(i) = Q.JHav(i);
+%                 else
+%                     Q.YYYa(i) = 30.*Q.JHav(i);
+%                 end
+%             end
+
+            
+            
+        for i = 1: length(Q.JLv)
+            if Q.Zmes2(i) <= 4000
+                Q.YY(i) = Q.JLv(i);
+            else
+                Q.YY(i) = smmohtenJL(i);
+            end
+        end
+
+        for i = 1: length(Q.JHv)
+            if  Q.Zmes2(i) <= 4000
+                Q.YYY(i) = Q.JHv(i);
+            else
+                Q.YYY(i) = smmohtenJH(i);
+            end
+        end
 
 %         Q.Yvar =[YYY YY JHav JLav];
 %         Q.Yvar =[JHreal JLreal];
-        
-                Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa Q.YYa];
+Q.YYYa = 0.01 .*  smmohtenJHa;
+Q.YYa =  0.01 .*  smmohtenJLa;
+        Q.Yvar =[Q.YYY Q.YY Q.YYYa' Q.YYa'];
+%                 Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa' Q.YYa'];
                 Q.yvar = diag(Q.Yvar);
                 
                 

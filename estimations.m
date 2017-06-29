@@ -60,16 +60,20 @@ SJLa = Q.JLnewa - Q.BaJLa;
 %     
 %     OVza = (OVz1a+OVz2a)./2;
 OVza = OVz1a;
-    OVza = smooth(OVza,100);
-     OVza(OVza>=1)=1;
+%     OVza = smooth(OVza,10);
+    normfac = OVza(end);
+    OVnw = OVza./normfac;
+%     plot(Q.Zmes1./1000,OVnw,'y')
+    
+%      OVza(OVza>=1)=1;
 %     OVz = [OVza;OVzd]; 
-     OV = interp1(Q.Zmes1,OVza,Q.Zret); % this is to smooth
+     OV = interp1(Q.Zmes1,OVnw,Q.Zret); % this is to smooth
      OV(isnan(OV))=1;
-    OV(OV>=1)=1;
+%     OV(OV>=1)=1;
 %     h = find(Q.Zret>=4500);
 % %     h = find(OV==1);
 %     OV(h(1):end)=1;
-  plot(Q.Zret./1000,OV,'y')
+%   plot(Q.Zret./1000,OV,'y')
 % hold off;
 % legend('Before interpolation','After interpolation','Final OV smoothed')
 
