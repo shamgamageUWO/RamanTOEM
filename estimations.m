@@ -40,8 +40,8 @@ SJLa = Q.JLnewa - Q.BaJLa;
     %     %  OVz = (JLnew + JHnew- Bg_JL_real- Bg_JH_real)./(JLwoOV + JHwoOV)';
     %     % figure;plot(Q.Zmes./1000,OVz,'b'); hold on;
 %     
-%     JLwoOV = ((CJL.*JL));
-%     JHwoOV = ((Q.R.*CJL.*JH));
+    JLwoOV = ((CJL.*JL));
+    JHwoOV = ((Q.R.*CJL.*JH));
 %     
     JLawoOV = ((CJLa.*JLa));
     JHawoOV = ((Q.Ra.*CJLa.*JHa));
@@ -49,11 +49,11 @@ SJLa = Q.JLnewa - Q.BaJLa;
 
 %     
 %     % It is now mean of the overlap as the a priori
-%     OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
-%     OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV )';
+     OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
+     OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV )';
 %     
     OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
-%     OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV )';
+     OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV )';
 %     
 %     OVzd = (OVz1d+OVz2d)./2;
 %     OVzd = smooth(OVzd,5);
