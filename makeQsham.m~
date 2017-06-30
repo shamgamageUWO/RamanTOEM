@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 10;
+Q.coaddalt = 5;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -48,11 +48,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=2000);
+Q.Eb = Eb(alt>=4000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=2000);
-Q.JLnew= JLnew(alt>=2000);
-Q.alt = alt(alt>=2000);
+Q.JHnew= JHnew(alt>=4000);
+Q.JLnew= JLnew(alt>=4000);
+Q.alt = alt(alt>=4000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -65,13 +65,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=80 & ANalt <= 5000);
+Q.Eba = Eba(ANalt>=100 & ANalt <= 5000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=80 & ANalt <= 5000);
-Q.JLnewa= JLnewa(ANalt>=80 & ANalt <= 5000);
-Q.ANalt = ANalt(ANalt>=80);
+Q.JHnewa= JHnewa(ANalt>=100 & ANalt <= 5000);
+Q.JLnewa= JLnewa(ANalt>=100 & ANalt <= 5000);
+Q.ANalt = ANalt(ANalt>=100);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=80 & ANalt <= 5000);
+Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 5000);
 Q.Zmes1 = Q.Zmes1';
 
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -105,7 +105,9 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 % Q.Zmes2 = Q.Zmes2(1:Q.n1-zAoffset);
 % Q.Zmes = Q.Zmes1;%[Q.Zmes1 Q.Zmes2];% Measurement grid
 % Q.Zmes = Q.Zmes(1:N-zAoffset);
+% Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:10000;% Retrieval grid
 Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:70000;% Retrieval grid
+% Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
 % Yc = [Q.JHnewa;Q.JHnew]
 % figure;semilogx(Yc,Q.Zmes./1000)
@@ -155,19 +157,24 @@ Q.Tr = Total_Transmission(Q);
  [R,Ra,aa,bb] = Rcalibration(Q); 
 Q.aa= aa;%1.148467566403494;%aa;
 Q.bb =bb;%22.634605327641157;%bb;
-Q.aa_an = 
+Q.aa_an = -2.1e2;
+Q.bb_an =1.2e2;
+Q.Ttraditional_an = Q.aa_an.*log((Q.JHnewa -Q.BaJHa) ./(Q.JLnewa -Q.BaJLa))+Q.bb_an; 
 
 Q.R = R;%0.808780013344381;%R;%R;%0.17;
 Q.Ra = Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
-
+Q.Ttraditional_digi = real(Q.bb./ (Q.aa-log((Q.JHnew -Q.BaJH) ./(Q.JLnew -Q.BaJL)))); 
+%      lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
+%                     Ttradi = real(Q.bb./(Q.aa-lnQ));
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 
 [CJL, CJLa,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-%  load('ovmodeldata.mat');
-%  OVnw = interp1(Q.Zmes,ov,Q.Zret,'linear');
-Q.OVa = OV;%ones(1,length(Q.Ta));
+% load('ovmodeldata.mat');
+% OVnw = interp1(z,epsi,Q.Zret,'linear');
+% OVnw(isnan(OVnw))=1;
+Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
@@ -229,49 +236,49 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 % above 2 km use the counts
 
 % Q.yvar = diag(Q.y);
-            [JHv,go] =bobpoissontest(JHreal,Q.Zmes2);
-            [JLv,go] =bobpoissontest(JLreal,Q.Zmes2);
+             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2);
+             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2);
+% 
+% 
+%             
+             r1 = ones(1,go-1).* JHv(1);
+             r2 = ones(1,go-1).* JHv(end);
+             r3 = ones(1,go-1).* JLv(1);
+             r4 = ones(1,go-1).* JLv(end);
+             Q.JHv = [r1 JHv r2];
+             Q.JLv = [r3 JLv r4];
 
 
-            
-            r1 = ones(1,go-1).* JHv(1);
-            r2 = ones(1,go-1).* JHv(end);
-            r3 = ones(1,go-1).* JLv(1);
-            r4 = ones(1,go-1).* JLv(end);
-            Q.JHv = [r1 JHv r2];
-            Q.JLv = [r3 JLv r4];
-
-
-[JHav,go] =bobpoissontest(smmohtenJHa',Q.Zmes1);
-[JLav,go] =bobpoissontest(smmohtenJLa',Q.Zmes1);
-
-            ar1 = ones(1,go-1).* JHav(1);
-            ar2 = ones(1,go-1).* JHav(end);
-            ar3 = ones(1,go-1).* JLav(1);
-            ar4 = ones(1,go-1).* JLav(end);
-            Q.JHav = [ar1 JHav ar2];
-            Q.JLav = [ar3 JLav ar4];
-            
-            for i = 1: length(Q.JLav)
-                if Q.Zmes2(i) <= 2000
-                    Q.YYa(i) = Q.JLav(i);
-                else
-                    Q.YYa(i) = 30.*Q.JLav(i);
-                end
-            end
-            
-            for i = 1: length(Q.JHav)
-                if  Q.Zmes2(i) <= 2000
-                    Q.YYYa(i) = Q.JHav(i);
-                else
-                    Q.YYYa(i) = 30.*Q.JHav(i);
-                end
-            end
+% [JHav,go] =bobpoissontest(smmohtenJHa',Q.Zmes1);
+% [JLav,go] =bobpoissontest(smmohtenJLa',Q.Zmes1);
+% 
+%             ar1 = ones(1,go-1).* JHav(1);
+%             ar2 = ones(1,go-1).* JHav(end);
+%             ar3 = ones(1,go-1).* JLav(1);
+%             ar4 = ones(1,go-1).* JLav(end);
+%             Q.JHav = [ar1 JHav ar2];
+%             Q.JLav = [ar3 JLav ar4];
+%             
+%             for i = 1: length(Q.JLav)
+%                 if Q.Zmes2(i) <= 3000
+%                     Q.YYa(i) = Q.JLav(i);
+%                 else
+%                     Q.YYa(i) = 30.*Q.JLav(i);
+%                 end
+%             end
+%             
+%             for i = 1: length(Q.JHav)
+%                 if  Q.Zmes2(i) <= 3000
+%                     Q.YYYa(i) = Q.JHav(i);
+%                 else
+%                     Q.YYYa(i) = 30.*Q.JHav(i);
+%                 end
+%             end
 
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 3000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = smmohtenJL(i);
@@ -279,7 +286,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
+            if  Q.Zmes2(i) <= 3000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = smmohtenJH(i);
@@ -288,8 +295,10 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 %         Q.Yvar =[YYY YY JHav JLav];
 %         Q.Yvar =[JHreal JLreal];
-        
-                Q.Yvar =[Q.YYY  Q.YY Q.YYYa Q.YYa];
+  Q.YYYa = 0.0025 .*  smmohtenJHa;
+  Q.YYa =  0.0025 .*  smmohtenJLa;
+         Q.Yvar =[Q.YYY Q.YY Q.YYYa' Q.YYa'];
+   %               Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa' Q.YYa'];
                 Q.yvar = diag(Q.Yvar);
                 
                 

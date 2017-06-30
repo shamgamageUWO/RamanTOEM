@@ -48,11 +48,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=4000);
+Q.Eb = Eb(alt>=3000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=4000);
-Q.JLnew= JLnew(alt>=4000);
-Q.alt = alt(alt>=4000);
+Q.JHnew= JHnew(alt>=3000);
+Q.JLnew= JLnew(alt>=3000);
+Q.alt = alt(alt>=3000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -65,13 +65,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=100 & ANalt <= 6000);
+Q.Eba = Eba(ANalt>=100 & ANalt <= 12000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=100 & ANalt <= 6000);
-Q.JLnewa= JLnewa(ANalt>=100 & ANalt <= 6000);
+Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=12000);
+Q.JLnewa= JLnewa(ANalt>=100 & ANalt <= 12000);
 Q.ANalt = ANalt(ANalt>=100);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 6000);
+Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 12000);
 Q.Zmes1 = Q.Zmes1';
 
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -249,56 +249,59 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
-[JHav,go] =bobpoissontest(smmohtenJHa',Q.Zmes1);
-[JLav,go] =bobpoissontest(smmohtenJLa',Q.Zmes1);
+% [JHav,go] =bobpoissontest(smmohtenJHa',Q.Zmes1);
+% [JLav,go] =bobpoissontest(smmohtenJLa',Q.Zmes1);
+% 
+%             ar1 = ones(1,go-1).* JHav(1);
+%             ar2 = ones(1,go-1).* JHav(end);
+%             ar3 = ones(1,go-1).* JLav(1);
+%             ar4 = ones(1,go-1).* JLav(end);
+%             Q.JHav = [ar1 JHav ar2];
+%             Q.JLav = [ar3 JLav ar4];
+%             
+%             for i = 1: length(Q.JLav)
+%                 if Q.Zmes2(i) <= 3000
+%                     Q.YYa(i) = Q.JLav(i);
+%                 else
+%                     Q.YYa(i) = 30.*Q.JLav(i);
+%                 end
+%             end
+%             
+%             for i = 1: length(Q.JHav)
+%                 if  Q.Zmes2(i) <= 3000
+%                     Q.YYYa(i) = Q.JHav(i);
+%                 else
+%                     Q.YYYa(i) = 30.*Q.JHav(i);
+%                 end
+%             end
 
-            ar1 = ones(1,go-1).* JHav(1);
-            ar2 = ones(1,go-1).* JHav(end);
-            ar3 = ones(1,go-1).* JLav(1);
-            ar4 = ones(1,go-1).* JLav(end);
-            Q.JHav = [ar1 JHav ar2];
-            Q.JLav = [ar3 JLav ar4];
-            
-            for i = 1: length(Q.JLav)
-                if Q.Zmes2(i) <= 3000
-                    Q.YYa(i) = Q.JLav(i);
-                else
-                    Q.YYa(i) = 30.*Q.JLav(i);
-                end
-            end
-            
-            for i = 1: length(Q.JHav)
-                if  Q.Zmes2(i) <= 3000
-                    Q.YYYa(i) = Q.JHav(i);
-                else
-                    Q.YYYa(i) = 30.*Q.JHav(i);
-                end
-            end
-
             
             
-        for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 3000
-                Q.YY(i) = Q.JLv(i);
-            else
-                Q.YY(i) = smmohtenJL(i);
-            end
-        end
-
-        for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 3000
-                Q.YYY(i) = Q.JHv(i);
-            else
-                Q.YYY(i) = smmohtenJH(i);
-            end
-        end
+%         for i = 1: length(Q.JLv)
+%             if Q.Zmes2(i) <= 3000
+%                 Q.YY(i) = Q.JLv(i);
+%             else
+%                 Q.YY(i) = smmohtenJL(i);
+%             end
+%         end
+% 
+%         for i = 1: length(Q.JHv)
+%             if  Q.Zmes2(i) <= 3000
+%                 Q.YYY(i) = Q.JHv(i);
+%             else
+%                 Q.YYY(i) = smmohtenJH(i);
+%             end
+%         end
 
 %         Q.Yvar =[YYY YY JHav JLav];
 %         Q.Yvar =[JHreal JLreal];
-%  Q.YYYa = 0.01 .*  smmohtenJHa;
-%  Q.YYa =  0.01 .*  smmohtenJLa;
-         Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
-   %               Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa' Q.YYa'];
+
+% HEre I linearlize the covariance
+slope = (2-0.000075)/length(Q.JHnewa);
+  Q.YYYa = slope .*  smmohtenJHa;
+  Q.YYa  = slope .*  smmohtenJLa;
+%          Q.Yvar =[Q.YYY Q.YY Q.YYYa' Q.YYa'];
+                  Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa' Q.YYa'];
                 Q.yvar = diag(Q.Yvar);
                 
                 
