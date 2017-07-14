@@ -11,10 +11,10 @@ n2 = Q.n2;
 n3 = Q.n3;
 y = Q.y;
 % 
-yJH = smooth(y(1:n1),100);
-yJL = smooth(y(n1+1:n1+n2),100);
-yJHa = smooth(y(n1+n2+1:n1+n2+n3),100);
-yJLa = smooth(y(n1+n2+n3+1:end),100);
+% yJH = smooth(y(1:n1),100);
+% yJL = smooth(y(n1+1:n1+n2),100);
+yJHa = smooth(y(1:n3),100);
+yJLa = smooth(y(n3+1:end),100);
 
 
 
@@ -36,33 +36,33 @@ if ~O.linear
     end
 end
 
-CJL = X.x(m+3);
-BJH = X.x(m+1);
-BJL = X.x(m+2);
+% CJL = X.x(m+3);
+% BJH = X.x(m+1);
+% BJL = X.x(m+2);
 % CJHa = X.x(end-1);
-CJLa = X.x(end-4);
-BJHa = X.x(end-3);
-BJLa = X.x(end-2);
-DT_JH = X.x(end-1);
-DT_JL = X.x(end); % deadtimes
+CJLa = X.x(end);
+BJHa = X.x(end-2);
+BJLa = X.x(end-1);
+% DT_JH = X.x(end-1);
+% DT_JL = X.x(end); % deadtimes
 
 'X.cost'
 X.cost
 
-'OEM-BG-JH'
-BJH
-
-'real-BG-JH'
-Q.BaJH
-
-'OEM-BG-JL'
-BJL
-
-'real-BG-JL'
-Q.BaJL
-
-'OEM-CL'
-CJL
+% 'OEM-BG-JH'
+% BJH
+% 
+% 'real-BG-JH'
+% Q.BaJH
+% 
+% 'OEM-BG-JL'
+% BJL
+% 
+% 'real-BG-JL'
+% Q.BaJL
+% 
+% 'OEM-CL'
+% CJL
 
 
 'OEM-BG-JHa'
@@ -82,12 +82,12 @@ CJLa
 
 'OEM-CHa'
 answ = (Q.Ra * CJLa)
-
-'DT-JH'
-DT_JH
-
-'DT-JL'
-DT_JL
+% 
+% 'DT-JH'
+% DT_JH
+% 
+% 'DT-JL'
+% DT_JL
 
 %CJL = exp(logCJL)
 
@@ -215,7 +215,7 @@ DT_JL
 % 
                     figure;
                     subplot(1,2,1)
-                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-5),Q.Zret./1000,'r')
+                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+1:end-3),Q.Zret./1000,'r')
                     grid on;
                     xlabel('OV')
                     ylabel('Altitude(km)')
@@ -225,7 +225,7 @@ DT_JL
                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
                     subplot(1,2,2)
-                    plot((((-Q.OVa')+X.x(m+4:end-5) )./X.x(m+4:end-5)).*100,Q.Zret./1000)
+                    plot((((-Q.OVa')+X.x(m+1:end-3) )./X.x(m+1:end-3)).*100,Q.Zret./1000)
                     grid on;
                     xlabel('OV residuals(OV OEM - OV a priori) (%)')
                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
@@ -239,37 +239,37 @@ DT_JL
 % 
 % %% Residual plots
                     figure;
-                    subplot(2,2,1)
-                    grid on;
-                    % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes2(Q.ind)./1000)
-                    plot(((y(1:n1) - X.yf(1:n1))./X.yf(1:n1)).*100 ,Q.Zmes2./1000)
-                    hold on
-                    plot(-(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r',(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r');
-                    %plot(-(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r');
+%                     subplot(2,2,1)
+%                     grid on;
+%                     % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes2(Q.ind)./1000)
+%                     plot(((y(1:n1) - X.yf(1:n1))./X.yf(1:n1)).*100 ,Q.Zmes2./1000)
+%                     hold on
+%                     plot(-(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r',(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r');
+%                     %plot(-(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r');
+% 
+%                     hold off
+%                     xlabel('JH digital counts residual(%)')
+%                     ylabel('Altitude (km)')
+% 
+%                     subplot(2,2,2)
+%                     grid on;
+%                     plot(((y(n1+1:n1+n2) - X.yf(n1+1:n1+n2))./X.yf(n1+1:n1+n2)).*100 ,Q.Zmes2./1000)
+%                     hold on;
+%                     plot(-(sqrt(yJL)./X.yf(n1+1:n1+n2)).*100,Q.Zmes2./1000,'r',(sqrt(yJL)./X.yf(n1+1:n1+n2)).*100,Q.Zmes2./1000,'r');
+%                     %plot(-(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r');
+% 
+%                     hold off
+%                     xlabel('JL digital counts residual(%)')
+%                     ylabel('Altitude (km)')
 
-                    hold off
-                    xlabel('JH digital counts residual(%)')
-                    ylabel('Altitude (km)')
 
-                    subplot(2,2,2)
-                    grid on;
-                    plot(((y(n1+1:n1+n2) - X.yf(n1+1:n1+n2))./X.yf(n1+1:n1+n2)).*100 ,Q.Zmes2./1000)
-                    hold on;
-                    plot(-(sqrt(yJL)./X.yf(n1+1:n1+n2)).*100,Q.Zmes2./1000,'r',(sqrt(yJL)./X.yf(n1+1:n1+n2)).*100,Q.Zmes2./1000,'r');
-                    %plot(-(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r');
-
-                    hold off
-                    xlabel('JL digital counts residual(%)')
-                    ylabel('Altitude (km)')
-
-
-                    subplot(2,2,3)
+                    subplot(1,2,1)
                     grid on;
                     % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes1(Q.ind)./1000)
-                    plot(((y(n1+n2+1:n1+n2+n3) - X.yf(n1+n2+1:n1+n2+n3))./X.yf(n1+n2+1:n1+n2+n3)).*100 ,Q.Zmes1./1000)
+                    plot(((y(1:n3) - X.yf(1:n3))./X.yf(1:n3)).*100 ,Q.Zmes1./1000)
                     hold on
 %                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
-                    plot(-(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+                    plot(-(Q.YYYa'./y(1:n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa'./y(1:n3)).*100,Q.Zmes1./1000,'r');
                     
 %plot(-(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r');
 
@@ -277,11 +277,11 @@ DT_JL
                     xlabel('JH - analog counts residual(%)')
                     ylabel('Altitude (km)')
 
-                    subplot(2,2,4)
+                    subplot(1,2,2)
                     grid on;
-                    plot(((y(n1+n2+n3+1:end) - X.yf(n1+n2+n3+1:end))./X.yf(n1+n2+n3+1:end)).*100 ,Q.Zmes1./1000)
+                    plot(((y(n3+1:end) - X.yf(n3+1:end))./X.yf(n3+1:end)).*100 ,Q.Zmes1./1000)
                     hold on;
-                    plot(-(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
+                    plot(-(Q.YYa'./y(n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa'./y(n3+1:end)).*100,Q.Zmes1./1000,'r');
                     %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
 
                     hold off

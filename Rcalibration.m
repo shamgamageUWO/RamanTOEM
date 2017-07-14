@@ -1,9 +1,9 @@
-function [R,Ra,aa,bb] = Rcalibration(Q)
+function [Ra] = Rcalibration(Q)
 
 date_in = Q.date_in;
 time_in = Q.time_in;
-JHnew = Q.JHnew-Q.BaJH;
-JLnew = Q.JLnew-Q.BaJL;
+% JHnew = Q.JHnew-Q.BaJH;
+% JLnew = Q.JLnew-Q.BaJL;
 JHnewa = Q.JHnewa-Q.BaJHa;
 JLnewa = Q.JLnewa-Q.BaJLa;
 % alt = Q.alt;
@@ -28,20 +28,20 @@ Q.R =1;
 Q.Ra = 1;
 
 % x = [Tsonde' 0 0 1 OVa 0 0 1 1];
-x = [Tsonde' 0 0 1 OVa 0 0 1 Q.deadtimeJH Q.deadtimeJL]; % coupled analog
+x = [Tsonde' OVa 0 0 1]; % coupled analog
 
 %% Digital
-[JL,JH,JLa,JHa]=forwardmodelTraman(Q,x);
+[JLa,JHa]=forwardmodelTraman(Q,x);
 % altitude corrected for the sonde
-Alt = Q.Zmes2 + 491;
-ind1 = Alt >= 8000 & Alt< 10000;
-
-x = (JH(ind1)./JL(ind1));
-y = JHnew(ind1)./JLnew(ind1);
-
-f = fittype({'x'});
-fit3 = fit(x',y,f,'Robust','on');
-R = fit3(1);
+% Alt = Q.Zmes2 + 491;
+% ind1 = Alt >= 8000 & Alt< 10000;
+% 
+% % x = (JH(ind1)./JL(ind1));
+% % y = JHnew(ind1)./JLnew(ind1);
+% % 
+% % f = fittype({'x'});
+% % fit3 = fit(x',y,f,'Robust','on');
+% % R = fit3(1);
 
 % %% analog
 Alt2 = Q.Zmes1 + 491;
@@ -57,16 +57,16 @@ Ra = fit3a(1);
 %  figure;plot(JLnewa,Ra.*JLa)
 
 % % %%%%%% Calibration for traditional method Digital channel
-lnQ = log(JHnew./JLnew);
-yy = interp1(Zsonde,Tsonde,Alt,'linear');
-yy = yy(Alt>=8000 & Alt<=10000);
-xx = lnQ;
-xx = xx(Alt>=8000 & Alt<=10000);
-g = fittype('b/(a-x)','coeff',{'a','b'});
-fit34 = fit(xx,yy',g,'Robust','on','Startpoint', [0 0]);
-s= coeffvalues(fit34);
-aa = s(1);
-bb = s(2);
+% lnQ = log(JHnew./JLnew);
+% yy = interp1(Zsonde,Tsonde,Alt,'linear');
+% yy = yy(Alt>=8000 & Alt<=10000);
+% xx = lnQ;
+% xx = xx(Alt>=8000 & Alt<=10000);
+% g = fittype('b/(a-x)','coeff',{'a','b'});
+% fit34 = fit(xx,yy',g,'Robust','on','Startpoint', [0 0]);
+% s= coeffvalues(fit34);
+% aa = s(1);
+% bb = s(2);
 %  ff = fittype({'a*x+b'},);
 % % % %%%%%% Calibration for traditional method Digital channel
 % lnQ1 = log(JHnewa./JLnewa);
