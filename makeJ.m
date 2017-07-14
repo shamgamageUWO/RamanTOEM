@@ -37,8 +37,8 @@ end
 
 %% BG jacobians Analytical 
 % ones need to be multiplied by the deadtime term: refer notes 
-Kb_JH = (((1-Q.deadtime.*JL).^2))'; %ones(n1,1).* 
-Kb_JL =  (((1-Q.deadtime.*JH).^2))'; %ones(n2,1).*
+Kb_JH = (((1-Q.deadtimeJL.*JL).^2))'; %ones(n1,1).* 
+Kb_JL =  (((1-Q.deadtimeJH.*JH).^2))'; %ones(n2,1).*
 Kb_JHa =  ones(n3,1); 
 Kb_JLa =  ones(n4,1);
 %zeros(n-n2,1)]; % fix the lengths
@@ -65,8 +65,8 @@ Kb_JLa =  ones(n4,1);
 
 
 %% Digital    
-            KCL11 = ((A_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtime.*JL).^2);%.*exp(logCJL);
-            KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtime.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
+            KCL11 = ((A_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtimeJL.*JL).^2);%.*exp(logCJL);
+            KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtimeJH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
 %             KCL = [KCL22 KCL11];
             
             
@@ -104,7 +104,7 @@ Kb_JLa =  ones(n4,1);
 % % JOVJH_an = ((Q.Ra.*CJLa.*B_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
 % OV analytical
 JOV = zeros(n,m);
-N = 2*m+6 ;
+% N = 2*m+6 ;
 
 for jj = 1:m 
    
@@ -115,6 +115,25 @@ for jj = 1:m
    JOV(n1+n2+n3+1:n,jj) = dOVJLa;
 
 end
+%% Deadtime jacobian
+Jdt1 = zeros(n,1);
+Jdt2 = zeros(n,1);
+
+    [dJHdt,dJLdt] = deridt(Q,x,@forwardmodelTraman);
+    
+   Jdt1(1:n1) = dJHdt;
+   Jdt1(n1+1:n1+n2) = 0;
+   Jdt1(n1+n2+1:n1+n2+n3) = 0;
+   Jdt1(n1+n2+n3+1:n) = 0;
+   
+   Jdt2(1:n1) = 0;
+   Jdt2(n1+1:n1+n2) = dJLdt;
+   Jdt2(n1+n2+1:n1+n2+n3) = 0;
+   Jdt2(n1+n2+n3+1:n) = 0;
+% j
+% disp('ok')
+
+%%
 
 %% Final Jacobian
 % JJ = [ J(1:n,1:m) Kb_JL zeros(n,1);J(n+1:2*n,1:m) zeros(n,1) Kb_JH];last
@@ -184,6 +203,6 @@ KCLa = [zeros(1,n1+n2) KCLa1];
 
 
  
-J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa'];
+J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa' Jdt1 Jdt2];
 
 

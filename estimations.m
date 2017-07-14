@@ -20,7 +20,7 @@ SJLa = Q.JLnewa - Q.BaJLa;
     Q.OVlength = length(OVa);
 
 %     x = [Q.Ta 0 0 1 OVa 0 0 1 1]; Run this to retrieve CJH independently
-    x = [Q.Ta 0 0 1 OVa 0 0 1]; % coupled analog channels
+    x = [Q.Ta 0 0 1 OVa 0 0 1 Q.deadtimeJH Q.deadtimeJL]; % coupled analog channels
 
 
     [JL,JH,JLa,JHa]=forwardmodelTraman(Q,x);

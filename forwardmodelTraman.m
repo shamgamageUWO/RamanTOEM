@@ -19,10 +19,13 @@ x_a = x(1:m);
 BJH = x(m+1);
 BJL = x(m+2);
 CJL = x(m+3);
-OV = x(m+4:end-3);
-BJHa = x(end-2);
-BJLa = x(end-1);
-CJLa = x(end);
+OV = x(m+4:end-5);
+BJHa = x(end-4);
+BJLa = x(end-3);
+CJLa = x(end-2);
+DT_JH = x(end-1);
+DT_JL = x(end); % deadtimes
+
 
 % interpolation
 Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear'); % T on data grid (digital)
@@ -83,9 +86,9 @@ Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
         JLnw = (JL.*Q.f);
         
         % 3. Apply DT
-        JL_dtc = JLnw ./ (1 + JLnw.*(Q.deadtime)); % non-paralyzable
+        JL_dtc = JLnw ./ (1 + JLnw.*(DT_JL)); % non-paralyzable
         % JL = JL .* exp(-JLnw.*(4e-9)); % paralyzable %units is counts
-        JH_dtc = JHnw ./ (1 + JHnw.*(Q.deadtime));
+        JH_dtc = JHnw ./ (1 + JHnw.*(DT_JH));
           % 4. Convert to counts
            JL = JL_dtc.*(1./Q.f);
            JH = JH_dtc.*(1./Q.f);

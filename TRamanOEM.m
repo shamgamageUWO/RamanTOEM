@@ -36,13 +36,15 @@ if ~O.linear
     end
 end
 
-CJL = X.x(Q.OVlength+3);
-BJH = (X.x(Q.OVlength+1));
-BJL = (X.x(Q.OVlength+2));
+CJL = X.x(m+3);
+BJH = X.x(m+1);
+BJL = X.x(m+2);
 % CJHa = X.x(end-1);
-CJLa = X.x(end);
-BJHa = (X.x(end-2));
-BJLa = (X.x(end-1));
+CJLa = X.x(end-4);
+BJHa = X.x(end-3);
+BJLa = X.x(end-2);
+DT_JH = X.x(end-1);
+DT_JL = X.x(end); % deadtimes
 
 'X.cost'
 X.cost
@@ -80,6 +82,13 @@ CJLa
 
 'OEM-CHa'
 answ = (Q.Ra * CJLa)
+
+'DT-JH'
+DT_JH
+
+'DT-JL'
+DT_JL
+
 %CJL = exp(logCJL)
 
 % 'OEM-CH'
@@ -206,7 +215,7 @@ answ = (Q.Ra * CJLa)
 % 
                     figure;
                     subplot(1,2,1)
-                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-3),Q.Zret./1000,'r')
+                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-5),Q.Zret./1000,'r')
                     grid on;
                     xlabel('OV')
                     ylabel('Altitude(km)')
@@ -216,7 +225,7 @@ answ = (Q.Ra * CJLa)
                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
                     subplot(1,2,2)
-                    plot((((-Q.OVa')+X.x(m+4:end-3) )./X.x(m+4:end-3)).*100,Q.Zret./1000)
+                    plot((((-Q.OVa')+X.x(m+4:end-5) )./X.x(m+4:end-5)).*100,Q.Zret./1000)
                     grid on;
                     xlabel('OV residuals(OV OEM - OV a priori) (%)')
                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
@@ -260,7 +269,7 @@ answ = (Q.Ra * CJLa)
                     plot(((y(n1+n2+1:n1+n2+n3) - X.yf(n1+n2+1:n1+n2+n3))./X.yf(n1+n2+1:n1+n2+n3)).*100 ,Q.Zmes1./1000)
                     hold on
 %                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
-                    plot(-(Q.YYYa./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+                    plot(-(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
                     
 %plot(-(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r');
 
@@ -272,7 +281,7 @@ answ = (Q.Ra * CJLa)
                     grid on;
                     plot(((y(n1+n2+n3+1:end) - X.yf(n1+n2+n3+1:end))./X.yf(n1+n2+n3+1:end)).*100 ,Q.Zmes1./1000)
                     hold on;
-                    plot(-(Q.YYa./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
+                    plot(-(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
                     %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
 
                     hold off

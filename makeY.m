@@ -108,7 +108,10 @@ Eb= S0.Channel(10).Signal(:,961:990);
 JL_an = S0.Channel(11).Signal(:,961:990);
 JH_an = S0.Channel(3).Signal(:,961:990);
 Eb_an = S0.Channel(9).Signal(:,961:990);
-
+JL_an = JL_an';
+JH_an = JH_an';
+Y.YYa = (std(JL_an)).^2;
+Y.YYYa = (std(JH_an)).^2;
 
 % for i = 1: length(g)
 %     if g(i)== 23 && (00 <= Minute(i)<=30)
@@ -171,8 +174,8 @@ JL = nansum(JL');
 JH = nansum(JH');
 Eb = nansum(Eb');
 
-JL_an = nansum(JL_an');
-JH_an = nansum(JH_an');
+JL_an = nansum(JL_an);
+JH_an = nansum(JH_an);
 Eb_an = nansum(Eb_an');
 
 N = length(JH);
