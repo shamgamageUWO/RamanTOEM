@@ -43,15 +43,17 @@ f = fittype({'x'});
 fit3 = fit(x',y,f,'Robust','on');
 R = fit3(1);
 
-% %% analog
-Alt2 = Q.Zmes1 + 491;
-ind2 = Alt2 >= 2000 & Alt2 <= 2100;
-xa = (JHa(ind2)./JLa(ind2));
-ya = JHnewa(ind2)./JLnewa(ind2);
-
-fa = fittype({'x'});
-fit3a = fit(xa',ya,fa,'Robust','on');
-Ra = fit3a(1);
+% % %% analogZi>=1500 & Zi< 2000;
+ Alt2 = Q.Zmes1 + 491;
+ind2 = Alt2 >= 1000 & Alt2 < 1200;
+ xa = (JHa(ind2)./JLa(ind2));
+ ya = JHnewa(ind2)./JLnewa(ind2);
+%  yd = JHnew(ind2)./JLnew(ind2);
+% 
+ fa = fittype({'x'});
+ fit3a = fit(xa',ya,fa,'Robust','on');
+ Ra = fit3a(1);
+% Ra = nanmean(ya./(R.*yd)); %% this coupling doesnt work !
 %%
 
 %  figure;plot(JLnewa,Ra.*JLa)

@@ -31,7 +31,7 @@ Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
-Q.deadtime = 3.8e-9; % 4ns
+Q.deadtime = 3.7e-9; % 4ns
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
@@ -48,11 +48,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=3000);
+Q.Eb = Eb(alt>3000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=3000);
-Q.JLnew= JLnew(alt>=3000);
-Q.alt = alt(alt>=3000);
+Q.JHnew= JHnew(alt>3000);
+Q.JLnew= JLnew(alt>3000);
+Q.alt = alt(alt>3000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -65,13 +65,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=100 & ANalt <= 12000);
+Q.Eba = Eba(ANalt>=100 & ANalt <= 8000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=12000);
-Q.JLnewa= JLnewa(ANalt>=100 & ANalt <= 12000);
+Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=8000);
+Q.JLnewa= JLnewa(ANalt>=100 & ANalt <= 8000);
 Q.ANalt = ANalt(ANalt>=100);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 12000);
+Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 8000);
 Q.Zmes1 = Q.Zmes1';
 
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -170,7 +170,7 @@ disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 
-[CJL, CJLa,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+[CJL, CJLa] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
 % load('ovmodeldata.mat');
 % OVnw = interp1(z,epsi,Q.Zret,'linear');
 % OVnw(isnan(OVnw))=1;
@@ -236,8 +236,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 % above 2 km use the counts
 
 % Q.yvar = diag(Q.y);
-             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2);
-             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2);
+             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2,8);
+             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,8);
 % 
 % 
 %             
@@ -249,15 +249,15 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
-% [JHav,go] =bobpoissontest(smmohtenJHa',Q.Zmes1);
-% [JLav,go] =bobpoissontest(smmohtenJLa',Q.Zmes1);
-% 
-%             ar1 = ones(1,go-1).* JHav(1);
-%             ar2 = ones(1,go-1).* JHav(end);
-%             ar3 = ones(1,go-1).* JLav(1);
-%             ar4 = ones(1,go-1).* JLav(end);
-%             Q.JHav = [ar1 JHav ar2];
-%             Q.JLav = [ar3 JLav ar4];
+[JHav,go1] =bobpoissontest(smmohtenJHa',Q.Zmes1,12);
+[JLav,go1] =bobpoissontest(smmohtenJLa',Q.Zmes1,12);
+
+            ar1 = ones(1,go1-1).* JHav(1);
+            ar2 = ones(1,go1-1).* JHav(end);
+            ar3 = ones(1,go1-1).* JLav(1);
+            ar4 = ones(1,go1-1).* JLav(end);
+            Q.JHav = [ar1 JHav ar2];
+            Q.JLav = [ar3 JLav ar4];
 %             
 %             for i = 1: length(Q.JLav)
 %                 if Q.Zmes2(i) <= 3000
@@ -277,31 +277,31 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
             
             
-%         for i = 1: length(Q.JLv)
-%             if Q.Zmes2(i) <= 3000
-%                 Q.YY(i) = Q.JLv(i);
-%             else
-%                 Q.YY(i) = smmohtenJL(i);
-%             end
-%         end
-% 
-%         for i = 1: length(Q.JHv)
-%             if  Q.Zmes2(i) <= 3000
-%                 Q.YYY(i) = Q.JHv(i);
-%             else
-%                 Q.YYY(i) = smmohtenJH(i);
-%             end
-%         end
+        for i = 1: length(Q.JLv)
+            if Q.Zmes2(i) <= 4000
+                Q.YY(i) = Q.JLv(i);
+            else
+                Q.YY(i) = smmohtenJL(i);
+            end
+        end
+
+        for i = 1: length(Q.JHv)
+            if  Q.Zmes2(i) <= 4000
+                Q.YYY(i) = Q.JHv(i);
+            else
+                Q.YYY(i) = smmohtenJH(i);
+            end
+        end
 
 %         Q.Yvar =[YYY YY JHav JLav];
 %         Q.Yvar =[JHreal JLreal];
 
 % HEre I linearlize the covariance
-slope = (2-0.000075)/length(Q.JHnewa);
-  Q.YYYa = slope .*  smmohtenJHa;
-  Q.YYa  = slope .*  smmohtenJLa;
-%          Q.Yvar =[Q.YYY Q.YY Q.YYYa' Q.YYa'];
-                  Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa' Q.YYa'];
+% slope = (2-0.000075)/length(Q.JHnewa);
+  Q.YYYa = Q.JHav';
+  Q.YYa  = Q.JLav';
+          Q.Yvar =[Q.YYY Q.YY Q.YYYa' Q.YYa'];
+%                   Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa' Q.YYa'];
                 Q.yvar = diag(Q.Yvar);
                 
                 

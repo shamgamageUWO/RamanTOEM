@@ -31,7 +31,7 @@ Q.Ra = 1;
 x = [Tsonde' 0 0 1 OVa 0 0 1]; % coupled analog
 
 %% Digital
-[JL,JH,JLa,JHa,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
+[JL,JH,JLa,JHa]=forwardmodelTraman(Q,x);
 % altitude corrected for the sonde
 Alt = Q.Zmes2 + 491;
 ind1 = Alt >= 8000 & Alt< 10000;
@@ -43,15 +43,17 @@ f = fittype({'x'});
 fit3 = fit(x',y,f,'Robust','on');
 R = fit3(1);
 
-% %% analog
-Alt2 = Q.Zmes1 + 491;
+% % %% analogZi>=1500 & Zi< 2000;
+ Alt2 = Q.Zmes1 + 491;
 ind2 = Alt2 >= 2000 & Alt2 <= 2100;
-xa = (JHa(ind2)./JLa(ind2));
-ya = JHnewa(ind2)./JLnewa(ind2);
-
-fa = fittype({'x'});
-fit3a = fit(xa',ya,fa,'Robust','on');
-Ra = fit3a(1);
+% xa = (JHa(ind2)./JLa(ind2));
+ ya = JHnewa(ind2)./JLnewa(ind2);
+ yd = JHnew(ind2)./JLnew(ind2);
+% 
+% fa = fittype({'x'});
+% fit3a = fit(xa',ya,fa,'Robust','on');
+% Ra = fit3a(1);
+Ra = nanmean(ya./(R.*yd)); %% this coupling doesnt work !
 %%
 
 %  figure;plot(JLnewa,Ra.*JLa)
@@ -68,7 +70,7 @@ s= coeffvalues(fit34);
 aa = s(1);
 bb = s(2);
 %  ff = fittype({'a*x+b'},);
-% % %%%%%% Calibration for traditional method Digital channel
+% % % %%%%%% Calibration for traditional method Digital channel
 % lnQ1 = log(JHnewa./JLnewa);
 % yy1 = interp1(Zsonde,Tsonde,Alt2,'linear');
 % yy1 = yy1(Alt2>=2500 & Alt2<3000);
