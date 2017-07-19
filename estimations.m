@@ -1,4 +1,4 @@
-function [CJL, CJLa,OV] = estimations(Q)
+function [CJL, CJLa,CJHa] = estimations(Q)
 
 
 
@@ -20,7 +20,7 @@ SJLa = Q.JLnewa - Q.BaJLa;
     Q.OVlength = length(OVa);
 
 %     x = [Q.Ta 0 0 1 OVa 0 0 1 1]; Run this to retrieve CJH independently
-    x = [Q.Ta 0 0 1 OVa 0 0 1 Q.deadtimeJH Q.deadtimeJL]; % coupled analog channels
+    x = [Q.Ta 0 0 1 OVa 0 0 1 1 Q.deadtimeJH Q.deadtimeJL]; % coupled analog channels
 
 
     [JL,JH,JLa,JHa]=forwardmodelTraman(Q,x);
@@ -30,7 +30,7 @@ SJLa = Q.JLnewa - Q.BaJLa;
 %     CJH = nanmean(SJH(ind1)./JH(ind1)');
 % 
     CJLa = nanmean(SJLa(ind2)./JLa(ind2)');
-%     CJHa = nanmean(SJHa(ind2)./JHa(ind2)');
+   CJHa = nanmean(SJHa(ind2)./JHa(ind2)');
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Overlap estimation
     % %     JLwoOV = ((CJL.*JL))+ Bg_JL_real;
@@ -47,28 +47,28 @@ SJLa = Q.JLnewa - Q.BaJLa;
     JHawoOV = ((Q.Ra.*CJLa.*JHa));
 %    JHawoOV = ((CJHa.*JHa));
 
+% %     
+% %     % It is now mean of the overlap as the a priori
+%      OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
+%      OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV )';
+% %     
+%     OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
+%      OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV )';
+% %     
+% %     OVzd = (OVz1d+OVz2d)./2;
+% %     OVzd = smooth(OVzd,5);
+% %     
+% %     OVza = (OVz1a+OVz2a)./2;
+% OVza = OVz1a;
+% %     OVza = smooth(OVza,10);
+%     normfac = OVza(end);
+%     OVnw = OVza./normfac;
+% %     plot(Q.Zmes1./1000,OVnw,'y')
 %     
-%     % It is now mean of the overlap as the a priori
-     OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
-     OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV )';
-%     
-    OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
-     OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV )';
-%     
-%     OVzd = (OVz1d+OVz2d)./2;
-%     OVzd = smooth(OVzd,5);
-%     
-%     OVza = (OVz1a+OVz2a)./2;
-OVza = OVz1a;
-%     OVza = smooth(OVza,10);
-    normfac = OVza(end);
-    OVnw = OVza./normfac;
-%     plot(Q.Zmes1./1000,OVnw,'y')
-    
-%      OVza(OVza>=1)=1;
-%     OVz = [OVza;OVzd]; 
-     OV = interp1(Q.Zmes1,OVnw,Q.Zret); % this is to smooth
-     OV(isnan(OV))=1;
+% %      OVza(OVza>=1)=1;
+% %     OVz = [OVza;OVzd]; 
+%      OV = interp1(Q.Zmes1,OVnw,Q.Zret); % this is to smooth
+%      OV(isnan(OV))=1;
 %     OV(OV>=1)=1;
 %     h = find(Q.Zret>=4500);
 % %     h = find(OV==1);

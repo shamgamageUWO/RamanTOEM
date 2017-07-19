@@ -34,8 +34,8 @@ Q.shots = 1800;
 
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
-Q.CovDTJL = (0.01.*Q.deadtimeJL).^2;
-Q.CovDTJH = (0.01 .*Q.deadtimeJH).^2;
+Q.CovDTJL = (0.1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (0.1 .*Q.deadtimeJH).^2;
 
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -70,13 +70,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=100 & ANalt <= 1000);
+Q.Eba = Eba(ANalt>=100 & ANalt <= 10000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=1000);
-Q.JLnewa= JLnewa(ANalt>=100 & ANalt <=1000);
+Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=10000);
+Q.JLnewa= JLnewa(ANalt>=100 & ANalt <=10000);
 Q.ANalt = ANalt(ANalt>=100);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 1000);
+Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 10000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -169,7 +169,7 @@ Q.aa_an = -2.1e2;
 Q.bb_an =1.2e2;
 Q.Ttraditional_an = Q.aa_an.*log((Q.JHnewa -Q.BaJHa) ./(Q.JLnewa -Q.BaJLa))+Q.bb_an; 
 
-Q.R = Ra;%0.808780013344381;%R;%R;%0.17;
+Q.R = R;%0.808780013344381;%R;%R;%0.17;
 Q.Ra = Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
 Q.Ttraditional_digi = real(Q.bb./ (Q.aa-log((Q.JHnew -Q.BaJH) ./(Q.JLnew -Q.BaJL)))); 
 %      lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
@@ -178,7 +178,7 @@ disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 
-[CJL, CJLa,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+[CJL, CJLa,CJHa] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
 % load('ovmodeldata.mat');
 % OVnw = interp1(z,epsi,Q.Zret,'linear');
 % OVnw(isnan(OVnw))=1;
@@ -190,8 +190,8 @@ Q.CL = CJL;
 Q.CovCL = (0.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = CJLa;
 Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
-% Q.CHa = CJHa;
-% Q.CovCHa = (0.5 .* (Q.CHa)).^2;%sqrt(Q.CL);
+Q.CHa = CJHa;
+Q.CovCHa = (0.1 .* (Q.CHa)).^2;%sqrt(Q.CL);
 
                            Q.CovBJLa = ((Y.bg_JL_stda)).^2; % day time
                            Q.CovBJHa = ((Y.bg_JH_stda)).^2;
@@ -225,10 +225,10 @@ Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
 JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLnewa';
 
-                        smmohtenJH = smooth(JHreal,10); % smoothing covariance to smooth the envelop cover
-                        smmohtenJL = smooth(JLreal,10);
-                        smmohtenJHa = smooth(JHrealan,10); % smoothing covariance to smooth the envelop cover
-                        smmohtenJLa = smooth(JLrealan,10);
+                        smmohtenJH = smooth(JHreal,100); % smoothing covariance to smooth the envelop cover
+                        smmohtenJL = smooth(JLreal,100);
+                        smmohtenJHa = smooth(JHrealan,100); % smoothing covariance to smooth the envelop cover
+                        smmohtenJLa = smooth(JLrealan,100);
                         % ysmoothen= [smmohtenJH' smmohtenJL']';
 
  Q.JHnew =JHreal;  Q.JLnew=JLreal ;  Q.JHnewa =JHrealan ;   Q.JLnewa= JLrealan;
@@ -257,8 +257,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(smmohtenJHa',Q.Zmes1,12);
- [JLav,go2] =bobpoissontest(smmohtenJLa',Q.Zmes1,12);
+ [JHav,go1] =bobpoissontest(smmohtenJHa',Q.Zmes1,8);
+ [JLav,go2] =bobpoissontest(smmohtenJLa',Q.Zmes1,8);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -274,7 +274,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %                     if Q.Zmes2(i) <= 3000
 %                         Q.YYa(i) = Q.JLav(i);
 %                     else
-%                         Q.YYa(i) = 20.*Q.JLav(i);
+%                         Q.YYa(i) = 10.*Q.JLav(i);
 %                     end
 %                 end
 %                 
@@ -282,14 +282,14 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %                     if  Q.Zmes2(i) <= 3000
 %                         Q.YYYa(i) = Q.JHav(i);
 %                     else
-%                         Q.YYYa(i) = 20.*Q.JHav(i);
+%                         Q.YYYa(i) = 10.*Q.JHav(i);
 %                     end
 %                 end
 
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 3000
+            if Q.Zmes2(i) <= 4000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = smmohtenJL(i);
@@ -297,7 +297,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 3000
+            if  Q.Zmes2(i) <= 4000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = smmohtenJH(i);
@@ -310,8 +310,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 % % HEre I linearlize the covariance
 % slope = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
 % slope1 = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
-   Q.YYYa = (1).* Q.JHav;% smmohtenJHa';
-   Q.YYa  = (1).* Q.JLav;%smmohtenJLa';
+   Q.YYYa =  Q.JHav;% smmohtenJHa';
+   Q.YYa  = Q.JLav;%smmohtenJLa';
 %  Q.YYYa = slope.*Q.JHav;
 %   Q.YYa  =slope1.*Q.JLav;
 

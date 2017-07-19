@@ -19,9 +19,10 @@ x_a = x(1:m);
 BJH = x(m+1);
 BJL = x(m+2);
 CJL = x(m+3);
-OV = x(m+4:end-5);
-BJHa = x(end-4);
-BJLa = x(end-3);
+OV = x(m+4:end-6);
+BJHa = x(end-5);
+BJLa = x(end-4);
+CJHa = x(end-3);
 CJLa = x(end-2);
 DT_JH = x(end-1);
 DT_JL = x(end); % deadtimes
@@ -62,13 +63,14 @@ Diff_JL_i = interp1(T,Diff_JL,Ti,'linear');
 
 
 CJH = (Q.R).* CJL;
-CHa = (Q.Ra).* CJLa;
+% CHa = (Q.Ra).* CJLa;
+% 
 
 JL = (CJL.* A_Zi_d .* Diff_JL_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
 JH = (CJH.* A_Zi_d .* Diff_JH_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
 
 JLa = (CJLa.* A_Zi_an .* Diff_JL_i(1:N1) )./(Ti(1:N1) );
-JHa = (CHa.* A_Zi_an .* Diff_JH_i(1:N1) )./(Ti(1:N1) );
+JHa = (CJHa.* A_Zi_an .* Diff_JH_i(1:N1) )./(Ti(1:N1) );
 
 
 

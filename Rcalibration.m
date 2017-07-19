@@ -28,7 +28,7 @@ Q.R =1;
 Q.Ra = 1;
 
 % x = [Tsonde' 0 0 1 OVa 0 0 1 1];
-x = [Tsonde' 0 0 1 OVa 0 0 1 Q.deadtimeJH Q.deadtimeJL]; % coupled analog
+x = [Tsonde' 0 0 1 OVa 0 0 1 1 Q.deadtimeJH Q.deadtimeJL]; % coupled analog
 
 %% Digital
 [JL,JH,JLa,JHa]=forwardmodelTraman(Q,x);
