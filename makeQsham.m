@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 4;
+Q.coaddalt = 5;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -57,7 +57,7 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
 Q.Zmes = Q.alt';% Measurement grid
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*40:70000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:70000;% Retrieval grid
 disp('Defined grids ')
 
 
@@ -120,7 +120,7 @@ Q.Bg_JH_real = Bg_JH_real; % revisit
 Q.Bg_JL_real = Bg_JL_real;
 Q.BaJL = Q.Bg_JL_real;%0.297350746852139; % change later
 Q.BaJH = Q.Bg_JH_real;%4.998109499057194e-04;
-Q.CovCL = (0.5 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (0.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
             %%%Q.CovCL = (0.01 .* log(Q.CL)).^2;%sqrt(Q.CL);
 
@@ -137,10 +137,10 @@ end
 % this need to be done if there is any zeros in the real measurements
 % smooth the signal over 1
 JHreal = Q.JHnew';
-JHreal(JHreal<=0)= rand();
+JHreal(JHreal<=0)= 1;
 % JHreal(end) = JHreal(end-1);
 JLreal = Q.JLnew';
-JLreal(JLreal<=0)= rand();
+JLreal(JLreal<=0)= 1;
 
 
 smmohtenJH = smooth(JHreal,100); % smoothing covariance to smooth the envelop cover

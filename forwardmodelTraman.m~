@@ -6,13 +6,13 @@ function [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x)
 m = length(Q.Zret);
  % temperature
 x_a = x(1:m);
-CJL = x(m+3);
-OV = x(m+4:end-1);
-BJL = x(m+2);
-BJH = x(m+1);
 DT = x(end);
+CJL = x(end-(Q.OVlength+1));
+OV = x(end-(Q.OVlength):end-1);
 Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear'); % T on data grid (digital)
 OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
+BJL=
+
 
 % Constants
 kb = 1.38064852*10^-23;
@@ -30,6 +30,21 @@ J_lowO2 = [5,7,9,11,13];
 J_highO2 = [15,17,19,21];
 
 
+
+% Transmission 
+
+% % exponent = 4+B+C*Lambda+D/Lambda;
+% % sigma_Rcm2 = A / Lambda^(exponent);
+% % sigmaNicolet = sigma_Rcm2*1e-4;%m2
+% % Nmol = (NA/M).* Q.rho ; % mol m-3
+% % alpha_aero = Q.alpha_aero';% m^-1 this is aerosol coefficient given in Povey etal
+% % % alpha_aero(isnan(alpha_aero))=0;
+% % sigma_tot = Nmol*sigmaNicolet+ alpha_aero;
+% % % %  Tr1 = exp(-2.*cumtrapz(Q.Zmes,alpha_aero)); % Molecular transmission
+% % % %  Tr = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet)); % Molecular transmission
+% %  Tr = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
+% % 
+% % % %  Tr_aero = exp(-cumtrapz(Q.Zmes).*alpha_aero); % aerosol transmission
 
 R_tr_i = (Q.Tr);
 
@@ -92,8 +107,8 @@ Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
        JH = JH.*(Q.deltatime.*Q.coaddalt);
        
  % Add background to the counts 
-JL = JL  + BJL;
-JH = JH  + BJH;
+JL = JL  + (x(end-Q.OVlength-2));
+JH = JH  + (x(end-Q.OVlength-3));
  
 
 

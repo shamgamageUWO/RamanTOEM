@@ -1,4 +1,4 @@
-    function [dDTJH,dDTJL] = deriCountsDT(j,Q,x,forwardmodelTraman)
+    function [dDTJH,dDTJL] = deriCountsDT(Q,x,forwardmodelTraman)
 
     [y_JL,y_JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,x);
 
@@ -7,9 +7,9 @@
         stop
     end
     
-dn = 1e-4 .* x(j);
+dn = 1e-10 .* x(end);
 xpert = x;
-xpert(j) = x(j) + dn;
+xpert(end) = x(end) + dn;
 
     [y_JL_dT,y_JH_dT,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,xpert);
 

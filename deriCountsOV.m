@@ -6,14 +6,14 @@
         'after FM: Nans in retrieval vector derivCounts'
         stop
     end
-%     m=length(Q.Zret);
+    m=length(Q.Zret);
 %     xa=x(1:m);
-    dn = x(j).*1e-4; % this can go anything smaller than 0.1 even for higher temperatures works ok
+    dn = x(m+3+j).*1e-4; % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
     if x(j) == 0 % trap for tau's where tau(1) = 0
-        dn = 1.e-4 .* x(j+1);
+        dn = 1.e-4 .* x(m+3+j+1);
     end
-    xpert(j) = x(j) + dn;
+    xpert(j) = x(m+3+j) + dn;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];
 
     [y_JL_dT,y_JH_dT,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,xpert);

@@ -79,7 +79,7 @@ Kb_JL =  (((1-x(end).*JH).^2))'; %ones(n2,1).*
 JOV = zeros(n,m);
 % [dSHdxA,dSNdxA,dSHdx,dSNdx] = derivSHSN2(Q,x,n-5,@forwardModelWV);
 for j = 1:m 
-    [dOVJH,dOVJL] = deriCountsOV(N-1,Q,x,@forwardmodelTraman);
+    [dOVJH,dOVJL] = deriCountsOV(j,Q,x,@forwardmodelTraman);
     
    JOV(1:n1,j) = dOVJH;
    JOV(n1+1:n,j) = dOVJL;
@@ -91,7 +91,7 @@ end
 % JDT = zeros(n,m);
 % 
 % for j = 1:m 
-  [dDTJH,dDTJL] = deriCountsDT(N,Q,x,@forwardmodelTraman);
+  [dDTJH,dDTJL] = deriCountsDT(Q,x,@forwardmodelTraman);
   JDT= [dDTJH dDTJL];
 %    JDT(1:n1,j) = dDTJH;
 %    JDT(n1+1:n,j) = dDTJL;
