@@ -31,7 +31,7 @@ Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
-Q.deadtime = 3.3e-9;% 4ns
+Q.deadtime = 3.8e-9;% 4ns
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
@@ -47,11 +47,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=100);
+Q.Eb = Eb(alt>=3000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=100);
-Q.JLnew= JLnew(alt>=100);
-Q.alt = alt(alt>=100);
+Q.JHnew= JHnew(alt>=3000);
+Q.JLnew= JLnew(alt>=3000);
+Q.alt = alt(alt>=3000);
 Q.BaJL=  Y.bgJL;
 Q.BaJH = Y.bgJH;
 Q.bg_JL_std = Y.bg_JL_std;
@@ -199,7 +199,7 @@ Q.y = [JHreal JLreal]';
 % % h2 = Q.Zmes(indi2)
 
         for i = 1: length(Q.JLv)
-            if Q.Zmes(i) <= 3000
+            if Q.Zmes(i) <= 100
                 YY(i) = Q.JLv(i);
             else
                 YY(i) = smmohtenJL(i);
@@ -207,7 +207,7 @@ Q.y = [JHreal JLreal]';
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes(i) <= 3000
+            if  Q.Zmes(i) <= 100
                 YYY(i) = Q.JHv(i);
             else
                 YYY(i) = smmohtenJH(i);

@@ -6,7 +6,7 @@ function [Y] = makeY(Q)
 % open S0 matfile according to the given date
 datadirS3='/Users/sham/Desktop';
 % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
-file = 'S0';
+file = 'S3';
 folderpath = [datadirS3 filesep  file];
 
 
@@ -67,8 +67,8 @@ load(folderpath);
 
 % Display the start and end times of the lidar measurment
 % disp('Start time')
-g = hour(S0.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
-Minute = minute(S0.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
+g = hour(S3.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
+Minute = minute(S3.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
 start =  [g(1) Minute(1)];
 % start
 
@@ -82,18 +82,22 @@ endtime =  [g(end) Minute(end)];
 JL=[];
 JH=[];
 % Eb=[];
-alt = S0.Channel(4).Range;
-Alt = S0.Channel(2).Range ; % for Eb channel they have a different binzise
+alt =S3.JL.Combined.Range;
+Alt = S3.Eb.Combined.Range  ; % for Eb channel they have a different binzise
 
 %% Load the analog channel measurements too 
 % figure;
 %   hold on;
 
+% 
+% JL = S0.Channel(12).Signal(:,961:990);
+% JH = S0.Channel(4).Signal(:,961:990);
+% Eb= S0.Channel(10).Signal(:,961:990);
 
-JL = S0.Channel(12).Signal(:,961:990);
-JH = S0.Channel(4).Signal(:,961:990);
-Eb= S0.Channel(10).Signal(:,961:990);
 
+JL = S3.JL.Combined.Signal(:,118:147);
+JH = S3.JH.Combined.Signal(:,118:147);
+Eb=  S3.Eb.Combined.Signal(:,118:147);
 % for i = 1: length(g)
 %     if g(i)== 23 && (00 <= Minute(i)<=30)
 %         JL(:,i) = S0.Channel(12).Signal(:,i); % change these for S0 format
@@ -136,7 +140,7 @@ Eb= S0.Channel(10).Signal(:,961:990);
 %   legend('JL ana','JH ana')
 
 % MHZ to Counts conversion constant 
-Y.binsize = S0.Channel(12).BinSize;
+Y.binsize = 3.75;%S0.Channel(12).BinSize;
 F = 1800.* (Y.binsize./150);
 
 
