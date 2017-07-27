@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 5;
+Q.coaddalt = 2;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -34,8 +34,8 @@ Q.shots = 1800;
 
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
-Q.CovDTJL = (0.01.*Q.deadtimeJL).^2;
-Q.CovDTJH = (0.01 .*Q.deadtimeJH).^2;
+Q.CovDTJL = (0.1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (0.1 .*Q.deadtimeJH).^2;
 
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -70,13 +70,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=100 & ANalt <= 8000);
+Q.Eba = Eba(ANalt>=100 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=8000);
-Q.JLnewa= JLnewa(ANalt>=100 & ANalt <=8000);
+Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=6000);
+Q.JLnewa= JLnewa(ANalt>=100 & ANalt <=6000);
 Q.ANalt = ANalt(ANalt>=100);
 % Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 8000);
+Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 Q.Zmes = Q.Zmes1;
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
@@ -156,7 +156,7 @@ disp('a priori temperature profile is loaded ')
 
 
 
-% Calculate the aerosol attenuation
+% % Calculate the aerosol attenuation
 [alphaAer] = asrSham(Q);
 Q.alpha_aero = alphaAer;
 % total transmission air + aerosol 
@@ -179,11 +179,13 @@ disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 
-[CJLa] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+[CJLa,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+ Q.OVa = OV;
 % load('ovmodeldata.mat');
 % OVnw = interp1(z,epsi,Q.Zret,'linear');
 % OVnw(isnan(OVnw))=1;
-Q.OVa = ones(1,length(Q.Ta));
+% Q.OVa =OVnw;
+%  Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 % 
@@ -226,8 +228,8 @@ Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
 JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLnewa';
 
-                        smmohtenJH = smooth(JHreal,10); % smoothing covariance to smooth the envelop cover
-                        smmohtenJL = smooth(JLreal,10);
+                        smmohtenJH = smooth(JHreal,100); % smoothing covariance to smooth the envelop cover
+                        smmohtenJL = smooth(JLreal,100);
                         smmohtenJHa = smooth(JHrealan,10); % smoothing covariance to smooth the envelop cover
                         smmohtenJLa = smooth(JLrealan,10);
                         % ysmoothen= [smmohtenJH' smmohtenJL']';
@@ -258,8 +260,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(smmohtenJHa',Q.Zmes1,12);
- [JLav,go2] =bobpoissontest(smmohtenJLa',Q.Zmes1,12);
+ [JHav,go1] =bobpoissontest(smmohtenJHa',Q.Zmes1,6);
+ [JLav,go2] =bobpoissontest(smmohtenJLa',Q.Zmes1,6);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -272,16 +274,16 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 % slope1 = (((0.05-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
 
 %                 for i = 1: length(Q.JLav)
-%                     if Q.Zmes2(i) <= 3000
-%                         Q.YYa(i) = Q.JLav(i);
+%                     if Q.Zmes2(i) <= 4000
+%                         Q.YYa(i) = 0.01.*Q.JLav(i);
 %                     else
 %                         Q.YYa(i) = 20.*Q.JLav(i);
 %                     end
 %                 end
 %                 
 %                 for i = 1: length(Q.JHav)
-%                     if  Q.Zmes2(i) <= 3000
-%                         Q.YYYa(i) = Q.JHav(i);
+%                     if  Q.Zmes2(i) <= 4000
+%                         Q.YYYa(i) = 0.01.*Q.JHav(i);
 %                     else
 %                         Q.YYYa(i) = 20.*Q.JHav(i);
 %                     end
@@ -309,12 +311,13 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %         Q.Yvar =[JHreal JLreal];
 
 % % HEre I linearlize the covariance
-% slope = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
-% slope1 = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
-   Q.YYYa = (1).* Q.JHav;% smmohtenJHa';
-   Q.YYa  = (1).* Q.JLav;%smmohtenJLa';
+  slope = (((0.0002-0.001).*Q.Zmes1)/(Q.Zmes1(end)))+0.001;
+% slope1 = (((0.0008-0.5).*Q.Zmes1)/(Q.Zmes1(end)))+0.5;
+    Q.YYYa = slope.*smmohtenJHa';
+    Q.YYa  =  slope.*smmohtenJLa';
+% %  slope=1;
 %  Q.YYYa = slope.*Q.JHav;
-%   Q.YYa  =slope1.*Q.JLav;
+%   Q.YYa  =slope.*Q.JLav;
 
             Q.Yvar =[Q.YYYa Q.YYa];
 %            Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa Q.YYa];
@@ -333,104 +336,6 @@ disp('makeQ complete ')
 end
 
 
-% % % 
-% % % % Constants
-% % % Q.effi_stokeN2_JH = [0.22742041,0.61706630,1,0.66219893,0.26342483,0.00549319,0];
-% % % Q.effi_antiN2_JH = [0.20278330,0.57977270,0.99609541,0.71343372,0.31181249,0.02739112,0];
-% % % 
-% % % Q.effi_stokeO2_JH = [0.37619836,0.98166707,0.53912801,0.0511171,0];
-% % % Q.effi_antiO2_JH = [0.34586496,0.94294973,0.59074973,0.08572700,0];
-% % % 
-% % % Q.effi_stokeO2_JL = [0.02301580,0.48028012,1,0.43039766,0.00583559];
-% % % Q.effi_antiO2_JL = [0.02098297,0.47166835,1,0.44867305,0.01345647];
-% % % 
-% % % Q.effi_stokeN2_JL = [0.00025546,0.23878872,0.63072501,1,0.64955950,0.25355097,0.00289517];
-% % % Q.effi_antiN2_JL = [0,0.23299892,0.62055134,1,0.66708875,0.27132321,0.00944014];
-% % % 
-% % % Q.h = 6.6262 *10^-27; %erg-s
-% % % Q.c = 2.9979*10^10; %cm/s
-% % % Q.kb = 1.3807*10^-16; % erg/K
-% % % Q.B_N2 = 1.98957;% cm-1
-% % % Q.B_O2 = 1.43768;%cm-1
-% % % Q.D_N2 = 5.76*10^-6;%cm-1
-% % % Q.D_O2 = 4.85*10^-6; %cm-1
-% % % Q.r_N2 = 0.51*10^-48; %cm^6
-% % % Q.r_O2 = 1.27*10^-48; %cm^6
-% % % Q.n_N2 = .7808; % relative volume abundance
-% % % Q.n_O2 = .2095;
-% % % Q.v0 = 1/ (3.547*10^-5); %cm-1 355nm
-% % % Q.kb_SI = 1.38064852*10^-23; %Boltzman SI
-% % % Q.I_N2 = 1;
-% % % Q.I_O2 = 0;
-% % % Q.Const_N2 = (112* pi^4* Q.h*Q.c*Q.r_N2*Q.n_N2 )/((2*Q.I_N2+1)^2 * Q.kb *15);
-% % % Q.Const_O2 = (112* pi^4* Q.h*Q.c*Q.r_O2*Q.n_O2 )/((2*Q.I_O2+1)^2 * Q.kb *15);
-% % % 
-% % % 
-% % % %Q numbers
-% % % JHO2= [15,17, 19, 21,0];
-% % % JLO2 = [5,7,9,11,13];
-% % % JHN2 =[10,11,12,13,14,15,0];
-% % % JLN2 =[3,4,5,6,7,8,9];
-% % % 
-% % % % rotational energy
-% % % Q.ErotJHO2=[];
-% % % Q.ErotJLO2=[];
-% % % Q.ErotJHN2=[];
-% % % Q.ErotJLN2=[];
-% % % 
-% % % % JH_O2
-% % % for i = 1:length(JHO2)
-% % %     
-% % %     Q.ErotJHO2(i)= (Q.B_O2.*JHO2(i) *(JHO2(i)+1) - Q.D_O2.*(JHO2(i)^2).*(JHO2(i)+1)^2)*Q.h*Q.c;
-% % %     Q.shift_JHO2_as(i) = Q.B_O2 * 2 * (2*(JHO2(i)+2)-1) - Q.D_O2 * (3 * (2*(JHO2(i)+2)-1) + (2*(JHO2(i)+2)-1)^3);
-% % %     Q.shift_JHO2_s(i) =  -Q.B_O2 * 2 * (2*JHO2(i)+3) + Q.D_O2 * (3 * (2*JHO2(i)+3) + (2*JHO2(i)+3)^3);
-% % %     Q.X_JHO2_as(i) = ((JHO2(i)+2)*((JHO2(i)+2)-1))/(2*(JHO2(i)+2)-1);
-% % %     Q.X_JHO2_s(i) = ((JHO2(i)+1)*(JHO2(i)+2))/(2*JHO2(i)+3);
-% % %     
-% % % end
-% % % 
-% % % % JH_N2
-% % % 
-% % % for i = 1:length(JHN2)
-% % %     Q.ErotJHN2(i)= (Q.B_N2.*JHN2(i) *(JHN2(i)+1) - Q.D_N2.*(JHN2(i)^2).*(JHN2(i)+1)^2)*Q.h*Q.c;
-% % %     Q.shift_JHN2_as(i) = Q.B_N2 * 2 * (2*(JHN2(i)+2)-1) - Q.D_N2 * (3 * (2*(JHN2(i)+2)-1) + (2*(JHN2(i)+2)-1)^3);
-% % %     Q.shift_JHN2_s(i) =  -Q.B_N2 * 2 * (2*JHN2(i)+3) + Q.D_N2 * (3 * (2*JHN2(i)+3) + (2*JHN2(i)+3)^3);
-% % %     Q.X_JHN2_as(i) = ((JHN2(i)+2)*((JHN2(i)+2)-1))/(2*(JHN2(i)+2)-1);
-% % %     Q.X_JHN2_s(i) = ((JHN2(i)+1)*(JHN2(i)+2))/(2*JHN2(i)+3);
-% % %     
-% % % end
-% % % 
-% % % 
-% % % 
-% % % % JL_O2
-% % % for i = 1:length(JLO2)
-% % %     
-% % %     Q.ErotJLO2(i)= (Q.B_O2.*JLO2(i) *(JLO2(i)+1) - Q.D_O2.*(JLO2(i)^2).*(JLO2(i)+1)^2)*Q.h*Q.c;
-% % %     Q.shift_JLO2_as(i) =Q.B_O2 * 2 * (2*(JLO2(i)+2)-1) - Q.D_O2 * (3 * (2*(JLO2(i)+2)-1) + (2*(JLO2(i)+2)-1)^3);
-% % %     Q.shift_JLO2_s(i) =  -Q.B_O2 * 2 * (2*JLO2(i)+3) + Q.D_O2 * (3 * (2*JLO2(i)+3) + (2*JLO2(i)+3)^3);
-% % %     Q.X_JLO2_as(i) = ((JLO2(i)+2)*((JLO2(i)+2)-1))/(2*(JLO2(i)+2)-1);
-% % %     Q.X_JLO2_s(i) = ((JLO2(i)+1)*(JLO2(i)+2))/(2*JLO2(i)+3);
-% % %     
-% % % end
-% % % 
-% % % 
-% % % % JL_N2
-% % % for i = 1:length(JLN2)
-% % %     
-% % %     Q.ErotJLN2(i)= (Q.B_N2.*JLN2(i) *(JLN2(i)+1) - Q.D_N2.*(JLN2(i)^2).*(JLN2(i)+1)^2)*Q.h*Q.c;
-% % %     Q.shift_JLN2_as(i) = Q.B_N2 * 2 * (2*(JLN2(i)+2)-1) - Q.D_N2 * (3 * (2*(JLN2(i)+2)-1) + (2*(JLN2(i)+2)-1)^3);
-% % %     Q.shift_JLN2_s(i) =  -Q.B_N2 * 2 * (2*JLN2(i)+3) + Q.D_N2 * (3 * (2*JLN2(i)+3) + (2*JLN2(i)+3)^3);
-% % %     Q.X_JLN2_as(i) = ((JLN2(i)+2)*((JLN2(i)+2)-1))/(2*(JLN2(i)+2)-1);
-% % %     Q.X_JLN2_s(i) = ((JLN2(i)+1)*(JLN2(i)+2))/(2*JLN2(i)+3);
-% % % end
-% % % 
-% % % 
-% % % 
-% % % 
-% % % 
-% % % Q.JHO2 = JHO2;
-% % % Q.JLO2 = JLO2;
-% % % Q.JHN2 = JHN2;
-% % % Q.JLN2 = JLN2;
+
 
 

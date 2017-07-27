@@ -45,7 +45,7 @@ x = [Tsonde' OVa 0 0 1]; % coupled analog
 
 % %% analog
 Alt2 = Q.Zmes1 + 491;
-ind2 = Alt2 >= 2000 & Alt2 <= 2100;
+ind2 = Alt2 >= 1000 & Alt2 <= 2000;
 xa = (JHa(ind2)./JLa(ind2));
 ya = JHnewa(ind2)./JLnewa(ind2);
 
@@ -69,13 +69,14 @@ Ra = fit3a(1);
 % bb = s(2);
 %  ff = fittype({'a*x+b'},);
 % % % %%%%%% Calibration for traditional method Digital channel
-% lnQ1 = log(JHnewa./JLnewa);
-% yy1 = interp1(Zsonde,Tsonde,Alt2,'linear');
-% yy1 = yy1(Alt2>=2500 & Alt2<3000);
-% xx1 = lnQ1;
-% xx1 = xx1(Alt2>=2500 & Alt2<3000);
-% g1 = fittype('b/(a-x)','coeff',{'a','b'});
-% fit341 = fit(xx1,yy1',g1,'Robust','on','Startpoint', [0 0]);
-% s1= coeffvalues(fit341);
-% aa1 = s1(1);
-% bb1 = s1(2);
+lnQ1 = log(JHnewa./JLnewa);
+yy1 = interp1(Zsonde,Tsonde,Alt2,'linear');
+yy1 = yy1(Alt2>=1500 & Alt2<2500);
+xx1 = lnQ1;
+xx1 = xx1(Alt2>=1500 & Alt2<2500);
+plot(xx1,yy1)
+g1 = fittype('b/(a-x)','coeff',{'a','b'});
+fit341 = fit(xx1,yy1',g1,'Robust','on','Startpoint', [0 0]);
+s1= coeffvalues(fit341);
+aa1 = s1(1);
+bb1 = s1(2);

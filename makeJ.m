@@ -12,25 +12,23 @@ end
 
 
 
-n1=Q.n1; %length JH
-n2=Q.n2; %length JL
+% n1=Q.n1; %length JH
+% n2=Q.n2; %length JL
 n3 =Q.n3; % length JHa
 n4 =Q.n4;
 
-n = n1+n2+n3+n4;
+ n = n3+n4;
 m = length(Q.Zret);
 yf = [JHa JLa]';
 
 % Temperature Jacobian 
-Jc = zeros(n3+n4,m);
+Jc = zeros(n,m);
 
 for j = 1:m 
-    [dJH,dJL,dJHa,dJLa] = deriCountsOEM(j,Q,x,@forwardmodelTraman);
+    [dJHa,dJLa] = deriCountsOEM(j,Q,x,@forwardmodelTraman);
     
-%    Jc(1:n1,j) = dJH;
-%    Jc(n1+1:n1+n2,j) = dJL;
    Jc(1:n3,j) = dJHa;
-   Jc(n3+1:n3+n4,j) = dJLa;
+   Jc(n3+1:n,j) = dJLa;
 % j
 % disp('ok')
 end
@@ -71,8 +69,8 @@ Kb_JLa =  ones(n4,1);
             
             
 %% Analog            
-            KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
-            KCLa22 = ((Q.Ra.* A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
+            KCLa11 = ((A_Zi_an.*Diff_JL_i(1:n3))./Ti(1:n3));%.*exp(logCJL);
+            KCLa22 = ((Q.Ra.* A_Zi_an.*Diff_JH_i(1:n3))./Ti(1:n3));
 %             KCHa = ((A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL); %% Note I have applied the cutoff for JH here
 %             KCLa = [KCLa22 KCLa11];
 %             KCL = KCL .* exp(logCJL); % this is done as I'm retrieving log of CJL now CJL 
@@ -103,16 +101,16 @@ Kb_JLa =  ones(n4,1);
 % % JOVJL_an = ((CJLa.*B_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));
 % % JOVJH_an = ((Q.Ra.*CJLa.*B_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
 % OV analytical
-JOV = zeros(n3+n4,m);
+JOV = zeros(n,m);
 % N = 2*m+6 ;
 
 for jj = 1:m 
    
-   [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(jj,Q,x,@forwardmodelTraman);
+   [dOVJHa,dOVJLa] = deriCountsOV(jj,Q,x,@forwardmodelTraman);
 %    JOV(1:n1,jj) = dOVJH;
 %    JOV(n1+1:n1+n2,jj) = dOVJL;
    JOV(1:n3,jj) = dOVJHa;
-   JOV(n3+1:n3+n4,jj) = dOVJLa;
+   JOV(n3+1:n,jj) = dOVJLa;
 
 end
 % %% Deadtime jacobian
