@@ -24,8 +24,8 @@ if ~O.linear
 end
 
 CJL = X.x(end-Q.OVlength);
- BJH = (X.x(end-Q.OVlength-2));
- BJL = (X.x(end-Q.OVlength-1));
+BJH = (X.x(end-Q.OVlength-2));
+BJL = (X.x(end-Q.OVlength-1));
   
 'X.cost'
 X.cost
@@ -34,13 +34,13 @@ X.cost
 BJH
 
 'real-BG-JH'
-Q.Bg_JH_real
+Q.BaJL
 
 'OEM-BG-JL'
 BJL
 
 'real-BG-JL'
-Q.Bg_JL_real
+Q.BaJH
 
 'OEM-CL'
 CJL
@@ -195,8 +195,8 @@ ylabel('Altitude(km)')
 
 %% Percent difference of background, lidar calibration constant retrievals and the true
 
-percent_BG_JH = ((Q.Bg_JH_real -BJH)./BJH).*100
-percent_BG_JL = ((Q.Bg_JL_real -BJL)./BJL).*100
+percent_BG_JH = ((Q.BaJH -BJH)./BJH).*100
+percent_BG_JL = ((Q.BaJL -BJL)./BJL).*100
 percent_CJL = ((Q.CL -CJL)./CJL).*100
 % percent_CJLTrue = ((Q.CL*(1.05) -CJL)./CJL).*100
 Degree_of_freedom_Temperature = trace(X.A(1:m,1:m))

@@ -1,19 +1,19 @@
-function [CJL, CJH,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length1,bg_length2,OV] = estimations(Q)
+function [CJL, CJH,OV] = estimations(Q)
 
 % [JHnew,JLnew,alt,JLwithoutBG,JHwithoutBG,bg_JL_mean,bg_JH_mean,bg_JL_std,bg_JH_std,Eb,bg_length]=rawcountsRALMOnew(Q);
-[Y]= makeY(Q);
-JHnew = Y.JH;
-JLnew= Y.JL;
-alt = Y.alt;
-bg_JL_mean=  Y.bgJL;
-bg_JH_mean = Y.bgJH;
-bg_JL_std = Y.bg_JL_std;
-bg_JH_std = Y.bg_JH_std;
-bg_length1 = Y.bg_length1;
-bg_length2 = Y.bg_length2;
-JHnew= JHnew(alt>=1500);
-JLnew= JLnew(alt>=1500);
-alt = alt(alt>=1500);
+% [Y]= makeY(Q);
+JHnew = Q.JHnew;
+JLnew= Q.JLnew;
+alt = Q.alt;
+bg_JL_mean=  Q.BaJL;
+bg_JH_mean = Q.BaJH;
+% bg_JL_std = Q.bg_JL_std;
+% bg_JH_std = Q.bg_JH_std;
+% bg_length1 = Q.bg_length1;
+% bg_length2 = Q.bg_length2;
+% JHnew= JHnew(alt>=500);
+% JLnew= JLnew(alt>=500);
+% alt = alt(alt>=500);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % HEre I'm trying to make an estimation of true background
 Bg_JL_real =  (bg_JL_mean); % this is an estimation of obs background
@@ -56,19 +56,19 @@ SJL = JLnew - Bg_JL_real;
 % %      OVz = (JLnew + JHnew)./(JLwoOV + JHwoOV)';
     JLwoOV = ((CJL.*JL));
     JHwoOV = ((Q.R.*CJL.*JH));
-    % It is now mean of the overlap as the a priori
+%     % It is now mean of the overlap as the a priori
     OVz1 = (JLnew - Bg_JL_real)./(JLwoOV )';
     OVz2 = (JHnew - Bg_JH_real)./(JHwoOV )';
     OVz = (OVz1+OVz2)./2;
    OVz = smooth(OVz,5);
+% % 
+% %     %  OVz = (JLnew + JHnew- Bg_JL_real- Bg_JH_real)./(JLwoOV + JHwoOV)';
+% %     % figure;plot(Q.Zmes./1000,OVz,'b'); hold on;
+     OV = interp1(Q.Zmes,OVz,Q.Zret); % this is to smooth
 % 
-%     %  OVz = (JLnew + JHnew- Bg_JL_real- Bg_JH_real)./(JLwoOV + JHwoOV)';
-%     % figure;plot(Q.Zmes./1000,OVz,'b'); hold on;
-    OV = interp1(Q.Zmes,OVz,Q.Zret); % this is to smooth
-
-% OV = ones(1,length(Q.Ta));
-% plot(Q.Zret./1000,OV,'r')
-        OV(OV>=1)=1;
+% % OV = ones(1,length(Q.Ta));
+% % plot(Q.Zret./1000,OV,'r')
+         OV(OV>=1)=1;
         h = find(OV==1);
         OV(h(1):end)=1;
 %  plot(Q.Zret./1000,OV,'y')

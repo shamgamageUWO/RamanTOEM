@@ -47,11 +47,18 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=1500);
+Q.Eb = Eb(alt>=100);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=1500);
-Q.JLnew= JLnew(alt>=1500);
-Q.alt = alt(alt>=1500);
+Q.JHnew= JHnew(alt>=100);
+Q.JLnew= JLnew(alt>=100);
+Q.alt = alt(alt>=100);
+Q.BaJL=  Y.bgJL;
+Q.BaJH = Y.bgJH;
+Q.bg_JL_std = Y.bg_JL_std;
+Q.bg_JH_std = Y.bg_JH_std;
+Q.bg_length1 = Y.bg_length1;
+Q.bg_length2 = Y.bg_length2;
+
 disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -112,25 +119,21 @@ Q.R = 0.7913;%R;%0.17;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
-[CJL, CJH,Bg_JL_real,Bg_JH_real,bg_JL_std,bg_JH_std,bg_length1,bg_length2,OV] = estimations(Q);
-Q.OVa = OV;%ones(1,length(OV));%
+[CJL, CJH,OV] = estimations(Q);
+Q.OVa = OV;%ones(1,length(Q.Zret));%
 Q.OVlength = length(Q.OVa);
 Q.CL = CJL;%(2.9e+18);
-Q.Bg_JH_real = Bg_JH_real; % revisit
-Q.Bg_JL_real = Bg_JL_real;
-Q.BaJL = Q.Bg_JL_real;%0.297350746852139; % change later
-Q.BaJH = Q.Bg_JH_real;%4.998109499057194e-04;
-Q.CovCL = (0.5 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (0.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
-            %%%Q.CovCL = (0.01 .* log(Q.CL)).^2;%sqrt(Q.CL);
+
 
 if flag ==1
-Q.CovBJL = ((bg_JL_std)).^2; % day time
-Q.CovBJH = ((bg_JH_std)).^2;
+Q.CovBJL = ((Q.bg_JL_std)).^2; % day time
+Q.CovBJH = ((Q.bg_JH_std)).^2;
 disp('Daytime retrieval')
 else 
-Q.CovBJL = ((bg_JL_std/sqrt(bg_length2))).^2;
-Q.CovBJH = ((bg_JH_std/sqrt(bg_length1))).^2;
+Q.CovBJL = ((Q.bg_JL_std/sqrt(Q.bg_length2))).^2;
+Q.CovBJH = ((Q.bg_JH_std/sqrt(Q.bg_length1))).^2;
 disp('Nighttime retrieval')
 end 
 
@@ -143,12 +146,12 @@ JLreal = Q.JLnew';
 JLreal(JLreal<=0)= rand();
 
 
-smmohtenJH = smooth(JHreal,10); % smoothing covariance to smooth the envelop cover
-smmohtenJL = smooth(JLreal,10);
+smmohtenJH = smooth(JHreal,100); % smoothing covariance to smooth the envelop cover
+smmohtenJL = smooth(JLreal,100);
 ysmoothen= [smmohtenJH' smmohtenJL']';
 Q.y = [JHreal JLreal]';
 
- Q.yvar = diag(ysmoothen);
+%  Q.yvar = diag(ysmoothen);
 
 
 % Variance need to be fixed as below: 
@@ -156,22 +159,16 @@ Q.y = [JHreal JLreal]';
 % above 2 km use the counts
 
 % % Q.yvar = diag(Q.y);
-%             [JHv,go] =bobpoissontest(JHreal,Q.Zmes);
-%             [JLv,go] =bobpoissontest(JLreal,Q.Zmes);
-% %             r1 = interp1(JHv, -3:0, 'linear', 'extrap');
-% %             r2 = ones(1,go-1).* JHv(end);
-% %             r3 = JLreal(1:go-1);
-% %             r4 = ones(1,go-1).* JLv(end);
-% % r1 = interp1(JHv, -(go-2):0, 'linear', 'extrap');
-% % r2 = interp1(JHv, JHv(end):go-1, 'linear', 'extrap');
-% % r3 = interp1(JLv, -(go-2):0, 'linear', 'extrap');
-% % r4 = interp1(JLv, JLv(end):go-1, 'linear', 'extrap');
-%             r1 = ones(1,go-1).* JHv(1);
-%             r2 = ones(1,go-1).* JHv(end);
-%             r3 = ones(1,go-1).* JLv(1);
-%             r4 = ones(1,go-1).* JLv(end);
-%             Q.JHv = [r1 JHv r2];
-%             Q.JLv = [r3 JLv r4];
+            [JHv,go] =bobpoissontest(smmohtenJH',Q.Zmes);
+            [JLv,go] =bobpoissontest(smmohtenJL',Q.Zmes);
+
+            r1 = ones(1,go-1).* JHv(1);
+            r2 = ones(1,go-1).* JHv(end);
+            r3 = ones(1,go-1).* JLv(1);
+            r4 = ones(1,go-1).* JLv(end);
+            Q.JHv = [r1 JHv r2];
+            Q.JLv = [r3 JLv r4];
+            
 % figure;plot(Q.JLv,Q.Zmes./1000,'r',JLreal,Q.Zmes./1000,'b')
 % xlabel('Log of Variance')
 % ylabel('Alt(km)')
@@ -201,22 +198,22 @@ Q.y = [JHreal JLreal]';
 % % indi2 = k2(1);
 % % h2 = Q.Zmes(indi2)
 
-%         for i = 1: length(Q.JLv)
-%             if Q.Zmes(i) <= 4000
-%                 YY(i) = Q.JLv(i);
-%             else
-%                 YY(i) = smmohtenJL(i);
-%             end
-%         end
-% 
-%         for i = 1: length(Q.JHv)
-%             if  Q.Zmes(i) <= 4000
-%                 YYY(i) = Q.JHv(i);
-% %             else
-% %                 YYY(i) = smmohtenJH(i);
-% %             end
-% %         end
-% 
+        for i = 1: length(Q.JLv)
+            if Q.Zmes(i) <= 3000
+                YY(i) = Q.JLv(i);
+            else
+                YY(i) = smmohtenJL(i);
+            end
+        end
+
+        for i = 1: length(Q.JHv)
+            if  Q.Zmes(i) <= 3000
+                YYY(i) = Q.JHv(i);
+            else
+                YYY(i) = smmohtenJH(i);
+            end
+        end
+
        
 
 %           Q.Yvar =[smmohtenJH;smmohtenJL];
@@ -239,8 +236,8 @@ Q.y = [JHreal JLreal]';
 % ylabel('Alt(km)')
 %  h2
 % % Q.yvar = diag(Q.Yvar);
-% % Q.Yvar =[Q.JHv Q.JLv];
-
+ Q.Yvar =[YYY YY];
+Q.yvar = diag(Q.Yvar);
 
 Q.n1=length(JHreal);
 Q.n2=length(JLreal);
