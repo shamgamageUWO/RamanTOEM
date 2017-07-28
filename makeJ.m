@@ -37,8 +37,8 @@ end
 
 %% BG jacobians Analytical 
 % ones need to be multiplied by the deadtime term: refer notes 
-Kb_JH = (((1-Q.deadtime.*JL).^2))'; %ones(n1,1).* 
-Kb_JL =  (((1-Q.deadtime.*JH).^2))'; %ones(n2,1).*
+Kb_JH = (((1-Q.deadtime.*JH).^2))'; %ones(n1,1).* 
+Kb_JL =  (((1-Q.deadtime.*JL).^2))'; %ones(n2,1).*
 Kb_JHa =  ones(n3,1); 
 Kb_JLa =  ones(n4,1);
 %zeros(n-n2,1)]; % fix the lengths

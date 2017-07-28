@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 5;
+Q.coaddalt = 4;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -48,11 +48,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>3000);
+Q.Eb = Eb(alt>1000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>3000);
-Q.JLnew= JLnew(alt>3000);
-Q.alt = alt(alt>3000);
+Q.JHnew= JHnew(alt>1000);
+Q.JLnew= JLnew(alt>1000);
+Q.alt = alt(alt>1000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
