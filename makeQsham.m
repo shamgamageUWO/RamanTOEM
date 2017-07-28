@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 5;
+Q.coaddalt = 10;
 Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -70,13 +70,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=100 & ANalt <= 10000);
+Q.Eba = Eba(ANalt>=100 & ANalt <= 3000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=10000);
-Q.JLnewa= JLnewa(ANalt>=100 & ANalt <=10000);
+Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=3000);
+Q.JLnewa= JLnewa(ANalt>=100 & ANalt <=3000);
 Q.ANalt = ANalt(ANalt>=100);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 10000);
+Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 3000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -179,10 +179,11 @@ disp('R is calibrated ')
 %% Estimating background and lidar constant wrt a priori 
 
 [CJL, CJLa,CJHa] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-% load('ovmodeldata.mat');
-% OVnw = interp1(z,epsi,Q.Zret,'linear');
-% OVnw(isnan(OVnw))=1;
-Q.OVa = ones(1,length(Q.Ta));
+load('ovmodeldata.mat');
+OVnw = interp1(z,epsi,Q.Zret,'linear');
+OVnw(isnan(OVnw))=1;
+Q.OVa = OVnw;
+% Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 

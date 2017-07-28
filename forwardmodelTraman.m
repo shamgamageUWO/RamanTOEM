@@ -4,17 +4,6 @@ function [JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=fo
 
 m = length(Q.Zret);
 % %     % retrieve CJH independtly 
-% % 
-% %     x_a = x(1:m);
-% %     BJH = x(m+1);
-% %     BJL = x(m+2);
-% %     CJL = x(m+3);
-% %     OV = x(m+4:end-4);
-% %     BJHa = x(end-3);
-% %     BJLa = x(end-2);
-% %     CJHa = x(end-1);
-% %     CJLa = x(end);
-
 x_a = x(1:m);
 BJH = x(m+1);
 BJL = x(m+2);

@@ -35,10 +35,12 @@ for j = 1:m
 % disp('ok')
 end
 
+DT_JH = x(end-1);
+DT_JL = x(end);
 %% BG jacobians Analytical 
 % ones need to be multiplied by the deadtime term: refer notes 
-Kb_JH = (((1-Q.deadtimeJL.*JL).^2))'; %ones(n1,1).* 
-Kb_JL =  (((1-Q.deadtimeJH.*JH).^2))'; %ones(n2,1).*
+Kb_JH = (((1-DT_JH.*JH).^2))'; %ones(n1,1).* 
+Kb_JL =  (((1-DT_JL.*JL).^2))'; %ones(n2,1).*
 Kb_JHa =  ones(n3,1); 
 Kb_JLa =  ones(n4,1);
 %zeros(n-n2,1)]; % fix the lengths
@@ -65,46 +67,17 @@ Kb_JLa =  ones(n4,1);
 
 
 %% Digital    
-            KCL11 = ((A_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtimeJL.*JL).^2);%.*exp(logCJL);
-            KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtimeJH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
+            KCL11 = ((A_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-DT_JL.*JL).^2);%.*exp(logCJL);
+            KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-DT_JH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
 %             KCL = [KCL22 KCL11];
             
             
 %% Analog            
             KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
             KCLa22 = ((A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
-%             KCHa = ((A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL); %% Note I have applied the cutoff for JH here
-%             KCLa = [KCLa22 KCLa11];
-%             KCL = KCL .* exp(logCJL); % this is done as I'm retrieving log of CJL now CJL 
 
 
-
-
-% Numerical
-
-%  dCL = Q.CLfac .* x(end-1);
-%  dCH = Q.CHfac .* x(end);
-%  x(end-1) = x(end-1)+ dCL;
-%  x(end) = x(end)+ dCH;
-%  
-% [y_JL_dCL,y_JH_dCH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,x);
-% 
-% KCL1 = (y_JL_dCL-JL)./dCL;
-% KCL2 = (y_JH_dCH-JH)./dCH;
-% KCL = [KCL1';zeros(length(KCL2),1)];
-% KCH = [zeros(length(KCL1),1);KCL2'];
-
-
-%% OV jacobians Analytical --- Interpolation need to be added here
-% % CJL = x(m+3);
-% % CJLa = x(end);
-% % JOVJL = ((CJL.*B_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtime.*JL).^2);
-% % JOVJH = ((Q.R.*CJL.*B_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtime.*JH).^2);
-% % JOVJL_an = ((CJLa.*B_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));
-% % JOVJH_an = ((Q.Ra.*CJLa.*B_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
-% OV analytical
 JOV = zeros(n,m);
-% N = 2*m+6 ;
 
 for jj = 1:m 
    
@@ -115,6 +88,7 @@ for jj = 1:m
    JOV(n1+n2+n3+1:n,jj) = dOVJLa;
 
 end
+
 %% Deadtime jacobian
 Jdt1 = zeros(n,1);
 Jdt2 = zeros(n,1);
@@ -122,14 +96,14 @@ Jdt2 = zeros(n,1);
     [dJHdt,dJLdt] = deridt(Q,x,@forwardmodelTraman);
     
    Jdt1(1:n1) = dJHdt;
-   Jdt1(n1+1:n1+n2) = 0;
-   Jdt1(n1+n2+1:n1+n2+n3) = 0;
-   Jdt1(n1+n2+n3+1:n) = 0;
+   Jdt1(n1+1:n) = 0;
+%    Jdt1(n1+n2+1:n1+n2+n3) = 0;
+%    Jdt1(n1+n2+n3+1:n) = 0;
    
    Jdt2(1:n1) = 0;
    Jdt2(n1+1:n1+n2) = dJLdt;
-   Jdt2(n1+n2+1:n1+n2+n3) = 0;
-   Jdt2(n1+n2+n3+1:n) = 0;
+   Jdt2(n1+n2+1:n) = 0;
+%    Jdt2(n1+n2+n3+1:n) = 0;
 % j
 % disp('ok')
 

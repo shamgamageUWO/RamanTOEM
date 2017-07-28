@@ -12,13 +12,13 @@ DT_JL = x(end); % deadtimes
     end
 %     m=length(Q.Zret);
 %     xa=x(1:m);
-    dn = DT_JH.*1e-3;
-    dn2 = DT_JL.*1e-3;
+    dn = DT_JH.*1e-9;
+    dn2 = DT_JL.*1e-9;
     % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
 
-    xpert(end-1) = x(end-1) + dn;
-    xpert(end) = x(end) + dn2;
+    xpert(end-1) = DT_JH + dn;
+    xpert(end) =  DT_JL + dn2;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];
 
     [y_JL_dT,y_JH_dT]=forwardmodelTraman(Q,xpert);
