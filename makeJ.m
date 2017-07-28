@@ -74,7 +74,7 @@ Kb_JLa =  ones(n4,1);
             
 %% Analog            
             KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
-            KCLa22 = ((A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
+            KCLa22 = ((Q.Ra.*A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
 
 
 JOV = zeros(n,m);
@@ -172,12 +172,12 @@ J_JHa = [zeros(n1+n2,1);Kb_JHa;zeros(n4,1)];
 
 J_JLa = [zeros(n1+n2+n3,1);Kb_JLa];
 
-% KCLa1 = [KCLa22 KCLa11];
-% KCLa = [zeros(1,n1+n2) KCLa1];
+KCLa1 = [KCLa22 KCLa11];
+KCLa = [zeros(1,n1+n2) KCLa1];
 
-KCHa = [zeros(1,n1+n2) KCLa22 zeros(1,n4)];
-KCLa = [zeros(1,n1+n2+n3) KCLa11];
+% KCHa = [zeros(1,n1+n2) KCLa22 zeros(1,n4)];
+% KCLa = [zeros(1,n1+n2+n3) KCLa11];
  
-J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCHa' KCLa' Jdt1 Jdt2];
+J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa' Jdt1 Jdt2];
 
 

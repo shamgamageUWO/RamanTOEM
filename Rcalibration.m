@@ -28,7 +28,7 @@ Q.R =1;
 Q.Ra = 1;
 
 % x = [Tsonde' 0 0 1 OVa 0 0 1 1];
-x = [Tsonde' 0 0 1 OVa 0 0 1 1 Q.deadtimeJH Q.deadtimeJL]; % coupled analog
+x = [Tsonde' 0 0 1 OVa 0 0 1 Q.deadtimeJH Q.deadtimeJL]; % coupled analog
 
 %% Digital
 [JL,JH,JLa,JHa]=forwardmodelTraman(Q,x);
@@ -45,7 +45,7 @@ R = fit3(1);
 
 % %% analog
 Alt2 = Q.Zmes1 + 491;
-ind2 = Alt2 >= 2000 & Alt2 <= 2100;
+ind2 = Alt2 >= 1500 & Alt2 <= 1700;
 xa = (JHa(ind2)./JLa(ind2));
 ya = JHnewa(ind2)./JLnewa(ind2);
 
