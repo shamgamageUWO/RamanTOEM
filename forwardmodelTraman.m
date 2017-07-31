@@ -30,7 +30,7 @@ area = pi * (0.3^2);
 R_tr_i = (Q.Tr);
 
 % Define the first part of the equation 
-N1 = length(Q.JHnewa);
+N1 = length(Q.Zmes1);
 % NN1 = length();
 % N2 = length(Q.JHnew); fr=OV_Zi(Q.d_alti_Diff+1:end);
 
