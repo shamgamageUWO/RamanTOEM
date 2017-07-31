@@ -45,10 +45,10 @@ Q.Rate = 1800;
 
 disp('All the constants are ready')
 
-Q.Zmes1 = 100:100:10000;
-Q.Zmes2 = 2000:100:65000;
-Q.Zmes = 100:100:65000;
-Q.Zret = 100:1000:70000;
+Q.Zmes1 = 100:37.5:10000;
+Q.Zmes2 = 1000:37.5:65000;
+Q.Zmes = 100:37.5:65000;
+Q.Zret = 100:375:70000;
 
 % US temperature model
 % load('USdata.mat');
@@ -72,7 +72,7 @@ load('ovmodeldata.mat');
 OVnw = interp1(z,epsi,Q.Zret,'linear');
 OVnw(isnan(OVnw))=1;
 Q.OVa = OVnw;
-% Q.OVa = ones(1,length(Q.Ta));
+%  Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
@@ -83,9 +83,9 @@ Q.deadtimeJH = 3.8e-9; % 4ns
 Q.CovDTJL = (0.01.*Q.deadtimeJL).^2;
 Q.CovDTJH = (0.01 .*Q.deadtimeJH).^2;
 
-Q.CL = 3e21;
+Q.CL = 3.7814e20;
 Q.CovCL = (0.1 .* (Q.CL)).^2;%sqrt(Q.CL);
-Q.CLa = 2e16;
+Q.CLa = 5.7798e16;
 Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
 
@@ -94,9 +94,9 @@ Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
      [Y] = makeY(Q);
 % Digital measurements 2km above
-%         JHnew = Y.JH;
-%         JLnew = Y.JL;
-%         alt = Y.alt;
+        JHnew = Y.JH;
+        JLnew = Y.JL;
+        alt = Y.alt;
 %         Eb = Y.Eb;
 %         Q.binzise = Y.binsize;
 %         Q.Eb = Eb(alt>=2000);
@@ -107,10 +107,10 @@ Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 %         Q.Zmes2 = Q.alt';
 % 
 %         % Analog measurements
-%         JHnewa = Y.JHa;
-%         JLnewa = Y.JLa;
+        JHnewa = Y.JHa;
+        JLnewa = Y.JLa;
 %         Eba = Y.Eba;
-%         ANalt = Y.alt_an;
+        ANalt = Y.alt_an;
 %         % Q.Eba = Eba(alt>=50 & alt<6000);
 %         % Q.Eba(Q.Eba <=0)= rand();
 %         % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
@@ -148,10 +148,7 @@ Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.JHnewa = Q.JHnewa(1+zAoffset:end);
 % Q.JLnewa = Q.JLnewa(1+zAoffset:end);
 
-%         Q.n1=length(Q.JHnew);
-%         Q.n2=length(Q.JLnew);
-%         Q.n3=length(Q.JHnewa);
-%         Q.n4=length(Q.JLnewa);
+
 
 %% Define grid sizes
 % Q.Zmes1 = Q.ANalt';
@@ -203,8 +200,8 @@ Q.Tr = Total_Transmission(Q);
 % Q.bb_an =1.2e2;
 % Q.Ttraditional_an = Q.aa_an.*log((Q.JHnewa -Q.BaJHa) ./(Q.JLnewa -Q.BaJLa))+Q.bb_an; 
 
-Q.R = 0.808;%0.808780013344381;%R;%R;%0.17;
-Q.Ra = 1.04;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
+Q.R = 0.7913;%0.808780013344381;%R;%R;%0.17;
+Q.Ra = 0.8639;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
 % Q.Ttraditional_digi = real(Q.bb./ (Q.aa-log((Q.JHnew -Q.BaJH) ./(Q.JLnew -Q.BaJL)))); 
 %      lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
 %                     Ttradi = real(Q.bb./(Q.aa-lnQ));
@@ -232,8 +229,10 @@ xx = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtim
 [JLreal,JHreal,JLareal,JHareal]=forwardmodelTraman(Q,xx);
 JLreal = NoiseP(JLreal);
 JHreal = NoiseP(JHreal);
-JLareal = NoiseP(JLareal);
-JHareal = NoiseP(JHareal);
+JLareal = awgn(JLareal,50,'measured');
+JHareal = awgn(JHareal,50,'measured');
+% JLareal = NoiseP(JLareal);
+% JHareal = NoiseP(JHareal);
 
 
                            Q.CovBJLa = ((Y.bg_JL_stda)).^2; % day time
@@ -261,10 +260,7 @@ JHareal = NoiseP(JHareal);
 %                         % this need to be done if there is any zeros in the real measurements
 %                         % smooth the signal over 1
 %                     
-%                         Q.JHnew(Q.JHnew<=0)= round(rand(1)*10);
-%                         Q.JHnewa(Q.JHnewa<=0)= round(rand(1)*10);
-%                         Q.JLnew(Q.JLnew<=0)= round(rand(1)*10);
-%                         Q.JLnewa(Q.JLnewa<=0)= round(rand(1)*10);
+
 % 
 % JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLnewa';
 % 
@@ -275,7 +271,10 @@ JHareal = NoiseP(JHareal);
 %                         % ysmoothen= [smmohtenJH' smmohtenJL']';
 
  Q.JHnew =JHreal;  Q.JLnew=JLreal ;  Q.JHnewa =JHareal ;   Q.JLnewa= JLareal;
-
+                        Q.JHnew(Q.JHnew<=0)= round(rand(1)*10);
+                        Q.JHnewa(Q.JHnewa<=0)= round(rand(1)*10);
+                        Q.JLnew(Q.JLnew<=0)= round(rand(1)*10);
+                        Q.JLnewa(Q.JLnewa<=0)= round(rand(1)*10);
                         Q.y = [Q.JHnew Q.JLnew Q.JHnewa Q.JLnewa]';
                         
                         
@@ -286,7 +285,7 @@ JHareal = NoiseP(JHareal);
 % below 2 km use the Var from the piecewise code
 % above 2 km use the counts
 
-Q.yvar = diag(Q.y);
+% Q.yvar = diag(Q.y);
 %              [JHv,go] =bobpoissontest(smmohtenJH',Q.Zmes2,8);
 %              [JLv,go] =bobpoissontest(smmohtenJL',Q.Zmes2,8);
 % % 
@@ -300,15 +299,15 @@ Q.yvar = diag(Q.y);
 %              Q.JLv = [r3 JLv r4];
 % 
 % 
-%  [JHav,go1] =bobpoissontest(smmohtenJHa',Q.Zmes1,8);
-%  [JLav,go2] =bobpoissontest(smmohtenJLa',Q.Zmes1,8);
-% 
-%             ar1 = ones(1,go1-1).* JHav(1);
-%             ar2 = ones(1,go1-1).* JHav(end);
-%             ar3 = ones(1,go2-1).* JLav(1);
-%             ar4 = ones(1,go2-1).* JLav(end);
-%             Q.JHav = [ar1 JHav ar2];
-%             Q.JLav = [ar3 JLav ar4];
+ [JHav,go1] =bobpoissontest(Q.JHnewa,Q.Zmes1,12);
+ [JLav,go2] =bobpoissontest(Q.JLnewa,Q.Zmes1,12);
+
+            ar1 = ones(1,go1-1).* JHav(1);
+            ar2 = ones(1,go1-1).* JHav(end);
+            ar3 = ones(1,go2-1).* JLav(1);
+            ar4 = ones(1,go2-1).* JLav(end);
+            Q.JHav = [ar1 JHav ar2];
+            Q.JLav = [ar3 JLav ar4];
             
 %             slope = (((0.05-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
 % slope1 = (((0.05-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
@@ -347,7 +346,7 @@ Q.yvar = diag(Q.y);
 %             end
 %         end
 % 
-% %         Q.Yvar =[YYY YY JHav JLav];
+        Q.Yvar =[Q.JHnew Q.JLnew Q.JHav Q.JLav];
 % %         Q.Yvar =[JHreal JLreal];
 % 
 % % % HEre I linearlize the covariance
@@ -360,7 +359,7 @@ Q.yvar = diag(Q.y);
 % 
 %             Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 % %            Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa Q.YYa];
-%                 Q.yvar = diag(Q.Yvar);
+                Q.yvar = diag(Q.Yvar);
                 
                 
 
@@ -369,9 +368,16 @@ Q.yvar = diag(Q.y);
 % disp('Estimations for CJL, backgrounds and overlap done ')
 disp('makeQ complete ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        Q.n1=length(Q.JHnew);
+        Q.n2=length(Q.JLnew);
+        Q.n3=length(Q.JHnewa);
+        Q.n4=length(Q.JLnewa);
+figure;
+subplot(1,2,1)
+semilogx(Q.JLnew,Q.Zmes2./1000,'r',Q.JHnew,Q.Zmes2./1000,'b',JLnew,alt./1000,'-y',JHnew,alt./1000,'-g')
 
-
-
+subplot(1,2,2)
+semilogx(Q.JLnewa,Q.Zmes1./1000,'r',Q.JHnewa,Q.Zmes1./1000,'b',JLnewa, ANalt./1000,'-y',JHnewa, ANalt./1000,'-g')
 end
 
 

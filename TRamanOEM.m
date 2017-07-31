@@ -147,32 +147,32 @@ DT_JL
 % 
 % 
 %                     %% Plot Avg Kenerl
+
+                    response = sum(X.A(1:m,1:m));
+                    % Vertical resolution
+                    width = zeros(size(Q.Zret));
+                    for j = 1:m % fini
+                        width(j) = fwhmquiet(Q.Zret,X.A(1:m,j));
+                        if isnan(width(j))
+                            width(j) = 0;
+                        end
+                    end
+
 % 
-%                     response = sum(X.A(1:m,1:m));
-%                     % Vertical resolution
-%                     width = zeros(size(Q.Zret));
-%                     for j = 1:m % fini
-%                         width(j) = fwhmquiet(Q.Zret,X.A(1:m,j));
-%                         if isnan(width(j))
-%                             width(j) = 0;
-%                         end
-%                     end
 % 
-% 
-% 
-%                     figure;
+                    figure;
 %                     subplot(1,2,1)
-%                     set(gca,'fontsize',16)
-%                     % hold on;
-%                     plot(X.A(1:m,1:m),Q.Zret(1:m)./1000)
-%                     grid on;
-%                     hold on;
-%                     plot(response,Q.Zret./1000,'r')
-%                     % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
-%                     hold off;
-%                     xlabel('Avgeraging Kernels')
-%                     ylabel('Altitude(km)')
-% 
+                    set(gca,'fontsize',16)
+                    % hold on;
+                    plot(X.A(1:m,1:m),Q.Zret(1:m)./1000)
+                    grid on;
+                    hold on;
+                    plot(response,Q.Zret./1000,'r')
+                    % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
+                    hold off;
+                    xlabel('Avgeraging Kernels')
+                    ylabel('Altitude(km)')
+
 %                     subplot(1,2,2)
 %                     plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
 %                     grid on;
@@ -205,9 +205,9 @@ DT_JL
 %                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 % 
                      subplot(1,2,2)
-                     plot(X.x(1:m) - (Tsonde'),Q.Zret./1000)
+                     plot(X.x(1:m) - (Q.Ta'),Q.Zret./1000)
                      grid on;
-                     xlabel('Temperature residuals(T OEM - T sonde) (K)')
+                     xlabel('Temperature residuals(T OEM - T a priori) (K)')
 %                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
 %                     %  xlabel('Temperature Percent Error (%)')
                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
@@ -267,9 +267,9 @@ DT_JL
                     grid on;
                     % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes1(Q.ind)./1000)
                     plot(((y(n1+n2+1:n1+n2+n3) - X.yf(n1+n2+1:n1+n2+n3))./X.yf(n1+n2+1:n1+n2+n3)).*100 ,Q.Zmes1./1000)
-                    hold on
-%                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
-                    plot(-(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+%                     hold on
+% %                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+%                     plot(-(Q.yvar(n1+n2+1:n1+n2+n3)./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.yvar(n1+n2+1:n1+n2+n3)./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
                     
 %plot(-(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r');
 
@@ -280,9 +280,9 @@ DT_JL
                     subplot(2,2,4)
                     grid on;
                     plot(((y(n1+n2+n3+1:end) - X.yf(n1+n2+n3+1:end))./X.yf(n1+n2+n3+1:end)).*100 ,Q.Zmes1./1000)
-                    hold on;
-                    plot(-(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
-                    %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
+%                     hold on;
+%                     plot(-(Q.yvar(n1+n2+n3+1:end)./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.yvar(n1+n2+n3+1:end)./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
+%                     %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
 
                     hold off
                     xlabel('JL - analog counts residual(%)')
