@@ -45,8 +45,8 @@ Q.Rate = 1800;
 
 disp('All the constants are ready')
 
-Q.Zmes1 = 100:37.5:10000;
-Q.Zmes2 = 1000:37.5:65000;
+Q.Zmes1 = 100:37.5:12000;
+Q.Zmes2 = 100:37.5:65000;
 Q.Zmes = 100:37.5:65000;
 Q.Zret = 100:375:70000;
 
@@ -231,8 +231,8 @@ JLreal = NoiseP(JLreal);
 JHreal = NoiseP(JHreal);
 JLareal = awgn(JLareal,50,'measured');
 JHareal = awgn(JHareal,50,'measured');
-% JLareal = NoiseP(JLareal);
-% JHareal = NoiseP(JHareal);
+% JLareal = NoiseP(JLareal.*1e3)./1e3;
+% JHareal = NoiseP(JHareal.*1e3)./1e3;
 
 
                            Q.CovBJLa = ((Y.bg_JL_stda)).^2; % day time
@@ -285,7 +285,7 @@ JHareal = awgn(JHareal,50,'measured');
 % below 2 km use the Var from the piecewise code
 % above 2 km use the counts
 
-% Q.yvar = diag(Q.y);
+ Q.yvar = diag(Q.y);
 %              [JHv,go] =bobpoissontest(smmohtenJH',Q.Zmes2,8);
 %              [JLv,go] =bobpoissontest(smmohtenJL',Q.Zmes2,8);
 % % 
@@ -346,7 +346,7 @@ JHareal = awgn(JHareal,50,'measured');
 %             end
 %         end
 % 
-        Q.Yvar =[Q.JHnew Q.JLnew Q.JHav Q.JLav];
+%         Q.Yvar =[Q.JHnew Q.JLnew Q.JHav Q.JLav];
 % %         Q.Yvar =[JHreal JLreal];
 % 
 % % % HEre I linearlize the covariance
@@ -359,7 +359,7 @@ JHareal = awgn(JHareal,50,'measured');
 % 
 %             Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 % %            Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa Q.YYa];
-                Q.yvar = diag(Q.Yvar);
+%                 Q.yvar = diag(Q.Yvar);
                 
                 
 
