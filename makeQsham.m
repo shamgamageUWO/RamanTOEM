@@ -70,13 +70,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=100 & ANalt <= 3000);
+Q.Eba = Eba(ANalt>=500 & ANalt <= 8000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=3000);
-Q.JLnewa= JLnewa(ANalt>=100 & ANalt <=3000);
-Q.ANalt = ANalt(ANalt>=100);
+Q.JHnewa= JHnewa(ANalt>=500 & ANalt <=8000);
+Q.JLnewa= JLnewa(ANalt>=500 & ANalt <=8000);
+Q.ANalt = ANalt(ANalt>=500);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 3000);
+Q.Zmes1 = ANalt(ANalt>=500 & ANalt <= 8000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -188,9 +188,9 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (0.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (0.01 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = CJLa;
-Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CovCLa = (0.01 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
 % Q.CovCHa = (0.1 .* (Q.CHa)).^2;%sqrt(Q.CL);
 
@@ -226,8 +226,8 @@ Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
 JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLnewa';
 
-                        smmohtenJH = smooth(JHreal,100); % smoothing covariance to smooth the envelop cover
-                        smmohtenJL = smooth(JLreal,100);
+                        smmohtenJH = smooth(JHreal,10); % smoothing covariance to smooth the envelop cover
+                        smmohtenJL = smooth(JLreal,10);
                         smmohtenJHa = smooth(JHrealan,100); % smoothing covariance to smooth the envelop cover
                         smmohtenJLa = smooth(JLrealan,100);
                         % ysmoothen= [smmohtenJH' smmohtenJL']';
@@ -258,8 +258,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(smmohtenJHa',Q.Zmes1,8);
- [JLav,go2] =bobpoissontest(smmohtenJLa',Q.Zmes1,8);
+ [JHav,go1] =bobpoissontest(smmohtenJHa',Q.Zmes1,20);
+ [JLav,go2] =bobpoissontest(smmohtenJLa',Q.Zmes1,20);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -290,7 +290,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 4000
+            if Q.Zmes2(i) <= 6000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = smmohtenJL(i);
@@ -298,7 +298,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 4000
+            if  Q.Zmes2(i) <= 6000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = smmohtenJH(i);
@@ -309,12 +309,12 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %         Q.Yvar =[JHreal JLreal];
 
 % % HEre I linearlize the covariance
-% slope = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
+ slope = (((0.9-0.5).*Q.Zmes1)/(Q.Zmes1(end)));
 % slope1 = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
-   Q.YYYa =  Q.JHav;% smmohtenJHa';
-   Q.YYa  = Q.JLav;%smmohtenJLa';
-%  Q.YYYa = slope.*Q.JHav;
-%   Q.YYa  =slope1.*Q.JLav;
+%    Q.YYYa =  Q.JHav;% smmohtenJHa';
+%    Q.YYa  = Q.JLav;%smmohtenJLa';
+ Q.YYYa = slope.*Q.JHav;
+  Q.YYa  =slope.*Q.JLav;
 
             Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 %            Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa Q.YYa];

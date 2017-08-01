@@ -12,8 +12,8 @@ DT_JL = x(end); % deadtimes
     end
 %     m=length(Q.Zret);
 %     xa=x(1:m);
-    dn = DT_JH.*1e-9;
-    dn2 = DT_JL.*1e-9;
+    dn = DT_JH.*1e-4;
+    dn2 = DT_JL.*1e-4;
     % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
 
