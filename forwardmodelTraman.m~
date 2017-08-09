@@ -22,7 +22,7 @@ Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear'); % T on data grid (digital)
 OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
 
 load('analogoverlaps.mat');
-OVa = (OVz1a+OVz2a)./2;
+OVa = (ovz1a+O)./2;
 
 % OVa = interp1(Q.Zret,OVa,Q.Zmes,'linear');
 %%
@@ -37,8 +37,7 @@ N1 = length(Q.JHnewa);
 % NN1 = length();
 % N2 = length(Q.JHnew); fr=OV_Zi(Q.d_alti_Diff+1:end);
 
-% A_Zi_an = (area .* OV_Zi(1:N1) .*R_tr_i(1:N1) .*Q.Pressi(1:N1))./(kb * Q.Zmes1 .^2);
-A_Zi_an = (area .* OVa' .*R_tr_i(1:N1) .*Q.Pressi(1:N1))./(kb * Q.Zmes1 .^2);
+A_Zi_an = (area .* OV_Zi(1:N1) .*R_tr_i(1:N1) .*Q.Pressi(1:N1))./(kb * Q.Zmes1 .^2);
 B_Zi_an = (area .*R_tr_i(1:N1) .*Q.Pressi(1:N1))./(kb * Q.Zmes1 .^2); % No overlap
 
 A_Zi_d = (area .* OV_Zi(Q.d_alti_Diff+1:end) .*R_tr_i(Q.d_alti_Diff+1:end) .*Q.Pressi(Q.d_alti_Diff+1:end))./(kb * Q.Zmes2 .^2);

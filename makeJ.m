@@ -84,8 +84,8 @@ for jj = 1:m
    [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(jj,Q,x,@forwardmodelTraman);
    JOV(1:n1,jj) = dOVJH;
    JOV(n1+1:n1+n2,jj) = dOVJL;
-   JOV(n1+n2+1:n1+n2+n3,jj) = dOVJHa;
-   JOV(n1+n2+n3+1:n,jj) = dOVJLa;
+   JOV(n1+n2+1:n1+n2+n3,jj) = 0;
+   JOV(n1+n2+n3+1:n,jj) = 0;
 
 end
 

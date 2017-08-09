@@ -53,11 +53,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=2000);
+Q.Eb = Eb(alt>=300);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=2000);
-Q.JLnew= JLnew(alt>=2000);
-Q.alt = alt(alt>=2000);
+Q.JHnew= JHnew(alt>=300);
+Q.JLnew= JLnew(alt>=300);
+Q.alt = alt(alt>=300);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -70,13 +70,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=500 & ANalt <= 8000);
+Q.Eba = Eba(ANalt>=300 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=500 & ANalt <=8000);
-Q.JLnewa= JLnewa(ANalt>=500 & ANalt <=8000);
-Q.ANalt = ANalt(ANalt>=500);
+Q.JHnewa= JHnewa(ANalt>=300 & ANalt <=6000);
+Q.JLnewa= JLnewa(ANalt>=300 & ANalt <=6000);
+Q.ANalt = ANalt(ANalt>=300);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=500 & ANalt <= 8000);
+Q.Zmes1 = ANalt(ANalt>=300 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -162,16 +162,16 @@ Q.alpha_aero = alphaAer;
 Q.Tr = Total_Transmission(Q);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-[R,Ra,aa,bb] = Rcalibration(Q); 
-Q.aa= aa;%1.148467566403494;%aa;
-Q.bb =bb;%22.634605327641157;%bb;
-Q.aa_an = -2.1e2;
-Q.bb_an =1.2e2;
-Q.Ttraditional_an = Q.aa_an.*log((Q.JHnewa -Q.BaJHa) ./(Q.JLnewa -Q.BaJLa))+Q.bb_an; 
+% [R,Ra,aa,bb] = Rcalibration(Q); 
+% Q.aa= aa;%1.148467566403494;%aa;
+% Q.bb =bb;%22.634605327641157;%bb;
+% Q.aa_an = -2.1e2;
+% Q.bb_an =1.2e2;
+% Q.Ttraditional_an = Q.aa_an.*log((Q.JHnewa -Q.BaJHa) ./(Q.JLnewa -Q.BaJLa))+Q.bb_an; 
 
-Q.R = R;%0.808780013344381;%R;%R;%0.17;
-Q.Ra = Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
-Q.Ttraditional_digi = real(Q.bb./ (Q.aa-log((Q.JHnew -Q.BaJH) ./(Q.JLnew -Q.BaJL)))); 
+Q.R = 0.7913;%R;%0.808780013344381;%R;%R;%0.17;
+Q.Ra = 0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
+% Q.Ttraditional_digi = real(Q.bb./ (Q.aa-log((Q.JHnew -Q.BaJH) ./(Q.JLnew -Q.BaJL)))); 
 %      lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
 %                     Ttradi = real(Q.bb./(Q.aa-lnQ));
 disp('R is calibrated ')
@@ -190,7 +190,7 @@ Q.COVa = OVCov(Q.Zret,Q.OVa);
 Q.CL = CJL;
 Q.CovCL = (0.01 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = CJLa;
-Q.CovCLa = (0.01 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
 % Q.CovCHa = (0.1 .* (Q.CHa)).^2;%sqrt(Q.CL);
 
@@ -333,104 +333,6 @@ disp('makeQ complete ')
 end
 
 
-% % % 
-% % % % Constants
-% % % Q.effi_stokeN2_JH = [0.22742041,0.61706630,1,0.66219893,0.26342483,0.00549319,0];
-% % % Q.effi_antiN2_JH = [0.20278330,0.57977270,0.99609541,0.71343372,0.31181249,0.02739112,0];
-% % % 
-% % % Q.effi_stokeO2_JH = [0.37619836,0.98166707,0.53912801,0.0511171,0];
-% % % Q.effi_antiO2_JH = [0.34586496,0.94294973,0.59074973,0.08572700,0];
-% % % 
-% % % Q.effi_stokeO2_JL = [0.02301580,0.48028012,1,0.43039766,0.00583559];
-% % % Q.effi_antiO2_JL = [0.02098297,0.47166835,1,0.44867305,0.01345647];
-% % % 
-% % % Q.effi_stokeN2_JL = [0.00025546,0.23878872,0.63072501,1,0.64955950,0.25355097,0.00289517];
-% % % Q.effi_antiN2_JL = [0,0.23299892,0.62055134,1,0.66708875,0.27132321,0.00944014];
-% % % 
-% % % Q.h = 6.6262 *10^-27; %erg-s
-% % % Q.c = 2.9979*10^10; %cm/s
-% % % Q.kb = 1.3807*10^-16; % erg/K
-% % % Q.B_N2 = 1.98957;% cm-1
-% % % Q.B_O2 = 1.43768;%cm-1
-% % % Q.D_N2 = 5.76*10^-6;%cm-1
-% % % Q.D_O2 = 4.85*10^-6; %cm-1
-% % % Q.r_N2 = 0.51*10^-48; %cm^6
-% % % Q.r_O2 = 1.27*10^-48; %cm^6
-% % % Q.n_N2 = .7808; % relative volume abundance
-% % % Q.n_O2 = .2095;
-% % % Q.v0 = 1/ (3.547*10^-5); %cm-1 355nm
-% % % Q.kb_SI = 1.38064852*10^-23; %Boltzman SI
-% % % Q.I_N2 = 1;
-% % % Q.I_O2 = 0;
-% % % Q.Const_N2 = (112* pi^4* Q.h*Q.c*Q.r_N2*Q.n_N2 )/((2*Q.I_N2+1)^2 * Q.kb *15);
-% % % Q.Const_O2 = (112* pi^4* Q.h*Q.c*Q.r_O2*Q.n_O2 )/((2*Q.I_O2+1)^2 * Q.kb *15);
-% % % 
-% % % 
-% % % %Q numbers
-% % % JHO2= [15,17, 19, 21,0];
-% % % JLO2 = [5,7,9,11,13];
-% % % JHN2 =[10,11,12,13,14,15,0];
-% % % JLN2 =[3,4,5,6,7,8,9];
-% % % 
-% % % % rotational energy
-% % % Q.ErotJHO2=[];
-% % % Q.ErotJLO2=[];
-% % % Q.ErotJHN2=[];
-% % % Q.ErotJLN2=[];
-% % % 
-% % % % JH_O2
-% % % for i = 1:length(JHO2)
-% % %     
-% % %     Q.ErotJHO2(i)= (Q.B_O2.*JHO2(i) *(JHO2(i)+1) - Q.D_O2.*(JHO2(i)^2).*(JHO2(i)+1)^2)*Q.h*Q.c;
-% % %     Q.shift_JHO2_as(i) = Q.B_O2 * 2 * (2*(JHO2(i)+2)-1) - Q.D_O2 * (3 * (2*(JHO2(i)+2)-1) + (2*(JHO2(i)+2)-1)^3);
-% % %     Q.shift_JHO2_s(i) =  -Q.B_O2 * 2 * (2*JHO2(i)+3) + Q.D_O2 * (3 * (2*JHO2(i)+3) + (2*JHO2(i)+3)^3);
-% % %     Q.X_JHO2_as(i) = ((JHO2(i)+2)*((JHO2(i)+2)-1))/(2*(JHO2(i)+2)-1);
-% % %     Q.X_JHO2_s(i) = ((JHO2(i)+1)*(JHO2(i)+2))/(2*JHO2(i)+3);
-% % %     
-% % % end
-% % % 
-% % % % JH_N2
-% % % 
-% % % for i = 1:length(JHN2)
-% % %     Q.ErotJHN2(i)= (Q.B_N2.*JHN2(i) *(JHN2(i)+1) - Q.D_N2.*(JHN2(i)^2).*(JHN2(i)+1)^2)*Q.h*Q.c;
-% % %     Q.shift_JHN2_as(i) = Q.B_N2 * 2 * (2*(JHN2(i)+2)-1) - Q.D_N2 * (3 * (2*(JHN2(i)+2)-1) + (2*(JHN2(i)+2)-1)^3);
-% % %     Q.shift_JHN2_s(i) =  -Q.B_N2 * 2 * (2*JHN2(i)+3) + Q.D_N2 * (3 * (2*JHN2(i)+3) + (2*JHN2(i)+3)^3);
-% % %     Q.X_JHN2_as(i) = ((JHN2(i)+2)*((JHN2(i)+2)-1))/(2*(JHN2(i)+2)-1);
-% % %     Q.X_JHN2_s(i) = ((JHN2(i)+1)*(JHN2(i)+2))/(2*JHN2(i)+3);
-% % %     
-% % % end
-% % % 
-% % % 
-% % % 
-% % % % JL_O2
-% % % for i = 1:length(JLO2)
-% % %     
-% % %     Q.ErotJLO2(i)= (Q.B_O2.*JLO2(i) *(JLO2(i)+1) - Q.D_O2.*(JLO2(i)^2).*(JLO2(i)+1)^2)*Q.h*Q.c;
-% % %     Q.shift_JLO2_as(i) =Q.B_O2 * 2 * (2*(JLO2(i)+2)-1) - Q.D_O2 * (3 * (2*(JLO2(i)+2)-1) + (2*(JLO2(i)+2)-1)^3);
-% % %     Q.shift_JLO2_s(i) =  -Q.B_O2 * 2 * (2*JLO2(i)+3) + Q.D_O2 * (3 * (2*JLO2(i)+3) + (2*JLO2(i)+3)^3);
-% % %     Q.X_JLO2_as(i) = ((JLO2(i)+2)*((JLO2(i)+2)-1))/(2*(JLO2(i)+2)-1);
-% % %     Q.X_JLO2_s(i) = ((JLO2(i)+1)*(JLO2(i)+2))/(2*JLO2(i)+3);
-% % %     
-% % % end
-% % % 
-% % % 
-% % % % JL_N2
-% % % for i = 1:length(JLN2)
-% % %     
-% % %     Q.ErotJLN2(i)= (Q.B_N2.*JLN2(i) *(JLN2(i)+1) - Q.D_N2.*(JLN2(i)^2).*(JLN2(i)+1)^2)*Q.h*Q.c;
-% % %     Q.shift_JLN2_as(i) = Q.B_N2 * 2 * (2*(JLN2(i)+2)-1) - Q.D_N2 * (3 * (2*(JLN2(i)+2)-1) + (2*(JLN2(i)+2)-1)^3);
-% % %     Q.shift_JLN2_s(i) =  -Q.B_N2 * 2 * (2*JLN2(i)+3) + Q.D_N2 * (3 * (2*JLN2(i)+3) + (2*JLN2(i)+3)^3);
-% % %     Q.X_JLN2_as(i) = ((JLN2(i)+2)*((JLN2(i)+2)-1))/(2*(JLN2(i)+2)-1);
-% % %     Q.X_JLN2_s(i) = ((JLN2(i)+1)*(JLN2(i)+2))/(2*JLN2(i)+3);
-% % % end
-% % % 
-% % % 
-% % % 
-% % % 
-% % % 
-% % % Q.JHO2 = JHO2;
-% % % Q.JLO2 = JLO2;
-% % % Q.JHN2 = JHN2;
-% % % Q.JLN2 = JLN2;
+
 
 
