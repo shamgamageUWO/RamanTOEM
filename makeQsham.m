@@ -303,16 +303,16 @@ end
 end
 
 
-for i = 1:length(Q.JLnewa)
-if Q.JLnewa(i)<15
-   Q.JLarealvar(i)=15;
-   Q.JLnewa(i)=Q.JLnewa(i)+randn(1)*sqrt(Q.JLarealvar(i));
-end
-if Q.JHnewa(i)<15
-   Q.JHarealvar(i)=15;
-   Q.JHnewa(i)=Q.JHnewa(i)+randn(1)*sqrt(Q.JHarealvar(i));
-end
-end
+% for i = 1:length(Q.JLnewa)
+% if Q.JLnewa(i)<15
+%    Q.JLarealvar(i)=15;
+%    Q.JLnewa(i)=Q.JLnewa(i)+randn(1)*sqrt(Q.JLarealvar(i));
+% end
+% if Q.JHnewa(i)<15
+%    Q.JHarealvar(i)=15;
+%    Q.JHnewa(i)=Q.JHnewa(i)+randn(1)*sqrt(Q.JHarealvar(i));
+% end
+% end
  
 Q.JHnew(Q.JHnew<=0)= round(rand(1)*10);
 Q.JHnewa(Q.JHnewa<=0)= round(rand(1)*10);
