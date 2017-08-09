@@ -190,7 +190,7 @@ Q.COVa = OVCov(Q.Zret,Q.OVa);
 Q.CL = CJL;
 Q.CovCL = (0.01 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = CJLa;
-Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
 % Q.CovCHa = (0.1 .* (Q.CHa)).^2;%sqrt(Q.CL);
 
