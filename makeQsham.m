@@ -53,11 +53,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=300);
+Q.Eb = Eb(alt>=2000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=300);
-Q.JLnew= JLnew(alt>=300);
-Q.alt = alt(alt>=300);
+Q.JHnew= JHnew(alt>=2000);
+Q.JLnew= JLnew(alt>=2000);
+Q.alt = alt(alt>=2000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -70,13 +70,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=300 & ANalt <= 6000);
+Q.Eba = Eba(ANalt>=1000 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=300 & ANalt <=6000);
-Q.JLnewa= JLnewa(ANalt>=300 & ANalt <=6000);
-Q.ANalt = ANalt(ANalt>=300);
+Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=6000);
+Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=6000);
+Q.ANalt = ANalt(ANalt>=1000);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=300 & ANalt <= 6000);
+Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -162,15 +162,15 @@ Q.alpha_aero = alphaAer;
 Q.Tr = Total_Transmission(Q);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-% [R,Ra,aa,bb] = Rcalibration(Q); 
+ [R,Ra] = Rcalibration(Q); 
 % Q.aa= aa;%1.148467566403494;%aa;
 % Q.bb =bb;%22.634605327641157;%bb;
 % Q.aa_an = -2.1e2;
 % Q.bb_an =1.2e2;
 % Q.Ttraditional_an = Q.aa_an.*log((Q.JHnewa -Q.BaJHa) ./(Q.JLnewa -Q.BaJLa))+Q.bb_an; 
 
-Q.R = 0.7913;%R;%0.808780013344381;%R;%R;%0.17;
-Q.Ra = 0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
+Q.R = R;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
+Q.Ra = Ra;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
 % Q.Ttraditional_digi = real(Q.bb./ (Q.aa-log((Q.JHnew -Q.BaJH) ./(Q.JLnew -Q.BaJL)))); 
 %      lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
 %                     Ttradi = real(Q.bb./(Q.aa-lnQ));
@@ -188,7 +188,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (0.01 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = CJLa;
 Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
@@ -309,7 +309,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %         Q.Yvar =[JHreal JLreal];
 
 % % HEre I linearlize the covariance
- slope = (((0.9-0.5).*Q.Zmes1)/(Q.Zmes1(end)));
+ slope = (((0.9-0.7).*Q.Zmes1)/(Q.Zmes1(end)));
 % slope1 = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
 %    Q.YYYa =  Q.JHav;% smmohtenJHa';
 %    Q.YYa  = Q.JLav;%smmohtenJLa';

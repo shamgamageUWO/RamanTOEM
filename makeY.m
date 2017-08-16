@@ -74,7 +74,7 @@ start =  [g(1) Minute(1)];
 
 %
 % disp('End time')
-% gg = hour(S3.GlobalParameters.End);
+% gg = hour(S0.GlobalParameters.End);
 endtime =  [g(end) Minute(end)];
 % endtime;
 
@@ -99,15 +99,15 @@ alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 %   hold on;
 
 
-JL = S0.Channel(12).Signal(:,961:990);
-JH = S0.Channel(4).Signal(:,961:990);
-Eb= S0.Channel(10).Signal(:,961:990);
+JL = S0.Channel(12).Signal(:,1347:1377);%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
+JH = S0.Channel(4).Signal(:,1347:1377);%20120717(:,1347:1377);%(:,961:990);
+Eb= S0.Channel(10).Signal(:,1347:1377);%20120717(:,1347:1377);%(:,961:990);
 
 
 
-JL_an = S0.Channel(11).Signal(:,961:990);
-JH_an = S0.Channel(3).Signal(:,961:990);
-Eb_an = S0.Channel(9).Signal(:,961:990);
+JL_an = S0.Channel(11).Signal(:,1347:1377);%20120717(:,1347:1377);%(:,961:990);
+JH_an = S0.Channel(3).Signal(:,1347:1377);%20120717(:,1347:1377);%(:,961:990);
+Eb_an = S0.Channel(9).Signal(:,1347:1377);%20120717(:,1347:1377);%(:,961:990);
 JL_an = JL_an';
 JH_an = JH_an';
 Y.YYa = (std(JL_an)).^2;
@@ -282,6 +282,11 @@ bg_length2an = length(bkg_JLan);
 %   ylabel('Alt (km)')
 %   legend('JL','JH')
 % hold on;
+        
+    figure;subplot(1,2,1)
+    semilogx(JL_an,Ebazc./1000,'m',JH_an,Ebazc./1000,'black',Eb_an,Ebazc./1000,'r')
+    subplot(1,2,2)
+    semilogx(Eb,alt./1000,'r',JL,alt./1000,'b',JH,alt./1000,'g')
 
 %% Digital
 Y.JL = JL ;
