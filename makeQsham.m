@@ -45,10 +45,10 @@ Q.Rate = 1800;
 
 disp('All the constants are ready')
 
-Q.Zmes1 = 100:37.5:12000;
-Q.Zmes2 = 100:37.5:65000;
-Q.Zmes = 100:37.5:65000;
-Q.Zret = 100:375:70000;
+Q.Zmes1 = 500:37.5:6000;
+Q.Zmes2 = 3000:37.5:65000;
+Q.Zmes = 500:37.5:65000;
+Q.Zret = 500:375:70000;
 
 % US temperature model
 % load('USdata.mat');
@@ -224,7 +224,7 @@ Q.Ra = 0.8639;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some re
 % Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
 % Q.CovCHa = (0.1 .* (Q.CHa)).^2;%sqrt(Q.CL);
-xx = [Q.Ta+2 Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
+xx = [Q.Ta+20 Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
 
 [JLreal,JHreal,JLareal,JHareal]=forwardmodelTraman(Q,xx);
 JLreal = NoiseP(JLreal);
