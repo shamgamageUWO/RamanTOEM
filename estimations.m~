@@ -1,4 +1,4 @@
-function [CJL, CJLa,CJHa,CJH] = estimations(Q)
+function [CJL, CJLa,CJHa] = estimations(Q)
 
 
 
@@ -18,10 +18,9 @@ SJLa = Q.JLnewa - Q.BaJLa;
 
     OVa = ones(1,length(Q.Ta));
     Q.OVlength = length(OVa);
-[Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
-Ti = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % T on data grid (digital)
+
 %     x = [Q.Ta 0 0 1 OVa 0 0 1 1]; Run this to retrieve CJH independently
-    x = [Ti 0 0 1 OVa 0 0 1 Q.deadtimeJH Q.deadtimeJL]; % coupled analog channels
+    x = [Q.Ta 0 0 1 OVa 0 0 1 Q.deadtimeJH Q.deadtimeJL]; % coupled analog channels
 
 
     [JL,JH,JLa,JHa]=forwardmodelTraman(Q,x);
@@ -35,13 +34,13 @@ subplot(1,2,1)
 semilogx(SJH,Q.Zmes2./1000,'b',JH,Q.Zmes2./1000,'g',CJH.*JH,Q.Zmes2./1000,'m',Q.R.*CJL.*JH,Q.Zmes2./1000,'y')
 hold on;
 semilogx(SJL,Q.Zmes2./1000,'black',JL,Q.Zmes2./1000,'r',CJL.*JL,Q.Zmes2./1000,'b')
-legend('JH real','JH FM (no const)','JH Syn (CJH)','JH Syn (CJL.*R)','JL real','JL FM (no const','JL Syn')
 
+figure;
 subplot(1,2,2)
 semilogx(SJLa,Q.Zmes1./1000,'black',JLa,Q.Zmes1./1000,'r',CJLa.*JLa,Q.Zmes1./1000,'b')
 hold on;
 semilogx(SJHa,Q.Zmes1./1000,'m',JHa,Q.Zmes1./1000,'y',CJHa.*JHa,Q.Zmes1./1000,'g',CJLa.*JHa.*Q.Ra,Q.Zmes1./1000,'r')
-legend('JL ana real','JL ana FM (no const)','JLana','JH ana real','JH ana FM (no const)','JH ana Syn (CJH)','JH ana Syn (CJLa.*Ra)')
+
 
 %     CJL = nanmean(SJL(ind1)./JL(ind1)');
 % %     CJH = nanmean(SJH(ind1)./JH(ind1)');

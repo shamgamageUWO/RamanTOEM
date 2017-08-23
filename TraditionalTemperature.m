@@ -23,22 +23,22 @@ alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 %   hold on;
 
 
-JL = S0.Channel(12).Signal(:,961:990);
-JH = S0.Channel(4).Signal(:,961:990);
-Eb= S0.Channel(10).Signal(:,961:990);
+JL = S0.Channel(12).Signal(:,1347:1377);%(:,961:990);
+JH = S0.Channel(4).Signal(:,1347:1377);%(:,961:990);
+Eb= S0.Channel(10).Signal(:,1347:1377);%(:,961:990);
 
 
 
-JL_an = S0.Channel(11).Signal(:,961:990);
-JH_an = S0.Channel(3).Signal(:,961:990);
-Eb_an = S0.Channel(9).Signal(:,961:990);
+JL_an = S0.Channel(11).Signal(:,1347:1377);%(:,961:990);
+JH_an = S0.Channel(3).Signal(:,1347:1377);%(:,961:990);
+Eb_an = S0.Channel(9).Signal(:,1347:1377);%(:,961:990);
 
 JL_an = JL_an';
 JH_an = JH_an';
 
-JL_Com = S3.JL.Combined.Signal(:,118:147);
-JH_Com = S3.JH.Combined.Signal(:,118:147);
-Eb_Com = S3.Eb.Combined.Signal(:,118:147);
+JL_Com = S3.JL.Combined.Signal(:,1347:1377);%(:,118:147);
+JH_Com = S3.JH.Combined.Signal(:,1347:1377);%(:,118:147);
+Eb_Com = S3.Eb.Combined.Signal(:,1347:1377);%(:,118:147);
 alt_Com = S3.JL.Combined.Range;
 
 
@@ -146,7 +146,7 @@ Q_Digi = log(Q_Digi);
 Q_an = log(Q_an);
 Q_Com = log(Q_Com);
 
-[Tsonde,Zsonde,Psonde] = get_sonde_RS92(20110909,23);
+[Tsonde,Zsonde,Psonde] = get_sonde_RS92(20120718,00);
 
 % figure;plot(Tsonde,Zsonde,'g')
 Zsonde = Zsonde-491;
@@ -191,7 +191,7 @@ B_a = f_a(2);
 
 T_lidar_d = 1./(Q_Digi.*A_d+ B_d) ;
 T_lidar_c =  1./(Q_Com.*A_c+ B_c);
-T_lidar_a =  1./(Q_ab.*A_a+ B_a);
+T_lidar_a =  1./(Q_an.*A_a+ B_a);
 
 % Pick a range of altitude where the fitting is done
 % Fit and find calibration constants

@@ -45,7 +45,7 @@ R = fit3(1);
 
 % %% analog
 Alt2 = Q.Zmes1 + 491;
-ind2 = Alt2 >= 1500 & Alt2 <= 1700;
+ind2 = Alt2 >= 1500 & Alt2 <= 2000;
 xa = (JHa(ind2)./JLa(ind2));
 ya = JHnewa(ind2)./JLnewa(ind2);
 
@@ -54,7 +54,7 @@ fit3a = fit(xa',ya,fa,'Robust','on');
 Ra = fit3a(1);
 %%
 
-%  figure;plot(JLnewa,Ra.*JLa)
+%   figure;plot(JLnewa,Ra.*JLa)
 
 % % %%%%%% Calibration for traditional method Digital channel
 lnQ = log(JHnew./JLnew);

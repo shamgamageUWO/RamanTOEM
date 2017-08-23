@@ -150,11 +150,6 @@ disp('a priori temperature profile is loaded ')
 
 %%%%%
 
-
-
-
-
-
 % Calculate the aerosol attenuation
 [alphaAer] = asrSham(Q);
 Q.alpha_aero = alphaAer;
@@ -162,15 +157,16 @@ Q.alpha_aero = alphaAer;
 Q.Tr = Total_Transmission(Q);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
- [R,Ra] = Rcalibration(Q); 
+[R,Ra,R_fit,Ra_fit] = Restimation(Q);
+%  [R,Ra] = Rcalibration(Q); 
 % Q.aa= aa;%1.148467566403494;%aa;
 % Q.bb =bb;%22.634605327641157;%bb;
 % Q.aa_an = -2.1e2;
 % Q.bb_an =1.2e2;
 % Q.Ttraditional_an = Q.aa_an.*log((Q.JHnewa -Q.BaJHa) ./(Q.JLnewa -Q.BaJLa))+Q.bb_an; 
 
-Q.R = R;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
-Q.Ra = Ra;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
+Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
+Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
 % Q.Ttraditional_digi = real(Q.bb./ (Q.aa-log((Q.JHnew -Q.BaJH) ./(Q.JLnew -Q.BaJL)))); 
 %      lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
 %                     Ttradi = real(Q.bb./(Q.aa-lnQ));
@@ -178,7 +174,7 @@ disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 
-[CJL, CJLa,CJHa] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+[CJL, CJLa,CJHa,CJH] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
 load('ovmodeldata.mat');
 OVnw = interp1(z,epsi,Q.Zret,'linear');
 OVnw(isnan(OVnw))=1;
