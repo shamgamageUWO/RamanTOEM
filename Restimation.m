@@ -5,19 +5,45 @@ JHnewa = Q.JHnewa-Q.BaJHa;
 JLnewa = Q.JLnewa-Q.BaJLa;
 N1 = length(Q.JHnewa);
 
-[Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
-Ti = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % T on data grid (digital)
+% Desaturate the signal
+        % 1. Make the Co added counts to avg counts
+        JHn = JHnew./(Q.deltatime.*Q.coaddalt);
+        JLn = JLnew./(Q.deltatime.*Q.coaddalt);
+        
+        % 2. Convert counts to Hz
+        JHnwn = (JHn.*Q.f);
+        JLnwn = (JLn.*Q.f);
+%         BG_JLn = BG_JLn .*Q.f;
+%         BG_JHn = BG_JHn .*Q.f;
+        
+        % 3. Apply DT correction
+        JL_dtc = JLnwn ./ (1 - JLnwn.*(Q.deadtimeJL)); % non-paralyzable
+        JH_dtc = JHnwn ./ (1 - JHnwn.*(Q.deadtimeJH));
+      
+%           % 4. Convert to counts
+           JLC = JL_dtc.*(1./Q.f);
+           JHC = JH_dtc.*(1./Q.f);
+% %            BG_JLn = BG_JLn*(1./Q.f);
+% %            BG_JHn = BG_JHn*(1./Q.f);
+%        % 5. Scale bacl to coadded signal    
+       JLnew = JLC.*(Q.deltatime.*Q.coaddalt);
+       JHnew = JHC.*(Q.deltatime.*Q.coaddalt);
+
+
+
+% [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
+% Ti = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % T on data grid (digital)
 
 % Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear'); % T on data grid (digital)
 
 %% loading cross sections
 load('DiffCrossSections.mat');
-Diff_JHi = interp1(T,Diff_JH,Ti,'linear');
-Diff_JLi = interp1(T,Diff_JL,Ti,'linear');
+Diff_JHi = interp1(T,Diff_JH,Q.Tsonde,'linear');
+Diff_JLi = interp1(T,Diff_JL,Q.Tsonde,'linear');
 
 Ratio_diff = Diff_JLi./Diff_JHi;
 
-Digital_ratio = JHnew./JLnew;
+Digital_ratio = JHnew ./JLnew ;
 Analog_ratio = JHnewa./JLnewa;
 
 R =  Digital_ratio'.*Ratio_diff(Q.d_alti_Diff+1:end);
@@ -68,7 +94,7 @@ R_fit = fit3(1);
 
 % %% analog
 Alt2 = Q.Zmes1;
-ind2 = Alt2 >= 1500 & Alt2 <= 1700;
+ind2 = Alt2 >= 1000 & Alt2 <= 1200;
  xa = 1./Ratio_diff(ind2);
  ya = Analog_ratio(ind2);
 

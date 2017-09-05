@@ -110,6 +110,7 @@ JH_an = S0.Channel(3).Signal(:,961:990);%20120717(:,1347:1377);%(:,961:990);
 Eb_an = S0.Channel(9).Signal(:,961:990);%20120717(:,1347:1377);%(:,961:990);
 JL_an = JL_an';
 JH_an = JH_an';
+
 Y.YYa = (std(JL_an)).^2;
 Y.YYYa = (std(JH_an)).^2;
 
@@ -165,8 +166,18 @@ JL = F.*JL; % single scans
 JH = F.*JH;
 Eb = F.*Eb; % single scans
 
-
-
+% figure;
+% subplot(1,2,1)
+% semilogx(JL,alt./1000,JH,alt./1000)
+% xlabel('Counts')
+% ylabel('Alt (km)')
+% legend('JL digital','JH digital')
+% 
+% subplot(1,2,2)
+% semilogx(JL_an,alt_an./1000,JH_an,alt_an./1000)
+% xlabel('Counts')
+% ylabel('Alt (km)')
+% legend('JL analog','JH analog')
 
 % figure;plot(nanmean(JL'),alt,'b',nanmean(JH'),alt,'r')
  %% coaddding 30mints
@@ -282,11 +293,11 @@ bg_length2an = length(bkg_JLan);
 %   ylabel('Alt (km)')
 %   legend('JL','JH')
 % hold on;
-        
-    figure;subplot(1,2,1)
-    semilogx(JL_an,Ebazc./1000,'m',JH_an,Ebazc./1000,'black',Eb_an,Ebazc./1000,'r')
-    subplot(1,2,2)
-    semilogx(Eb,alt./1000,'r',JL,alt./1000,'b',JH,alt./1000,'g')
+%         
+%     figure;subplot(1,2,1)
+%     semilogx(JL_an,Ebazc./1000,'m',JH_an,Ebazc./1000,'black',Eb_an,Ebazc./1000,'r')
+%     subplot(1,2,2)
+%     semilogx(Eb,alt./1000,'r',JL,alt./1000,'b',JH,alt./1000,'g')
 
 %% Digital
 Y.JL = JL ;

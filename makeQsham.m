@@ -31,6 +31,7 @@ Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
+Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
@@ -53,11 +54,11 @@ JLnew = Y.JL;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=2000);
+Q.Eb = Eb(alt>=3000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=2000);
-Q.JLnew= JLnew(alt>=2000);
-Q.alt = alt(alt>=2000);
+Q.JHnew= JHnew(alt>=3000);
+Q.JLnew= JLnew(alt>=3000);
+Q.alt = alt(alt>=3000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -70,13 +71,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=1000 & ANalt <= 6000);
+Q.Eba = Eba(ANalt>=1000 & ANalt <= 5000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=6000);
-Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=6000);
+Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=5000);
+Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=5000);
 Q.ANalt = ANalt(ANalt>=1000);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 6000);
+Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 5000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -148,6 +149,20 @@ disp('Defined grids ')
 
 disp('a priori temperature profile is loaded ')
 
+[Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
+Zsonde = Zsonde-491; % altitude correction
+% for i =1 :length(Zsonde)-1
+% if Zsonde(i+1)<= Zsonde(i)
+% Zsonde(i+1) = [];
+% end
+% end
+%  Zsonde = Zsonde(1:i);
+%  Tsonde = Tsonde(1:i);
+%  Psonde = Psonde(1:i);
+
+Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
+Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'linear'); % this goes asr 
+Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
 %%%%%
 
 % Calculate the aerosol attenuation
@@ -175,18 +190,18 @@ disp('R is calibrated ')
 %% Estimating background and lidar constant wrt a priori 
 
 [CJL, CJLa,CJHa,CJH] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-load('ovmodeldata.mat');
-OVnw = interp1(z,epsi,Q.Zret,'linear');
-OVnw(isnan(OVnw))=1;
-Q.OVa = OVnw;
-% Q.OVa = ones(1,length(Q.Ta));
+% load('ovmodeldata.mat');
+% OVnw = interp1(z,epsi,Q.Zret,'linear');
+% OVnw(isnan(OVnw))=1;
+% Q.OVa = OVnw;
+Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
 Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = CJLa;
-Q.CovCLa = (0.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
 % Q.CovCHa = (0.1 .* (Q.CHa)).^2;%sqrt(Q.CL);
 

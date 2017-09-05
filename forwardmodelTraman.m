@@ -33,7 +33,7 @@ area = pi * (0.3^2);
 R_tr_i = (Q.Tr);
 
 % Define the first part of the equation 
-N1 = length(Q.JHnewa);
+N1 = length(Q.Zmes1);
 % NN1 = length();
 % N2 = length(Q.JHnew); fr=OV_Zi(Q.d_alti_Diff+1:end);
 
@@ -67,9 +67,18 @@ JHa = (CJHa.* A_Zi_an .* Diff_JH_i(1:N1) )./(Ti(1:N1) );
 
 
 
-Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
-
-
+% Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
+% 
+%  % Add true background to the counts 
+%  % Convert observed bg to true only for Digital, apply DS
+% BJL_t = BJL./(1-BJL.*Q.f.*DT_JL);
+% BJH_t = BJH./(1-BJH.*Q.f.*DT_JH);
+% JL = JL  + BJL_t;
+% JH = JH  + BJH_t;
+% 
+% 
+% JLa = JLa  + BJLa;
+% JHa = JHa  + BJHa;
 % 
         %% Saturation correction is applied for the averaged count profile This is just for digital channel
         % 1. Make the Co added counts to avg counts
@@ -82,7 +91,6 @@ Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
         
         % 3. Apply DT
         JL_dtc = JLnw ./ (1 + JLnw.*(DT_JL)); % non-paralyzable
-        % JL = JL .* exp(-JLnw.*(4e-9)); % paralyzable %units is counts
         JH_dtc = JHnw ./ (1 + JHnw.*(DT_JH));
           % 4. Convert to counts
            JL = JL_dtc.*(1./Q.f);
@@ -91,7 +99,7 @@ Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
        JL = JL.*(Q.deltatime.*Q.coaddalt);
        JH = JH.*(Q.deltatime.*Q.coaddalt);
        
- % Add background to the counts 
+%  % Add background to the counts 
 JL = JL  + BJL;
 JH = JH  + BJH;
 

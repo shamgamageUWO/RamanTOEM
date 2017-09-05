@@ -21,6 +21,8 @@ asr =AerosolScatteringRatio03(S3,config );
 % Load beta molecular values here 
 % Max's Codes ( all are now in the same directory as QpackSham)
 zN = Q.Zmes;
+% P = Q.Psonde;
+% T = Q.Tsonde;
 P = Q.Pressi;
 T = Q.Ti;
 lambda_rec= 354.7; % nm

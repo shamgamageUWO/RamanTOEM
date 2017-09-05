@@ -183,7 +183,7 @@ DT_JL
                     upper = err+ X.x(1:m);
                     lower =  X.x(1:m)-err;
 % 
-                     [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
+                     [Tsonde,Zsonde,Psonde] = get_sonde_RS92(20120718,00);
                      Zsonde = Zsonde-491; % altitude correction
 %                     lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
 %                     Ttradi = real(Q.bb./(Q.aa-lnQ));
