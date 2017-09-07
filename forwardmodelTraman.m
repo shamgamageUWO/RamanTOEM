@@ -7,11 +7,12 @@ m = length(Q.Zret);
 x_a = x(1:m);
 BJH = x(m+1);
 BJL = x(m+2);
-CJL = x(m+3);
-OV = x(m+4:end-5);
-BJHa = x(end-4);
-BJLa = x(end-3);
-% CJHa = x(end-3);
+CJH = x(m+3);
+CJL = x(m+4);
+OV = x(m+5:end-6);
+BJHa = x(end-5);
+BJLa = x(end-4);
+CJHa = x(end-3);
 CJLa = x(end-2);
 DT_JH = x(end-1);
 DT_JL = x(end); % deadtimes
@@ -55,8 +56,8 @@ Diff_JL_i = interp1(T,Diff_JL,Ti,'linear');
 % toc
 
 
-CJH = (Q.R).* CJL;
-CJHa = (Q.Ra).* CJLa;
+% CJH = (Q.R).* CJL;
+% CJHa = (Q.Ra).* CJLa;
 % 
 
 JL = (CJL.* A_Zi_d .* Diff_JL_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
@@ -70,15 +71,11 @@ JHa = (CJHa.* A_Zi_an .* Diff_JH_i(1:N1) )./(Ti(1:N1) );
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 % 
 %  % Add true background to the counts 
-%  % Convert observed bg to true only for Digital, apply DS
-% BJL_t = BJL./(1-BJL.*Q.f.*DT_JL);
-% BJH_t = BJH./(1-BJH.*Q.f.*DT_JH);
-% JL = JL  + BJL_t;
-% JH = JH  + BJH_t;
-% 
-% 
-% JLa = JLa  + BJLa;
-% JHa = JHa  + BJHa;
+JL = JL  + BJL;
+JH = JH  + BJH;
+
+JLa = JLa  + BJLa;
+JHa = JHa  + BJHa;
 % 
         %% Saturation correction is applied for the averaged count profile This is just for digital channel
         % 1. Make the Co added counts to avg counts
@@ -98,14 +95,7 @@ JHa = (CJHa.* A_Zi_an .* Diff_JH_i(1:N1) )./(Ti(1:N1) );
        % 5. Scale bacl to coadded signal    
        JL = JL.*(Q.deltatime.*Q.coaddalt);
        JH = JH.*(Q.deltatime.*Q.coaddalt);
-       
-%  % Add background to the counts 
-JL = JL  + BJL;
-JH = JH  + BJH;
 
-
-JLa = JLa  + BJLa;
-JHa = JHa  + BJHa;
 
 return
 

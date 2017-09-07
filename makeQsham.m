@@ -52,12 +52,17 @@ disp('All the constants are ready')
 JHnew = Y.JH;
 JLnew = Y.JL;
 alt = Y.alt;
+JH_DS = Y.JH_DS; 
+JL_DS = Y.JL_DS; 
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
 Q.Eb = Eb(alt>=3000);
 Q.Eb(Q.Eb <=0)= rand();
+
 Q.JHnew= JHnew(alt>=3000);
 Q.JLnew= JLnew(alt>=3000);
+Q.JH_DS = JH_DS(alt>=3000);
+Q.JL_DS = JL_DS(alt>=3000);
 Q.alt = alt(alt>=3000);
 Q.Zmes2 = Q.alt';
 
@@ -124,18 +129,6 @@ disp('Defined grids ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  a priori temperatures
 
-%msis data for temperature
-% [Tmsis, pmsis,zmsis]= msisRALMO;
-% % Tmsis = Tmsis;
-%  Q.Ta = interp1(zmsis,Tmsis,Q.Zret,'linear');
-%  Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-%  Q.Pressi = interp1(zmsis,pmsis,Q.Zmes,'linear');
-%  Q.rho = Q.Pressi./(Rsp.*Q.Ti);
-% [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
-% Q.Ta = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this should be in x vector
-% Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-% Q.Pressi =interp1(Zsonde,Psonde,Q.Zmes,'linear');
-% Q.rho = Q.Pressi./(Rsp.*Q.Ti);
 
 % US temperature model
 % load('USdata.mat');
@@ -151,14 +144,6 @@ disp('a priori temperature profile is loaded ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
-% for i =1 :length(Zsonde)-1
-% if Zsonde(i+1)<= Zsonde(i)
-% Zsonde(i+1) = [];
-% end
-% end
-%  Zsonde = Zsonde(1:i);
-%  Tsonde = Tsonde(1:i);
-%  Psonde = Psonde(1:i);
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
 Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'linear'); % this goes asr 
@@ -172,20 +157,11 @@ Q.alpha_aero = alphaAer;
 Q.Tr = Total_Transmission(Q);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-[R,Ra,R_fit,Ra_fit] = Restimation(Q);
-%  [R,Ra] = Rcalibration(Q); 
-% Q.aa= aa;%1.148467566403494;%aa;
-% Q.bb =bb;%22.634605327641157;%bb;
-% Q.aa_an = -2.1e2;
-% Q.bb_an =1.2e2;
-% Q.Ttraditional_an = Q.aa_an.*log((Q.JHnewa -Q.BaJHa) ./(Q.JLnewa -Q.BaJLa))+Q.bb_an; 
-
-Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
-Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
-% Q.Ttraditional_digi = real(Q.bb./ (Q.aa-log((Q.JHnew -Q.BaJH) ./(Q.JLnew -Q.BaJL)))); 
-%      lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
-%                     Ttradi = real(Q.bb./(Q.aa-lnQ));
-disp('R is calibrated ')
+% [R,Ra,R_fit,Ra_fit] = Restimation(Q);
+% Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
+% Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2
+% 
+% disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 
@@ -198,12 +174,14 @@ Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
+Q.CH = CJH;
+Q.CovCH = (.1 .* (Q.CH)).^2;%sqrt(Q.CL);
 Q.CL = CJL;
 Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = CJLa;
-Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
-% Q.CHa = CJHa;
-% Q.CovCHa = (0.1 .* (Q.CHa)).^2;%sqrt(Q.CL);
+Q.CovCLa = (.01 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CHa = CJHa;
+Q.CovCHa = (0.01 .* (Q.CHa)).^2;%sqrt(Q.CL);
 
                            Q.CovBJLa = ((Y.bg_JL_stda)).^2; % day time
                            Q.CovBJHa = ((Y.bg_JH_stda)).^2;
@@ -320,7 +298,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %         Q.Yvar =[JHreal JLreal];
 
 % % HEre I linearlize the covariance
- slope = (((0.9-0.7).*Q.Zmes1)/(Q.Zmes1(end)));
+ slope = (((4-0.5).*Q.Zmes1)/(Q.Zmes1(end)));
 % slope1 = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
 %    Q.YYYa =  Q.JHav;% smmohtenJHa';
 %    Q.YYa  = Q.JLav;%smmohtenJLa';

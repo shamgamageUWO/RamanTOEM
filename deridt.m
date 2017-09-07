@@ -1,6 +1,6 @@
 function [dJHdt,dJLdt] = deridt(Q,x,forwardmodelTraman)
-DT_JH = x(end-1);
-DT_JL = x(end); % deadtimes
+% DT_JH = x(end-1);
+% DT_JL = x(end); % deadtimes
 % N = 2*m+6 ;
 
 
@@ -10,10 +10,12 @@ DT_JL = x(end); % deadtimes
         'after FM: Nans in retrieval vector derivCounts'
         stop
     end
+DT_JH = x(end-1);
+DT_JL = x(end); % deadtimes
 %     m=length(Q.Zret);
 %     xa=x(1:m);
-    dn = DT_JH.*1e-4;
-    dn2 = DT_JL.*1e-4;
+    dn = DT_JH.*1e-6;
+    dn2 = DT_JL.*1e-6;
     % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
 

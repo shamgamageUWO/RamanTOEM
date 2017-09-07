@@ -233,7 +233,27 @@ bkg_ind3 = Alt>8e3 & Alt<12e3;
 % [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
 % [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
 
-% BAckground
+% BAckground for digitalhas to be true
+% First desaturate the digital signal
+
+  % 1. Make the Co added counts to avg counts
+        JH_HZ = JH./(Q.deltatime.*Q.coaddalt);
+        JL_HZ = JL./(Q.deltatime.*Q.coaddalt);
+        
+        % 2. Convert counts to Hz
+        JHnw = (JH_HZ.*Q.f);
+        JLnw = (JL_HZ.*Q.f);
+        
+        % 3. Apply DT
+        JL_dtc = JLnw ./ (1 - JLnw.*(Q.deadtimeJL)); % non-paralyzable
+        JH_dtc = JHnw ./ (1 - JHnw.*(Q.deadtimeJH));
+          % 4. Convert to counts
+           JL_Ds = JL_dtc.*(1./Q.f);
+           JH_Ds = JH_dtc.*(1./Q.f);
+       % 5. Scale bacl to coadded signal    
+       JL_Ds = JL_Ds.*(Q.deltatime.*Q.coaddalt);% Desaturated counts
+       JH_Ds = JH_Ds.*(Q.deltatime.*Q.coaddalt);% Desaturated counts
+       
 bkg_JL = JL(bkg_ind1);
 bkg_JH = JH(bkg_ind1);
 bkg_Eb = Eb(bkg_ind1);
@@ -247,7 +267,7 @@ bkg_Eban = Eb_an(bkg_ind1);
 % JHnew = JH-bkg_JH;
 
 
-%% Digital
+%% Digital 
 bg_JL_std = std(bkg_JL);
 bg_JH_std = std(bkg_JH);
 bg_JL_v = var(bkg_JL);
@@ -299,10 +319,14 @@ bg_length2an = length(bkg_JLan);
 %     subplot(1,2,2)
 %     semilogx(Eb,alt./1000,'r',JL,alt./1000,'b',JH,alt./1000,'g')
 
+
+
 %% Digital
 Y.JL = JL ;
 Y.JH = JH ;
 Y.Eb = Eb;
+Y.JL_DS = JL_Ds;
+Y.JH_DS = JH_Ds;
 Y.Ebalt = Ebzc;
 Y.alt = alt;
 Y.bgJL = bg_JL;
