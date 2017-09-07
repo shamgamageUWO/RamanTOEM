@@ -11,7 +11,6 @@ CJL = x(m+3);
 OV = x(m+4:end-5);
 BJHa = x(end-4);
 BJLa = x(end-3);
-% CJHa = x(end-3);
 CJLa = x(end-2);
 DT_JH = x(end-1);
 DT_JL = x(end); % deadtimes
@@ -21,10 +20,7 @@ DT_JL = x(end); % deadtimes
 Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear'); % T on data grid (digital)
 OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
 
-% load('analogoverlaps.mat');
-% OVa = (OVz1a+OVz2a)./2;
 
-% OVa = interp1(Q.Zret,OVa,Q.Zmes,'linear');
 %%
 % Constants
 kb = 1.38064852*10^-23;
@@ -73,8 +69,8 @@ JHa = (CJHa.* A_Zi_an .* Diff_JH_i(1:N1) )./(Ti(1:N1) );
 %  % Convert observed bg to true only for Digital, apply DS
 % BJL_t = BJL./(1-BJL.*Q.f.*DT_JL);
 % BJH_t = BJH./(1-BJH.*Q.f.*DT_JH);
-% JL = JL  + BJL_t;
-% JH = JH  + BJH_t;
+JL = JL  + BJL;
+JH = JH  + BJH;
 % 
 % 
 % JLa = JLa  + BJLa;
@@ -100,8 +96,8 @@ JHa = (CJHa.* A_Zi_an .* Diff_JH_i(1:N1) )./(Ti(1:N1) );
        JH = JH.*(Q.deltatime.*Q.coaddalt);
        
 %  % Add background to the counts 
-JL = JL  + BJL;
-JH = JH  + BJH;
+% JL = JL  + BJL;
+% JH = JH  + BJH;
 
 
 JLa = JLa  + BJLa;

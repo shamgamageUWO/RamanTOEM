@@ -159,7 +159,11 @@ Y.YYYa = (std(JH_an)).^2;
 Y.binsize = S0.Channel(12).BinSize;
 F = 1800.* (Y.binsize./150);
 
+% % Apply DS to find true background
+%         JL_dtc = (F.*JL) ./ (1 - JL.*(Q.deadtimeJL.*1e6)); % non-paralyzable
+%         JH_dtc = (F.*JH) ./ (1 - JH.*(Q.deadtimeJH.*1e6));
 
+       
 % Coadd in time
 % Eb= S0.Channel(2).Signal; % this is over night signal
 JL = F.*JL; % single scans
@@ -234,8 +238,33 @@ bkg_ind3 = Alt>8e3 & Alt<12e3;
 % [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
 
 % BAckground
-bkg_JL = JL(bkg_ind1);
-bkg_JH = JH(bkg_ind1);
+
+% Desaturate and find the true background first
+     % 1. Make the Co added counts to avg counts
+        JHn = JH./(Q.deltatime.*Q.coaddalt);
+        JLn = JL./(Q.deltatime.*Q.coaddalt);
+        
+        % 2. Convert counts to Hz
+        JHnwn = (JHn./F);
+        JLnwn = (JLn./F);
+
+        
+        % 3. Apply DT correction
+        JL_dtc = JLn ./ (1 - JLnwn.*(Q.deadtimeJL.*1e6)); % non-paralyzable
+        JH_dtc = JHn ./ (1 - JHnwn.*(Q.deadtimeJH).*1e6);
+
+% %           % 4. Convert to counts
+%            JLC = JL_dtc.*(1./Q.f);
+%            JHC = JH_dtc.*(1./Q.f);
+
+%        % 5. Scale bacl to coadded signal    
+       JL_DS = JL_dtc.*(Q.deltatime.*Q.coaddalt);
+       JH_DS = JH_dtc.*(Q.deltatime.*Q.coaddalt);
+       
+
+
+bkg_JL = JL_DS(bkg_ind1);
+bkg_JH = JH_DS(bkg_ind1);
 bkg_Eb = Eb(bkg_ind1);
 
 
@@ -303,6 +332,8 @@ bg_length2an = length(bkg_JLan);
 Y.JL = JL ;
 Y.JH = JH ;
 Y.Eb = Eb;
+Y.JL_DS = JL_DS;
+Y.JH_DS = JH_DS;
 Y.Ebalt = Ebzc;
 Y.alt = alt;
 Y.bgJL = bg_JL;
@@ -323,6 +354,6 @@ Y.bg_JH_stda = bg_JHan_std ;
 Y.bg_length1a = bg_length1an;
 Y.bg_length2a = bg_length2an;
 Y.alt_an = Alt;
-
+Y.F = F;
 
 % save('data.mat','-struct','Y');

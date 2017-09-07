@@ -25,13 +25,13 @@ Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
 Q.coaddalt = 10;
-Q.Rate = 30;%Hz
+% Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
-Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
+% Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
@@ -42,8 +42,8 @@ Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.deltatime = 30;
-Q.Rate = 1800; 
-
+Q.Shots = 1800; 
+% Q.f = Q.Clight ./ (2.*(Q.Shots).*Q.altbinsize); 
 disp('All the constants are ready')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Load raw measurements
@@ -51,6 +51,9 @@ disp('All the constants are ready')
 % Digital measurements 2km above
 JHnew = Y.JH;
 JLnew = Y.JL;
+JL_DS = Y.JL_DS;
+JH_DS = Y.JH_DS;
+
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
@@ -58,8 +61,12 @@ Q.Eb = Eb(alt>=3000);
 Q.Eb(Q.Eb <=0)= rand();
 Q.JHnew= JHnew(alt>=3000);
 Q.JLnew= JLnew(alt>=3000);
+Q.JH_DS =JH_DS(alt>=3000);
+Q.JL_DS =JL_DS(alt>=3000);
 Q.alt = alt(alt>=3000);
 Q.Zmes2 = Q.alt';
+
+Q.f = 1e6./(Y.F);
 
 % Analog measurements
 JHnewa = Y.JHa;
@@ -172,7 +179,7 @@ Q.alpha_aero = alphaAer;
 Q.Tr = Total_Transmission(Q);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-[R,Ra,R_fit,Ra_fit] = Restimation(Q);
+[R,Ra,R_fit,Ra_fit] = Restimationnew(Q);
 %  [R,Ra] = Rcalibration(Q); 
 % Q.aa= aa;%1.148467566403494;%aa;
 % Q.bb =bb;%22.634605327641157;%bb;

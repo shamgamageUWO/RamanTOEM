@@ -16,7 +16,7 @@ Rsp = 287;
 NA = 6.02214129 *(10^23) ;% Avergadro Number mol?1
 M = 28.9645 * (10^-3); 
 Q.coaddalt = 10;
-Q.Rate = 30;%Hz
+% Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
@@ -61,7 +61,7 @@ Q.alpha_aero = alphaAer;
 Q.Tr = Total_Transmission(Q);
 
 x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
-[JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTramanNew(Q,x_a);
+[JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x_a);
 
 %  figure;semilogx(JLa,Q.Zmes1./1000,'black',JL,Q.Zmes2./1000,'r',JHa,Q.Zmes1./1000,'b',JH,Q.Zmes2./1000,'m')
 
@@ -115,15 +115,7 @@ ana_R_diff_2 = abs(Q.Ra - nanmean(R_esti_a_2(Q.Zmes>=100 & Q.Zmes<=1200)'))
 
 x = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa 3.8e-9 3.8e-9]; % new synthetic counts with DT
 [JLn,JHn,JLan,JHan]=forwardmodelTraman(Q,x);
-% determine the observed bg from the counts
-BG_JLn = JLn(ind);
-BG_JLn  = nanmean(BG_JLn');
-BG_JHn = JHn(ind);
-BG_JHn = nanmean(BG_JHn');
-BG_JLan = JLan(ind2);
-BG_JLan = nanmean(BG_JLan');
-BG_JHan = JHan(ind2);
-BG_JHan  = nanmean(BG_JHan');
+
 % Correct counts before finding R
 % Desatuarte
     %% Saturation correction is applied for the averaged count profile This is just for digital channel
@@ -134,23 +126,28 @@ BG_JHan  = nanmean(BG_JHan');
         % 2. Convert counts to Hz
         JHnwn = (JHn.*Q.f);
         JLnwn = (JLn.*Q.f);
-%         BG_JLn = BG_JLn .*Q.f;
-%         BG_JHn = BG_JHn .*Q.f;
         
         % 3. Apply DT
         JL_dtc = JLnwn ./ (1 - JLnwn.*(3.8e-9)); % non-paralyzable
         JH_dtc = JHnwn ./ (1 - JHnwn.*(3.8e-9));
-         BG_JHn=  BG_JHn./ (1 - BG_JHn.*Q.f.*(3.8e-9));
-          BG_JLn=  BG_JLn./ (1 - BG_JLn.*Q.f.*(3.8e-9));
           % 4. Convert to counts
            JLn = JL_dtc.*(1./Q.f);
            JHn = JH_dtc.*(1./Q.f);
-%            BG_JLn = BG_JLn*(1./Q.f);
-%            BG_JHn = BG_JHn*(1./Q.f);
        % 5. Scale bacl to coadded signal    
        JLn = JLn.*(Q.deltatime.*Q.coaddalt);
        JHn = JHn.*(Q.deltatime.*Q.coaddalt);
 
+       % Now find the true background from the desaturated signal
+       % determine the observed bg from the counts
+BG_JLn = JLn(ind);
+BG_JLn  = nanmean(BG_JLn');
+BG_JHn = JHn(ind);
+BG_JHn = nanmean(BG_JHn');
+BG_JLan = JLan(ind2);
+BG_JLan = nanmean(BG_JLan');
+BG_JHan = JHan(ind2);
+BG_JHan  = nanmean(BG_JHan');
+       
 Ratio_Counts_digi_3 = (JHn-BG_JHn)./(JLn-BG_JLn);
 Ratio_Counts_an_3 = (JHan-BG_JHan)./(JLan-BG_JLan);
 R_esti_digi_3 = Ratio_Counts_digi_3 ./Ratio_diff(Q.d_alti_Diff+1:end);

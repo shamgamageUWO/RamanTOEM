@@ -3,14 +3,14 @@ function [CJL, CJLa,CJHa,CJH] = estimations(Q)
 
 
 Zi = Q.Zmes;
-ind1 = Zi>=15000 & Zi< 20000;
+ind1 = Zi>=8000 & Zi< 10000;
 ind2 = Zi>=1500 & Zi< 1700;
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Removing true background from the desaturated signal
-SJH = Q.JHnew - Q.BaJH;
-SJL = Q.JLnew - Q.BaJL;
+SJH = Q.JH_DS-Q.BaJH;
+SJL = Q.JL_DS-Q.BaJL;
 SJHa = Q.JHnewa - Q.BaJHa;
 SJLa = Q.JLnewa - Q.BaJLa;
 % SJHa = Q.JHnewa;
@@ -59,18 +59,18 @@ CJHa = fitJHa(1);
 % CJLa = SJLa(14)./JLa(14);
 % CJHa = SJHa(14)./JHa(14);
 
-% figure;
-% subplot(1,2,1)
-% semilogx(SJH,Q.Zmes2./1000,'b',JH,Q.Zmes2./1000,'g',CJH.*JH,Q.Zmes2./1000,'m',Q.R.*CJL.*JH,Q.Zmes2./1000,'y')
-% hold on;
-% semilogx(SJL,Q.Zmes2./1000,'black',JL,Q.Zmes2./1000,'r',CJL.*JL,Q.Zmes2./1000,'b')
-% legend('JH real','JH FM (no const)','JH Syn (CJH)','JH Syn (CJL.*R)','JL real','JL FM (no const','JL Syn')
-% 
-% subplot(1,2,2)
-% semilogx(SJLa,Q.Zmes1./1000,'black',JLa,Q.Zmes1./1000,'r',CJLa.*JLa,Q.Zmes1./1000,'b')
-% hold on;
-% semilogx(SJHa,Q.Zmes1./1000,'m',JHa,Q.Zmes1./1000,'y',CJHa.*JHa,Q.Zmes1./1000,'g',CJLa.*JHa.*Q.Ra,Q.Zmes1./1000,'r')
-% legend('JL ana real','JL ana FM (no const)','JLana','JH ana real','JH ana FM (no const)','JH ana Syn (CJH)','JH ana Syn (CJLa.*Ra)')
+%  figure;
+%  subplot(1,2,1)
+%  semilogx(SJH,Q.Zmes2./1000,'b',JH,Q.Zmes2./1000,'g',CJH.*JH,Q.Zmes2./1000,'m',Q.R.*CJL.*JH,Q.Zmes2./1000,'y')
+%  hold on;
+%  semilogx(SJL,Q.Zmes2./1000,'black',JL,Q.Zmes2./1000,'r',CJL.*JL,Q.Zmes2./1000,'b')
+%  legend('JH real','JH FM (no const)','JH Syn (CJH)','JH Syn (CJL.*R)','JL real','JL FM (no const','JL Syn')
+% % 
+%  subplot(1,2,2)
+%  semilogx(SJLa,Q.Zmes1./1000,'black',JLa,Q.Zmes1./1000,'r',CJLa.*JLa,Q.Zmes1./1000,'b')
+%  hold on;
+%  semilogx(SJHa,Q.Zmes1./1000,'m',JHa,Q.Zmes1./1000,'y',CJHa.*JHa,Q.Zmes1./1000,'g',CJLa.*JHa.*Q.Ra,Q.Zmes1./1000,'r')
+%  legend('JL ana real','JL ana FM (no const)','JLana','JH ana real','JH ana FM (no const)','JH ana Syn (CJH)','JH ana Syn (CJLa.*Ra)')
 % 
 % %     CJL = nanmean(SJL(ind1)./JL(ind1)');
 % %     CJH = nanmean(SJH(ind1)./JH(ind1)');
@@ -86,28 +86,28 @@ CJHa = fitJHa(1);
     %     %  OVz = (JLnew + JHnew- Bg_JL_real- Bg_JH_real)./(JLwoOV + JHwoOV)';
     %     % figure;plot(Q.Zmes./1000,OVz,'b'); hold on;
 %     
-     JLwoOV = ((CJL.*JL));
-     JHwoOV1 = ((Q.R.*CJL.*JH));
-     JHwoOV2 = ((CJH.*JH));
-% %     
-    JLawoOV = ((CJLa.*JLa));
-     JHawoOV1 = ((Q.Ra.*CJLa.*JHa));
-    JHawoOV2 = ((CJHa.*JHa));
-
-% %     
-% %     % It is now mean of the overlap as the a priori
-      OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
-      OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV1 )';
-      OVz3d = (Q.JHnew - Q.BaJH)./(JHwoOV2 )';
-
-   
-      
-      
-     OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
-     OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV1 )';
-     OVz3a = (Q.JHnewa - Q.BaJHa)./(JHawoOV2 )';
-%    figure;plot(Q.Zmes2./1000,OVz1d,'r',Q.Zmes2./1000,OVz2d,'b',Q.Zmes2./1000,OVz3d,'g')
-%   figure;plot(Q.Zmes1./1000,OVz1a,'r',Q.Zmes1./1000,OVz3a,'g',Q.Zmes2./1000,OVz1d,'m',Q.Zmes2./1000,OVz3d,'black')
+%      JLwoOV = ((CJL.*JL));
+%      JHwoOV1 = ((Q.R.*CJL.*JH));
+%      JHwoOV2 = ((CJH.*JH));
+% % %     
+%     JLawoOV = ((CJLa.*JLa));
+%      JHawoOV1 = ((Q.Ra.*CJLa.*JHa));
+%     JHawoOV2 = ((CJHa.*JHa));
+% 
+% % %     
+% % %     % It is now mean of the overlap as the a priori
+%       OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
+%       OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV1 )';
+%       OVz3d = (Q.JHnew - Q.BaJH)./(JHwoOV2 )';
+% 
+%    
+%       
+%       
+%      OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
+%      OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV1 )';
+%      OVz3a = (Q.JHnewa - Q.BaJHa)./(JHawoOV2 )';
+% %    figure;plot(Q.Zmes2./1000,OVz1d,'r',Q.Zmes2./1000,OVz2d,'b',Q.Zmes2./1000,OVz3d,'g')
+% %   figure;plot(Q.Zmes1./1000,OVz1a,'r',Q.Zmes1./1000,OVz3a,'g',Q.Zmes2./1000,OVz1d,'m',Q.Zmes2./1000,OVz3d,'black')
 
 % %     
 % %     OVzd = (OVz1d+OVz2d)./2;

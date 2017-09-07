@@ -32,8 +32,8 @@ N1 = length(Q.JHnewa);
 %     bkg_JH = JHnew(ind1);
 %      BaJH_t = nanmean(bkg_JH);
 
-JHnew = Q.JH_DS-Q.BaJH;
-JLnew = Q.JL_DS-Q.BaJL;
+JHnew = JHnew-BaJH_t;
+JLnew = JLnew-BaJL_t;
 JHnewa = Q.JHnewa-Q.BaJHa;
 JLnewa = Q.JLnewa-Q.BaJLa;
 
