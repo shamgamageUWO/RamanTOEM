@@ -33,7 +33,7 @@ Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
 
 Q.deadtimeJL = 3.8e-9; % 4ns
-Q.deadtimeJH = 3.8e-9; % 4ns
+Q.deadtimeJH = 3.9e-9; % 4ns
 Q.CovDTJL = (0.01.*Q.deadtimeJL).^2;
 Q.CovDTJH = (0.01 .*Q.deadtimeJH).^2;
 
@@ -215,10 +215,10 @@ Q.CovCHa = (0.01 .* (Q.CHa)).^2;%sqrt(Q.CL);
 
 JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLnewa';
 
-                        smmohtenJH = smooth(JHreal,10); % smoothing covariance to smooth the envelop cover
-                        smmohtenJL = smooth(JLreal,10);
-                        smmohtenJHa = smooth(JHrealan,100); % smoothing covariance to smooth the envelop cover
-                        smmohtenJLa = smooth(JLrealan,100);
+                        smmohtenJH = smooth(JHreal,5); % smoothing covariance to smooth the envelop cover
+                        smmohtenJL = smooth(JLreal,5);
+                        smmohtenJHa = smooth(JHrealan,5); % smoothing covariance to smooth the envelop cover
+                        smmohtenJLa = smooth(JLrealan,5);
                         % ysmoothen= [smmohtenJH' smmohtenJL']';
 
  Q.JHnew =JHreal;  Q.JLnew=JLreal ;  Q.JHnewa =JHrealan ;   Q.JLnewa= JLrealan;
@@ -247,8 +247,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(smmohtenJHa',Q.Zmes1,20);
- [JLav,go2] =bobpoissontest(smmohtenJLa',Q.Zmes1,20);
+ [JHav,go1] =bobpoissontest(smmohtenJHa',Q.Zmes1,8);
+ [JLav,go2] =bobpoissontest(smmohtenJLa',Q.Zmes1,8);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -298,10 +298,11 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %         Q.Yvar =[JHreal JLreal];
 
 % % HEre I linearlize the covariance
-%  slope = (((1-0.3).*Q.Zmes1)/(Q.Zmes1(end)));
- slope = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
-   Q.YYYa = slope.*Q.JHav;% smmohtenJHa';
-   Q.YYa  = slope.*Q.JLav;%smmohtenJLa';
+%   slope = (((1-0.3).*Q.Zmes1)/(Q.Zmes1(end)));
+%   slope = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
+% slope = (0.5-0.05)./(Q.Zmes1(end)-Q.Zmes1(1));
+   Q.YYYa = 0.01.*Q.JHav;% smmohtenJHa';
+   Q.YYa  = 0.01.*Q.JLav;%smmohtenJLa';
 %  Q.YYYa = slope.*Q.JHav;
 %   Q.YYa  =slope.*Q.JLav;
 
