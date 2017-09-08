@@ -25,13 +25,12 @@ Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
 Q.coaddalt = 10;
-Q.Rate = 30;%Hz
+% Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
-Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
@@ -42,7 +41,8 @@ Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.deltatime = 30;
-Q.Rate = 1800; 
+Q.Shots = 1800; 
+Q.f = Q.Clight ./ (2.*(Q.Shots).*Q.altbinsize);
 
 disp('All the constants are ready')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -56,14 +56,14 @@ JH_DS = Y.JH_DS;
 JL_DS = Y.JL_DS; 
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=3000);
+Q.Eb = Eb(alt>=2000);
 Q.Eb(Q.Eb <=0)= rand();
 
-Q.JHnew= JHnew(alt>=3000);
-Q.JLnew= JLnew(alt>=3000);
-Q.JH_DS = JH_DS(alt>=3000);
-Q.JL_DS = JL_DS(alt>=3000);
-Q.alt = alt(alt>=3000);
+Q.JHnew= JHnew(alt>=2000);
+Q.JLnew= JLnew(alt>=2000);
+Q.JH_DS = JH_DS(alt>=2000);
+Q.JL_DS = JL_DS(alt>=2000);
+Q.alt = alt(alt>=2000);
 Q.Zmes2 = Q.alt';
 
 % Analog measurements
@@ -175,9 +175,9 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CH = CJH;
-Q.CovCH = (.1 .* (Q.CH)).^2;%sqrt(Q.CL);
+Q.CovCH = (.01 .* (Q.CH)).^2;%sqrt(Q.CL);
 Q.CL = CJL;
-Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.01 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = CJLa;
 Q.CovCLa = (.01 .* (Q.CLa)).^2;%sqrt(Q.CL);
 Q.CHa = CJHa;
@@ -298,12 +298,12 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %         Q.Yvar =[JHreal JLreal];
 
 % % HEre I linearlize the covariance
- slope = (((4-0.5).*Q.Zmes1)/(Q.Zmes1(end)));
-% slope1 = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
-%    Q.YYYa =  Q.JHav;% smmohtenJHa';
-%    Q.YYa  = Q.JLav;%smmohtenJLa';
- Q.YYYa = slope.*Q.JHav;
-  Q.YYa  =slope.*Q.JLav;
+%  slope = (((1-0.3).*Q.Zmes1)/(Q.Zmes1(end)));
+ slope = (((0.0008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
+   Q.YYYa = slope.*Q.JHav;% smmohtenJHa';
+   Q.YYa  = slope.*Q.JLav;%smmohtenJLa';
+%  Q.YYYa = slope.*Q.JHav;
+%   Q.YYa  =slope.*Q.JLav;
 
             Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 %            Q.Yvar =[smmohtenJH' smmohtenJL' Q.YYYa Q.YYa];
