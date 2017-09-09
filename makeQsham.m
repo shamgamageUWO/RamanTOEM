@@ -78,13 +78,13 @@ ANalt = Y.alt_an;
 % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
 % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
 % % Q.ANalt = ANalt(alt>=50 & alt<5000);
-Q.Eba = Eba(ANalt>=1000 & ANalt <= 3000);
+Q.Eba = Eba(ANalt>=2000 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=3000);
-Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=3000);
-Q.ANalt = ANalt(ANalt>=1000);
+Q.JHnewa= JHnewa(ANalt>=2000 & ANalt <=6000);
+Q.JLnewa= JLnewa(ANalt>=2000 & ANalt <=6000);
+Q.ANalt = ANalt(ANalt>=2000);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 3000);
+Q.Zmes1 = ANalt(ANalt>=2000 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -244,10 +244,10 @@ Q.CovCLa = (.01 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
 JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLnewa';
 
-                        smmohtenJH = smooth(JHreal,5); % smoothing covariance to smooth the envelop cover
-                        smmohtenJL = smooth(JLreal,5);
-                        smmohtenJHa = smooth(JHrealan,5); % smoothing covariance to smooth the envelop cover
-                        smmohtenJLa = smooth(JLrealan,5);
+                        smmohtenJH = smooth(JHreal,10); % smoothing covariance to smooth the envelop cover
+                        smmohtenJL = smooth(JLreal,10);
+                        smmohtenJHa = smooth(JHrealan,10); % smoothing covariance to smooth the envelop cover
+                        smmohtenJLa = smooth(JLrealan,10);
                         % ysmoothen= [smmohtenJH' smmohtenJL']';
 
  Q.JHnew =JHreal;  Q.JLnew=JLreal ;  Q.JHnewa =JHrealan ;   Q.JLnewa= JLrealan;
@@ -308,7 +308,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 3000
+            if Q.Zmes2(i) <= 6000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = smmohtenJL(i);
@@ -316,7 +316,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 3000
+            if  Q.Zmes2(i) <= 6000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = smmohtenJH(i);
@@ -328,7 +328,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 % % HEre I linearlize the covariance
 %  slope = (((0.9-0.7).*Q.Zmes1)/(Q.Zmes1(end)));
- slope = (((0.008-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
+ slope = (((0.8-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
 %    Q.YYYa =  Q.JHav;% smmohtenJHa';
 %    Q.YYa  = Q.JLav;%smmohtenJLa';
  Q.YYYa = slope.*Q.JHav;

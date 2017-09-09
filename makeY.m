@@ -232,8 +232,8 @@ Alt = JHazc;
 %   legend('JL','JH')
 % Save in a new mat file
 bkg_ind1 = alt>50e3;% & alt<60e3;
-bkg_ind2 = Alt>8e3 & Alt<12e3;
-bkg_ind3 = Alt>8e3 & Alt<12e3;
+bkg_ind2 = Alt>8e3;
+% bkg_ind3 = Alt>8e3 & Alt<12e3;
 % [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
 % [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
 
@@ -268,9 +268,9 @@ bkg_JH = JH_DS(bkg_ind1);
 bkg_Eb = Eb(bkg_ind1);
 
 
-bkg_JLan = JL_an(bkg_ind1);
-bkg_JHan = JH_an(bkg_ind1);
-bkg_Eban = Eb_an(bkg_ind1);
+bkg_JLan = JL_an(bkg_ind2);
+bkg_JHan = JH_an(bkg_ind2);
+bkg_Eban = Eb_an(bkg_ind2);
 
 % JLnew = JL-bkg_JL;
 % JHnew = JH-bkg_JH;
