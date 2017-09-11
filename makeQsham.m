@@ -217,8 +217,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
                         smmohtenJH = smooth(JHreal,5); % smoothing covariance to smooth the envelop cover
                         smmohtenJL = smooth(JLreal,5);
-                        smmohtenJHa = smooth(JHrealan,5); % smoothing covariance to smooth the envelop cover
-                        smmohtenJLa = smooth(JLrealan,5);
+                        smmohtenJHa = smooth(JHrealan,10); % smoothing covariance to smooth the envelop cover
+                        smmohtenJLa = smooth(JLrealan,10);
                         % ysmoothen= [smmohtenJH' smmohtenJL']';
 
  Q.JHnew =JHreal;  Q.JLnew=JLreal ;  Q.JHnewa =JHrealan ;   Q.JLnewa= JLrealan;
