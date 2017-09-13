@@ -57,31 +57,31 @@ X2 = Q.Zmes1./1000;
 Y1 = R;
 Y2 = Ra;
 
-figure1 = figure;
-
-% Create axes
-axes1 = axes('Parent',figure1);
-hold(axes1,'on');
-
-% Create semilogx
-plot(X1,Y1,'DisplayName','R','Color',[1 0 0]);
-
-% Create semilogx
-plot(X2,Y2,'DisplayName','Ra','Color',[0 0 1]);
-
-% Create xlabel
-xlabel('Altitude (km)');
-
-% Create ylabel
-ylabel('R and Ra');
-
-% Uncomment the following line to preserve the X-limits of the axes
-% xlim(axes1,[0 20]);
-box(axes1,'on');
-% Set the remaining axes properties
-set(axes1,'FontSize',20,'XMinorTick','on','XScale','linear');
-% Create legend
-legend(axes1,'show');
+% figure1 = figure;
+% 
+% % Create axes
+% axes1 = axes('Parent',figure1);
+% hold(axes1,'on');
+% 
+% % Create semilogx
+% plot(X1,Y1,'DisplayName','R','Color',[1 0 0]);
+% 
+% % Create semilogx
+% plot(X2,Y2,'DisplayName','Ra','Color',[0 0 1]);
+% 
+% % Create xlabel
+% xlabel('Altitude (km)');
+% 
+% % Create ylabel
+% ylabel('R and Ra');
+% 
+% % Uncomment the following line to preserve the X-limits of the axes
+% % xlim(axes1,[0 20]);
+% box(axes1,'on');
+% % Set the remaining axes properties
+% set(axes1,'FontSize',20,'XMinorTick','on','XScale','linear');
+% % Create legend
+% legend(axes1,'show');
 
 
  Alt = Q.Zmes2;
