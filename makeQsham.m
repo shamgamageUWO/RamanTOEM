@@ -67,8 +67,8 @@ disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
-Q.Zmes = 100:10:70000;% Measurement grid
-Q.Zret = 100:100:70000;% Retrieval grid
+Q.Zmes = 100:100:70000;% Measurement grid
+Q.Zret = 100:200:75000;% Retrieval grid
 disp('Defined grids ')
 
 
@@ -82,9 +82,10 @@ disp('Defined grids ')
 %  Q.Ta = interp1(zmsis,Tmsis,Q.Zret,'linear');
 %  Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
 %  Q.Pressi = interp1(zmsis,pmsis,Q.Zmes,'linear');
-%  Q.rho = Q.Pressi./(Rsp.*Q.Ti);
+% %  Q.rho = Q.Pressi./(Rsp.*Q.Ti);
 % [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
-% Q.Ta = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this should be in x vector
+% Zsonde = Zsonde-491;
+% Q.Treal = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this should be in x vector
 % Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
 % Q.Pressi =interp1(Zsonde,Psonde,Q.Zmes,'linear');
 % Q.rho = Q.Pressi./(Rsp.*Q.Ti);
@@ -124,10 +125,13 @@ disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 % [CJL, CJH,OV] = estimations(Q);
-Q.OVa = ones(1,length(Q.Zret));%
+load('ovmodeldata.mat');
+Q.OVa = interp1(z,epsi,Q.Zret,'linear');
+Q.OVa(isnan(Q.OVa))=1;
+% Q.OVa = ones(1,length(Q.Zret));%
 Q.OVlength = length(Q.OVa);
 Q.CL = 8e19;%(2.9e+18);
-Q.CovCL = (0.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 
 
@@ -141,7 +145,7 @@ Q.CovBJH = ((Q.bg_JH_std/sqrt(Q.bg_length1))).^2;
 disp('Nighttime retrieval')
 end 
 
-x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa];
+x_a = [Q.Ta+10 Q.BaJH Q.BaJL Q.CL Q.OVa];
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x_a);
 % add noise
 Q.JLnew = NoiseP(JL);
@@ -169,8 +173,8 @@ Q.y = [Q.JHnew Q.JLnew]';
 % above 2 km use the counts
 
 % % Q.yvar = diag(Q.y);
-%             [JHv,go] =bobpoissontest(Q.JHnew',Q.Zmes);
-%             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes);
+%             [JHv,go] =bobpoissontest(Q.JHnew,Q.Zmes);
+%             [JLv,go] =bobpoissontest(Q.JLnew,Q.Zmes);
 % 
 %             r1 = ones(1,go-1).* JHv(1);
 %             r2 = ones(1,go-1).* JHv(end);
@@ -178,7 +182,7 @@ Q.y = [Q.JHnew Q.JLnew]';
 %             r4 = ones(1,go-1).* JLv(end);
 %             Q.JHv = [r1 JHv r2];
 %             Q.JLv = [r3 JLv r4];
-            
+%             
 % figure;plot(Q.JLv,Q.Zmes./1000,'r',JLreal,Q.Zmes./1000,'b')
 % xlabel('Log of Variance')
 % ylabel('Alt(km)')
@@ -209,7 +213,7 @@ Q.y = [Q.JHnew Q.JLnew]';
 % % h2 = Q.Zmes(indi2)
 
 %         for i = 1: length(Q.JLv)
-%             if Q.Zmes(i) <= 100
+%             if Q.Zmes(i) <= 6000
 %                 YY(i) = Q.JLv(i);
 %             else
 %                 YY(i) = Q.JLnew(i);
@@ -217,7 +221,7 @@ Q.y = [Q.JHnew Q.JLnew]';
 %         end
 % 
 %         for i = 1: length(Q.JHv)
-%             if  Q.Zmes(i) <= 100
+%             if  Q.Zmes(i) <= 6000
 %                 YYY(i) = Q.JHv(i);
 %             else
 %                 YYY(i) = Q.JHnew(i);
@@ -226,7 +230,7 @@ Q.y = [Q.JHnew Q.JLnew]';
 
        
 
-           Q.Yvar =[Q.JHnew Q.JLnew];
+            Q.Yvar =[Q.JHnew Q.JLnew];
 %         for ii = 1:length(Q.y)
 %             if Q.y(ii) <= 15
 %                 Q.Yvar(ii)=15;
@@ -245,8 +249,8 @@ Q.y = [Q.JHnew Q.JLnew]';
 % xlabel('Log of Variance')
 % ylabel('Alt(km)')
 %  h2
-% % Q.yvar = diag(Q.Yvar);
-%  Q.Yvar =[YYY YY];
+%  Q.yvar = diag(Q.Yvar);
+%   Q.Yvar =[YYY YY];
 Q.yvar = diag(Q.Yvar);
 
 Q.n1=length(Q.JHnew);

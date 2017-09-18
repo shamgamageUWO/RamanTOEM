@@ -111,14 +111,14 @@ ylabel('Altitude (km)')
  upper = err+ X.x(1:m);
 lower =  X.x(1:m)-err;
 
- [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
- lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
-%  Ttradi = real(Q.bb./(Q.aa-lnQ));
-
-Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
+%  [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
+%  lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
+% %  Ttradi = real(Q.bb./(Q.aa-lnQ));
+% 
+% Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
 figure;
 subplot(1,2,1)
-plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b') %,Ttradi(Q.Zmes<=25000),Q.Zmes(Q.Zmes<=25000)./1000,'black'
+plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r') %,Ttradi(Q.Zmes<=25000),Q.Zmes(Q.Zmes<=25000)./1000,'black'
 grid on;
  hold on
  [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
@@ -132,7 +132,7 @@ ylabel('Altitude(km)')
 %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
  subplot(1,2,2)
- plot(X.x(1:m) - (Tsonde'),Q.Zret./1000)
+ plot(X.x(1:m) - (Q.Ta'),Q.Zret./1000)
  grid on;
  xlabel('Temperature residuals(T OEM - T sonde) (K)')
 %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
