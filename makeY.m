@@ -139,6 +139,8 @@ Eb=  S3.Eb.Combined.Signal(:,118:147);
 %   ylabel('Alt (km)')
 %   legend('JL ana','JH ana')
 
+
+
 % MHZ to Counts conversion constant 
 Y.binsize = 3.75;%S0.Channel(12).BinSize;
 F = 1800.* (Y.binsize./150);
@@ -173,6 +175,29 @@ Eb = nansum(Eb');
 [Eb, Ebzc] = coadd(Eb, Alt, Q.coaddalt);
 
 alt = JHzc;
+Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
+
+% New field to keep desaturated signal
+        %% Saturation correction is applied for the averaged count profile
+        % 1. Make the Co added counts to avg counts
+        JH_DS = JH./(Q.deltatime.*Q.coaddalt);
+        JL_DS = JL./(Q.deltatime.*Q.coaddalt);
+        
+        % 2. Convert counts to Hz
+        JHnw = (JH_DS.*Q.f);
+        JLnw = (JL_DS.*Q.f);
+        
+        % 3. Apply DT
+        JL_dtc = JLnw ./ (1 - JLnw.*(Q.deadtime)); % non-paralyzable
+        % JL = JL .* exp(-JLnw.*(4e-9)); % paralyzable %units is counts
+        JH_dtc = JHnw ./ (1 - JHnw.*(Q.deadtime));
+          % 4. Convert to counts
+           JL_ds = JL_dtc.*(1./Q.f);
+           JH_ds = JH_dtc.*(1./Q.f);
+       % 5. Scale bacl to coadded signal    
+       Y.JL_DS = JL_ds.*(Q.deltatime.*Q.coaddalt);
+       Y.JH_DS = JH_ds.*(Q.deltatime.*Q.coaddalt);
+
 
 %    figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r')%,Eb,Ebzc./1000,'g') 
 %   xlabel('30min and 40bin  Coadded signal (Counts/bin/time)')

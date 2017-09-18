@@ -1,72 +1,82 @@
-function [R,Ra,aa,bb] = Rcalibration(Q)
+function [R] = Rcalibration(Q)
 
 date_in = Q.date_in;
 time_in = Q.time_in;
-JHnew = Q.JHnew-Q.BaJH;
-JLnew = Q.JLnew-Q.BaJL;
-JHnewa = Q.JHnewa-Q.BaJHa;
-JLnewa = Q.JLnewa-Q.BaJLa;
+JHnew = Q.JH_DS-Q.BaJH;
+JLnew = Q.JL_DS-Q.BaJL;
+% JHnewa = Q.JHnewa-Q.BaJHa;
+% JLnewa = Q.JLnewa-Q.BaJLa;
 % alt = Q.alt;
 % Zi= alt';
 % Q.Zmes = (Zi>50);
 
-%% Load Sonde
-[Tsonde,Zsonde,Psonde] = get_sonde_RS92(date_in,time_in);
-Pressi = Psonde';
-Q.Pressi =interp1(Zsonde,Pressi,Q.Zmes,'linear');
-Ti =interp1(Zsonde,Tsonde,Q.Zmes,'linear');
-Q.rho = (Q.Pressi./(287.*Ti));
-Q.Zret = Zsonde';
+% %% Load Sonde
+% [Tsonde,Zsonde,Psonde] = get_sonde_RS92(date_in,time_in);
+% Zsonde = Zsonde-491;
+% Pressi = Psonde';
+% Q.Pressi =interp1(Zsonde,Pressi,Q.Zmes,'linear');
+% Ti =interp1(Zsonde,Tsonde,Q.Zmes,'linear');
+% Q.rho = (Q.Pressi./(287.*Ti));
+% Q.Zret = Zsonde';
 
+
+
+load('DiffCrossSections.mat');
+Diff_JH_i = interp1(T,Diff_JH,Q.Ti,'linear');
+Diff_JL_i = interp1(T,Diff_JL,Q.Ti,'linear');
+
+
+R_full = (JHnew./JLnew).*(Diff_JL_i'./Diff_JH_i');
+% figure;plot(Q.Zmes./1000,R_full)
 %% R estimation using JL and JH channels
 % x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa];
-% Make background zero, CJL = 1 and overlap 1; Q.R =1;
-OVa = ones(1,length(Zsonde));
-% OVa = Q.Ova;
-Q.OVlength = length(OVa);
-Q.R =1;
-Q.Ra = 1;
-
-% x = [Tsonde' 0 0 1 OVa 0 0 1 1];
-x = [Tsonde' 0 0 1 OVa 0 0 1]; % coupled analog
-
-%% Digital
-[JL,JH,JLa,JHa,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
+% % Make background zero, CJL = 1 and overlap 1; Q.R =1;
+% OVa = ones(1,length(Zsonde));
+% % OVa = Q.Ova;
+% Q.OVlength = length(OVa);
+% Q.R =1;
+% Q.Ra = 1;
+% 
+% % x = [Tsonde' 0 0 1 OVa 0 0 1 1];
+% x = [Tsonde' 0 0 1 OVa 0 0 1]; % coupled analog
+% 
+% %% Digital
+% [JL,JH,JLa,JHa,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
 % altitude corrected for the sonde
-Alt = Q.Zmes2 + 491;
-ind1 = Alt >= 8000 & Alt< 10000;
+Alt = Q.Zmes;
+ind = Alt >= 8000 & Alt< 10000;
 
-x = (JH(ind1)./JL(ind1));
-y = JHnew(ind1)./JLnew(ind1);
+x =(Diff_JH_i(ind)./Diff_JL_i(ind));
+y = JHnew(ind)./JLnew(ind);
 
 f = fittype({'x'});
 fit3 = fit(x',y,f,'Robust','on');
 R = fit3(1);
 
-% %% analog
-Alt2 = Q.Zmes1 + 491;
-ind2 = Alt2 >= 2000 & Alt2 <= 2100;
-xa = (JHa(ind2)./JLa(ind2));
-ya = JHnewa(ind2)./JLnewa(ind2);
-
-fa = fittype({'x'});
-fit3a = fit(xa',ya,fa,'Robust','on');
-Ra = fit3a(1);
+% % %% analog
+% Alt2 = Q.Zmes1;
+% ind2 = Alt2 >= 2000 & Alt2 <= 2100;
+% xa = (JHa(ind2)./JLa(ind2));
+% ya = JHnewa(ind2)./JLnewa(ind2);
+% 
+% fa = fittype({'x'});
+% fit3a = fit(xa',ya,fa,'Robust','on');
+% Ra = fit3a(1);
 %%
 
 %  figure;plot(JLnewa,Ra.*JLa)
 
-% % %%%%%% Calibration for traditional method Digital channel
-lnQ = log(JHnew./JLnew);
-yy = interp1(Zsonde,Tsonde,Alt,'linear');
-yy = yy(Alt>=8000 & Alt<=10000);
-xx = lnQ;
-xx = xx(Alt>=8000 & Alt<=10000);
-g = fittype('b/(a-x)','coeff',{'a','b'});
-fit34 = fit(xx,yy',g,'Robust','on','Startpoint', [0 0]);
-s= coeffvalues(fit34);
-aa = s(1);
-bb = s(2);
+% % % %%%%%% Calibration for traditional method Digital channel
+% lnQ = log(JHnew./JLnew);
+% yy = interp1(Zsonde,Tsonde,Alt,'linear');
+% yy = yy(Alt>=8000 & Alt<=10000);
+% xx = lnQ;
+% xx = xx(Alt>=8000 & Alt<=10000);
+% g = fittype('b/(a-x)','coeff',{'a','b'});
+% fit34 = fit(xx,yy',g,'Robust','on','Startpoint', [0 0]);
+% s= coeffvalues(fit34);
+% aa = s(1);
+% bb = s(2);
 %  ff = fittype({'a*x+b'},);
 % % %%%%%% Calibration for traditional method Digital channel
 % lnQ1 = log(JHnewa./JLnewa);

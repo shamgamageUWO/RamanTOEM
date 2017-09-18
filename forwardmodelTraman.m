@@ -9,7 +9,7 @@ function [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x)
  x_a = x(1:m);
  
  % defining OV Q.OVlength  
- OV = x(end+1-(Q.OVlength):end);
+ OV = x(m+4:end);
 % Ti = interp1(Q.Zret,x(1:m),Q.Zmes,'linear'); % T on data grid (digital)
 Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear'); % T on data grid (digital)
 OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
@@ -19,18 +19,18 @@ OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
 
 % Constants
 kb = 1.38064852*10^-23;
-area = pi * (0.3^2);
-Lambda = 354.7* (10^-3);
-NA = 6.02214129 *(10^23) ;% Avergadro Number mol?1
-M = 28.9645 * (10^-3); % molar mass - Mair	28.9645 g.mol-1 Molecular mass of dry air kg/mol
-A = 4.02*10^(-28);
-B = -0.3228;
-C = 0.389;
-D = 0.09426;
-J_low = [3,4,5,6,7,8,9];
-J_high = [10,11,12,13,14,15];
-J_lowO2 = [5,7,9,11,13];
-J_highO2 = [15,17,19,21];
+% area = pi * (0.3^2);
+% Lambda = 354.7* (10^-3);
+% NA = 6.02214129 *(10^23) ;% Avergadro Number mol?1
+% M = 28.9645 * (10^-3); % molar mass - Mair	28.9645 g.mol-1 Molecular mass of dry air kg/mol
+% A = 4.02*10^(-28);
+% B = -0.3228;
+% C = 0.389;
+% D = 0.09426;
+% J_low = [3,4,5,6,7,8,9];
+% J_high = [10,11,12,13,14,15];
+% J_lowO2 = [5,7,9,11,13];
+% J_highO2 = [15,17,19,21];
 
 
 
@@ -76,7 +76,7 @@ Diff_JH_i = interp1(T,Diff_JH,Ti,'linear');
 Diff_JL_i = interp1(T,Diff_JL,Ti,'linear');
 % toc
 
-CJL = x(end-Q.OVlength);
+CJL = x(m+3);
 CH = (Q.R).* CJL;
 JL = (CJL.*A_Zi .* Diff_JL_i)./(Ti);
 JH = (CH.* A_Zi .* Diff_JH_i)./(Ti);
@@ -85,8 +85,9 @@ JH = (CH.* A_Zi .* Diff_JH_i)./(Ti);
 
 
 
-Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
-
+ % Add background to the counts 
+JL = JL  + x(m+2);
+JH = JH  + x(m+1);
 
 % 
         %% Saturation correction is applied for the averaged count profile
@@ -109,9 +110,7 @@ Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
        JL = JL.*(Q.deltatime.*Q.coaddalt);
        JH = JH.*(Q.deltatime.*Q.coaddalt);
        
- % Add background to the counts 
-JL = JL  + (x(end-Q.OVlength-1));
-JH = JH  + (x(end-Q.OVlength-2));
+
  
 
 

@@ -13,7 +13,7 @@ disp('starting oem.m ')
 [X,R] = oem(O,Q,R,@makeJ,S_a,Se,S_ainv,Seinv,xa,y);
 disp('Done running oem.m ')
 
-R =bparameterjacobians (Q,X);
+% R =bparameterjacobians (Q,X);
 
 if ~O.linear
     if X.converged ~= 1
@@ -113,7 +113,7 @@ lower =  X.x(1:m)-err;
 
  [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
  lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
- Ttradi = real(Q.bb./(Q.aa-lnQ));
+%  Ttradi = real(Q.bb./(Q.aa-lnQ));
 
 Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
 figure;
@@ -195,11 +195,11 @@ ylabel('Altitude(km)')
 
 %% Percent difference of background, lidar calibration constant retrievals and the true
 
-percent_BG_JH = ((Q.BaJH -BJH)./BJH).*100
-percent_BG_JL = ((Q.BaJL -BJL)./BJL).*100
-percent_CJL = ((Q.CL -CJL)./CJL).*100
-% percent_CJLTrue = ((Q.CL*(1.05) -CJL)./CJL).*100
-Degree_of_freedom_Temperature = trace(X.A(1:m,1:m))
+% percent_BG_JH = ((Q.BaJH -BJH)./BJH).*100
+% percent_BG_JL = ((Q.BaJL -BJL)./BJL).*100
+% percent_CJL = ((Q.CL -CJL)./CJL).*100
+% % percent_CJLTrue = ((Q.CL*(1.05) -CJL)./CJL).*100
+% Degree_of_freedom_Temperature = trace(X.A(1:m,1:m))
 % e = cputime
 toc
 
