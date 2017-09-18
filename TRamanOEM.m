@@ -5,9 +5,9 @@ xa = xa';
 S_ainv=[];
 Seinv=[];
 m = length(Q.Zret);
-n = Q.n1+Q.n2+Q.n3+Q.n4;
-n1 = Q.n1;
-n2 = Q.n2;
+% n = Q.n3+Q.n4;
+% n1 = Q.n1;
+% n2 = Q.n2;
 n3 = Q.n3;
 y = Q.y;
 % 
@@ -148,36 +148,36 @@ answ = (Q.Ra * CJLa)
 % 
 %                     %% Plot Avg Kenerl
 % 
-%                     response = sum(X.A(1:m,1:m));
-%                     % Vertical resolution
-%                     width = zeros(size(Q.Zret));
-%                     for j = 1:m % fini
-%                         width(j) = fwhmquiet(Q.Zret,X.A(1:m,j));
-%                         if isnan(width(j))
-%                             width(j) = 0;
-%                         end
-%                     end
+                    response = sum(X.A(1:m,1:m));
+                    % Vertical resolution
+                    width = zeros(size(Q.Zret));
+                    for j = 1:m % fini
+                        width(j) = fwhmquiet(Q.Zret,X.A(1:m,j));
+                        if isnan(width(j))
+                            width(j) = 0;
+                        end
+                    end
 % 
 % 
 % 
-%                     figure;
-%                     subplot(1,2,1)
-%                     set(gca,'fontsize',16)
-%                     % hold on;
-%                     plot(X.A(1:m,1:m),Q.Zret(1:m)./1000)
-%                     grid on;
-%                     hold on;
-%                     plot(response,Q.Zret./1000,'r')
-%                     % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
-%                     hold off;
-%                     xlabel('Avgeraging Kernels')
-%                     ylabel('Altitude(km)')
-% 
-%                     subplot(1,2,2)
-%                     plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
-%                     grid on;
-%                     xlabel('Vertical Resolution (km)')
-%                     ylabel('Altitude(km)')
+                    figure;
+                    subplot(1,2,1)
+                    set(gca,'fontsize',16)
+                    % hold on;
+                    plot(X.A(1:m,1:m),Q.Zret(1:m)./1000)
+                    grid on;
+                    hold on;
+                    plot(response,Q.Zret./1000,'r')
+                    % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
+                    hold off;
+                    xlabel('Avgeraging Kernels')
+                    ylabel('Altitude(km)')
+
+                    subplot(1,2,2)
+                    plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
+                    grid on;
+                    xlabel('Vertical Resolution (km)')
+                    ylabel('Altitude(km)')
 %                     %
                     err = X.e(1:m);
                     upper = err+ X.x(1:m);

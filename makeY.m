@@ -216,7 +216,7 @@ Alt = JHazc;
 %   ylabel('Alt (km)')
 %   legend('JL','JH')
 % Save in a new mat file
-bkg_ind1 = alt>50e3;% & alt<60e3;
+bkg_ind1 = alt>8e3;% & alt<60e3;
 bkg_ind2 = Alt>8e3 & Alt<12e3;
 bkg_ind3 = Alt>8e3 & Alt<12e3;
 % [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
