@@ -204,7 +204,7 @@ JH_an = JH_an(1+zAoffset:end);
 JL_an = JL_an(1+zAoffset:end);
 Eb_an = Eb_an(1+zAoffset:end);
 alt = alt(1:N-zAoffset);
-alt_an = alt_an(1:N-zAoffset);
+alt_an = alt_an(1+zAoffset:end);
 % 
 %             figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r',JL_an,alt./1000,'g',JH_an,alt./1000,'y')%,Eb,Ebzc./1000,'g')
 %             xlabel('30min Coadded signal (Counts/bin/time)')
