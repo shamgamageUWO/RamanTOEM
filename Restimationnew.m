@@ -1,9 +1,9 @@
-function [R,Ra,R_fit,Ra_fit] = Restimationnew(Q)
+function [R,R_fit] = Restimationnew(Q)
 % JHnew = Q.JHnew-Q.BaJH;
 % JLnew = Q.JLnew-Q.BaJL;
 % JHnewa = Q.JHnewa-Q.BaJHa;
 % JLnewa = Q.JLnewa-Q.BaJLa;
-N1 = length(Q.JHnewa);
+% N1 = length(Q.JHnewa);
 
 % % Desaturate the signal
 %         % 1. Make the Co added counts to avg counts
@@ -34,8 +34,8 @@ N1 = length(Q.JHnewa);
 
 JHnew = Q.JH_DS-Q.BaJH;
 JLnew = Q.JL_DS-Q.BaJL;
-JHnewa = Q.JHnewa-Q.BaJHa;
-JLnewa = Q.JLnewa-Q.BaJLa;
+% JHnewa = Q.JHnewa-Q.BaJHa;
+% JLnewa = Q.JLnewa-Q.BaJLa;
 
 
 
@@ -47,15 +47,15 @@ Diff_JLi = interp1(T,Diff_JL,Q.Tsonde,'linear');
 Ratio_diff = Diff_JLi./Diff_JHi;
 
 Digital_ratio = JHnew ./JLnew ;
-Analog_ratio = JHnewa./JLnewa;
+% Analog_ratio = JHnewa./JLnewa;
 
-R =  Digital_ratio'.*Ratio_diff(Q.d_alti_Diff+1:end);
-Ra = Analog_ratio'.* Ratio_diff(1:N1);
+R =  Digital_ratio'.*Ratio_diff;
+% Ra = Analog_ratio'.* Ratio_diff(1:N1);
 
-X1 = Q.Zmes2./1000;
-X2 = Q.Zmes1./1000;
-Y1 = R;
-Y2 = Ra;
+% X1 = Q.Zmes2./1000;
+% X2 = Q.Zmes1./1000;
+% Y1 = R;
+% Y2 = Ra;
 
 % figure1 = figure;
 % 
@@ -95,13 +95,13 @@ fit3 = fit(x',y,f,'Robust','on');
 R_fit = fit3(1);
 % 
 
-% %% analog
-Alt2 = Q.Zmes1;
-ind2 = Alt2 >= 2000 & Alt2 <= 2200;
- xa = 1./Ratio_diff(ind2);
- ya = Analog_ratio(ind2);
-
-fa = fittype({'x'});
-fit3a = fit(xa',ya,fa,'Robust','on');
-Ra_fit = fit3a(1);
-%%
+% % %% analog
+% Alt2 = Q.Zmes1;
+% ind2 = Alt2 >= 2000 & Alt2 <= 2200;
+%  xa = 1./Ratio_diff(ind2);
+%  ya = Analog_ratio(ind2);
+% 
+% fa = fittype({'x'});
+% fit3a = fit(xa',ya,fa,'Robust','on');
+% Ra_fit = fit3a(1);
+% %%

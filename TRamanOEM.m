@@ -5,16 +5,16 @@ xa = xa';
 S_ainv=[];
 Seinv=[];
 m = length(Q.Zret);
-n = Q.n1+Q.n2+Q.n3+Q.n4;
+n = Q.n1+Q.n2;
 n1 = Q.n1;
-n2 = Q.n2;
-n3 = Q.n3;
+ n2 = Q.n2;
+% n3 = Q.n3;
 y = Q.y;
 % 
 yJH = smooth(y(1:n1),100);
 yJL = smooth(y(n1+1:n1+n2),100);
-yJHa = smooth(y(n1+n2+1:n1+n2+n3),100);
-yJLa = smooth(y(n1+n2+n3+1:end),100);
+% yJHa = smooth(y(n1+n2+1:n1+n2+n3),100);
+% yJLa = smooth(y(n1+n2+n3+1:end),100);
 
 
 
@@ -39,10 +39,10 @@ end
 CJL = X.x(m+3);
 BJH = X.x(m+1);
 BJL = X.x(m+2);
-CJHa = Q.Ra.*X.x(end-2);
-CJLa = X.x(end-2);
-BJHa = X.x(end-4);
-BJLa = X.x(end-3);
+% CJHa = Q.Ra.*X.x(end-2);
+% CJLa = X.x(end-2);
+% BJHa = X.x(end-4);
+% BJLa = X.x(end-3);
 DT_JH = X.x(end-1);
 DT_JL = X.x(end); % deadtimes
 
@@ -63,25 +63,6 @@ Q.BaJL
 
 'OEM-CL'
 CJL
-
-
-'OEM-BG-JHa'
-BJHa
-
-'real-BG-JHa'
-Q.BaJHa
-
-'OEM-BG-JLa'
-BJLa
-
-'real-BG-JLa'
-Q.BaJLa
-
-'OEM-CLa'
-CJLa
-
-'OEM-CHa'
-CJHa
 
 'DT-JH'
 DT_JH
@@ -124,17 +105,17 @@ DT_JL
 % % 
 % % 
 % %                     %% Plot Temperature Jacobians
-% %                     figure;
-% %                     subplot(2,1,1)
-% %                     plot(X.J(1:n1,1:m),Q.Zmes./1000)
-% %                     xlabel('Jacobian - JH')
-% %                     ylabel('Altitude (km)')
-% % 
-% %                     subplot(2,1,2)
-% %                     plot(X.J(n1+1:n1+n2,1:m),Q.Zmes./1000)
-% %                     xlabel('Jacobian - JL')
-%                     ylabel('Altitude (km)')
-% 
+                    figure;
+                    subplot(2,1,1)
+                    plot(X.J(1:n1,1:m),Q.Zmes./1000)
+                    xlabel('Jacobian - JH')
+                    ylabel('Altitude (km)')
+
+                    subplot(2,1,2)
+                    plot(X.J(n1+1:n1+n2,1:m),Q.Zmes./1000)
+                    xlabel('Jacobian - JL')
+                    ylabel('Altitude (km)')
+
 %                     subplot(2,2,1)
 %                     plot(X.J(n1+n2+1:n1+n2+n3,1:m),Q.Zmes./1000)
 %                     xlabel('Jacobian - JHa')
@@ -191,7 +172,7 @@ DT_JL
                     Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
                     figure;
                     subplot(1,2,1)
-                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b')
+                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Q.Traditional(Q.Zmes<=25000),Q.Zmes(Q.Zmes<=25000)./1000,'m')
                     grid on;
                     hold on
                     [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
@@ -199,13 +180,15 @@ DT_JL
                     % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
                     xlabel('Temperature (K)')
                     ylabel('Altitude(km)')
-                    legend('T a priori','T OEM','T sonde')
+                    legend('T a priori','T OEM','T sonde','T traditional')
                     hold off;
 % 
 %                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 % 
                      subplot(1,2,2)
-                     plot(X.x(1:m) - (Tsonde'),Q.Zret./1000)
+                     plot(X.x(1:m) - (Tsonde'),Q.Zret./1000);
+                     %,'r',Q.Traditional(Q.Zmes<=25000) - (Q.Tsonde(Q.Zmes<=25000)'),Q.Zmes(Q.Zmes<=25000)./1000,'b')
+%                      legend('T OEM - T sonde','T traditional - T sonde')
                      grid on;
                      xlabel('Temperature residuals(T OEM - T sonde) (K)')
 %                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
@@ -215,7 +198,7 @@ DT_JL
 % 
                     figure;
                     subplot(1,2,1)
-                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-5),Q.Zret./1000,'r')
+                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-2),Q.Zret./1000,'r')
                     grid on;
                     xlabel('OV')
                     ylabel('Altitude(km)')
@@ -225,7 +208,7 @@ DT_JL
                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
                     subplot(1,2,2)
-                    plot((((-Q.OVa')+X.x(m+4:end-5) )./X.x(m+4:end-5)).*100,Q.Zret./1000)
+                    plot((((-Q.OVa')+X.x(m+4:end-2) )./X.x(m+4:end-2)).*100,Q.Zret./1000)
                     grid on;
                     xlabel('OV residuals(OV OEM - OV a priori) (%)')
                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
@@ -239,7 +222,7 @@ DT_JL
 % 
 % %% Residual plots
                     figure;
-                    subplot(2,2,1)
+                    subplot(1,2,1)
                     grid on;
                     % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes2(Q.ind)./1000)
                     plot(((y(1:n1) - X.yf(1:n1))./X.yf(1:n1)).*100 ,Q.Zmes2./1000)
@@ -251,7 +234,7 @@ DT_JL
                     xlabel('JH digital counts residual(%)')
                     ylabel('Altitude (km)')
 
-                    subplot(2,2,2)
+                    subplot(1,2,2)
                     grid on;
                     plot(((y(n1+1:n1+n2) - X.yf(n1+1:n1+n2))./X.yf(n1+1:n1+n2)).*100 ,Q.Zmes2./1000)
                     hold on;
@@ -263,30 +246,30 @@ DT_JL
                     ylabel('Altitude (km)')
 
 
-                    subplot(2,2,3)
-                    grid on;
-                    % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes1(Q.ind)./1000)
-                    plot(((y(n1+n2+1:n1+n2+n3) - X.yf(n1+n2+1:n1+n2+n3))./X.yf(n1+n2+1:n1+n2+n3)).*100 ,Q.Zmes1./1000)
-                    hold on
-%                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
-                    plot(-(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
-                    
-%plot(-(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r');
-
-                    hold off
-                    xlabel('JH - analog counts residual(%)')
-                    ylabel('Altitude (km)')
-
-                    subplot(2,2,4)
-                    grid on;
-                    plot(((y(n1+n2+n3+1:end) - X.yf(n1+n2+n3+1:end))./X.yf(n1+n2+n3+1:end)).*100 ,Q.Zmes1./1000)
-                    hold on;
-                    plot(-(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
-                    %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
-
-                    hold off
-                    xlabel('JL - analog counts residual(%)')
-                    ylabel('Altitude (km)')
+%                     subplot(2,2,3)
+%                     grid on;
+%                     % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes1(Q.ind)./1000)
+%                     plot(((y(n1+n2+1:n1+n2+n3) - X.yf(n1+n2+1:n1+n2+n3))./X.yf(n1+n2+1:n1+n2+n3)).*100 ,Q.Zmes1./1000)
+%                     hold on
+% %                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+%                     plot(-(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+%                     
+% %plot(-(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r');
+% 
+%                     hold off
+%                     xlabel('JH - analog counts residual(%)')
+%                     ylabel('Altitude (km)')
+% 
+%                     subplot(2,2,4)
+%                     grid on;
+%                     plot(((y(n1+n2+n3+1:end) - X.yf(n1+n2+n3+1:end))./X.yf(n1+n2+n3+1:end)).*100 ,Q.Zmes1./1000)
+%                     hold on;
+%                     plot(-(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
+%                     %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
+% 
+%                     hold off
+%                     xlabel('JL - analog counts residual(%)')
+%                     ylabel('Altitude (km)')
 % (mchanA+1:2*mchanA))./y(mchanA+1:2*mchanA)
 %                     %% Percent difference of background, lidar calibration constant retrievals and the true
 % 

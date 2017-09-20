@@ -1,7 +1,7 @@
 function [R,yf,J] = makeJ(Q, R, x, iter)
 
 
-[JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
+[JL,JH,A_Zi_d,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
 
 
 if ~isempty(find(isnan(x)) == 1)
@@ -14,23 +14,21 @@ end
 
 n1=Q.n1; %length JH
 n2=Q.n2; %length JL
-n3 =Q.n3; % length JHa
-n4 =Q.n4;
+% n3 =Q.n3; % length JHa
+% n4 =Q.n4;
 
-n = n1+n2+n3+n4;
+n = n1+n2;
 m = length(Q.Zret);
-yf = [JH JL JHa JLa]';
+yf = [JH JL]';
 
 % Temperature Jacobian 
 Jc = zeros(n,m);
 
 for j = 1:m 
-    [dJH,dJL,dJHa,dJLa] = deriCountsOEM(j,Q,x,@forwardmodelTraman);
+    [dJH,dJL] = deriCountsOEM(j,Q,x,@forwardmodelTraman);
     
    Jc(1:n1,j) = dJH;
-   Jc(n1+1:n1+n2,j) = dJL;
-   Jc(n1+n2+1:n1+n2+n3,j) = dJHa;
-   Jc(n1+n2+n3+1:n,j) = dJLa;
+   Jc(n1+1:n,j) = dJL;
 % j
 % disp('ok')
 end
@@ -41,8 +39,8 @@ DT_JL = x(end);
 % ones need to be multiplied by the deadtime term: refer notes 
 Kb_JH = (((1-DT_JH.*JH).^2))'; %ones(n1,1).* 
 Kb_JL =  (((1-DT_JL.*JL).^2))'; %ones(n2,1).*
-Kb_JHa =  ones(n3,1); 
-Kb_JLa =  ones(n4,1);
+% Kb_JHa =  ones(n3,1); 
+% Kb_JLa =  ones(n4,1);
 %zeros(n-n2,1)]; % fix the lengths
 
 % Jacobian for CL
@@ -67,25 +65,25 @@ Kb_JLa =  ones(n4,1);
 
 
 %% Digital    
-            KCL11 = ((A_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-DT_JL.*JL).^2);%.*exp(logCJL);
-            KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-DT_JH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
+            KCL11 = ((A_Zi_d.*Diff_JL_i)./Ti).*((1-DT_JL.*JL).^2);%.*exp(logCJL);
+            KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i)./Ti).*((1-DT_JH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
 %             KCL = [KCL22 KCL11];
             
             
 %% Analog            
-            KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
-            KCLa22 = ((Q.Ra.*A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
+%             KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
+%             KCLa22 = ((Q.Ra.*A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
 
 
 JOV = zeros(n,m);
 
 for jj = 1:m 
    
-   [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(jj,Q,x,@forwardmodelTraman);
+   [dOVJH,dOVJL] = deriCountsOV(jj,Q,x,@forwardmodelTraman);
    JOV(1:n1,jj) = dOVJH;
    JOV(n1+1:n1+n2,jj) = dOVJL;
-   JOV(n1+n2+1:n1+n2+n3,jj) = dOVJHa;
-   JOV(n1+n2+n3+1:n,jj) = dOVJLa;
+%    JOV(n1+n2+1:n1+n2+n3,jj) = dOVJHa;
+%    JOV(n1+n2+n3+1:n,jj) = dOVJLa;
 
 end
 
@@ -101,8 +99,8 @@ Jdt2 = zeros(n,1);
 %    Jdt1(n1+n2+n3+1:n) = 0;
    
    Jdt2(1:n1) = 0;
-   Jdt2(n1+1:n1+n2) = dJLdt;
-   Jdt2(n1+n2+1:n) = 0;
+   Jdt2(n1+1:n) = dJLdt;
+%    Jdt2(n1+n2+1:n) = 0;
 %    Jdt2(n1+n2+n3+1:n) = 0;
 % j
 % disp('ok')
@@ -159,25 +157,25 @@ Jdt2 = zeros(n,1);
 %% coupled analog
 J_counts = Jc;
 
-J_JH = [Kb_JH;zeros(n2+n3+n4,1)];
+J_JH = [Kb_JH;zeros(n2,1)];
 
-J_JL = [zeros(n1,1);Kb_JL;zeros(n3+n4,1)];
+J_JL = [zeros(n1,1);Kb_JL];
 
 KCL1 = [KCL22 KCL11];
-KCL = [KCL1 zeros(1,n3+n4)];
+% KCL = [KCL1 zeros(1,n3+n4)];
 
 J_OV = JOV;
 
-J_JHa = [zeros(n1+n2,1);Kb_JHa;zeros(n4,1)];
+% J_JHa = [zeros(n1+n2,1);Kb_JHa;zeros(n4,1)];
+% 
+% J_JLa = [zeros(n1+n2+n3,1);Kb_JLa];
 
-J_JLa = [zeros(n1+n2+n3,1);Kb_JLa];
-
-KCLa1 = [KCLa22 KCLa11];
-KCLa = [zeros(1,n1+n2) KCLa1];
+% KCLa1 = [KCLa22 KCLa11];
+% KCLa = [zeros(1,n1+n2) KCLa1];
 
 % KCHa = [zeros(1,n1+n2) KCLa22 zeros(1,n4)];
 % KCLa = [zeros(1,n1+n2+n3) KCLa11];
  
-J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa' Jdt1 Jdt2];
+J = [J_counts J_JH J_JL KCL1' J_OV Jdt1 Jdt2];
 
 
