@@ -102,11 +102,6 @@ disp('a priori temperature profile is loaded ')
 
 %%%%%
 
-
-
-
-
-
 % Calculate the aerosol attenuation
 [alphaAer] = asrSham(Q);
 Q.alpha_aero = alphaAer;
@@ -145,7 +140,7 @@ Q.CovBJH = ((Q.bg_JH_std/sqrt(Q.bg_length1))).^2;
 disp('Nighttime retrieval')
 end 
 
-x_a = [Q.Ta+10 Q.BaJH Q.BaJL Q.CL Q.OVa];
+x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa];
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x_a);
 % add noise
 Q.JLnew = NoiseP(JL);
