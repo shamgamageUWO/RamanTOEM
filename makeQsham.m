@@ -145,7 +145,7 @@ disp('Defined grids ')
             [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
             Q.Ta = temp; % for now im adding 2K to test
             Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-            Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'linear');
+            Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'linear'); %% I am trying to make this looks like psonde
             Q.rho = Q.Pressi./(Rsp.*Q.Ti);
             Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 
