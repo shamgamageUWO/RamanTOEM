@@ -153,16 +153,13 @@ disp('a priori temperature profile is loaded ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
-% for i =1 :length(Zsonde)-1
-% if Zsonde(i+1)<= Zsonde(i)
-% Zsonde(i+1) = [];
-% end
-% end
-%  Zsonde = Zsonde(1:i);
-%  Tsonde = Tsonde(1:i);
-%  Psonde = Psonde(1:i);
+ ind = Zsonde<= 33500;
+ Zsonde = Zsonde(ind);
+ Tsonde = Tsonde(ind);
+ Psonde = Psonde(ind);
 
-Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
+
+Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear','extrap'); % this goes to Restimation and asr code
 Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'linear'); % this goes asr 
 Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
 %%%%%

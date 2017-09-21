@@ -57,13 +57,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=1000);
+Q.Eb = Eb(alt>=1000 & alt<=33500);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=1000);
-Q.JLnew= JLnew(alt>=1000);
-Q.JH_DS =JH_DS(alt>=1000);
-Q.JL_DS =JL_DS(alt>=1000);
-Q.alt = alt(alt>=1000);
+Q.JHnew= JHnew(alt>=1000 & alt<=33500);
+Q.JLnew= JLnew(alt>=1000 & alt<=33500);
+Q.JH_DS =JH_DS(alt>=1000 & alt<=33500);
+Q.JL_DS =JL_DS(alt>=1000 & alt<=33500);
+Q.alt = alt(alt>=1000 & alt<=33500);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -117,7 +117,7 @@ Q.n2=length(Q.JLnew);
 % Q.Zmes = Q.Zmes1;%[Q.Zmes1 Q.Zmes2];% Measurement grid
 % Q.Zmes = Q.Zmes(1:N-zAoffset);
 % Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:10000;% Retrieval grid
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:62000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:33000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
 % Yc = [Q.JHnewa;Q.JHnew]
@@ -153,15 +153,10 @@ disp('a priori temperature profile is loaded ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
-% for i =1 :length(Zsonde)-1
-% if Zsonde(i+1)<= Zsonde(i)
-% Zsonde(i+1) = [];
-% end
-% end
-%  Zsonde = Zsonde(1:i);
-%  Tsonde = Tsonde(1:i);
-%  Psonde = Psonde(1:i);
-
+ind = Zsonde<= 33500;
+Zsonde = Zsonde(ind);
+Tsonde = Tsonde(ind);
+Psonde = Psonde(ind);
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
 Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'linear'); % this goes asr 
 Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
@@ -333,18 +328,19 @@ disp('makeQ complete ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Traditional Method 
-Q_Digi = Q.JH_DS-Q.BaJ ./Q.JL_DS;
+Q_Digi = (Q.JH_DS-Q.BaJH) ./(Q.JL_DS - Q.BaJL );
 y_d = log(Q_Digi);
 x_d = (1./Q.Tsonde);
 y = y_d( Q.Zmes>=8000 & Q.Zmes<=10000);
 x = x_d( Q.Zmes>=8000 & Q.Zmes<=10000);
 
-g = fittype('x','coeff',{'a','b'});
-fit34 = fit(x,y',g,'Robust','on');
+g = fittype('a*x+b','coeff',{'a','b'});
+fit34 = fit(x',y,g,'Robust','on');
 s= coeffvalues(fit34);
 a = s(1);
 b = s(2);
 Q.Traditional = a./(y_d-b);
+
 end
 
 

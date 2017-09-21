@@ -3,6 +3,7 @@
 function [O,Q,R,S_a,Se,x_a] = InputsForOEM( date_in,time_in,flag)
 %set Q
 [Q] = makeQsham( date_in,time_in,flag);
+% [Q] = makeQshamSyn( date_in,time_in,flag);
 %set O 
 O = defOreal;
 

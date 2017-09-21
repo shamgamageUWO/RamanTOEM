@@ -172,7 +172,9 @@ DT_JL
                     Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
                     figure;
                     subplot(1,2,1)
-                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Q.Traditional(Q.Zmes<=25000),Q.Zmes(Q.Zmes<=25000)./1000,'m')
+                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b')
+% plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Q.Traditional(Q.Zmes<=25000),Q.Zmes(Q.Zmes<=25000)./1000,'m')
+% 
                     grid on;
                     hold on
                     [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
