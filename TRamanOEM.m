@@ -132,7 +132,7 @@ ylabel('Altitude(km)')
 %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
  subplot(1,2,2)
- plot(X.x(1:m) - (Q.Ta'),Q.Zret./1000)
+ plot(X.x(1:m) - ((Q.Ta+Q.deltaTemp)'),Q.Zret./1000)
  grid on;
  xlabel('Temperature residuals(T OEM - T sonde) (K)')
 %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)

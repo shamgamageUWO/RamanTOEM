@@ -31,7 +31,7 @@ Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
-Q.deadtime = 3.8e-9;% 4ns
+Q.deadtime = 4e-9;% 4ns
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
@@ -68,7 +68,7 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
 Q.Zmes = 100:100:70000;% Measurement grid
-Q.Zret = 100:200:75000;% Retrieval grid
+Q.Zret = 100:1000:75000;% Retrieval grid
 disp('Defined grids ')
 
 
@@ -126,7 +126,7 @@ Q.OVa(isnan(Q.OVa))=1;
 % Q.OVa = ones(1,length(Q.Zret));%
 Q.OVlength = length(Q.OVa);
 Q.CL = 8e19;%(2.9e+18);
-Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 
 
@@ -140,7 +140,9 @@ Q.CovBJH = ((Q.bg_JH_std/sqrt(Q.bg_length1))).^2;
 disp('Nighttime retrieval')
 end 
 
-x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa];
+Q.deltaTemp = 20;
+Q.Treal = Q.Ta+Q.deltaTemp;
+x_a = [Q.Treal Q.BaJH Q.BaJL Q.CL Q.OVa];
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x_a);
 % add noise
 Q.JLnew = NoiseP(JL);

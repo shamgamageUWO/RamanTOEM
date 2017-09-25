@@ -102,11 +102,6 @@ disp('a priori temperature profile is loaded ')
 
 %%%%%
 
-
-
-
-
-
 % Calculate the aerosol attenuation
 [alphaAer] = asrSham(Q);
 Q.alpha_aero = alphaAer;
@@ -131,7 +126,7 @@ Q.OVa(isnan(Q.OVa))=1;
 % Q.OVa = ones(1,length(Q.Zret));%
 Q.OVlength = length(Q.OVa);
 Q.CL = 8e19;%(2.9e+18);
-Q.CovCL = (0.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 
 
@@ -145,7 +140,7 @@ Q.CovBJH = ((Q.bg_JH_std/sqrt(Q.bg_length1))).^2;
 disp('Nighttime retrieval')
 end 
 
-x_a = [Q.Ta+5 Q.BaJH Q.BaJL Q.CL Q.OVa];
+x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa];
 [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x_a);
 % add noise
 Q.JLnew = NoiseP(JL);
@@ -173,15 +168,15 @@ Q.y = [Q.JHnew Q.JLnew]';
 % above 2 km use the counts
 
 % % Q.yvar = diag(Q.y);
-%             [JHv,go] =bobpoissontest(Q.JHnew,Q.Zmes);
-%             [JLv,go] =bobpoissontest(Q.JLnew,Q.Zmes);
-% 
-%             r1 = ones(1,go-1).* JHv(1);
-%             r2 = ones(1,go-1).* JHv(end);
-%             r3 = ones(1,go-1).* JLv(1);
-%             r4 = ones(1,go-1).* JLv(end);
-%             Q.JHv = [r1 JHv r2];
-%             Q.JLv = [r3 JLv r4];
+            [JHv,go] =bobpoissontest(Q.JHnew,Q.Zmes);
+            [JLv,go] =bobpoissontest(Q.JLnew,Q.Zmes);
+
+            r1 = ones(1,go-1).* JHv(1);
+            r2 = ones(1,go-1).* JHv(end);
+            r3 = ones(1,go-1).* JLv(1);
+            r4 = ones(1,go-1).* JLv(end);
+            Q.JHv = [r1 JHv r2];
+            Q.JLv = [r3 JLv r4];
 %             
 % figure;plot(Q.JLv,Q.Zmes./1000,'r',JLreal,Q.Zmes./1000,'b')
 % xlabel('Log of Variance')
@@ -230,7 +225,7 @@ Q.y = [Q.JHnew Q.JLnew]';
 
        
 
-%            Q.Yvar =[Q.JHnew Q.JLnew];
+            Q.Yvar =[Q.JHnew Q.JLnew];
 %         for ii = 1:length(Q.y)
 %             if Q.y(ii) <= 15
 %                 Q.Yvar(ii)=15;
