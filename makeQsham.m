@@ -25,6 +25,7 @@ Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
 Q.coaddalt = 10;
+Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -145,10 +146,17 @@ disp('Defined grids ')
             [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
             Q.Ta = temp; % for now im adding 2K to test
             Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-            Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'linear');
+            lnpress = log(press);
+            Pressi =interp1(Q.Zret,lnpress,Q.Zmes,'linear');
+            Q.Pressi = exp(Pressi);
             Q.rho = Q.Pressi./(Rsp.*Q.Ti);
             Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 
+obj2 = Gravity(Q.Zmes, 46.82);
+Q.grav = obj2.accel;
+Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
+Q.z0 = 30000;            
+[Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);           
 disp('a priori temperature profile is loaded ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
@@ -160,7 +168,7 @@ Zsonde = Zsonde-491; % altitude correction
 
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear','extrap'); % this goes to Restimation and asr code
-Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'linear'); % this goes asr 
+Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'spline'); % 
 Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
 %%%%%
 
@@ -189,7 +197,7 @@ disp('R is calibrated ')
 %% Estimating background and lidar constant wrt a priori 
 
 [CJL] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-% load('ovmodeldata.mat');
+%  load('ovmodeldata.mat');
 % OVnw = interp1(z,epsi,Q.Zret,'linear');
 % OVnw(isnan(OVnw))=1;
 % Q.OVa = OVnw;
@@ -291,7 +299,7 @@ Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 3000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) =  Q.JLnew(i);
@@ -299,7 +307,7 @@ Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
+            if  Q.Zmes2(i) <= 3000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) =  Q.JHnew(i);

@@ -150,7 +150,7 @@ disp('Defined grids ')
             [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
             Q.Ta = temp; % for now im adding 2K to test
             Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-            Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'linear');
+            Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'spline');
             Q.rho = Q.Pressi./(Rsp.*Q.Ti);
             Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 
@@ -168,7 +168,7 @@ Zsonde = Zsonde-491; % altitude correction
 %  Psonde = Psonde(1:i);
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
-Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'linear'); % this goes asr 
+Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'spline'); % this goes asr 
 Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
 %%%%%
 

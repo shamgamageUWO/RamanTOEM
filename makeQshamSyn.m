@@ -1,4 +1,4 @@
-function [Q] = makeQshamSyn( date_in,time_in,flag)
+function [Q] = makeQsham( date_in,time_in,flag)
 % makeQ(in)
 
 % -Usage-
@@ -30,7 +30,7 @@ Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
-
+Q.Rgas = 8.3145;
 Q.deadtimeJL = 3.9e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
 Q.CovDTJL = (0.01.*Q.deadtimeJL).^2;
@@ -99,10 +99,10 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
 % Q.Zmes1 = 500:100:7000;
-Q.Zmes2 = 500:100:55000;
+Q.Zmes2 = 500:10:55000;
 Q.Zmes = Q.Zmes2;
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Q.Zret = 500:1000:60000;% Retrieval grid
+Q.Zret = 500:100:60000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
 % Yc = [Q.JHnewa;Q.JHnew]
@@ -118,6 +118,10 @@ disp('Defined grids ')
             Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'linear');
             Q.rho = Q.Pressi./(Rsp.*Q.Ti);
             Q.Nmol = (NA/M).* Q.rho ; % mol m-3
+obj2 = Gravity(Q.Zmes, 46.82);
+Q.grav = obj2.accel;
+Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
+Q.z0 = 30000;   
 
 disp('a priori temperature profile is loaded ')
 [Tmsis, pmsis,zmsis]= msisRALMO;
@@ -163,7 +167,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = 2.8e20;
-Q.CovCL = (.01 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 % Q.CLa = 1.9e17;
 % Q.CovCLa = (.01 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
@@ -194,7 +198,7 @@ Q.CovCL = (.01 .* (Q.CL)).^2;%sqrt(Q.CL);
                         % this need to be done if there is any zeros in the real measurements
                         % smooth the signal over 1
                         
-xx = [Q.Tsonde2 Q.BaJH Q.BaJL Q.CL Q.OVa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
+xx = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
 
 [JLreal,JHreal]=forwardmodelTraman(Q,xx);
 JLreal = NoiseP(JLreal);

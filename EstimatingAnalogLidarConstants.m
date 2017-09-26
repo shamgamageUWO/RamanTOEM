@@ -44,7 +44,7 @@ F = 1800.* (3.75./150);
 % legend('JL','JH')
 % CJL = 2.8e20;
 
-x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa 0 0]; % CJL = 2.8e20 No deadtime, so no issue with saturation
+x_a = [Q.Ta 0 0 Q.CL Q.OVa 0 0 Q.CLa 0 0]; % CJL = 2.8e20 No deadtime, so no issue with saturation
 [JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x_a);
 
 % Idea here is a_JL .*N_JLA + b_JLA = DS{N_JL} = N_JL + B_JL
