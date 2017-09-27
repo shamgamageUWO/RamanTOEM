@@ -41,21 +41,33 @@ JLnewa = Q.JLnewa-Q.BaJLa;
 
 %% loading cross sections
 load('DiffCrossSections.mat');
-Diff_JHi = interp1(T,Diff_JH,Q.Tsonde,'linear');
-Diff_JLi = interp1(T,Diff_JL,Q.Tsonde,'linear');
+Td = interp1(Q.Zret,Q.Tsonde2,Q.Zmes2,'linear'); % T on data grid (digital)
+Ta = interp1(Q.Zret,Q.Tsonde2,Q.Zmes1,'linear');
 
-Ratio_diff = Diff_JLi./Diff_JHi;
+
+Diff_JHia = interp1(T,Diff_JH,Ta,'linear');
+Diff_JLia = interp1(T,Diff_JL,Ta,'linear');
+
+Diff_JHid = interp1(T,Diff_JH,Td,'linear');
+Diff_JLid = interp1(T,Diff_JL,Td,'linear');
+
+
+Ratio_diff_a = Diff_JLia./Diff_JHia; % analog
+Ratio_diff_d = Diff_JLid./Diff_JHid; % digi
+
+
+% Diff_JHi = interp1(T,Diff_JH,Q.Tsonde,'linear');
 
 Digital_ratio = JHnew ./JLnew ;
 Analog_ratio = JHnewa./JLnewa;
 
-R =  Digital_ratio'.*Ratio_diff(Q.d_alti_Diff+1:end);
-Ra = Analog_ratio'.* Ratio_diff(1:N1);
+R =  Digital_ratio'.*Ratio_diff_d;
+Ra = Analog_ratio'.* Ratio_diff_a;
 
-X1 = Q.Zmes2./1000;
-X2 = Q.Zmes1./1000;
-Y1 = R;
-Y2 = Ra;
+% X1 = Q.Zmes2./1000;
+% X2 = Q.Zmes1./1000;
+% Y1 = R;
+% Y2 = Ra;
 
 % figure1 = figure;
 % 
@@ -87,7 +99,7 @@ Y2 = Ra;
  Alt = Q.Zmes2;
  ind1 = Alt >= 8000 & Alt< 10000;
 % 
- x = 1./Ratio_diff(ind1);
+ x = 1./Ratio_diff_d(ind1);
  y = Digital_ratio(ind1);
 % 
  f = fittype({'x'});
@@ -98,7 +110,7 @@ R_fit = fit3(1);
 % %% analog
 Alt2 = Q.Zmes1;
 ind2 = Alt2 >= 2000 & Alt2 <= 2200;
- xa = 1./Ratio_diff(ind2);
+ xa = 1./Ratio_diff_a(ind2);
  ya = Analog_ratio(ind2);
 
 fa = fittype({'x'});

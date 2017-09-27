@@ -30,7 +30,7 @@ Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
-
+ Q.Rgas = 8.3145;%Hz
 Q.deadtimeJL = 3.9e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
 Q.CovDTJL = (0.01.*Q.deadtimeJL).^2;
@@ -98,11 +98,11 @@ disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
-Q.Zmes1 = 500:100:7000;
-Q.Zmes2 = 2000:100:55000;
-Q.Zmes = 500:100:55000;
+Q.Zmes1 = 500:10:7000;
+Q.Zmes2 = 500:10:55000;
+Q.Zmes = 500:10:55000;
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Q.Zret = 500:1000:60000;% Retrieval grid
+Q.Zret = 500:100:60000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
 % Yc = [Q.JHnewa;Q.JHnew]
@@ -115,11 +115,20 @@ disp('Defined grids ')
             [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
             Q.Ta = temp; % for now im adding 2K to test
             Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-            Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'linear');
+             lnpress = log(press);
+            Pressi =interp1(Q.Zret,lnpress,Q.Zmes,'linear'); %% I am trying to make this looks like psonde
+            Q.Pressi = exp(Pressi);
             Q.rho = Q.Pressi./(Rsp.*Q.Ti);
             Q.Nmol = (NA/M).* Q.rho ; % mol m-3
-
+            
+            
+obj2 = Gravity(Q.Zmes, 46.82);
+Q.grav = obj2.accel;
+Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
+Q.z0 = 30000;            
+[Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);  
 disp('a priori temperature profile is loaded ')
+
 [Tmsis, pmsis,zmsis]= msisRALMO;
 %  [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
 %  Zsonde = Zsonde-491; % altitude correction
@@ -163,9 +172,9 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = 2.8e20;
-Q.CovCL = (.01 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CLa = 1.9e17;
-Q.CovCLa = (.01 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
 % Q.CovCHa = (0.1 .* (Q.CHa)).^2;%sqrt(Q.CL);
 
@@ -199,8 +208,8 @@ xx = [Q.Tsonde2 Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.de
 [JLreal,JHreal,JLareal,JHareal]=forwardmodelTraman(Q,xx);
 JLreal = NoiseP(JLreal);
 JHreal = NoiseP(JHreal);
-JLareal = awgn(JLareal,100,'measured');
-JHareal = awgn(JHareal,100,'measured');
+JLareal = awgn(JLareal,50,'measured');
+JHareal = awgn(JHareal,50,'measured');
     Q.JHnew =JHreal;  Q.JLnew=JLreal ;  Q.JHnewa =JHareal ;   Q.JLnewa= JLareal;                     
                         Q.JHnew(Q.JHnew<=0)= round(rand(1)*10);
                         Q.JHnewa(Q.JHnewa<=0)= round(rand(1)*10);
@@ -261,7 +270,7 @@ Q.n4=length(Q.JLnewa);
                     if Q.Zmes2(i) <= 4000
                         Q.YYa(i) = Q.JLav(i);
                     else
-                        Q.YYa(i) = 5.*Q.JLav(i);
+                        Q.YYa(i) = 10.*Q.JLav(i);
                     end
                 end
                 
@@ -269,7 +278,7 @@ Q.n4=length(Q.JLnewa);
                     if  Q.Zmes2(i) <= 4000
                         Q.YYYa(i) = Q.JHav(i);
                     else
-                        Q.YYYa(i) = 5.*Q.JHav(i);
+                        Q.YYYa(i) = 10.*Q.JHav(i);
                     end
                 end
 

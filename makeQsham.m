@@ -25,7 +25,7 @@ Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
 Q.coaddalt = 10;
-% Q.Rate = 30;%Hz
+ Q.Rgas = 8.3145;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
@@ -38,7 +38,7 @@ Q.deadtimeJH = 3.8e-9; % 4ns
 Q.CovDTJL = (0.01.*Q.deadtimeJL).^2;
 Q.CovDTJH = (0.01 .*Q.deadtimeJH).^2;
 
-Q.deltaT = 10; %2 K
+Q.deltaT = 5; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.deltatime = 30;
@@ -145,10 +145,18 @@ disp('Defined grids ')
             [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
             Q.Ta = temp; % for now im adding 2K to test
             Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-            Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'linear'); %% I am trying to make this looks like psonde
+            lnpress = log(press);
+            Pressi =interp1(Q.Zret,lnpress,Q.Zmes,'linear'); %% I am trying to make this looks like psonde
+            Q.Pressi = exp(Pressi);
             Q.rho = Q.Pressi./(Rsp.*Q.Ti);
             Q.Nmol = (NA/M).* Q.rho ; % mol m-3
-
+            
+            
+obj2 = Gravity(Q.Zmes, 46.82);
+Q.grav = obj2.accel;
+Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
+Q.z0 = 30000;            
+[Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);  
 disp('a priori temperature profile is loaded ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
@@ -163,7 +171,8 @@ Zsonde = Zsonde-491; % altitude correction
 %  Psonde = Psonde(1:i);
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
-Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'linear'); % this goes asr 
+Psonde = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr 
+Q.Psonde = exp(Psonde);
 Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
 %%%%%
 
@@ -192,11 +201,11 @@ disp('R is calibrated ')
 %% Estimating background and lidar constant wrt a priori 
 
 [CJL, CJLa,CJHa,CJH] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-load('ovmodeldata.mat');
-OVnw = interp1(z,epsi,Q.Zret,'linear');
-OVnw(isnan(OVnw))=1;
-Q.OVa = OVnw;
-% Q.OVa = ones(1,length(Q.Ta));
+% load('ovmodeldata.mat');
+% OVnw = interp1(z,epsi,Q.Zret,'linear');
+% OVnw(isnan(OVnw))=1;
+% Q.OVa = OVnw;
+ Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
@@ -271,8 +280,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,12);
- [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,12);
+ [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,8);
+ [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,8);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -323,9 +332,9 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 % % HEre I linearlize the covariance
 %  slope = (((0.9-0.7).*Q.Zmes1)/(Q.Zmes1(end)));
-%  slope = (((0.5-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
-% %    Q.YYYa =  Q.JHav;% smmohtenJHa';
-% %    Q.YYa  = Q.JLav;%smmohtenJLa';
+%   slope = (((0.5-0.9).*Q.Zmes1)/(Q.Zmes1(end)))+0.8;
+% % %    Q.YYYa =  Q.JHav;% smmohtenJHa';
+% % %    Q.YYa  = Q.JLav;%smmohtenJLa';
 %  Q.YYYa = slope.*Q.JHav;
 %   Q.YYa  =slope.*Q.JLav;
 

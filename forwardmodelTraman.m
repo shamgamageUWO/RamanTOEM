@@ -16,9 +16,14 @@ DT_JL = x(end); % deadtimes
 
 
 % interpolation
-Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear'); % T on data grid (digital)
-OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
+Td = interp1(Q.Zret,x_a,Q.Zmes2,'linear'); % T on data grid (digital)
+Ta = interp1(Q.Zret,x_a,Q.Zmes1,'linear');
+Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear');
 
+
+
+OV_Zid = interp1(Q.Zret,OV,Q.Zmes2,'linear');
+OV_Zia = interp1(Q.Zret,OV,Q.Zmes1,'linear');
 
 %%
 % Constants
@@ -27,20 +32,42 @@ area = pi * (0.3^2);
 % Transmission
 R_tr_i = (Q.Tr);
 
+R_tr_id = interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
+R_tr_ia = interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
+
+
+
+[Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Ti,Q.Pressi,0,Q.grav',Q.MoR);
+Pdigid = interp1(Q.Zmes,log(Pdigi),Q.Zmes2,'linear');
+Pdigia = interp1(Q.Zmes,log(Pdigi),Q.Zmes1,'linear');
+
+Pd = exp(Pdigid);
+Pa = exp(Pdigia);
+
 % Define the first part of the equation 
-N1 = length(Q.Zmes1);
+% N1 = length(Q.Zmes1);
 
+% ind1 = Q.Zmes>3.8e3 & Q.Zmes<5e3; %JL
 
-A_Zi_an = (area .* OV_Zi(1:N1) .*R_tr_i(1:N1) .*Q.Pressi(1:N1))./(kb * Q.Zmes1 .^2);
-B_Zi_an = (area .*R_tr_i(1:N1) .*Q.Pressi(1:N1))./(kb * Q.Zmes1 .^2); % No overlap
+A_Zi_an = (area .* OV_Zia .*R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2);
+B_Zi_an = (area .*R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2); % No overlap
 
-A_Zi_d = (area .* OV_Zi(Q.d_alti_Diff+1:end) .*R_tr_i(Q.d_alti_Diff+1:end) .*Q.Pressi(Q.d_alti_Diff+1:end))./(kb * Q.Zmes2 .^2);
-B_Zi_d = (area .*R_tr_i(Q.d_alti_Diff+1:end) .*Q.Pressi(Q.d_alti_Diff+1:end))./(kb * Q.Zmes2 .^2); % No overlap
+A_Zi_d = (area .* OV_Zid .*R_tr_id .*Pd)./(kb * Q.Zmes2 .^2);
+B_Zi_d = (area .*R_tr_id .*Pd)./(kb * Q.Zmes2 .^2); % No overlap
 
 %% loading cross sections
 load('DiffCrossSections.mat');
 Diff_JH_i = interp1(T,Diff_JH,Ti,'linear');
 Diff_JL_i = interp1(T,Diff_JL,Ti,'linear');
+
+
+dJHd = interp1(Q.Zmes,Diff_JH_i,Q.Zmes2,'linear');
+dJLd = interp1(Q.Zmes,Diff_JL_i,Q.Zmes2,'linear');
+
+dJHa = interp1(Q.Zmes,Diff_JH_i,Q.Zmes1,'linear');
+dJLa = interp1(Q.Zmes,Diff_JL_i,Q.Zmes1,'linear');
+
+
 % toc
 
 
@@ -48,11 +75,11 @@ CJH = (Q.R).* CJL;
 CJHa = (Q.Ra).* CJLa;
 % 
 
-JL = (CJL.* A_Zi_d .* Diff_JL_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
-JH = (CJH.* A_Zi_d .* Diff_JH_i(Q.d_alti_Diff+1:end))./(Ti(Q.d_alti_Diff+1:end));
+JL = (CJL.* A_Zi_d .* dJLd)./(Td);
+JH = (CJH.* A_Zi_d .* dJHd)./(Td);
 
-JLa = (CJLa.* A_Zi_an .* Diff_JL_i(1:N1) )./(Ti(1:N1) );
-JHa = (CJHa.* A_Zi_an .* Diff_JH_i(1:N1) )./(Ti(1:N1) );
+JLa = (CJLa.* A_Zi_an .* dJLa )./(Ta );
+JHa = (CJHa.* A_Zi_an .* dJHa )./(Ta );
 
 
        

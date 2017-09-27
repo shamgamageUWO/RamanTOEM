@@ -3,8 +3,12 @@ function [CJL, CJLa,CJHa,CJH] = estimations(Q)
 
 
 Zi = Q.Zmes;
-ind1 = Zi>=15000 & Zi< 20000;
-ind2 = Zi>=2000 & Zi< 2200;
+Za = Q.Zmes1;%analog
+Zd = Q.Zmes2;%digital
+
+ind1 = Zd>=15000 & Zd< 20000;
+
+ind2 = Za>=2000 & Za< 2200;
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

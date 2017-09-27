@@ -4,9 +4,73 @@
 % CJLa =  {(analog - bg)} / {Corrected digital counts / CJL}
 
 % This is using real measurements
-%             [Q] = makeQsham( 20110909,23,2);
+            [Q] = makeQsham( 20110909,23,2);
 %             x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa 1.9e17 Q.deadtimeJH Q.deadtimeJL];
 %             [JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x_a);
+% 
+%             % Desaturate the digital
+            JLDS =Q.JL_DS;
+            JHDS =Q.JH_DS;
+%             % Remove Bg
+            JL_CC = JLDS - Q.BaJL;
+            JH_CC = JHDS - Q.BaJH;
+%             % divide by CJL
+             PC_ratio = JL_CC;
+%             % analog remove bg 
+            JLan = Q.JLnewa - Q.BaJLa;
+% 
+            % Measurements between 2-3km
+ind1 = Q.Zmes1>3.8e3 & Q.Zmes1<5e3; %JL
+ind11 = Q.Zmes2>3.8e3 & Q.Zmes2<5e3; %JL
+
+
+%             ind = Q.Zmes>1e3 & Q.Zmes<10e3;
+             PC_CC_Ratio = PC_ratio(ind1);
+             JLa_Range = JLan(ind11);
+% 
+            CJLa = (JLa_Range.* Q.CL)./PC_CC_Ratio';
+             fL = fittype({'x'});
+             fitJL = fit(PC_CC_Ratio,Q.CL.*JLa_Range',fL,'Robust','on');
+             CJLafit = fitJL(1)
+%              figure;plot(CJLa,Q.Zmes(ind));
+
+
+% Simulations
+% 
+% %% Method 1:
+%  [Q] = makeQsham(20110909,23,2);
+% F = 1800.* (3.75./150);
+% % First determine the range where PC signal is 5-10MHz use the average
+% % signal
+% % figure;plot((Q.JLnew./(Q.deltatime.*Q.coaddalt.*F)),Q.Zmes2./1000,'r',(Q.JHnew./(Q.deltatime.*Q.coaddalt.*F)),Q.Zmes2./1000,'b')
+% % xlabel('Avg signal (MHz)')
+% % ylabel('Alt (km)')
+% % legend('JL','JH')
+% % CJL = 2.8e20;
+% 
+% x_a = [Q.Ta 0 0 Q.CL Q.OVa 0 0 Q.CLa 0 0]; % CJL = 2.8e20 No deadtime, so no issue with saturation
+% [JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x_a);
+% 
+% % Idea here is a_JL .*N_JLA + b_JLA = DS{N_JL} = N_JL + B_JL
+%  % Measurements between 2-3km
+% ind1 = Q.Zmes1>3.8e3 & Q.Zmes1<5e3; %JL
+% ind11 = Q.Zmes2>3.8e3 & Q.Zmes2<5e3; %JL
+% ind2 = Q.Zmes>2.4e3 & Q.Zmes<3.5e3;% JH
+% 
+% 
+% y = JL(ind11); 
+% x = Q.CL.*(JLa(ind1));
+% 
+% 
+% figure;
+% % subplot(1,2,1)
+% % semilogx(Q.JLnew(ind1)./Q.JLnewa(ind1),Q.Zmes(ind1)./1000)
+% % subplot(1,2,2)
+% semilogx(JL(ind11)./JLa(ind1),Q.Zmes(ind1)./1000)
+% 
+% 
+% figure;plot(x./y,Q.Zmes(ind1)./1000)
+
 % 
 %             % Desaturate the digital
 %             JLDS =Q.JL_DS;
@@ -15,66 +79,16 @@
 %             JL_CC = JLDS - Q.BaJL;
 %             JH_CC = JHDS - Q.BaJH;
 %             % divide by CJL
-%             PC_ratio = JL_CC./Q.CL;
+%            Y= JL_CC;
 %             % analog remove bg 
-%             JLan = Q.JLnewa - Q.BaJLa;
+%             X = Q.CL.*(Q.JLnewa - Q.BaJLa);
 % 
-%             % Measurements between 2-3km
-%             ind = Q.Zmes>1e3 & Q.Zmes<10e3;
-%             PC_CC_Ratio = PC_ratio(ind);
-%             JLa_Range = JLan(ind);
 % 
-%             CJLa = JLa_Range./PC_CC_Ratio';
-%             fL = fittype({'x'});
-%             fitJL = fit(PC_CC_Ratio,JLa_Range',fL,'Robust','on');
-%             CJLafit = fitJL(1)
-%             figure;plot(CJLa,Q.Zmes(ind));
-
-
-% Simulations
-
-%% Method 1:
-[Q] = makeQshamCopy(20110909,23,2);
-F = 1800.* (3.75./150);
-% First determine the range where PC signal is 5-10MHz use the average
-% signal
-% figure;plot((Q.JLnew./(Q.deltatime.*Q.coaddalt.*F)),Q.Zmes2./1000,'r',(Q.JHnew./(Q.deltatime.*Q.coaddalt.*F)),Q.Zmes2./1000,'b')
-% xlabel('Avg signal (MHz)')
-% ylabel('Alt (km)')
-% legend('JL','JH')
-% CJL = 2.8e20;
-
-x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa 0 0]; % CJL = 2.8e20 No deadtime, so no issue with saturation
-[JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x_a);
-
-% Idea here is a_JL .*N_JLA + b_JLA = DS{N_JL} = N_JL + B_JL
- % Measurements between 2-3km
-ind1 = Q.Zmes>3.8e3 & Q.Zmes<5e3; %JL
-ind2 = Q.Zmes>2.4e3 & Q.Zmes<3.5e3;% JH
-
-y = JL(ind1)-Q.BaJL; 
-x = Q.CL.*(JLa(ind1)-Q.BaJLa);
-
-figure;plot(x./y,Q.Zmes(ind1)./1000)
-
-
-            % Desaturate the digital
-            JLDS =Q.JL_DS;
-            JHDS =Q.JH_DS;
-            % Remove Bg
-            JL_CC = JLDS - Q.BaJL;
-            JH_CC = JHDS - Q.BaJH;
-            % divide by CJL
-           Y= JL_CC;
-            % analog remove bg 
-            X = Q.CL.*(Q.JLnewa - Q.BaJLa);
-
-
-            YY = Y(ind1);
-            XX = X(ind1);
-
-
-            figure;plot(XX'./YY,Q.Zmes(ind1)./1000);
+%             YY = Y(ind1);
+%             XX = X(ind1);
+% 
+% 
+%             figure;plot(XX'./YY,Q.Zmes(ind1)./1000);
 
 %% Method 2
 % fL = fittype({'x','1'},'coefficients',{'a1','a2'});
