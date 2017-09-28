@@ -24,8 +24,8 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 2;
-Q.Rate = 30;%Hz
+Q.coaddalt = 10;
+% Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
@@ -89,7 +89,8 @@ disp('Defined grids ')
 [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret); 
 Q.Ta = temp; % for now im adding 2K to test
 Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-Q.Pressi =interp1(Q.Zret,press,Q.Zmes,'linear');
+Pressi =interp1(Q.Zret,log(press),Q.Zmes,'linear');
+Q.Pressi = exp(Pressi);
 Q.rho = Q.Pressi./(Rsp.*Q.Ti);
 Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 
@@ -146,9 +147,9 @@ JLreal = Q.JLnew';
 JLreal(JLreal<=0)= rand();
 
 
-smmohtenJH = smooth(JHreal,100); % smoothing covariance to smooth the envelop cover
-smmohtenJL = smooth(JLreal,100);
-ysmoothen= [smmohtenJH' smmohtenJL']';
+% smmohtenJH = smooth(JHreal,100); % smoothing covariance to smooth the envelop cover
+% smmohtenJL = smooth(JLreal,100);
+% ysmoothen= [smmohtenJH' smmohtenJL']';
 Q.y = [JHreal JLreal]';
 
 %  Q.yvar = diag(ysmoothen);
@@ -159,8 +160,8 @@ Q.y = [JHreal JLreal]';
 % above 2 km use the counts
 
 % % Q.yvar = diag(Q.y);
-            [JHv,go] =bobpoissontest(smmohtenJH',Q.Zmes);
-            [JLv,go] =bobpoissontest(smmohtenJL',Q.Zmes);
+            [JHv,go] =bobpoissontest(JHreal,Q.Zmes);
+            [JLv,go] =bobpoissontest(JLreal,Q.Zmes);
 
             r1 = ones(1,go-1).* JHv(1);
             r2 = ones(1,go-1).* JHv(end);
@@ -202,7 +203,7 @@ Q.y = [JHreal JLreal]';
             if Q.Zmes(i) <= 3000
                 YY(i) = Q.JLv(i);
             else
-                YY(i) = smmohtenJL(i);
+                YY(i) = JLreal(i);
             end
         end
 
@@ -210,7 +211,7 @@ Q.y = [JHreal JLreal]';
             if  Q.Zmes(i) <= 3000
                 YYY(i) = Q.JHv(i);
             else
-                YYY(i) = smmohtenJH(i);
+                YYY(i) = JHreal(i);
             end
         end
 
