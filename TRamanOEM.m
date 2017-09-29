@@ -215,7 +215,7 @@ DT_JL
 % 
                     figure;
                     subplot(1,2,1)
-                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-5),Q.Zret./1000,'r')
+                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-3),Q.Zret./1000,'r')
                     grid on;
                     xlabel('OV')
                     ylabel('Altitude(km)')
@@ -225,7 +225,7 @@ DT_JL
                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
                     subplot(1,2,2)
-                    plot((((-Q.OVa')+X.x(m+4:end-5) )./X.x(m+4:end-5)).*100,Q.Zret./1000)
+                    plot((((-Q.OVa')+X.x(m+4:end-3) )./X.x(m+4:end-3)).*100,Q.Zret./1000)
                     grid on;
                     xlabel('OV residuals(OV OEM - OV a priori) (%)')
                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)

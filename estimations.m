@@ -26,7 +26,7 @@ SJLa = Q.JLnewa - Q.BaJLa;
 % [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
 % Ti = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % T on data grid (digital)
 %     x = [Q.Ta 0 0 1 OVa 0 0 1 1]; Run this to retrieve CJH independently
-    x = [Q.Tsonde2 0 0 1 OVa 0 0 1 0 0]; % coupled analog channels
+    x = [Q.Tsonde2 0 0 1 OVa 0 0 1]; % coupled analog channels
 % DTs use to get the synthetic measurements were made to zero as we need
 % corrected counts/true counts without bks
 

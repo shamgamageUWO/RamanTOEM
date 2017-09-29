@@ -7,12 +7,12 @@ x_a = x(1:m);
 BJH = x(m+1);
 BJL = x(m+2);
 CJL = x(m+3);
-OV = x(m+4:end-5);
-BJHa = x(end-4);
-BJLa = x(end-3);
-CJLa = x(end-2);
-DT_JH = x(end-1);
-DT_JL = x(end); % deadtimes
+OV = x(m+4:end-3);
+BJHa = x(end-2);
+BJLa = x(end-1);
+CJLa = x(end);
+% DT_JH = x(end-1);
+% DT_JL = x(end); % deadtimes
 
 
 % interpolation
@@ -98,8 +98,8 @@ JH = JH  + BJH;
         JLnw = (JL.*Q.f);
         
         % 3. Apply DT
-        JL_dtc = JLnw ./ (1 + JLnw.*(DT_JL)); % non-paralyzable
-        JH_dtc = JHnw ./ (1 + JHnw.*(DT_JH));
+        JL_dtc = JLnw ./ (1 + JLnw.*(Q.deadtimeJL)); % non-paralyzable
+        JH_dtc = JHnw ./ (1 + JHnw.*(Q.deadtimeJH));
           % 4. Convert to counts
            JL = JL_dtc.*(1./Q.f);
            JH = JH_dtc.*(1./Q.f);

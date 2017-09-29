@@ -35,8 +35,8 @@ for j = 1:m
 % disp('ok')
 end
 
-DT_JH = x(end-1);
-DT_JL = x(end);
+DT_JH = Q.deadtimeJH;
+DT_JL = Q.deadtimeJH;
 %% BG jacobians Analytical 
 % ones need to be multiplied by the deadtime term: refer notes 
 Kb_JH = (((1-DT_JH.*JH).^2))'; %ones(n1,1).* 
@@ -89,20 +89,20 @@ for jj = 1:m
 
 end
 
-%% Deadtime jacobian
-Jdt1 = zeros(n,1);
-Jdt2 = zeros(n,1);
-
-    [dJHdt,dJLdt] = deridt(Q,x,@forwardmodelTraman);
-    
-   Jdt1(1:n1) = dJHdt;
-   Jdt1(n1+1:n) = 0;
-%    Jdt1(n1+n2+1:n1+n2+n3) = 0;
-%    Jdt1(n1+n2+n3+1:n) = 0;
-   
-   Jdt2(1:n1) = 0;
-   Jdt2(n1+1:n1+n2) = dJLdt;
-   Jdt2(n1+n2+1:n) = 0;
+% %% Deadtime jacobian
+% Jdt1 = zeros(n,1);
+% Jdt2 = zeros(n,1);
+% 
+%     [dJHdt,dJLdt] = deridt(Q,x,@forwardmodelTraman);
+%     
+%    Jdt1(1:n1) = dJHdt;
+%    Jdt1(n1+1:n) = 0;
+% %    Jdt1(n1+n2+1:n1+n2+n3) = 0;
+% %    Jdt1(n1+n2+n3+1:n) = 0;
+%    
+%    Jdt2(1:n1) = 0;
+%    Jdt2(n1+1:n1+n2) = dJLdt;
+%    Jdt2(n1+n2+1:n) = 0;
 %    Jdt2(n1+n2+n3+1:n) = 0;
 % j
 % disp('ok')
@@ -178,6 +178,6 @@ KCLa = [zeros(1,n1+n2) KCLa1];
 % KCHa = [zeros(1,n1+n2) KCLa22 zeros(1,n4)];
 % KCLa = [zeros(1,n1+n2+n3) KCLa11];
  
-J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa' Jdt1 Jdt2];
+J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa'];
 
 
