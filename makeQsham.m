@@ -33,8 +33,8 @@ Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJL = 4e-9; % 4ns
-Q.deadtimeJH = 4e-9; % 4ns
+Q.deadtimeJL = 3.8e-9; % 4ns
+Q.deadtimeJH = 3.8e-9; % 4ns
 % Q.CovDTJL = (0.01.*Q.deadtimeJL).^2;
 % Q.CovDTJH = (0.01 .*Q.deadtimeJH).^2;
 
