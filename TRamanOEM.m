@@ -182,7 +182,7 @@ DT_JL
                     % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
                     xlabel('Temperature (K)')
                     ylabel('Altitude(km)')
-                    legend('T a priori','T OEM','T sonde','T traditional')
+                    legend('T a priori','T OEM','T sonde')
                     hold off;
 % 
 %                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');

@@ -168,7 +168,8 @@ Zsonde = Zsonde-491; % altitude correction
 
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear','extrap'); % this goes to Restimation and asr code
-Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'spline'); % 
+Psonde = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % 
+Q.Psonde = exp(Psonde);
 Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
 %%%%%
 

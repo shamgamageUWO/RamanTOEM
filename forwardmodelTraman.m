@@ -41,29 +41,35 @@ JL = (CJL.* A_Zi_d .* Diff_JL_i)./(Ti);
 JH = (CJH.* A_Zi_d .* Diff_JH_i)./(Ti);
        
 %  % Add true background to the digital counts 
-JL = JL  + BJL;
-JH = JH  + BJH;
+JL1 = JL  + BJL;
+JH1 = JH  + BJH;
 
+% figure;semilogx(JL1,Q.Zmes./1000,'r')
+% hold on
 % 
         %% Saturation correction is applied for the averaged count profile This is just for digital channel
         % 1. Make the Co added counts to avg counts
-        JH = JH./(Q.deltatime.*Q.coaddalt);
-        JL = JL./(Q.deltatime.*Q.coaddalt);
+        JH_C = JH1./(Q.deltatime.*Q.coaddalt); % counts
+        JL_C = JL1./(Q.deltatime.*Q.coaddalt);
         
         % 2. Convert counts to Hz
-        JHnw = (JH.*Q.f);
-        JLnw = (JL.*Q.f);
-        
+        JHHz = (JH_C.*Q.f);
+        JLHz = (JL_C.*Q.f);
+%         figure;semilogx(JLHz./1e6,Q.Zmes./1000,'r',JHHz./1e6,Q.Zmes./1000,'b')
         % 3. Apply DT
-        JL_dtc = JLnw ./ (1 + JLnw.*(DT_JL)); % non-paralyzable
-        JH_dtc = JHnw ./ (1 + JHnw.*(DT_JH));
-          % 4. Convert to counts
-           JL = JL_dtc.*(1./Q.f);
-           JH = JH_dtc.*(1./Q.f);
+        JL_dtc = JL_C ./ (1 + JLHz.*(DT_JL)); % non-paralyzable
+%          figure;plot(JL_C-JL_dtc,Q.Zmes./1000,'b')
+        JH_dtc = JH_C ./ (1 + JHHz.*(DT_JH));
+        
+%           % 4. Convert to counts
+%            JL = JL_dtc.*(1./Q.f);
+%            JH = JH_dtc.*(1./Q.f);
        % 5. Scale bacl to coadded signal    
-       JL = JL.*(Q.deltatime.*Q.coaddalt);
-       JH = JH.*(Q.deltatime.*Q.coaddalt);
-
+       JL = JL_dtc.*(Q.deltatime.*Q.coaddalt);
+       JH = JH_dtc.*(Q.deltatime.*Q.coaddalt);
+       
+% figure;plot(JL1-JL,Q.Zmes./1000,'b')
+% hold off;
 
 return
 
