@@ -33,12 +33,26 @@ for j = 1:m
 % disp('ok')
 end
 
-DT_JH = x(end-1);
-DT_JL = x(end);
+% DT_JH = x(end-1);
+% DT_JL = x(end);
 %% BG jacobians Analytical 
 % ones need to be multiplied by the deadtime term: refer notes 
-Kb_JH = (((1-DT_JH.*JH).^2))'; %ones(n1,1).* 
-Kb_JL =  (((1-DT_JL.*JL).^2))'; %ones(n2,1).*
+Kb_JH = zeros(n,1);
+Kb_JL = zeros(n,1);
+
+    [dJHdbg,dJLdbg] = deriBg(Q,x,@forwardmodelTraman);
+    
+   Kb_JH(1:n1) = dJHdbg;
+   Kb_JH(n1+1:n) = 0;
+%    Jdt1(n1+n2+1:n1+n2+n3) = 0;
+%    Jdt1(n1+n2+n3+1:n) = 0;
+   
+   Kb_JL(1:n1) = 0;
+   Kb_JL(n1+1:n) = dJLdbg;
+% Kb_JH1 = (((1-DT_JH.*JH).^2))'; %ones(n1,1).* 
+% Kb_JL1 =  (((1-DT_JL.*JL).^2))'; %ones(n2,1).*
+
+
 % Kb_JHa =  ones(n3,1); 
 % Kb_JLa =  ones(n4,1);
 %zeros(n-n2,1)]; % fix the lengths
@@ -65,8 +79,26 @@ Kb_JL =  (((1-DT_JL.*JL).^2))'; %ones(n2,1).*
 
 
 %% Digital    
-            KCL11 = ((A_Zi_d.*Diff_JL_i)./Ti).*((1-DT_JL.*JL).^2);%.*exp(logCJL);
-            KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i)./Ti).*((1-DT_JH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
+% Numerical
+
+[dJHdc,dJLdc] =  deriC(Q,x,@forwardmodelTraman);
+    
+KCL1(1:n1) = dJHdc;
+%    Jdt1(n1+1:n) = 0;
+%    Jdt1(n1+n2+1:n1+n2+n3) = 0;
+%    Jdt1(n1+n2+n3+1:n) = 0;
+   
+%    Jdt2(1:n1) = 0;
+KCL1(n1+1:n) = dJLdc;
+%    Jdt2(n1+n2+1:n) = 0;
+%    Jdt2(n1+n2+n3+1:n) = 0;
+% j
+% disp('ok')
+
+
+% Analytical
+%             KCL11 = ((A_Zi_d.*Diff_JL_i)./Ti).*((1-DT_JL.*JL).^2);%.*exp(logCJL);
+%             KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i)./Ti).*((1-DT_JH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
 %             KCL = [KCL22 KCL11];
             
             
@@ -157,11 +189,11 @@ Jdt2 = zeros(n,1);
 %% coupled analog
 J_counts = Jc;
 
-J_JH = [Kb_JH;zeros(n2,1)];
+% J_JH = [Kb_JH;zeros(n2,1)];
+% 
+% J_JL = [zeros(n1,1);Kb_JL];
 
-J_JL = [zeros(n1,1);Kb_JL];
-
-KCL1 = [KCL22 KCL11];
+% KCL1 = [KCL22 KCL11];
 % KCL = [KCL1 zeros(1,n3+n4)];
 
 J_OV = JOV;
@@ -176,6 +208,6 @@ J_OV = JOV;
 % KCHa = [zeros(1,n1+n2) KCLa22 zeros(1,n4)];
 % KCLa = [zeros(1,n1+n2+n3) KCLa11];
  
-J = [J_counts J_JH J_JL KCL1' J_OV Jdt1 Jdt2];
+J = [J_counts Kb_JH Kb_JL KCL1' J_OV Jdt1 Jdt2];
 
 

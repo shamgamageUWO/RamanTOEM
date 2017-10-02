@@ -12,7 +12,7 @@ function [S_OV]=OVCov(Zj,OV)
  lc = lengthcT.*ones(1,m);
  l = size(OV);
  
-  Tfac = 1;
+  Tfac = .1;
   Tmodvar = (Tfac.*ones(l)).^2;
 % %  
 %  ll = size(OV);
@@ -84,7 +84,7 @@ for i = 1:m
             %          Sa_T(i,j) = Ta(i);
             %         end
          else
-             S_OV(i,i) = 1e-5;
+             S_OV(i,i) = 1e-3;
          end
     end
 end

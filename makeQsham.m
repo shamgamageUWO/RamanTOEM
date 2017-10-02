@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 10;
+Q.coaddalt = 5;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -35,9 +35,9 @@ Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
 Q.deadtimeJL = 3.9e-9; % 4ns
-Q.deadtimeJH = 3.8e-9; % 4ns
-Q.CovDTJL = (0.01.*Q.deadtimeJL).^2;
-Q.CovDTJH = (0.01 .*Q.deadtimeJH).^2;
+Q.deadtimeJH = 4e-9; % 4ns
+Q.CovDTJL = (1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (1 .*Q.deadtimeJH).^2;
 
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -118,7 +118,7 @@ Q.n2=length(Q.JLnew);
 % Q.Zmes = Q.Zmes1;%[Q.Zmes1 Q.Zmes2];% Measurement grid
 % Q.Zmes = Q.Zmes(1:N-zAoffset);
 % Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:10000;% Retrieval grid
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:62000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:70000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
 % Yc = [Q.JHnewa;Q.JHnew]
@@ -207,7 +207,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 % Q.CLa = CJLa;
 % Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
@@ -255,8 +255,8 @@ Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 % above 2 km use the counts
 
 % Q.yvar = diag(Q.y);
-             [JHv,go] =bobpoissontest(Q.JHnew',Q.Zmes2,8);
-             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,8);
+             [JHv,go] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
+             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,12);
 % 
 % 
 %             

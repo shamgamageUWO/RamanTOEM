@@ -1,6 +1,8 @@
-function [dJHdt,dJLdt] = deridt(Q,x,forwardmodelTraman)
-DT_JH = x(end-1);
-DT_JL = x(end); % deadtimes
+function  [dJHdbg,dJLdbg] = deriBg(Q,x,forwardmodelTraman)
+
+m = length(Q.Zret);
+BJH = x(m+1);
+BJL = x(m+2);
 % N = 2*m+6 ;
 
 
@@ -12,19 +14,19 @@ DT_JL = x(end); % deadtimes
     end
 %     m=length(Q.Zret);
 %     xa=x(1:m);
-    dn = DT_JH.*1e4;
-    dn2 = DT_JL.*1e4;
+    dn = BJH.*1e-4;
+   dn2 = BJL.*1e-4;
     % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
 
-    xpert(end-1) = DT_JH + dn;
-    xpert(end) =  DT_JL + dn2;
+    xpert(m+1) = BJH + dn;
+    xpert(m+2) =  BJL + dn2;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];
 
     [y_JL_dT,y_JH_dT]=forwardmodelTraman(Q,xpert);
 
-    dJHdt= -(y_JH_dT - y_JH)./dn;
-    dJLdt= -(y_JL_dT - y_JL)./dn2;
+    dJHdbg= (y_JH_dT - y_JH)./dn;
+    dJLdbg =(y_JL_dT - y_JL)./dn2;
    
    
     return
