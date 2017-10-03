@@ -34,15 +34,19 @@ for j = 1:m
 % j
 % disp('ok')
 end
-
-DT_JH = x(end-1);
-DT_JL = x(end);
+% 
+% DT_JH = x(end-1);
+% DT_JL = x(end);
 %% BG jacobians Analytical 
 % ones need to be multiplied by the deadtime term: refer notes 
-Kb_JH = (((1-DT_JH.*JH).^2))'; %ones(n1,1).* 
-Kb_JL =  (((1-DT_JL.*JL).^2))'; %ones(n2,1).*
-Kb_JHa =  ones(n3,1); 
-Kb_JLa =  ones(n4,1);
+% Kb_JH = (((1-DT_JH.*JH).^2))'; %ones(n1,1).* 
+% Kb_JL =  (((1-DT_JL.*JL).^2))'; %ones(n2,1).*
+% Kb_JHa =  ones(n3,1); 
+% Kb_JLa =  ones(n4,1);
+[Kb_JH,Kb_JL,Kb_JHa,Kb_JLa] = deriBg(Q,x,@forwardmodelTraman);
+% analytical jacobians for bg
+
+
 %zeros(n-n2,1)]; % fix the lengths
 
 % Jacobian for CL
@@ -67,15 +71,25 @@ Kb_JLa =  ones(n4,1);
 
 
 %% Digital    
-            KCL11 = ((A_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-DT_JL.*JL).^2);%.*exp(logCJL);
-            KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-DT_JH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
-%             KCL = [KCL22 KCL11];
-            
-            
-%% Analog            
-            KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
-            KCLa22 = ((Q.Ra.*A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
+%             KCL11 = ((A_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-DT_JL.*JL).^2);%.*exp(logCJL);
+%             KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-DT_JH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
+% %             KCL = [KCL22 KCL11];
+%             
+%             
+% %% Analog            
+%             KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
+%             KCLa22 = ((Q.Ra.*A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
 
+
+% Need analytical
+
+[dJHdc,dJLdc,dJHadc,dJLadc] = deriC(Q,x,@forwardmodelTraman);
+
+KCL1 = [dJHdc dJLdc];
+KCL = [KCL1 zeros(1,n3+n4)];
+
+KCLa1 = [dJHadc dJLadc];
+KCLa = [zeros(1,n1+n2) KCLa1];
 
 JOV = zeros(n,m);
 
@@ -159,21 +173,19 @@ Jdt2 = zeros(n,1);
 %% coupled analog
 J_counts = Jc;
 
-J_JH = [Kb_JH;zeros(n2+n3+n4,1)];
+J_JH = [Kb_JH'; zeros(n2+n3+n4,1)];
 
-J_JL = [zeros(n1,1);Kb_JL;zeros(n3+n4,1)];
+J_JL = [zeros(n1,1);Kb_JL';zeros(n3+n4,1)];
 
-KCL1 = [KCL22 KCL11];
-KCL = [KCL1 zeros(1,n3+n4)];
+
 
 J_OV = JOV;
 
-J_JHa = [zeros(n1+n2,1);Kb_JHa;zeros(n4,1)];
+J_JHa = [zeros(n1+n2,1);Kb_JHa';zeros(n4,1)];
 
-J_JLa = [zeros(n1+n2+n3,1);Kb_JLa];
+J_JLa = [zeros(n1+n2+n3,1);Kb_JLa'];
 
-KCLa1 = [KCLa22 KCLa11];
-KCLa = [zeros(1,n1+n2) KCLa1];
+
 
 % KCHa = [zeros(1,n1+n2) KCLa22 zeros(1,n4)];
 % KCLa = [zeros(1,n1+n2+n3) KCLa11];

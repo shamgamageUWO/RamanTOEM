@@ -1,7 +1,6 @@
 % This code is to create synthetic data using the US standard data
 
 function [JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x)
-
 m = length(Q.Zret);
 x_a = x(1:m);
 BJH = x(m+1);

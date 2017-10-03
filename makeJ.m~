@@ -1,7 +1,7 @@
 function [R,yf,J] = makeJ(Q, R, x, iter)
 
 
-[JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
+[JL,JH,JLa,JHa,A_Zi_an,A_Zi_d,B_Zi_an,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x);
 
 
 if ~isempty(find(isnan(x)) == 1)
@@ -35,12 +35,18 @@ for j = 1:m
 % disp('ok')
 end
 
+DT_JH = x(end-1);
+DT_JL = x(end);
 %% BG jacobians Analytical 
 % ones need to be multiplied by the deadtime term: refer notes 
-Kb_JH = (((1-Q.deadtime.*JL).^2))'; %ones(n1,1).* 
-Kb_JL =  (((1-Q.deadtime.*JH).^2))'; %ones(n2,1).*
-Kb_JHa =  ones(n3,1); 
-Kb_JLa =  ones(n4,1);
+% Kb_JH = (((1-DT_JH.*JH).^2))'; %ones(n1,1).* 
+% Kb_JL =  (((1-DT_JL.*JL).^2))'; %ones(n2,1).*
+% Kb_JHa =  ones(n3,1); 
+% Kb_JLa =  ones(n4,1);
+[Kb_JH,Kb_JL,Kb_JHa,Kb_JLa] = deriBg(Q,x,@forwardmodelTraman);
+% analytical jacobians for bg
+
+
 %zeros(n-n2,1)]; % fix the lengths
 
 % Jacobian for CL
@@ -65,55 +71,55 @@ Kb_JLa =  ones(n4,1);
 
 
 %% Digital    
-            KCL11 = ((A_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtime.*JL).^2);%.*exp(logCJL);
-            KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-Q.deadtime.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
-%             KCL = [KCL22 KCL11];
-            
-            
-%% Analog            
-            KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
-            KCLa22 = ((Q.Ra.* A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
-%             KCHa = ((A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL); %% Note I have applied the cutoff for JH here
-%             KCLa = [KCLa22 KCLa11];
-%             KCL = KCL .* exp(logCJL); % this is done as I'm retrieving log of CJL now CJL 
+%             KCL11 = ((A_Zi_d.*Diff_JL_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-DT_JL.*JL).^2);%.*exp(logCJL);
+%             KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i(Q.d_alti_Diff+1:end))./Ti(Q.d_alti_Diff+1:end)).*((1-DT_JH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
+% %             KCL = [KCL22 KCL11];
+%             
+%             
+% %% Analog            
+%             KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
+%             KCLa22 = ((Q.Ra.*A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
 
 
+% Need analytical
 
+KCL = zeros(n,1);
+Jdt2 = zeros(n,1);
+[dJHdc,dJLdc,dJHadc,dJLadc] = deriC(Q,x,@forwardmodelTraman);
 
-% Numerical
-
-%  dCL = Q.CLfac .* x(end-1);
-%  dCH = Q.CHfac .* x(end);
-%  x(end-1) = x(end-1)+ dCL;
-%  x(end) = x(end)+ dCH;
-%  
-% [y_JL_dCL,y_JH_dCH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i]=forwardmodelTraman(Q,x);
-% 
-% KCL1 = (y_JL_dCL-JL)./dCL;
-% KCL2 = (y_JH_dCH-JH)./dCH;
-% KCL = [KCL1';zeros(length(KCL2),1)];
-% KCH = [zeros(length(KCL1),1);KCL2'];
-
-
-%% OV jacobians Analytical --- Interpolation need to be added here
-
-JOVJL = ((CJL.*A_Zi_an.*Diff_JL_i)./Ti).*((1-Q.deadtime.*JL).^2);
-JOVJH = ((Q.R.*CJL.*B_Zi.*Diff_JH_i)./Ti).*((1-Q.deadtime.*JH).^2);
-JOVJL_an = ((CJLa.*B_Zi.*Diff_JL_i)./Ti);
-JOVJH_an = ((Q.Ra.*CJLa.*B_Zi.*Diff_JH_i)./Ti);
-% OV analytical
+KCL(1:n1) = dJHdc;
+KCL(n1+1:end)
 JOV = zeros(n,m);
-N = 2*m+6 ;
-% 
-% for j = 1:m 
-%    
-%    [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(j,Q,x,@forwardmodelTraman);
-%    JOV(1:n1,j) = dOVJH;
-%    JOV(n1+1:n1+n2,j) = dOVJL;
-%    JOV(n1+n2+1:n1+n2+n3,j) = dOVJHa;
-%    JOV(n1+n2+n3+1:n,j) = dOVJLa;
-% 
-% end
+
+for jj = 1:m 
+   
+   [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(jj,Q,x,@forwardmodelTraman);
+   JOV(1:n1,jj) = dOVJH;
+   JOV(n1+1:n1+n2,jj) = dOVJL;
+   JOV(n1+n2+1:n1+n2+n3,jj) = dOVJHa;
+   JOV(n1+n2+n3+1:n,jj) = dOVJLa;
+
+end
+
+%% Deadtime jacobian
+Jdt1 = zeros(n,1);
+Jdt2 = zeros(n,1);
+
+    [dJHdt,dJLdt] = deridt(Q,x,@forwardmodelTraman);
+    
+   Jdt1(1:n1) = dJHdt;
+   Jdt1(n1+1:n) = 0;
+%    Jdt1(n1+n2+1:n1+n2+n3) = 0;
+%    Jdt1(n1+n2+n3+1:n) = 0;
+   
+   Jdt2(1:n1) = 0;
+   Jdt2(n1+1:n1+n2) = dJLdt;
+   Jdt2(n1+n2+1:n) = 0;
+%    Jdt2(n1+n2+n3+1:n) = 0;
+% j
+% disp('ok')
+
+%%
 
 %% Final Jacobian
 % JJ = [ J(1:n,1:m) Kb_JL zeros(n,1);J(n+1:2*n,1:m) zeros(n,1) Kb_JH];last
@@ -181,8 +187,9 @@ J_JLa = [zeros(n1+n2+n3,1);Kb_JLa];
 KCLa1 = [KCLa22 KCLa11];
 KCLa = [zeros(1,n1+n2) KCLa1];
 
-
+% KCHa = [zeros(1,n1+n2) KCLa22 zeros(1,n4)];
+% KCLa = [zeros(1,n1+n2+n3) KCLa11];
  
-J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa'];
+J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa' Jdt1 Jdt2];
 
 
