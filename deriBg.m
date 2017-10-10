@@ -3,8 +3,8 @@ function  [dJHdbg,dJLdbg,dJHadbg,dJLadbg] = deriBg(Q,x,forwardmodelTraman)
 m = length(Q.Zret);
 BJH = x(m+1);
 BJL = x(m+2);
-BJHa = x(end-4);
-BJLa = x(end-3);
+% BJHa = x(end-4);
+% BJLa = x(end-3);
 % N = 2*m+6 ;
 
 
@@ -18,23 +18,23 @@ BJLa = x(end-3);
 %     xa=x(1:m);
     dn1 = BJH.*1e-4;
     dn2 = BJL.*1e-4;
-    dn3 = BJHa.*1e-4;
-    dn4 = BJLa.*1e-4;
+%     dn3 = BJHa.*1e-4;
+%     dn4 = BJLa.*1e-4;
     % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
 
     xpert(m+1) = BJH + dn1;
     xpert(m+2) =  BJL + dn2;
-    xpert(end-4) = BJHa + dn3;
-    xpert(end-3) =  BJLa + dn4;
+%     xpert(end-4) = BJHa + dn3;
+%     xpert(end-3) =  BJLa + dn4;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];
 
     [y_JL_dT,y_JH_dT,y_JLa_dT,y_JHa_dT]=forwardmodelTraman(Q,xpert);
 
     dJHdbg= (y_JH_dT - y_JH)./dn1;
     dJLdbg =(y_JL_dT - y_JL)./dn2;
-    dJHadbg= (y_JHa_dT - y_JHa)./dn3;
-    dJLadbg =(y_JLa_dT - y_JLa)./dn4;
+    dJHadbg= (y_JHa_dT - y_JHa)./dn1;
+    dJLadbg =(y_JLa_dT - y_JLa)./dn2;
    
     return
 

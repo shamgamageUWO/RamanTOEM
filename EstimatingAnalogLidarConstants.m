@@ -31,7 +31,8 @@ ind11 = Q.Zmes2>3.8e3 & Q.Zmes2<5e3; %JL
             CJLa = (JLa_Range.* Q.CL)./PC_CC_Ratio';
              fL = fittype({'x'});
              fitJL = fit(PC_CC_Ratio,Q.CL.*JLa_Range',fL,'Robust','on');
-             CJLafit = fitJL(1)
+             g = coeffvalues(fitJL);
+             CJLafit = g(1);
 %              figure;plot(CJLa,Q.Zmes(ind));
 
 

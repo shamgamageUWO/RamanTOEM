@@ -2,13 +2,13 @@ function [CJL, CJLa,CJHa,CJH] = estimations(Q)
 
 
 
-Zi = Q.Zmes;
-Za = Q.Zmes1;%analog
+% Zi = Q.Zmes;
+ Za = Q.Zmes1;%analog
 Zd = Q.Zmes2;%digital
 
 ind1 = Zd>=15000 & Zd< 20000;
 
-ind2 = Za>=2000 & Za< 2200;
+ ind2 = Za>=2000 & Za< 2200;
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -20,17 +20,17 @@ SJLa = Q.JLnewa - Q.BaJLa;
 % SJHa = Q.JHnewa;
 % SJLa = Q.JLnewa;
 
-    OVa = ones(1,length(Q.Ta));
-    Q.OVlength = length(OVa);
+%     OVa = ones(1,length(Q.Ta));
+%     Q.OVlength = length(OVa);
     
 % [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
 % Ti = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % T on data grid (digital)
 %     x = [Q.Ta 0 0 1 OVa 0 0 1 1]; Run this to retrieve CJH independently
-    x = [Q.Tsonde2 0 0 1 OVa 0 0 1 0 0]; % coupled analog channels
+    x = [Q.Tsonde2 0 0 1 Q.OVa 0 0 1 0 0]; % coupled analog channels
 % DTs use to get the synthetic measurements were made to zero as we need
 % corrected counts/true counts without bks
 
-[JL,JH,JLa,JHa]=forwardmodelTraman(Q,x);
+[JL,JH]=forwardmodelTraman(Q,x);
   
 yJL= SJL(ind1);
 xJL=JL(ind1);

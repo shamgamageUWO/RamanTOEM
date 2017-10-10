@@ -39,10 +39,6 @@ end
 CJL = X.x(m+3);
 BJH = X.x(m+1);
 BJL = X.x(m+2);
-CJHa = Q.Ra.*X.x(end-2);
-CJLa = X.x(end-2);
-BJHa = X.x(end-4);
-BJLa = X.x(end-3);
 DT_JH = X.x(end-1);
 DT_JL = X.x(end); % deadtimes
 
@@ -63,25 +59,6 @@ Q.BaJL
 
 'OEM-CL'
 CJL
-
-
-'OEM-BG-JHa'
-BJHa
-
-'real-BG-JHa'
-Q.BaJHa
-
-'OEM-BG-JLa'
-BJLa
-
-'real-BG-JLa'
-Q.BaJLa
-
-'OEM-CLa'
-CJLa
-
-'OEM-CHa'
-CJHa
 
 'DT-JH'
 DT_JH
@@ -183,15 +160,15 @@ DT_JL
                     upper = err+ X.x(1:m);
                     lower =  X.x(1:m)-err;
 % 
-                     [Tsonde,Zsonde,Psonde] = get_sonde_RS92(20120718,00);
-                     Zsonde = Zsonde-491; % altitude correction
+%                      [Tsonde,Zsonde,Psonde] = get_sonde_RS92(20120718,00);
+%                      Zsonde = Zsonde-491; % altitude correction
 %                     lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
 %                     Ttradi = real(Q.bb./(Q.aa-lnQ));
 % 
-                    Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
+%                     Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
                     figure;
                     subplot(1,2,1)
-                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b')
+                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Tsonde2,Q.Zret./1000,'b')
                     grid on;
                     hold on
                     [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
@@ -205,7 +182,7 @@ DT_JL
 %                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 % 
                      subplot(1,2,2)
-                     plot(X.x(1:m) - (Tsonde'),Q.Zret./1000)
+                     plot(X.x(1:m) - (Q.Tsonde2'),Q.Zret./1000)
                      grid on;
                      xlabel('Temperature residuals(T OEM - T sonde) (K)')
 %                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
@@ -215,7 +192,7 @@ DT_JL
 % 
                     figure;
                     subplot(1,2,1)
-                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-5),Q.Zret./1000,'r')
+                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-2),Q.Zret./1000,'r')
                     grid on;
                     xlabel('OV')
                     ylabel('Altitude(km)')
@@ -225,7 +202,7 @@ DT_JL
                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
                     subplot(1,2,2)
-                    plot((((-Q.OVa')+X.x(m+4:end-5) )./X.x(m+4:end-5)).*100,Q.Zret./1000)
+                    plot((((-Q.OVa')+X.x(m+4:end-2) )./X.x(m+4:end-2)).*100,Q.Zret./1000)
                     grid on;
                     xlabel('OV residuals(OV OEM - OV a priori) (%)')
                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
