@@ -1,4 +1,4 @@
-function [Q] = makeQsham( date_in,time_in,flag)
+function [Q] = makeQshamSyn( date_in,time_in,flag)
 % makeQ(in)
 
 % -Usage-
@@ -87,7 +87,10 @@ Q.f = 1e6./(Y.F);
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
 
-
+Q.a_JL = 2.8345e3;
+Q.b_JH = -8.0952e5;
+Q.a_JH = 2.6236e3;
+Q.b_JL = -1.6029e6;
 Q.BaJL = 0.2434; % change later
 Q.BaJH = 0.2237;
 Q.BaJLa =596;%0.297350746852139; % change later
@@ -98,9 +101,9 @@ disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
-Q.Zmes1 = 500:10:7000;
-Q.Zmes2 = 500:10:55000;
-Q.Zmes = 500:10:55000;
+Q.Zmes1 = 500:50:6000;
+Q.Zmes2 = 4000:50:55000;
+Q.Zmes = 500:50:55000;
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 Q.Zret = 500:100:60000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
@@ -203,7 +206,7 @@ Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                         % this need to be done if there is any zeros in the real measurements
                         % smooth the signal over 1
                         
-xx = [Q.Tsonde2 Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
+xx = [Q.Tsonde2 Q.BaJH Q.BaJL Q.CL Q.OVa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
 
 [JLreal,JHreal,JLareal,JHareal]=forwardmodelTraman(Q,xx);
 JLreal = NoiseP(JLreal);
@@ -253,8 +256,8 @@ Q.n4=length(Q.JLnewa);
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(Q.JHnewa,Q.Zmes1,8);
- [JLav,go2] =bobpoissontest(Q.JLnewa,Q.Zmes1,8);
+ [JHav,go1] =bobpoissontest(Q.JHnewa,Q.Zmes1,12);
+ [JLav,go2] =bobpoissontest(Q.JLnewa,Q.Zmes1,12);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -267,25 +270,25 @@ Q.n4=length(Q.JLnewa);
 % slope1 = (((0.05-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes2(i) <= 4000
+                    if Q.Zmes1(i) <= 6000
                         Q.YYa(i) = Q.JLav(i);
                     else
-                        Q.YYa(i) = 10.*Q.JLav(i);
+                        Q.YYa(i) = .1.*Q.JLav(i);
                     end
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes2(i) <= 4000
+                    if  Q.Zmes1(i) <= 6000
                         Q.YYYa(i) = Q.JHav(i);
                     else
-                        Q.YYYa(i) = 10.*Q.JHav(i);
+                        Q.YYYa(i) = .1.*Q.JHav(i);
                     end
                 end
 
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 1000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = Q.JLnew(i);
@@ -293,7 +296,7 @@ Q.n4=length(Q.JLnewa);
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
+            if  Q.Zmes2(i) <= 1000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = Q.JHnew(i);

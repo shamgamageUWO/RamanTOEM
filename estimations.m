@@ -1,22 +1,22 @@
-function [CJL, CJLa,CJHa,CJH] = estimations(Q)
+function [CJL] = estimations(Q)
 
 
 
 % Zi = Q.Zmes;
- Za = Q.Zmes1;%analog
+%  Za = Q.Zmes1;%analog
 Zd = Q.Zmes2;%digital
 
 ind1 = Zd>=15000 & Zd< 20000;
 
- ind2 = Za>=2000 & Za< 2200;
+%  ind2 = Za>=2000 & Za< 2200;
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Removing true background from the desaturated signal
 SJH = Q.JH_DS-Q.BaJH;
 SJL = Q.JL_DS-Q.BaJL;
-SJHa = Q.JHnewa - Q.BaJHa;
-SJLa = Q.JLnewa - Q.BaJLa;
+% SJHa = Q.JHnewa - Q.BaJHa;
+% SJLa = Q.JLnewa - Q.BaJLa;
 % SJHa = Q.JHnewa;
 % SJLa = Q.JLnewa;
 
@@ -26,7 +26,7 @@ SJLa = Q.JLnewa - Q.BaJLa;
 % [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
 % Ti = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % T on data grid (digital)
 %     x = [Q.Ta 0 0 1 OVa 0 0 1 1]; Run this to retrieve CJH independently
-    x = [Q.Tsonde2 0 0 1 Q.OVa 0 0 1 0 0]; % coupled analog channels
+    x = [Q.Tsonde2 0 0 1 Q.OVa 0 0]; % coupled analog channels
 % DTs use to get the synthetic measurements were made to zero as we need
 % corrected counts/true counts without bks
 
@@ -44,19 +44,19 @@ CJL = fitJL(1);
 fH = fittype({'x'});
 fitJH = fit(xJH',yJH,fH,'Robust','on');
 CJH = fitJH(1);
-
-yJLa = SJLa(ind2);
-xJLa = JLa(ind2);
-yJHa = SJHa(ind2);
-xJHa = JHa(ind2);
-
-fLa = fittype({'x'});
-fitJLa = fit(xJLa',yJLa,fLa,'Robust','on');
-CJLa = fitJLa(1);
-
-fHa = fittype({'x'});
-fitJHa = fit(xJHa',yJHa,fHa,'Robust','on');
-CJHa = fitJHa(1);
+% 
+% yJLa = SJLa(ind2);
+% xJLa = JLa(ind2);
+% yJHa = SJHa(ind2);
+% xJHa = JHa(ind2);
+% 
+% fLa = fittype({'x'});
+% fitJLa = fit(xJLa',yJLa,fLa,'Robust','on');
+% CJLa = fitJLa(1);
+% 
+% fHa = fittype({'x'});
+% fitJHa = fit(xJHa',yJHa,fHa,'Robust','on');
+% CJHa = fitJHa(1);
 
 % When using Z = 8km and Za = 1.5km
 % CJL= SJL(187)./JL(187);
