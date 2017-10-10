@@ -34,7 +34,7 @@ Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
 Q.deadtimeJL = 3.8e-9; % 4ns
-Q.deadtimeJH = 3.8e-9; % 4ns
+Q.deadtimeJH = 3.7e-9; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1 .*Q.deadtimeJH).^2;
 
@@ -59,11 +59,11 @@ Eb = Y.Eb;
 Q.binzise = Y.binsize;
 Q.Eb = Eb(alt>=1500);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=1500);
-Q.JLnew= JLnew(alt>=1500);
-Q.JH_DS =JH_DS(alt>=1500);
-Q.JL_DS =JL_DS(alt>=1500);
-Q.alt = alt(alt>=1500);
+Q.JHnew= JHnew(alt>=4000);
+Q.JLnew= JLnew(alt>=4000);
+Q.JH_DS =JH_DS(alt>=4000);
+Q.JL_DS =JL_DS(alt>=4000);
+Q.alt = alt(alt>=4000);
 Q.Zmes2 = Q.alt';
 
 Q.f = 1e6./(Y.F);
@@ -216,8 +216,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
 
-             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2,12);
-             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,12);
+             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2,8);
+             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,8);
           
              r1 = ones(1,go-1).* JHv(1);
              r2 = ones(1,go-1).* JHv(end);
@@ -228,7 +228,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
  [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,24);
- [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,24);
+ [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,12);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -239,25 +239,25 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 6000
+                    if Q.Zmes1(i) <= 4000
                         Q.YYa(i) = Q.JLav(i);
                     else
-                        Q.YYa(i) = 100.*Q.JLav(i);
+                        Q.YYa(i) = .1.*Q.JLav(i);
                     end
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes1(i) <= 6000
+                    if  Q.Zmes1(i) <= 4000
                         Q.YYYa(i) = Q.JHav(i);
                     else
-                        Q.YYYa(i) = 100.*Q.JHav(i);
+                        Q.YYYa(i) = .1.*Q.JHav(i);
                     end
                 end
 
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 10000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = JLreal(i);
@@ -265,7 +265,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
+            if  Q.Zmes2(i) <= 10000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = JHreal(i);
