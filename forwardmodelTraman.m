@@ -105,7 +105,7 @@ JH = JH  + BJH;
        % 5. Scale bacl to coadded signal    
        JL = JL.*(Q.deltatime.*Q.coaddalt);
        JH = JH.*(Q.deltatime.*Q.coaddalt);
-       
+
 %  % Add background to the analog signal
 
 JLa = JLa  + BJLa;

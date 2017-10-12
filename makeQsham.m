@@ -36,7 +36,7 @@ Q.shots = 1800;
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.7e-9; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (.1 .*Q.deadtimeJH).^2;
+Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 
 % Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -57,13 +57,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=1500);
+Q.Eb = Eb(alt>=3000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=4000);
-Q.JLnew= JLnew(alt>=4000);
-Q.JH_DS =JH_DS(alt>=4000);
-Q.JL_DS =JL_DS(alt>=4000);
-Q.alt = alt(alt>=4000);
+Q.JHnew= JHnew(alt>=3000);
+Q.JLnew= JLnew(alt>=3000);
+Q.JH_DS =JH_DS(alt>=3000);
+Q.JL_DS =JL_DS(alt>=3000);
+Q.alt = alt(alt>=3000);
 Q.Zmes2 = Q.alt';
 
 Q.f = 1e6./(Y.F);
@@ -106,7 +106,9 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:70000;% Retrieval grid
 disp('Defined grids ')
 
-
+% slopeDT= (1-0.1)/(Q.Zret(1)-Q.Zret(end));
+% Q.CovDTJL = (slopeDT.*Q.deadtimeJL.*Q.Zret).^2;
+% Q.CovDTJH = (slopeDT .*Q.deadtimeJH.*Q.Zret).^2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%  a priori temperatures
 
@@ -216,18 +218,18 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
 
-             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2,8);
+             [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,12);
              [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,8);
           
-             r1 = ones(1,go-1).* JHv(1);
-             r2 = ones(1,go-1).* JHv(end);
+             r1 = ones(1,go11-1).* JHv(1);
+             r2 = ones(1,go11-1).* JHv(end);
              r3 = ones(1,go-1).* JLv(1);
              r4 = ones(1,go-1).* JLv(end);
              Q.JHv = [r1 JHv r2];
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,24);
+ [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,15);
  [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,12);
 
             ar1 = ones(1,go1-1).* JHav(1);
@@ -242,22 +244,22 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
                     if Q.Zmes1(i) <= 4000
                         Q.YYa(i) = Q.JLav(i);
                     else
-                        Q.YYa(i) = .1.*Q.JLav(i);
+                        Q.YYa(i) = Q.JLav(i);
                     end
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes1(i) <= 4000
+                    if  Q.Zmes1(i) <= 3000
                         Q.YYYa(i) = Q.JHav(i);
                     else
-                        Q.YYYa(i) = .1.*Q.JHav(i);
+                        Q.YYYa(i) = Q.JHav(i);
                     end
                 end
 
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 10000
+            if Q.Zmes2(i) <= 8000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = JLreal(i);
@@ -265,7 +267,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 10000
+            if  Q.Zmes2(i) <= 20000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = JHreal(i);

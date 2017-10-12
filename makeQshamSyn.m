@@ -1,4 +1,4 @@
-function [Q] = makeQsham( date_in,time_in,flag)
+function [Q] = makeQshamSyn( date_in,time_in,flag)
 % makeQ(in)
 
 % -Usage-
@@ -33,8 +33,8 @@ Q.shots = 1800;
  Q.Rgas = 8.3145;%Hz
 Q.deadtimeJL = 3.9e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
-Q.CovDTJL = (0.01.*Q.deadtimeJL).^2;
-Q.CovDTJH = (0.01 .*Q.deadtimeJH).^2;
+Q.CovDTJL = (001.*Q.deadtimeJL).^2;
+Q.CovDTJH = (001 .*Q.deadtimeJH).^2;
 
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -98,11 +98,11 @@ disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
-Q.Zmes1 = 500:10:7000;
-Q.Zmes2 = 500:10:55000;
-Q.Zmes = 500:10:55000;
+Q.Zmes1 = 500:25:6000;
+Q.Zmes2 = 4000:25:55000;
+Q.Zmes = 500:25:55000;
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Q.Zret = 500:100:60000;% Retrieval grid
+Q.Zret = 500:50:60000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
 % Yc = [Q.JHnewa;Q.JHnew]
@@ -205,11 +205,14 @@ Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                         
 xx = [Q.Tsonde2 Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
 
-[JLreal,JHreal,JLareal,JHareal]=forwardmodelTraman(Q,xx);
+[JLreal,JHreal,JLarealNO,JHarealNO]=forwardmodelTraman(Q,xx);
 JLreal = NoiseP(JLreal);
 JHreal = NoiseP(JHreal);
-JLareal = awgn(JLareal,50,'measured');
-JHareal = awgn(JHareal,50,'measured');
+JLareal = awgn(JLarealNO,2);
+JHareal = awgn(JHarealNO,2);
+
+%  Q.JLav= JLareal./2;
+%  Q.JHav= JHareal./2;
     Q.JHnew =JHreal;  Q.JLnew=JLreal ;  Q.JHnewa =JHareal ;   Q.JLnewa= JLareal;                     
                         Q.JHnew(Q.JHnew<=0)= round(rand(1)*10);
                         Q.JHnewa(Q.JHnewa<=0)= round(rand(1)*10);
@@ -253,8 +256,8 @@ Q.n4=length(Q.JLnewa);
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(Q.JHnewa,Q.Zmes1,8);
- [JLav,go2] =bobpoissontest(Q.JLnewa,Q.Zmes1,8);
+ [JHav,go1] =bobpoissontest(Q.JHnewa,Q.Zmes1,12);
+ [JLav,go2] =bobpoissontest(Q.JLnewa,Q.Zmes1,12);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -267,25 +270,25 @@ Q.n4=length(Q.JLnewa);
 % slope1 = (((0.05-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes2(i) <= 4000
-                        Q.YYa(i) = Q.JLav(i);
+                    if Q.Zmes1(i) <= 4000
+                        Q.YYa(i) = (Q.JLav(i));
                     else
-                        Q.YYa(i) = 10.*Q.JLav(i);
+                        Q.YYa(i) = .1.*(Q.JLav(i));
                     end
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes2(i) <= 4000
-                        Q.YYYa(i) = Q.JHav(i);
+                    if  Q.Zmes1(i) <= 6000
+                        Q.YYYa(i) = (Q.JHav(i));
                     else
-                        Q.YYYa(i) = 10.*Q.JHav(i);
+                        Q.YYYa(i) = 0.1.*(Q.JHav(i));
                     end
                 end
 
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 1000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = Q.JLnew(i);
@@ -293,7 +296,7 @@ Q.n4=length(Q.JLnewa);
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
+            if  Q.Zmes2(i) <= 1000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = Q.JHnew(i);

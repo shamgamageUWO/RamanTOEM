@@ -287,6 +287,11 @@ DT_JL
                     hold off
                     xlabel('JL - analog counts residual(%)')
                     ylabel('Altitude (km)')
+                    
+                    
+                    figure;plot(X.eo(1:length(Q.Zret)),Q.Zret./1000)
+                    xlabel('Temperature Stat error (K)')
+                    ylabel( ' Alt (km)')
 % (mchanA+1:2*mchanA))./y(mchanA+1:2*mchanA)
 %                     %% Percent difference of background, lidar calibration constant retrievals and the true
 % 
