@@ -35,8 +35,8 @@ Q.shots = 1800;
 
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
-Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (.1 .*Q.deadtimeJH).^2;
+Q.CovDTJL = (1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (1 .*Q.deadtimeJH).^2;
 
 % Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -63,13 +63,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=500 & alt<=60000);
+Q.Eb = Eb(alt>=4000 & alt<=60000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=500 & alt<=60000);
-Q.JLnew= JLnew(alt>=500 & alt<=60000);
-Q.JH_DS =JH_DS(alt>=500 & alt<=60000);
-Q.JL_DS =JL_DS(alt>=500 & alt<=60000);
-Q.alt = alt(alt>=500 & alt<=60000);
+Q.JHnew= JHnew(alt>=4000 & alt<=60000);
+Q.JLnew= JLnew(alt>=4000 & alt<=60000);
+Q.JH_DS =JH_DS(alt>=4000 & alt<=60000);
+Q.JL_DS =JL_DS(alt>=4000 & alt<=60000);
+Q.alt = alt(alt>=4000 & alt<=60000);
 Q.Zmes2 = Q.alt';
 
 Q.f = 1e6./(Y.F);
@@ -79,13 +79,13 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=500 & ANalt<=60000);
+Q.Eba = Eba(ANalt>=1000 & ANalt<=6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=500 & ANalt<=60000);
-Q.JLnewa= JLnewa(ANalt>=500 & ANalt<=60000);
-Q.ANalt = ANalt(ANalt>=500 & ANalt<=60000);
+Q.JHnewa= JHnewa(ANalt>=1000 & ANalt<=6000);
+Q.JLnewa= JLnewa(ANalt>=1000 & ANalt<=6000);
+Q.ANalt = ANalt(ANalt>=1000);
 Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=500 & ANalt<=60000);
+Q.Zmes1 = ANalt(ANalt>=1000 & ANalt<=6000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -170,11 +170,11 @@ Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
-% load('ovmodeldata.mat');
-% OVnw = interp1(z,epsi,Q.Zret,'linear');
-% OVnw(isnan(OVnw))=1;
-% Q.OVa = OVnw;
- Q.OVa = ones(1,length(Q.Ta));
+load('ovmodeldata.mat');
+OVnw = interp1(z,epsi,Q.Zret,'linear');
+OVnw(isnan(OVnw))=1;
+Q.OVa = OVnw;
+%  Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
@@ -221,11 +221,11 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
 
-             [JHv,go] =bobpoissontest(JHreal,Q.Zmes2,12);
-             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,12);
+             [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,12);
+             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,8);
           
-             r1 = ones(1,go-1).* JHv(1);
-             r2 = ones(1,go-1).* JHv(end);
+             r1 = ones(1,go11-1).* JHv(1);
+             r2 = ones(1,go11-1).* JHv(end);
              r3 = ones(1,go-1).* JLv(1);
              r4 = ones(1,go-1).* JLv(end);
              Q.JHv = [r1 JHv r2];
@@ -252,7 +252,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes1(i) <= 4000
+                    if  Q.Zmes1(i) <= 3000
                         Q.YYYa(i) = Q.JHav(i);
                     else
                         Q.YYYa(i) = .1.*Q.JHav(i);
@@ -262,7 +262,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 8000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = JLreal(i);

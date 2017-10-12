@@ -13,11 +13,11 @@ function [a_JL,b_JL,a_JH,b_JH] = GlueCoef
             
 
             % Measurements between 2-3km
-indJL1 = Q.Zmes1>3.2e3 & Q.Zmes1<4.5e3; %JL-ana
-indJL2 = Q.Zmes2>3.2e3 & Q.Zmes2<4.5e3; %JL-digi
+indJL1 = Q.Zmes1>3.2e3 & Q.Zmes1<4.2e3; %JL-ana
+indJL2 = Q.Zmes2>3.2e3 & Q.Zmes2<4.2e3; %JL-digi
 
-indJH1 = Q.Zmes1>2.2e3 & Q.Zmes1<3.2e3; %JH
-indJH2 = Q.Zmes2>2.2e3 & Q.Zmes2<3.2e3; %JH
+indJH1 = Q.Zmes1>2e3 & Q.Zmes1<2.5e3; %JH
+indJH2 = Q.Zmes2>2e3 & Q.Zmes2<2.5e3; %JH
 
 x_JL = JLan(indJL1);
 x_JH = JHan(indJH1);
