@@ -24,13 +24,17 @@ area = pi * (0.3^2);
 % Transmission
 R_tr_i = (Q.Tr);
 
+Pa = Q.Pdigi;
+% Pdigia = interp1(Q.Zmes,log(Q.Pdigi),Q.Zmes1,'linear');
+% Pa = exp(Pdigia);
+
 % Define the first part of the equation 
 % N1 = length(Q.JHnewa);
 % NN1 = length();
 % N2 = length(Q.JHnew); fr=OV_Zi(Q.d_alti_Diff+1:end);
 
-A_Zi_an = (area .* OV_Zi .*R_tr_i .*Q.Pressi)./(kb * Q.Zmes1 .^2);
-B_Zi_an = (area .*R_tr_i .*Q.Pressi)./(kb * Q.Zmes1 .^2); % No overlap
+A_Zi_an = (area .* OV_Zi .*R_tr_i .*Pa)./(kb * Q.Zmes1 .^2);
+B_Zi_an = (area .*R_tr_i .*Pa)./(kb * Q.Zmes1 .^2); % No overlap
 
 
 %% loading cross sections

@@ -1,10 +1,10 @@
-function [CJLa,OV] = estimations(Q)
+function [CJLa] = estimations(Q)
 
 
 
 Zi = Q.Zmes;
-ind1 = Zi>=8000 & Zi< 10000;
-ind2 = Zi>=2000 & Zi< 3000;
+% ind1 = Zi>=8000 & Zi< 10000;
+ind2 = Zi>=2000 & Zi< 2200;
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -43,7 +43,7 @@ SJLa = Q.JLnewa - Q.BaJLa;
 %     JLwoOV = ((CJL.*JL));
 %     JHwoOV = ((Q.R.*CJL.*JH));
 % %     
-    JLawoOV = ((CJLa.*JLa));
+%     JLawoOV = ((CJLa.*JLa));
 %     JHawoOV = ((Q.Ra.*CJLa.*JHa));
 % %    JHawoOV = ((CJHa.*JHa));
 % 
@@ -52,23 +52,23 @@ SJLa = Q.JLnewa - Q.BaJLa;
 %      OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
 %      OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV )';
 % %     
-     OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
-%      OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV )';
-% %     
-% %     OVzd = (OVz1d+OVz2d)./2;
-% %     OVzd = smooth(OVzd,5);
-% %     
-% %     OVza = (OVz1a+OVz2a)./2;
- OVza = OVz1a;
-    OVza = smooth(OVza,10);
-%      normfac = OVza(end);
-%     OVza = OVza./normfac;
-%     plot(Q.Zmes1./1000,OVnw,'y')
-    
-     OVza(OVza>=1)=1;
-%     OVz = [OVza;OVzd]; 
-      OV = interp1(Q.Zmes1,OVza,Q.Zret); % this is to smooth
-      OV(isnan(OV))=1;
+%      OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
+% %      OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV )';
+% % %     
+% % %     OVzd = (OVz1d+OVz2d)./2;
+% % %     OVzd = smooth(OVzd,5);
+% % %     
+% % %     OVza = (OVz1a+OVz2a)./2;
+%  OVza = OVz1a;
+%     OVza = smooth(OVza,10);
+% %      normfac = OVza(end);
+% %     OVza = OVza./normfac;
+% %     plot(Q.Zmes1./1000,OVnw,'y')
+%     
+%      OVza(OVza>=1)=1;
+% %     OVz = [OVza;OVzd]; 
+%       OV = interp1(Q.Zmes1,OVza,Q.Zret); % this is to smooth
+%       OV(isnan(OV))=1;
 %     OV(OV>=1)=1;
 %     h = find(Q.Zret>=4500);
 % %     h = find(OV==1);
