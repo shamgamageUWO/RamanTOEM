@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 5;
+Q.coaddalt = 4;
  Q.Rgas = 8.3145;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -34,7 +34,7 @@ Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
 Q.deadtimeJL = 3.8e-9; % 4ns
-Q.deadtimeJH = 3.7e-9; % 4ns
+Q.deadtimeJH = 3.8e-9; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 
@@ -141,7 +141,7 @@ disp('Defined grids ')
 obj2 = Gravity(Q.Zmes, 46.82);
 Q.grav = obj2.accel;
 Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
-Q.z0 = 30000;            
+Q.z0 = 25000;            
 [Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);  
 disp('a priori temperature profile is loaded ')
 
@@ -229,8 +229,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,15);
- [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,12);
+ [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,24);
+ [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,24);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -241,7 +241,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 4000
+                    if Q.Zmes1(i) <= 3500
                         Q.YYa(i) = Q.JLav(i);
                     else
                         Q.YYa(i) = Q.JLav(i);
@@ -267,7 +267,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 20000
+            if  Q.Zmes2(i) <= 8000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = JHreal(i);
