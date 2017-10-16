@@ -63,25 +63,30 @@ disp('All the constants are ready')
 % % Analog measurements
  Q.JHreal = Y.JHa;
  Q.JLreal = Y.JLa;
-Eba = Y.Eba;
+% Eba = Y.Eba;
  Q.ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=100 & ANalt <= 10000);
-Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=10000);
-Q.JLnewa= JLnewa(ANalt>=100 & ANalt <=10000);
-Q.ANalt = ANalt(ANalt>=100);
-% Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 10000);
+% % Q.Eba = Eba(alt>=50 & alt<6000);
+% % Q.Eba(Q.Eba <=0)= rand();
+% % Q.JHnewa= JHnewa(alt>=50 & alt<5000);
+% % Q.JLnewa= JLnewa(alt>=50 & alt<5000);
+% % % Q.ANalt = ANalt(alt>=50 & alt<5000);
+% Q.Eba = Eba(ANalt>=100 & ANalt <= 10000);
+% Q.Eba(Q.Eba <=0)= rand();
+% Q.JHnewa= JHnewa(ANalt>=100 & ANalt <=10000);
+% Q.JLnewa= JLnewa(ANalt>=100 & ANalt <=10000);
+% Q.ANalt = ANalt(ANalt>=100);
+% % Q.Zmes = Q.ANalt';
+% Q.Zmes1 = ANalt(ANalt>=100 & ANalt <= 10000);
 % Q.Zmes1 = Q.Zmes1';
-Q.Zmes = Q.Zmes1;
+% Q.Zmes = Q.Zmes1;
 % %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
 
 
 % Q.BaJL = Y.bgJL;%0.297350746852139; % change later
 % Q.BaJH = Y.bgJH;%4.998109499057194e-04;
-Q.BaJLa = Y.bgJLa;%0.297350746852139; % change later
-Q.BaJHa = Y.bgJHa;%4.998109499057194e-04;
+Q.BaJLa = 119;%Y.bgJLa;%0.297350746852139; % change later
+Q.BaJHa = 61;%Y.bgJHa;%4.998109499057194e-04;
 % Q.BaJLa = 10;%0.297350746852139; % change later
 % Q.BaJHa = 20;%4.998109499057194e-04;
 disp('Loaded RALMO measurements ')
@@ -110,8 +115,8 @@ disp('Loaded RALMO measurements ')
 % Q.Zmes = Q.Zmes1;%[Q.Zmes1 Q.Zmes2];% Measurement grid
 % Q.Zmes = Q.Zmes(1:N-zAoffset);
 % Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:10000;% Retrieval grid
-% Q.Zmes1 = 100:10:12000;
-% Q.Zmes = Q.Zmes1;
+Q.Zmes1 = 100:10:12000;
+Q.Zmes = Q.Zmes1;
 Q.Zret = Q.Zmes1(1):(Q.Zmes1(2)-Q.Zmes1(1))*10:12000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
