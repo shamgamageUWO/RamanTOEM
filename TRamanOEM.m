@@ -294,7 +294,7 @@ CJLa
                     
                     
                     figure; 
-%                      subplot(1,3,1)
+                      subplot(1,3,1)
                      plot(X.x(1:m) - (Tsonde'),Q.Zret./1000)
                      hold on;
                      plot(X.eo(1:m),Q.Zret./1000,'r',-X.eo(1:m),Q.Zret./1000,'r')
@@ -303,24 +303,22 @@ CJLa
                      xlabel('Temperature residuals(T OEM - T sonde) (K)')
                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
                      
-%                     subplot(1,3,2)
-%                      plot(X.x(1:m) - (Q.Ttradi),Q.Zret./1000)
-%                      hold on;
-%                      plot(X.eo(1:m),Q.Zret./1000,'r',-X.eo(1:m),Q.Zret./1000,'r')
-%                      hold off;
-%                      grid on;
-%                      xlabel('Temperature residuals(T OEM - T traditional) (K)')
-%                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
-%                      
-%                       subplot(1,3,2)
-%                      plot((Q.Ttradi)-(Tsonde'),Q.Zret./1000)
-% %                      hold on;
-% %                      plot(X.eo(1:m),Q.Zret./1000,'r',-X.eo(1:m),Q.Zret./1000,'r')
-% %                      hold off;
-%                      grid on;
-%                      xlabel('Temperature residuals(T OEM - T traditional) (K)')
-%                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
-%                      
+                    subplot(1,3,2)
+                     plot(X.x(1:m) - (Q.Ttradi'),Q.Zret./1000)
+                     hold on;
+                     plot(X.eo(1:m),Q.Zret./1000,'r',-X.eo(1:m),Q.Zret./1000,'r')
+                     hold off;
+                     grid on;
+                     xlabel('Temperature residuals(T OEM - T traditional) (K)')
+                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+                     
+                      subplot(1,3,3)
+                     plot((Q.Ttradi)-(Tsonde),Q.Zret./1000,'r',X.x(1:m) - (Q.Ttradi'),Q.Zret./1000,'b',X.x(1:m) - (Tsonde'),Q.Zret./1000,'g')
+
+                     grid on;
+                     xlabel('Temperature residuals (K)')
+                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+                         legend('Traditional-Sonde','OEM - Traditional','OEM - Sonde') 
 % (mchanA+1:2*mchanA))./y(mchanA+1:2*mchanA)
 %                     %% Percent difference of background, lidar calibration constant retrievals and the true
 % 

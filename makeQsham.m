@@ -66,13 +66,13 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=1000 & ANalt <= 6000);
+Q.Eba = Eba(ANalt>=500 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=6000);
-Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=6000);
-Q.ANalt = ANalt(ANalt>=1000);
+Q.JHnewa= JHnewa(ANalt>=500 & ANalt <=6000);
+Q.JLnewa= JLnewa(ANalt>=500 & ANalt <=6000);
+Q.ANalt = ANalt(ANalt>=500);
 % Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 6000);
+Q.Zmes1 = ANalt(ANalt>=500 & ANalt <= 6000);
  Q.Zmes1 = Q.Zmes1';
 Q.Zmes = Q.Zmes1;
 % %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
@@ -211,8 +211,8 @@ Q.n4=length(Q.JLnewa);
 % above 2 km use the counts
 
 
- [JHav,go1] =bobpoissontest(Q.JHnewa',Q.Zmes1,24);
- [JLav,go2] =bobpoissontest(Q.JLnewa',Q.Zmes1,24);
+ [JHav,go1] =bobpoissontest(Q.JHnewa',Q.Zmes1,12);
+ [JLav,go2] =bobpoissontest(Q.JLnewa',Q.Zmes1,12);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -223,19 +223,19 @@ Q.n4=length(Q.JLnewa);
             
 
                 for i = 1: length(Q.JLav)
-%                     if Q.Zmes(i) <= 6000
+                     if Q.Zmes(i) <= 4000
                         Q.YYa(i) = Q.JLav(i);
-%                     else
-%                         Q.YYa(i) = .1.*Q.JLav(i);
-%                     end
+                     else
+                         Q.YYa(i) = .1.*Q.JLav(i);
+                     end
                 end
                 
                 for i = 1: length(Q.JHav)
-%                     if  Q.Zmes(i) <= 6000
+                     if  Q.Zmes(i) <= 4000
                         Q.YYYa(i) = Q.JHav(i);
-%                     else
-%                         Q.YYYa(i) = .1.*Q.JHav(i);
-%                     end
+                     else
+                         Q.YYYa(i) = .1.*Q.JHav(i);
+                     end
                 end
 
             
@@ -251,6 +251,49 @@ Q.n4=length(Q.JLnewa);
 
 disp('Estimations for CJL, backgrounds and overlap done ')
 disp('makeQ complete ')
+
+% Traditional Temperature
+
+
+% Q = L./H;
+% Tprofile = (1./log(Q));
+
+% D1 = 1./Tprofile(ind);
+% D2 = Tsonde(ind);
+% 
+% % fit using y = a/(x+b)
+% 
+% ft=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
+% fo = fitoptions('method','NonlinearLeastSquares','Robust','On');
+% set(fo, 'StartPoint',[350, 0.3]);
+% 
+% [cf gof] = fit(D1,D2,ft,fo);
+
+Q_an = (Q.JLnewa -Q.BaJLa) ./(Q.JHnewa-Q.BaJHa);
+Tprofile = 1./log(Q_an);
+
+y_a = (Q.Tsonde);
+y_a = y_a( Q.Zmes>=1500 & Q.Zmes<=3000);
+x_a = 1./Tprofile( Q.Zmes>=1500 & Q.Zmes<=3000);
+
+ft=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
+fo = fitoptions('method','NonlinearLeastSquares','Robust','On');
+set(fo, 'StartPoint',[350, 0.3]);
+
+% [cf gof] = fit(D1,D2,ft,fo);
+
+[f_a,gofa] = fit(x_a,y_a',ft,fo);
+% figure;
+% plot(f_a,x_a,y_a)
+% fl =coeffvalues(f_a);
+a = f_a.a;
+b = f_a.b;
+
+Ttradi = a./(1./Tprofile +b);
+Q.Ttradi = interp1(Q.Zmes,Ttradi,Q.Zret,'linear'); % this goes to CJL estimation
+
+% figure;plot(Q.Traditional,Q.Zmes./1000,Q.Tsonde,Q.Zmes./1000)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
