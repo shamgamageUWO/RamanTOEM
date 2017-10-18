@@ -313,7 +313,7 @@ CJLa
                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
                      
                       subplot(1,3,3)
-                     plot((Q.Ttradi)-(Tsonde),Q.Zret./1000,'r',X.x(1:m) - (Q.Ttradi'),Q.Zret./1000,'b',X.x(1:m) - (Tsonde'),Q.Zret./1000,'g')
+                     plot(abs(Q.Ttradi-Tsonde),Q.Zret./1000,'r',abs(X.x(1:m) - Q.Ttradi'),Q.Zret./1000,'b',abs(X.x(1:m) - Tsonde'),Q.Zret./1000,'g')
 
                      grid on;
                      xlabel('Temperature residuals (K)')
