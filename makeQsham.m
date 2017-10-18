@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 5;
+Q.coaddalt = 4;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -34,10 +34,10 @@ Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJL = 3.9e-9; % 4ns
-Q.deadtimeJH = 4e-9; % 4ns
-Q.CovDTJL = (1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (1 .*Q.deadtimeJH).^2;
+Q.deadtimeJL = 3.8e-9; % 4ns
+Q.deadtimeJH = 3.8e-9; % 4ns
+Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (.1 .*Q.deadtimeJH).^2;
 
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -58,13 +58,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=1000);
+Q.Eb = Eb(alt>=1500);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=1000);
-Q.JLnew= JLnew(alt>=1000);
-Q.JH_DS =JH_DS(alt>=1000);
-Q.JL_DS =JL_DS(alt>=1000);
-Q.alt = alt(alt>=1000);
+Q.JHnew= JHnew(alt>=1500);
+Q.JLnew= JLnew(alt>=1500);
+Q.JH_DS =JH_DS(alt>=1500);
+Q.JL_DS =JL_DS(alt>=1500);
+Q.alt = alt(alt>=1500);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -255,13 +255,13 @@ Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 % above 2 km use the counts
 
 % Q.yvar = diag(Q.y);
-             [JHv,go] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
+             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
              [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,12);
 % 
 % 
 %             
-             r1 = ones(1,go-1).* JHv(1);
-             r2 = ones(1,go-1).* JHv(end);
+             r1 = ones(1,go1-1).* JHv(1);
+             r2 = ones(1,go1-1).* JHv(end);
              r3 = ones(1,go-1).* JLv(1);
              r4 = ones(1,go-1).* JLv(end);
              Q.JHv = [r1 JHv r2];
@@ -300,7 +300,7 @@ Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 3000
+            if Q.Zmes2(i) <= 10000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) =  Q.JLnew(i);
@@ -308,7 +308,7 @@ Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 3000
+            if  Q.Zmes2(i) <= 8000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) =  Q.JHnew(i);
@@ -339,18 +339,29 @@ disp('makeQ complete ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Traditional Method 
-Q_Digi = (Q.JH_DS-Q.BaJH) ./(Q.JL_DS - Q.BaJL );
-y_d = log(Q_Digi);
-x_d = (1./Q.Tsonde);
-y = y_d( Q.Zmes>=8000 & Q.Zmes<=10000);
-x = x_d( Q.Zmes>=8000 & Q.Zmes<=10000);
-
-g = fittype('a*x+b','coeff',{'a','b'});
-fit34 = fit(x',y,g,'Robust','on');
-s= coeffvalues(fit34);
-a = s(1);
-b = s(2);
-Q.Traditional = a./(y_d-b);
+Q_an = (Q.JL_DS -Q.BaJL) ./(Q.JH_DS-Q.BaJH);
+Tprofile = 1./log(Q_an);
+ 
+y_a = (Q.Tsonde);
+y_a = y_a( Q.Zmes>=4000 & Q.Zmes<=10000);
+x_a = 1./Tprofile( Q.Zmes>=4000 & Q.Zmes<=10000);
+ 
+ft=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
+fo = fitoptions('method','NonlinearLeastSquares','Robust','On');
+set(fo, 'StartPoint',[350, 0.3]);
+ 
+% [cf gof] = fit(D1,D2,ft,fo);
+ 
+[f_a,gofa] = fit(x_a,y_a',ft,fo);
+% figure;
+% plot(f_a,x_a,y_a)
+% fl =coeffvalues(f_a);
+a = f_a.a;
+b = f_a.b;
+ 
+Q.Traditional = real(a./(1./Tprofile +b));
+Q.Ttradi = interp1(Q.Zmes,Q.Traditional,Q.Zret,'linear'); 
+% figure;plot(Q.Traditional(Q.Zmes<=30000),Q.Zmes(Q.Zmes<=30000)./1000,Q.Tsonde(Q.Zmes<=30000),Q.Zmes(Q.Zmes<=30000)./1000)
 
 end
 

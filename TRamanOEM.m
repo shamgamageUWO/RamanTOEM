@@ -248,6 +248,35 @@ DT_JL
                     ylabel('Altitude (km)')
 
 
+                    
+                        figure; 
+                      subplot(1,3,1)
+                     plot(X.x(1:m) - (Q.Tsonde2'),Q.Zret./1000)
+                     hold on;
+                     plot(X.eo(1:m),Q.Zret./1000,'r',-X.eo(1:m),Q.Zret./1000,'r')
+                     hold off;
+                     grid on;
+                     xlabel('Temperature residuals(T OEM - T sonde) (K)')
+                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+                     
+                    subplot(1,3,2)
+                     plot(X.x(1:m) - (Q.Ttradi'),Q.Zret./1000)
+                     hold on;
+                     plot(X.eo(1:m),Q.Zret./1000,'r',-X.eo(1:m),Q.Zret./1000,'r')
+                     hold off;
+                     grid on;
+                     xlabel('Temperature residuals(T OEM - T traditional) (K)')
+                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+                     
+                      subplot(1,3,3)
+                     plot(abs(Q.Ttradi-Q.Tsonde2),Q.Zret./1000,'r',abs(X.x(1:m) - Q.Ttradi'),Q.Zret./1000,'b',abs(X.x(1:m) - Q.Tsonde2'),Q.Zret./1000,'g')
+ 
+                     grid on;
+                     xlabel('Temperature residuals (K)')
+                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+                         legend('Traditional-Sonde','OEM - Traditional','OEM - Sonde') 
+
+                    
 %                     subplot(2,2,3)
 %                     grid on;
 %                     % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes1(Q.ind)./1000)
