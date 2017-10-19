@@ -244,7 +244,7 @@ bkg_ind2 = Alt>50e3;
         JHn = JH./(Q.deltatime.*Q.coaddalt);
         JLn = JL./(Q.deltatime.*Q.coaddalt);
         
-        % 2. Convert counts to Hz
+        % 2. Convert counts to MHz
         JHnwn = (JHn./F);
         JLnwn = (JLn./F);
 

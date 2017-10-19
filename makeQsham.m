@@ -34,7 +34,7 @@ Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
 Q.deadtimeJL = 3.8e-9; % 4ns
-Q.deadtimeJH = 3.8e-9; % 4ns
+Q.deadtimeJH = 3.7e-9; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 
@@ -78,12 +78,12 @@ Q.Eba(Q.Eba <=0)= rand();
 Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=6000);
 Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=6000);
 Q.ANalt = ANalt(ANalt>=1000);
-Q.Zmes = Q.ANalt';
+% Q.Zmes = Q.ANalt';
 Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
-
+Q.Zmes = [Q.Zmes1 Q.Zmes2];
 
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
 Q.BaJH = Y.bgJH;%4.998109499057194e-04;
@@ -241,10 +241,10 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 3500
+                    if Q.Zmes1(i) <= 3000
                         Q.YYa(i) = Q.JLav(i);
                     else
-                        Q.YYa(i) = Q.JLav(i);
+                        Q.YYa(i) = 0.1.*Q.JLav(i);
                     end
                 end
                 
@@ -252,7 +252,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
                     if  Q.Zmes1(i) <= 3000
                         Q.YYYa(i) = Q.JHav(i);
                     else
-                        Q.YYYa(i) = Q.JHav(i);
+                        Q.YYYa(i) = 0.1.*Q.JHav(i);
                     end
                 end
 
