@@ -31,10 +31,10 @@ Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
  Q.Rgas = 8.3145;%Hz
-Q.deadtimeJL = 3.9e-9; % 4ns
+Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
-Q.CovDTJL = (001.*Q.deadtimeJL).^2;
-Q.CovDTJH = (001 .*Q.deadtimeJH).^2;
+Q.CovDTJL = (00.1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (00.1 .*Q.deadtimeJH).^2;
 
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -98,11 +98,11 @@ disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
-Q.Zmes1 = 500:25:6000;
-Q.Zmes2 = 4000:25:55000;
-Q.Zmes = 500:25:55000;
+Q.Zmes1 = 50:50:3000;
+Q.Zmes2 = 3000:50:55000;
+Q.Zmes = 50:50:55000;
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Q.Zret = 500:50:60000;% Retrieval grid
+Q.Zret = 50:500:60000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
 % Yc = [Q.JHnewa;Q.JHnew]
@@ -129,13 +129,15 @@ Q.z0 = 30000;
 [Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);  
 disp('a priori temperature profile is loaded ')
 
-[Tmsis, pmsis,zmsis]= msisRALMO;
-%  [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
-%  Zsonde = Zsonde-491; % altitude correction
+% [Tmsis, pmsis,zmsis]= msisRALMO;
+  [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
+  Zsonde = Zsonde-491; % altitude correction
 % 
 % Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
 % Q.Psonde = interp1(Zsonde,Psonde,Q.Zmes,'linear'); % this goes asr 
-  Q.Tsonde2 = interp1(zmsis,Tmsis,Q.Zret,'linear'); % this goes to CJL estimation
+%   Q.Tsonde2 = interp1(zmsis,Tmsis,Q.Zret,'linear'); % this goes to CJL estimation
+  Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
+
 %%%%%
 
 % Calculate the aerosol attenuation
@@ -203,13 +205,15 @@ Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                         % this need to be done if there is any zeros in the real measurements
                         % smooth the signal over 1
                         
-xx = [Q.Tsonde2 Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
+xx = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
 
 [JLreal,JHreal,JLarealNO,JHarealNO]=forwardmodelTraman(Q,xx);
 JLreal = NoiseP(JLreal);
 JHreal = NoiseP(JHreal);
 JLareal = awgn(JLarealNO,2);
 JHareal = awgn(JHarealNO,2);
+% JLareal = JLarealNO;
+% JHareal = JHarealNO;
 
 %  Q.JLav= JLareal./2;
 %  Q.JHav= JHareal./2;
@@ -243,8 +247,8 @@ Q.n4=length(Q.JLnewa);
 % above 2 km use the counts
 
 % Q.yvar = diag(Q.y);
-             [JHv,go] =bobpoissontest(Q.JHnew,Q.Zmes2,8);
-             [JLv,go] =bobpoissontest(Q.JLnew,Q.Zmes2,8);
+             [JHv,go] =bobpoissontest(Q.JHnew,Q.Zmes2,12);
+             [JLv,go] =bobpoissontest(Q.JLnew,Q.Zmes2,12);
 % 
 % 
 %             
@@ -256,8 +260,8 @@ Q.n4=length(Q.JLnewa);
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(Q.JHnewa,Q.Zmes1,12);
- [JLav,go2] =bobpoissontest(Q.JLnewa,Q.Zmes1,12);
+ [JHav,go1] =bobpoissontest(Q.JHnewa,Q.Zmes1,4);
+ [JLav,go2] =bobpoissontest(Q.JLnewa,Q.Zmes1,4);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -270,37 +274,37 @@ Q.n4=length(Q.JLnewa);
 % slope1 = (((0.05-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 4000
+                    if Q.Zmes1(i) <= 3000
                         Q.YYa(i) = (Q.JLav(i));
                     else
-                        Q.YYa(i) = .1.*(Q.JLav(i));
+                        Q.YYa(i) = (10.*Q.JLav(i));
                     end
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes1(i) <= 6000
+                    if  Q.Zmes1(i) <= 3000
                         Q.YYYa(i) = (Q.JHav(i));
                     else
-                        Q.YYYa(i) = 0.1.*(Q.JHav(i));
+                        Q.YYYa(i) = 10.*Q.JHav(i);
                     end
                 end
 
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 1000
-                Q.YY(i) = Q.JLv(i);
-            else
+%             if Q.Zmes2(i) <= 3000
+%                 Q.YY(i) = Q.JLv(i);
+%             else
                 Q.YY(i) = Q.JLnew(i);
-            end
+%             end
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 1000
-                Q.YYY(i) = Q.JHv(i);
-            else
+%             if  Q.Zmes2(i) <= 3000
+%                 Q.YYY(i) = Q.JHv(i);
+%             else
                 Q.YYY(i) = Q.JHnew(i);
-            end
+%             end
         end
 
 %         Q.Yvar =[YYY YY JHav JLav];
