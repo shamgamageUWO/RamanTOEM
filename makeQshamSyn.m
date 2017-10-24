@@ -101,11 +101,11 @@ disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
-Q.Zmes1 = 1000:50:6000;
-Q.Zmes2 = 4000:50:55000;
-Q.Zmes = 1000:50:55000;
+Q.Zmes1 = 50:50:3000;
+Q.Zmes2 = 3000:50:55000;
+Q.Zmes = 50:50:55000;
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Q.Zret = 1000:100:60000;% Retrieval grid
+Q.Zret = 50:500:60000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
 % Yc = [Q.JHnewa;Q.JHnew]
@@ -271,7 +271,7 @@ Q.n4=length(Q.JLnewa);
 % slope1 = (((0.05-1).*Q.Zmes1)/(Q.Zmes1(end)))+1;
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 4000
+                    if Q.Zmes1(i) <= 3000
                         Q.YYa(i) = Q.JLav(i);
                     else
                         Q.YYa(i) = .1.*Q.JLav(i);
@@ -289,7 +289,7 @@ Q.n4=length(Q.JLnewa);
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 3000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = Q.JLnew(i);
@@ -297,7 +297,7 @@ Q.n4=length(Q.JLnewa);
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
+            if  Q.Zmes2(i) <= 3000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = Q.JHnew(i);
