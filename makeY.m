@@ -69,13 +69,17 @@ load(folderpath);
 % disp('Start time')
 g = hour(S0.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
 Minute = minute(S0.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
-start =  [g(1) Minute(1)];
+
+% from 2300 to 2330
+starttime=find(g==23 & Minute==00);
+endtime=find(g==23 & Minute==30);
+% start =  [g(1) Minute(1)];
 % start
 
 %
 % disp('End time')
 % gg = hour(S0.GlobalParameters.End);
-endtime =  [g(end) Minute(end)];
+% endtime =  [g(end) Minute(end)];
 % endtime;
 
 % pick the measurements from 11-11.30
@@ -99,15 +103,15 @@ alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 %   hold on;
 
 
-JL = S0.Channel(12).Signal(:,961:990);%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
-JH = S0.Channel(4).Signal(:,961:990);%20120717(:,1347:1377);%(:,961:990);
-Eb= S0.Channel(10).Signal(:,961:990);%20120717(:,1347:1377);%(:,961:990);
+JL = S0.Channel(12).Signal(:,starttime:endtime);%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
+JH = S0.Channel(4).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
+Eb= S0.Channel(10).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
 
 
 
-JL_an = S0.Channel(11).Signal(:,961:990);%20120717(:,1347:1377);%(:,961:990);
-JH_an = S0.Channel(3).Signal(:,961:990);%20120717(:,1347:1377);%(:,961:990);
-Eb_an = S0.Channel(9).Signal(:,961:990);%20120717(:,1347:1377);%(:,961:990);
+JL_an = S0.Channel(11).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
+JH_an = S0.Channel(3).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
+Eb_an = S0.Channel(9).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
 JL_an = JL_an';
 JH_an = JH_an';
 

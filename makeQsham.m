@@ -57,13 +57,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=3000);
+Q.Eb = Eb(alt>=4000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=3000);
-Q.JLnew= JLnew(alt>=3000);
-Q.JH_DS =JH_DS(alt>=3000);
-Q.JL_DS =JL_DS(alt>=3000);
-Q.alt = alt(alt>=3000);
+Q.JHnew= JHnew(alt>=4000);
+Q.JLnew= JLnew(alt>=4000);
+Q.JH_DS =JH_DS(alt>=4000);
+Q.JL_DS =JL_DS(alt>=4000);
+Q.alt = alt(alt>=4000);
 Q.Zmes2 = Q.alt';
 
 Q.f = 1e6./(Y.F);
@@ -73,13 +73,13 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=1000 & ANalt <= 6000);
+Q.Eba = Eba(ANalt>=500 & ANalt <= 4000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=6000);
-Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=6000);
-Q.ANalt = ANalt(ANalt>=1000);
+Q.JHnewa= JHnewa(ANalt>=500 & ANalt <=4000);
+Q.JLnewa= JLnewa(ANalt>=500 & ANalt <=4000);
+Q.ANalt = ANalt(ANalt>=500);
 % Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 6000);
+Q.Zmes1 = ANalt(ANalt>=500 & ANalt <= 4000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -103,7 +103,7 @@ Q.n4=length(Q.JLnewa);
 
 %% Define grid sizes
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:70000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*30:70000;% Retrieval grid
 disp('Defined grids ')
 
 % slopeDT= (1-0.1)/(Q.Zret(1)-Q.Zret(end));
@@ -229,8 +229,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,24);
- [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,24);
+ [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,12);
+ [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,12);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);
@@ -241,18 +241,18 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 3000
+                    if Q.Zmes1(i) <= 4000
                         Q.YYa(i) = Q.JLav(i);
                     else
-                        Q.YYa(i) = 0.1.*Q.JLav(i);
+                        Q.YYa(i) = 10.*Q.JLav(i);
                     end
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes1(i) <= 3000
+                    if  Q.Zmes1(i) <= 4000
                         Q.YYYa(i) = Q.JHav(i);
                     else
-                        Q.YYYa(i) = 0.1.*Q.JHav(i);
+                        Q.YYYa(i) = 10.*Q.JHav(i);
                     end
                 end
 
