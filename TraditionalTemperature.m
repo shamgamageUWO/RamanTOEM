@@ -8,6 +8,8 @@ datadirS0='/Users/sham/Desktop';
 file1 = 'S0';
 folderpath1 = [datadirS0 filesep  file1];
 
+
+
 datadirS3='/Users/sham/Desktop';
 % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
 file = 'S3';
@@ -17,6 +19,19 @@ load(folderpath1);
 load(folderpath);
 
 
+g = hour(S0.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
+Minute = minute(S0.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
+
+% from 2300 to 2330
+starttime=find(g==23 & Minute==00);
+endtime=find(g==23 & Minute==30);
+
+g1 = hour(S3.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
+Minute1 = minute(S3.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
+% from 2300 to 2330
+starttime1=find(g1==23 & Minute1==00);
+endtime1=find(g1==23 & Minute1==30);
+
 alt =  S0.Channel(4).Range;
 alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 %% Load the analog channel measurements too 
@@ -24,22 +39,22 @@ alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 %   hold on;
 
 
-JL = S0.Channel(12).Signal(:,961:990);
-JH = S0.Channel(4).Signal(:,961:990);
-Eb= S0.Channel(10).Signal(:,961:990);
+JL = S0.Channel(12).Signal(:,starttime:endtime);
+JH = S0.Channel(4).Signal(:,starttime:endtime);
+Eb= S0.Channel(10).Signal(:,starttime:endtime);
 
 
 
-JL_an = S0.Channel(11).Signal(:,961:990);
-JH_an = S0.Channel(3).Signal(:,961:990);
-Eb_an = S0.Channel(9).Signal(:,961:990);
+JL_an = S0.Channel(11).Signal(:,starttime:endtime);
+JH_an = S0.Channel(3).Signal(:,starttime:endtime);
+Eb_an = S0.Channel(9).Signal(:,starttime:endtime);
 
 JL_an = JL_an';
 JH_an = JH_an';
 
-JL_Com = S3.JL.Combined.Signal(:,118:147);
-JH_Com = S3.JH.Combined.Signal(:,118:147);%;(:,1347:1377)
-Eb_Com = S3.Eb.Combined.Signal(:,118:147);
+JL_Com = S3.JL.Combined.Signal(:,starttime1:endtime1);
+JH_Com = S3.JH.Combined.Signal(:,starttime1:endtime1);%;(:,1347:1377)
+Eb_Com = S3.Eb.Combined.Signal(:,starttime1:endtime1);
 alt_Com = S3.JL.Combined.Range;
 
 
