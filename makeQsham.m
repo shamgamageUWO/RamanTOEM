@@ -109,7 +109,7 @@ Q.n4=length(Q.JLnewa);
 
 %% Define grid sizes
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:70000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*4:65000;% Retrieval grid
 disp('Defined grids ')
 
 
@@ -170,11 +170,11 @@ Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
-load('ovmodeldata.mat');
-OVnw = interp1(z,epsi,Q.Zret,'linear');
-OVnw(isnan(OVnw))=1;
-Q.OVa = OVnw;
-%  Q.OVa = ones(1,length(Q.Ta));
+% load('ovmodeldata.mat');
+% OVnw = interp1(z,epsi,Q.Zret,'linear');
+% OVnw(isnan(OVnw))=1;
+% Q.OVa = OVnw;
+ Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 

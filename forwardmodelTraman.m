@@ -29,7 +29,7 @@ area = pi * (0.3^2);
 R_tr_i = (Q.Tr);
 
 R_tr_id = interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
- R_tr_ia = interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
+R_tr_ia = interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
 
 
 

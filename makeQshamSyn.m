@@ -101,9 +101,11 @@ disp('Loaded RALMO measurements ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Define grid sizes
+% z1 = 50:50:3000;
+% z2=3000:100:5000;
 Q.Zmes1 = 50:50:3000;
 Q.Zmes2 = 3000:50:55000;
-Q.Zmes = 50:50:55000;
+Q.Zmes = [Q.Zmes1 Q.Zmes2];
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 Q.Zret = 50:500:60000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
@@ -167,11 +169,11 @@ disp('R is calibrated ')
 %% Estimating background and lidar constant wrt a priori 
 
 % [CJL, CJLa,CJHa,CJH] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
- load('ovmodeldata.mat');
- OVnw = interp1(z,epsi,Q.Zret,'linear');
- OVnw(isnan(OVnw))=1;
- Q.OVa = OVnw;
-% Q.OVa = ones(1,length(Q.Ta));
+%  load('ovmodeldata.mat');
+%  OVnw = interp1(z,epsi,Q.Zret,'linear');
+%  OVnw(isnan(OVnw))=1;
+%  Q.OVa = OVnw;
+Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
