@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 4;
+Q.coaddalt = 8;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -34,7 +34,7 @@ Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJL = 3.8e-9; % 4ns
+Q.deadtimeJL = 3.9e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1 .*Q.deadtimeJH).^2;
@@ -58,13 +58,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=1500);
+Q.Eb = Eb(alt>=500);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=1500);
-Q.JLnew= JLnew(alt>=1500);
-Q.JH_DS =JH_DS(alt>=1500);
-Q.JL_DS =JL_DS(alt>=1500);
-Q.alt = alt(alt>=1500);
+Q.JHnew= JHnew(alt>=500);
+Q.JLnew= JLnew(alt>=500);
+Q.JH_DS =JH_DS(alt>=500);
+Q.JL_DS =JL_DS(alt>=500);
+Q.alt = alt(alt>=500);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -118,7 +118,7 @@ Q.n2=length(Q.JLnew);
 % Q.Zmes = Q.Zmes1;%[Q.Zmes1 Q.Zmes2];% Measurement grid
 % Q.Zmes = Q.Zmes(1:N-zAoffset);
 % Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:10000;% Retrieval grid
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:70000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:65000;% Retrieval grid
 % Q.Zret = [Z1 Z2];% Retrieval grid
 disp('Defined grids ')
 % Yc = [Q.JHnewa;Q.JHnew]
@@ -207,7 +207,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 % Q.CLa = CJLa;
 % Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
@@ -300,7 +300,7 @@ Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 10000
+            if Q.Zmes2(i) <= 8000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) =  Q.JLnew(i);
@@ -338,29 +338,34 @@ disp('Estimations for CJL, backgrounds and overlap done ')
 disp('makeQ complete ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Traditional Method 
-Q_an = (Q.JL_DS -Q.BaJL) ./(Q.JH_DS-Q.BaJH);
-Tprofile = 1./log(Q_an);
- 
-y_a = (Q.Tsonde);
-y_a = y_a( Q.Zmes>=4000 & Q.Zmes<=10000);
-x_a = 1./Tprofile( Q.Zmes>=4000 & Q.Zmes<=10000);
- 
-ft=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
-fo = fitoptions('method','NonlinearLeastSquares','Robust','On');
-set(fo, 'StartPoint',[350, 0.3]);
- 
-% [cf gof] = fit(D1,D2,ft,fo);
- 
-[f_a,gofa] = fit(x_a,y_a',ft,fo);
-% figure;
-% plot(f_a,x_a,y_a)
-% fl =coeffvalues(f_a);
-a = f_a.a;
-b = f_a.b;
- 
-Q.Traditional = real(a./(1./Tprofile +b));
-Q.Ttradi = interp1(Q.Zmes,Q.Traditional,Q.Zret,'linear'); 
+load('Temperature20110909.mat');
+% Q.Ttradi = 
+
+% % Traditional Method 
+% Q_an = (Q.JL_DS -Q.BaJL) ./(Q.JH_DS-Q.BaJH);
+% Tprofile = 1./log(Q_an);
+%  
+% y_a = (Q.Tsonde);
+% y_a = y_a( Q.Zmes>=4000 & Q.Zmes<=10000);
+% x_a = 1./Tprofile( Q.Zmes>=4000 & Q.Zmes<=10000);
+%  
+% ft=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
+% fo = fitoptions('method','NonlinearLeastSquares','Robust','On');
+% set(fo, 'StartPoint',[350, 0.3]);
+%  
+% % [cf gof] = fit(D1,D2,ft,fo);
+%  
+% [f_a,gofa] = fit(x_a,y_a',ft,fo);
+% % figure;
+% % plot(f_a,x_a,y_a)
+% % fl =coeffvalues(f_a);
+% a = f_a.a;
+% b = f_a.b;
+%  
+% Q.Traditional = real(a./(1./Tprofile +b));
+Q.Ttradi = interp1(T.alt_digi,T.T_dg,Q.Zret,'linear'); 
+Q.Tanalog = T.T_an(T.alt_an<=6000);
+Q.Aanalog = T.alt_an(T.alt_an<=6000);
 % figure;plot(Q.Traditional(Q.Zmes<=30000),Q.Zmes(Q.Zmes<=30000)./1000,Q.Tsonde(Q.Zmes<=30000),Q.Zmes(Q.Zmes<=30000)./1000)
 
 end

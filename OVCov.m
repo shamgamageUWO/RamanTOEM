@@ -8,7 +8,7 @@ function [S_OV]=OVCov(Zj,OV)
  m = length(OV);
  n = m;
  S_OV =zeros(n,n);
- lengthcT = 150; % =3000; % only need m of these
+ lengthcT = 1000; % =3000; % only need m of these
  lc = lengthcT.*ones(1,m);
  l = size(OV);
  

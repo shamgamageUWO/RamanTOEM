@@ -172,7 +172,7 @@ DT_JL
 % Tsonde = interp1(Zsonde,Tsonde,Q.Zret);Q.Tsonde2
                     figure;
                     subplot(1,2,1)
-                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Tsonde2,Q.Zret./1000,'b')
+                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Tsonde2,Q.Zret./1000,'b',Q.Ttradi,Q.Zret./1000,'m',Q.Tanalog,Q.Aanalog./1000,'y')
 % plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Q.Traditional(Q.Zmes<=25000),Q.Zmes(Q.Zmes<=25000)./1000,'m')
 % 
                     grid on;
@@ -182,7 +182,7 @@ DT_JL
                     % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
                     xlabel('Temperature (K)')
                     ylabel('Altitude(km)')
-                    legend('T a priori','T OEM','T sonde')
+                    legend('T a priori','T OEM','T sonde','T Traditional','T analog')
                     hold off;
 % 
 %                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
