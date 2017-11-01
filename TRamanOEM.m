@@ -129,7 +129,8 @@ DT_JL
 % 
 %                     %% Plot Avg Kenerl
 % 
-                    response = sum(X.A(1:m,1:m));
+                     response = sum(X.A(1:m,1:m));
+                                 
                     % Vertical resolution
                     width = zeros(size(Q.Zret));
                     for j = 1:m % fini
@@ -172,7 +173,7 @@ DT_JL
 % Tsonde = interp1(Zsonde,Tsonde,Q.Zret);Q.Tsonde2
                     figure;
                     subplot(1,2,1)
-                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Tsonde2,Q.Zret./1000,'b',Q.Ttradi,Q.Zret./1000,'m',Q.Tanalog,Q.Aanalog./1000,'y')
+                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Tsonde2,Q.Zret./1000,'b',Q.Ttradi,Q.Zret./1000,'m')
 % plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Q.Traditional(Q.Zmes<=25000),Q.Zmes(Q.Zmes<=25000)./1000,'m')
 % 
                     grid on;
