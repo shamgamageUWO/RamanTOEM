@@ -55,14 +55,14 @@ R = calibration * C_N .* Eb./Mo .* dTr ;
 % counts for averaging time (1 min = 1800 shots) per bin
 % Signal*Shots is matrix to vector multiplication to get the number of
 % counts per bin for the averaged time defined by the number of laser shots
-ScaleFactor = 150/data.JL.Photon.BinSize;
-Shots       = data.JL.Photon.Shots;
-JLsum       = data.JL.(what).Signal * Shots / ScaleFactor;
+ScaleFactor = 150/data.JL.J_high.BinSize;
+Shots       = data.JL.J_high.Shots  ;
+JLsum       = data.JL.(what).Signal * Shots' / ScaleFactor;
 JLsig       = CorrBkg(JLsum, 166, 0, 1);
 
-ScaleFactor = 150/data.JH.Photon.BinSize;
-Shots       = data.JH.Photon.Shots;
-JHsum       = data.JH.(what).Signal * Shots / ScaleFactor;
+ScaleFactor = 150/data.JH.J_high.BinSize;
+Shots       = data.JH.J_high.Shots;
+JHsum       = data.JH.(what).Signal * Shots' / ScaleFactor;
 JHsig       = CorrBkg(JHsum, 166, 0, 1);
 
 ScaleFactor = 150/data.Eb.Photon.BinSize;
@@ -135,6 +135,6 @@ ASRatio.errind      = find((sigma_f > precision), 3, 'first');
 
 % Gives the index of the profile where the relative error is > 5 %
 
-ASRatio.starttime   = datenum(data.GlobalParameters.Start(1,:));    
-ASRatio.stoptime    = datenum(data.GlobalParameters.End(end,:));
+ASRatio.starttime   = datenum(data.GlobalParameters.Start.FastCom(1,:)); %datenum(data.GlobalParameters.Start(1,:)); datenum(S3.GlobalParameters.Start.FastCom(1,:));    
+ASRatio.stoptime    = datenum(data.GlobalParameters.End.FastCom(1,:)); %datenum(data.GlobalParameters.End(end,:));
 

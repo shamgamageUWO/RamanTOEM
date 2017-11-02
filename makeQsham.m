@@ -36,8 +36,8 @@ Q.shots = 1800;
 
 Q.deadtimeJL = 2.4e-9; % 4ns
 Q.deadtimeJH = 1.5e-9; % 4ns
-Q.CovDTJL = (1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (1 .*Q.deadtimeJH).^2;
+Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (.1 .*Q.deadtimeJH).^2;
 
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -129,8 +129,8 @@ Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimatio
 %%%%%
 
 % Calculate the aerosol attenuation NoT USINH+G THIS FOR NOW
-% [alphaAer] = asrSham(Q);
-% Q.alpha_aero = alphaAer;
+[alphaAer] = asrSham(Q);
+ Q.alpha_aero = alphaAer;
 % total transmission air 
 Q.Tr = Total_Transmission(Q);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -151,7 +151,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 if flag ==1
     Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
@@ -190,7 +190,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 20000
+                 if Q.Zmes2(i) <= 10000
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -198,7 +198,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 20000
+                 if  Q.Zmes2(i) <= 10000
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);
@@ -206,7 +206,7 @@ end
              end
              
              
-             Q.Yvar =[Q.YYY Q.YY];
+              Q.Yvar =[Q.YYY Q.YY];
              Q.yvar = diag(Q.Yvar);
                 
                 
@@ -225,8 +225,8 @@ Q_Digi = JLt./JHt;
 Tprofiledg = 1./log(Q_Digi);
 
 y_d = (Q.Tsonde);
-y_d = y_d( Q.Zmes>=4000 & Q.Zmes<=10000);
-x_d = 1./Tprofiledg( Q.Zmes>=4000 & Q.Zmes<=10000);
+y_d = y_d( Q.Zmes>=8000 & Q.Zmes<=10000);
+x_d = 1./Tprofiledg( Q.Zmes>=8000 & Q.Zmes<=10000);
 
 ftdg=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
 fodg = fitoptions('method','NonlinearLeastSquares','Robust','On');

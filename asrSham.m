@@ -2,16 +2,28 @@
 function [alphaAer] = asrSham(Q)
 % first load S3.mat 
 
-% open S0 matfile according to the given date
-datadirS3='/Users/sham/Desktop';
-% datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
-file = 'S3';
-folderpath = [datadirS3 filesep  file];
+% % open S0 matfile according to the given date
+% datadirS3='/Users/sham/Desktop';
+% % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
+% file = 'S3';
+% folderpath = [datadirS3 filesep  file];
+% load(folderpath);
+date = Q.date_in;
+[year,month,day] = getYMDFromDate(date);
+ yr = num2str(year);
+ datadirS3 = '/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';
+% 
+ cleanmacpollution(datadirS3); % this is to remove DS_store.dat files from the data folder
+% 
+ Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
+% 
+filename = 'S3.mat';
+folderpath = [datadirS3 filesep  Dateofthefolder filesep filename];
 load(folderpath);
 
 % now run the config file
-config = setup('ralmo.conf');
-config.t0 = datenum (['20110909'], 'yyyymmdd');
+config = setup('adt.conf');
+ config.t0 = datenum (['20170921'], 'yyyymmdd'); % needto change daily
 config = getCalibration(config);
 
 % Now run the aerosol code
@@ -75,11 +87,19 @@ asrDATAnew = asrDATAs./fneg;
 % hold on;
 
     for i = 1:length(Q.Zmes)
-        if Q.Zmes(i) >= 1600
-          
+        if Q.Zmes(i) >= 12000
+
             asrDATAnew(i) = 1;
         end
     end
+% remove the comments later
+%%%%%%%%%%%%%
+
+
+
+
+
+
 
 % plot(asrDATAnew,Q.Zmes./1000,'m')
 % ylabel( 'Alt (km)' )

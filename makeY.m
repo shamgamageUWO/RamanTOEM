@@ -21,41 +21,42 @@ date = Q.date_in;
 % 
  Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
 % 
- folderpath = [datadirS3 filesep  Dateofthefolder];
+filename = 'S0.mat';
+ folderpath = [datadirS3 filesep  Dateofthefolder filesep filename];
  folders = dirFiles(folderpath);
- lengthfolders = length(folders);
-
-                if lengthfolders ~= 1
-
-                    if lengthfolders == 0
-                        sprintf('There are no folders of RALMO data for this date: \n')
-                        return
-                    end
-                    sprintf('There is more than one folder of RALMO data for this date: \n')
-                    disp(folders)
-
-                    folder = input('Please type in the name of the folder you want, without quotes. \n','s');
-                    if isempty(folder)
-                        sprintf('Default is the first one')
-
-
-                        folder =(folders{1});
-                    end
-                    folderpath = [datadir filesep folder];
-                else
-                    
-                    folders = folders{1};
-                    folderpath = [folderpath  filesep folders];
-                    
-                end
-
-files = dirFiles(folderpath);
-files = sort(files);
-
-scans = length(files);
-if ~(0 < scans)
-     error('NODATA:RawCountsem', ['No RALMO data is available for the date ' num2str(date)]);
-end
+%  lengthfolders = length(folders);
+% 
+%                 if lengthfolders ~= 1
+% 
+%                     if lengthfolders == 0
+%                         sprintf('There are no folders of RALMO data for this date: \n')
+%                         return
+%                     end
+%                     sprintf('There is more than one folder of RALMO data for this date: \n')
+%                     disp(folders)
+% 
+%                     folder = input('Please type in the name of the folder you want, without quotes. \n','s');
+%                     if isempty(folder)
+%                         sprintf('Default is the first one')
+% 
+% 
+%                         folder =(folders{1});
+%                     end
+%                     folderpath = [datadir filesep folder];
+%                 else
+%                     
+%                     folders = folders{1};
+%                     folderpath = [folderpath  filesep folders];
+%                     
+%                 end
+% 
+% files = dirFiles(folderpath);
+% files = sort(files);
+% 
+% scans = length(files);
+% if ~(0 < scans)
+%      error('NODATA:RawCountsem', ['No RALMO data is available for the date ' num2str(date)]);
+% end
 
 % times = zeros(1,scans);
 % shots = zeros(1,scans);
@@ -76,13 +77,13 @@ deltatime = length(g);
 %% Digital Channels Fast_COm high gain
 JL=[];
 JH=[];
-
+Eb=[];
 
 alt = S0.Channel(11).Range;
 JL = S0.Channel(11).Signal;
 JH = S0.Channel(3).Signal;
-
-
+Eb = S0.Channel(10).Signal;
+Ebalt = S0.Channel(10).Range;
 % MHZ to Counts conversion constant 
 Y.binsize = S0.Channel(11).BinSize;
 F = 1800.* (Y.binsize./150);
@@ -91,15 +92,17 @@ F = 1800.* (Y.binsize./150);
 
 JL = F.*JL; % single scans
 JH = F.*JH;
+Eb = F.*Eb;
 
  %% coaddding 30mints
 JL = nansum(JL');
 JH = nansum(JH');
-
+Eb = nansum(Eb');
 % Coadd in alt
 
 [JH, JHzc] = coadd(JH, alt, Q.coaddalt);
 [JL, JLzc] = coadd(JL, alt, Q.coaddalt);
+[Eb, Ebzc] = coadd(Eb, Ebalt, Q.coaddalt);
 
 alt = JHzc;
 
