@@ -39,7 +39,7 @@ Q.deadtimeJH = 1.5e-9; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1 .*Q.deadtimeJH).^2;
 
-Q.deltaT = 10; %2 K
+% Q.deltaT = 5; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 % Q.deltatime = 30;
@@ -56,14 +56,18 @@ JHnew = Y.JH;
 JLnew = Y.JL;
 JL_DS = Y.JL_DS;
 JH_DS = Y.JH_DS;
+Eb = Y.Eb;
+Ebalt = Y.Ebalt;
 
 alt = Y.alt;
 Q.binzise = Y.binsize;
-Q.JHnew= JHnew(alt>=50);
-Q.JLnew= JLnew(alt>=50);
-Q.JH_DS =JH_DS(alt>=50);
-Q.JL_DS =JL_DS(alt>=50);
-Q.alt = alt(alt>=50);
+Q.JHnew= JHnew(alt>=1500  & alt <=50000);
+Q.JLnew= JLnew(alt>=1500 & alt <=50000);
+Q.JH_DS =JH_DS(alt>=1500 & alt <=50000);
+Q.JL_DS =JL_DS(alt>=1500 & alt <=50000);
+Q.alt = alt(alt>=1500 & alt <=50000);
+Q.Eb = Eb(Ebalt>=1500 & Ebalt <=50000);
+Q.Ebalt = Ebalt(Ebalt>=1500 & Ebalt <=50000);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -76,7 +80,7 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Define grid sizes
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:65000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:55000;% Retrieval grid
 disp(' Grids Defined')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,12 +119,23 @@ Q.z0 = 30000;
 disp('a priori temperature profile is loaded ')
 
 [Tsonde,Zsonde,Psonde] = get_Sonde_C50(Q.date_in, Q.time_in);
-% Zsonde = Zsonde; % altitude correction isn't required for C50
- ind = Zsonde<= 35000;
- Zsonde = Zsonde(ind);
- Tsonde = Tsonde(ind);
- Psonde = Psonde(ind);
+ Zsonde = Zsonde - 491; % altitude correction isn't required for C50
+%  ind =  Zsonde>=0 & Zsonde < 33000;
+%  Zsonde = Zsonde(ind);
+%  Tsonde = Tsonde(ind);
+%  Psonde = Psonde(ind);
 
+%  [Zsonde, sortIndex] = sort(Zsonde);
+% Tsonde = Tsonde(sortIndex);
+% Psonde = Psonde(sortIndex); 
+nn=find(isnan(Tsonde)); %% There is always a nan at the end of the temperature 
+Tsonde = Tsonde(1:nn-1);
+Psonde = Psonde(1:nn-1);
+Zsonde = Zsonde(1:nn-1);
+
+[Zsonde, index] = unique(Zsonde); 
+Tsonde = Tsonde(index);
+Psonde = Psonde(index);
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
 Psonde = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % 
@@ -190,7 +205,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 10000
+                 if Q.Zmes2(i) <= 2000
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -198,7 +213,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 10000
+                 if  Q.Zmes2(i) <= 2000
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);
@@ -225,8 +240,8 @@ Q_Digi = JLt./JHt;
 Tprofiledg = 1./log(Q_Digi);
 
 y_d = (Q.Tsonde);
-y_d = y_d( Q.Zmes>=8000 & Q.Zmes<=10000);
-x_d = 1./Tprofiledg( Q.Zmes>=8000 & Q.Zmes<=10000);
+y_d = y_d( Q.Zmes>=3000 & Q.Zmes<=5000);
+x_d = 1./Tprofiledg( Q.Zmes>=3000 & Q.Zmes<=5000);
 
 ftdg=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
 fodg = fitoptions('method','NonlinearLeastSquares','Robust','On');

@@ -82,7 +82,7 @@ Eb=[];
 alt = S0.Channel(11).Range;
 JL = S0.Channel(11).Signal;
 JH = S0.Channel(3).Signal;
-Eb = S0.Channel(10).Signal;
+Eb = S0.Channel(10).Signal(:,2:31);
 Ebalt = S0.Channel(10).Range;
 % MHZ to Counts conversion constant 
 Y.binsize = S0.Channel(11).BinSize;
@@ -107,13 +107,12 @@ Eb = nansum(Eb');
 alt = JHzc;
 
 bkg_ind1 = alt>35e3;% & alt<60e3;
-bkg_ind2 = alt>28e3;
+bkg_ind2 = alt>35e3;
 
 % Desaturate and find the true background first
      % 1. Make the Co added counts to avg counts
         JHn = JH./(deltatime.*Q.coaddalt);
         JLn = JL./(deltatime.*Q.coaddalt);
-        
         % 2. Convert counts to Hz
         JHnwn = (JHn./F);
         JLnwn = (JLn./F);
@@ -131,7 +130,8 @@ bkg_ind2 = alt>28e3;
        JL_DS = JL_dtc.*(deltatime.*Q.coaddalt);
        JH_DS = JH_dtc.*(deltatime.*Q.coaddalt);
        
-
+%                         JL_DS(JL_DS<=0)= round(rand(1)*10);
+%                          JH_DS(JH_DS<=0)= round(rand(1)*10);
 
 bkg_JL = JL_DS(bkg_ind1);
 bkg_JH = JH_DS(bkg_ind2);
@@ -167,5 +167,6 @@ Y.bg_length1 = bg_length1;
 Y.bg_length2 = bg_length2;
 Y.F = F;
 Y.deltatime = deltatime;
-
+Y.Eb = Eb;
+Y.Ebalt = Ebzc;
 % save('data.mat','-struct','Y');

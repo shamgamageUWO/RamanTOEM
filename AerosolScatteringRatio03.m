@@ -33,8 +33,10 @@ JH = CorrBkg(JH,sum(bkg_ind),0,1);
 Mo = JH + JL;
 
 % ELASTIC SIGNAL
-Eb = data.Eb.(what).SignalMean;     
-Eb = CorrBkg(Eb,sum(bkg_ind),0,1);
+% Eb = data.Eb.(what).SignalMean(2:31);     Original line
+Eb = data.Eb.(what).Signal(:,2:31); 
+Eb = nansum(Eb');
+Eb = CorrBkg(Eb',sum(bkg_ind),0,1);
 
 % signal ratio
 SignalRatio = Eb./Mo;

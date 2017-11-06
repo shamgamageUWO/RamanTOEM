@@ -21,12 +21,12 @@ OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
 %%
 % Constants
 kb = 1.38064852*10^-23;
-area = pi * (0.3^2);
+% area = pi * (0.3^2);
 % Transmission
 R_tr_i = (Q.Tr);
 
-A_Zi_d = (area .* OV_Zi .*R_tr_i .*Pdigi)./(kb * Q.Zmes2 .^2);
-B_Zi_d = (area .*R_tr_i .*Pdigi)./(kb * Q.Zmes2 .^2); % No overlap
+A_Zi_d = ( OV_Zi .*R_tr_i .*Pdigi)./(kb * Q.Zmes2 .^2);
+B_Zi_d = (R_tr_i .*Pdigi)./(kb * Q.Zmes2 .^2); % No overlap
 
 %% loading cross sections
 load('DiffCrossSections.mat');

@@ -1,6 +1,6 @@
 % This is to get the radiosonde files
 
-function [Tsonde,Psonde,Zsonde]=get_Sonde_C50(date,tin)
+function [Tsonde,Zsonde,Psonde]=get_Sonde_C50(date,tin)
 % date =20110607;
 % tin=20110607110917; % format yyyymmddHHMMSS;
 % tfi=20110607181927;
@@ -42,31 +42,33 @@ file= [folder '/' Dateofthefolder '.csv'];
  if exist(file, 'file')
          disp('operational Sonde file exsist')    
         fid = fopen(file); %create the file number
-C = textscan(fid, '%f32%s%s%f32%s%s%f32%f32%f32%f32%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s', 'Delimiter', ';','headerlines', 48);
+C = textscan(fid, '%n%s%s%n%s%s%n%n%n%n%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s', 'Delimiter', ';','headerlines', 48);
          C50 = struct();
          
-%          C50.RealTime = C{1};
-%          C50.Date = C{2};
-%          C50.Time = C{3};
+          C50.RealTime = C{1};
+         C50.Date = C{2};
+         C50.Time = C{3};
          C50.z = C{4};
-%          C50.winddirectio = C{5};
-%          C50.windspeed = C{6};
+         C50.winddirectio = C{5};
+         C50.windspeed = C{6};
          C50.P = C{7};
          C50.T = C{8};
-%          C50.HU = C{9};
-%          C50.DP = C{10};
-%          C50.Ozone = C{11};
-%          C50.Ozonenorm = C{12};
-%          C50.PumpT= C{13};
-%          C50.a = C{14};
-%          C50.b = C{15};
-%          C50.c = C{16};
-%          C50.d = C{17};
+         C50.HU = C{9};
+         C50.DP = C{10};
+         C50.Ozone = C{11};
+         C50.Ozonenorm = C{12};
+         C50.PumpT= C{13};
+         C50.a = C{14};
+         C50.b = C{15};
+         C50.c = C{16};
+         C50.d = C{17};
+        
 %         
-%         
-        Tsonde = C50.T+273.15; % K
+        Tsonde = C50.T; % K
+        Tsonde = Tsonde +273.15;
         Zsonde = C50.z;
-        Psonde = C50.P.*100;%Pa
+        Psonde = C50.P;%Pa
+        Psonde = Psonde.*100;
         fclose(fid);
 %         
 else

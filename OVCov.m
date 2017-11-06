@@ -8,7 +8,7 @@ function [S_OV]=OVCov(Zj,OV)
  m = length(OV);
  n = m;
  S_OV =zeros(n,n);
- lengthcT = 1500; % =3000; % only need m of these
+ lengthcT = 100; % =3000; % only need m of these
  lc = lengthcT.*ones(1,m);
  l = size(OV);
  
@@ -68,7 +68,7 @@ vars2 = Tmodvar ;
 
 for i = 1:m
     for j = 1:m
-         if Zj(i)< 6000 % this is to force the ov to go to 1.
+         if Zj(i)< 8000 % this is to force the ov to go to 1.
 %             disp('ok')
             sigprod = sqrt(vars2(i).*vars2(j));
             diffz = Zj(i) - Zj(j);

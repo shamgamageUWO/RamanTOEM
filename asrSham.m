@@ -87,7 +87,7 @@ asrDATAnew = asrDATAs./fneg;
 % hold on;
 
     for i = 1:length(Q.Zmes)
-        if Q.Zmes(i) >= 12000
+        if Q.Zmes(i) >= 1200
 
             asrDATAnew(i) = 1;
         end
