@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 10;
+Q.coaddalt = 50;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -61,13 +61,13 @@ Ebalt = Y.Ebalt;
 
 alt = Y.alt;
 Q.binzise = Y.binsize;
-Q.JHnew= JHnew(alt>=1500  & alt <=50000);
-Q.JLnew= JLnew(alt>=1500 & alt <=50000);
-Q.JH_DS =JH_DS(alt>=1500 & alt <=50000);
-Q.JL_DS =JL_DS(alt>=1500 & alt <=50000);
-Q.alt = alt(alt>=1500 & alt <=50000);
-Q.Eb = Eb(Ebalt>=1500 & Ebalt <=50000);
-Q.Ebalt = Ebalt(Ebalt>=1500 & Ebalt <=50000);
+Q.JHnew= JHnew(alt>=50  & alt <=50000);
+Q.JLnew= JLnew(alt>=50 & alt <=50000);
+Q.JH_DS =JH_DS(alt>=50 & alt <=50000);
+Q.JL_DS =JL_DS(alt>=50 & alt <=50000);
+Q.alt = alt(alt>=50 & alt <=50000);
+Q.Eb = Eb(Ebalt>=50 & Ebalt <=50000);
+Q.Ebalt = Ebalt(Ebalt>=50 & Ebalt <=50000);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -80,7 +80,10 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Define grid sizes
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:55000;% Retrieval grid
+% deltaZ = (Q.Zmes(2)-Q.Zmes(1));
+% Z1 = Q.Zmes(1):deltaZ*5:2000;
+% Z2=2000:deltaZ*10:55000;
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:55000;% Retrieval grid
 disp(' Grids Defined')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,14 +147,15 @@ Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimatio
 %%%%%
 
 % Calculate the aerosol attenuation NoT USINH+G THIS FOR NOW
-[alphaAer] = asrSham(Q);
+[alphaAer] = asrShamFastCom(Q);
  Q.alpha_aero = alphaAer;
 % total transmission air 
 Q.Tr = Total_Transmission(Q);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-[R,R_fit] = Restimationnew(Q);
-Q.R = R_fit;
+% [R,R_fit] = Restimationnew(Q);
+% Q.R = R_fit;
+Q.R = 0.8359;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
@@ -166,7 +170,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 if flag ==1
     Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
@@ -205,7 +209,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 2000
+                 if Q.Zmes2(i) <= 6000
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -213,7 +217,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 2000
+                 if  Q.Zmes2(i) <= 6000
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);
@@ -239,20 +243,23 @@ JLt = Q.JL_DS-Q.BaJL;
 Q_Digi = JLt./JHt;
 Tprofiledg = 1./log(Q_Digi);
 
-y_d = (Q.Tsonde);
-y_d = y_d( Q.Zmes>=3000 & Q.Zmes<=5000);
-x_d = 1./Tprofiledg( Q.Zmes>=3000 & Q.Zmes<=5000);
+%             y_d = (Q.Tsonde);
+%             y_d = y_d( Q.Zmes>=1000 & Q.Zmes<=10000);
+%             x_d = 1./Tprofiledg( Q.Zmes>=1000 & Q.Zmes<=10000);
+% 
+%             ftdg=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
+%             fodg = fitoptions('method','NonlinearLeastSquares','Robust','On');
+%             set(fodg, 'StartPoint',[350, 0.3]);
+% 
+% 
+%             [f_dg,gofdg] = fit(x_d,y_d',ftdg,fodg);
+%             Q.a_dg = f_dg.a;
+%             Q.b_dg = f_dg.b;
 
-ftdg=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
-fodg = fitoptions('method','NonlinearLeastSquares','Robust','On');
-set(fodg, 'StartPoint',[350, 0.3]);
+Q.a_dg = 399.8616;
+Q.b_dg = 0.5247;
 
-
-[f_dg,gofdg] = fit(x_d,y_d',ftdg,fodg);
-a_dg = f_dg.a;
-b_dg = f_dg.b;
-
-Tradi= real(a_dg./(1./Tprofiledg +b_dg));
+Tradi= real(Q.a_dg./(1./Tprofiledg +Q.b_dg));
 Q.Ttradi = interp1(Q.Zmes,Tradi,Q.Zret,'linear');
 
 

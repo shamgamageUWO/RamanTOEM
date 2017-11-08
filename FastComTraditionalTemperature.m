@@ -1,14 +1,14 @@
 % this is to read S0.mat files and pick the measurements from 11-11.30pm
 % Save the JL,JH,Eb and alt in seperate structure 
 
-function [Y] = makeY(Q)
+function [T,alt] = FastComTraditionalTemperature(date,coaddalt,time)
 
-% Q.coaddalt = coaddalt;
-% Q.deadtimeJL=deadtimeJL;
-% Q. deadtimeJH =deadtimeJH;
+Q.coaddalt = coaddalt;
+Q.deadtimeJL= 2.4e-9;
+Q. deadtimeJH = 1.5e-9;
 
 
-date = Q.date_in;
+% date = Q.date_in;
 [year,month,day] = getYMDFromDate(date);
  yr = num2str(year);
 % 
@@ -151,22 +151,42 @@ bg_JH = nanmean(bkg_JH);
 bg_length1 = length(bkg_JH);
 bg_length2 = length(bkg_JL);
 
-%%
+JHt = JH_DS-bg_JH;
+JLt = JL_DS-bg_JL;
 
-%% Digital
-Y.JL = JL ;
-Y.JH = JH ;
-Y.JL_DS = JL_DS;
-Y.JH_DS = JH_DS;
-Y.alt = alt;
-Y.bgJL = bg_JL;
-Y.bgJH = bg_JH;
-Y.bg_JL_std = bg_JL_std ;
-Y.bg_JH_std = bg_JH_std ;
-Y.bg_length1 = bg_length1;
-Y.bg_length2 = bg_length2;
-Y.F = F;
-Y.deltatime = deltatime;
-Y.Eb = Eb;
-Y.Ebalt = Ebzc;
+Q_Digi = JLt./JHt;
+Tprofiledg = 1./log(Q_Digi);
+[Tsonde,Zsonde,Psonde] = get_Sonde_C50(date, time);
+ Zsonde = Zsonde - 491; % altitude correction isn't required for C50
+ 
+nn=find(isnan(Tsonde)); %% There is always a nan at the end of the temperature 
+Tsonde = Tsonde(1:nn-1);
+Psonde = Psonde(1:nn-1);
+Zsonde = Zsonde(1:nn-1);
+
+[Zsonde, index] = unique(Zsonde); 
+Tsonde = Tsonde(index);
+Psonde = Psonde(index);
+
+Tsonde = interp1(Zsonde,Tsonde,alt,'linear'); % this goes to Restimation and asr code
+Psonde1 = interp1(Zsonde,log(Psonde),alt,'linear'); % 
+Psonde = exp(Psonde1);
+
+            y_d = (Tsonde);
+            y_d = y_d( alt>=3000 & alt<=10000);
+            x_d = 1./Tprofiledg( alt>=3000 & alt<=10000);
+
+            ftdg=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
+            fodg = fitoptions('method','NonlinearLeastSquares','Robust','On');
+            set(fodg, 'StartPoint',[350, 0.3]);
+
+
+            [f_dg,gofdg] = fit(x_d,y_d,ftdg,fodg);
+            a_dg = f_dg.a;
+            b_dg = f_dg.b;
+            
+T= real(a_dg./(1./Tprofiledg +b_dg));
+
+figure;plot(Tsonde,alt./1000,'g',T,alt./1000,'r')
+
 % save('data.mat','-struct','Y');

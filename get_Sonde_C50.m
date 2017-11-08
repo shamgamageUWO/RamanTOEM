@@ -19,8 +19,10 @@ yr = num2str(year);
 
 if tin>5 && tin<17
 time= 12;
-else
+elseif tin==0
     time = 0;
+else
+    time =0;
 day = day+1;
 end
 
@@ -35,7 +37,7 @@ Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f
 datadir = '/Users/sham/Documents/MATLAB/RALMO_Data/Sonde/C50';
 
 folder = [datadir filesep Dateofthefolder];
-file= [folder '/' Dateofthefolder '.csv'];
+file= [folder '/' Dateofthefolder '.csv']
 
 
   
