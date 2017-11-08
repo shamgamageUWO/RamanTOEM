@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 4;
+Q.coaddalt = 8;
  Q.Rgas = 8.3145;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -57,13 +57,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=4000);
+Q.Eb = Eb(alt>=4000 & alt <= 50000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=4000);
-Q.JLnew= JLnew(alt>=4000);
-Q.JH_DS =JH_DS(alt>=4000);
-Q.JL_DS =JL_DS(alt>=4000);
-Q.alt = alt(alt>=4000);
+Q.JHnew= JHnew(alt>=4000 & alt <= 50000);
+Q.JLnew= JLnew(alt>=4000 & alt <= 50000);
+Q.JH_DS =JH_DS(alt>=4000 & alt <= 50000);
+Q.JL_DS =JL_DS(alt>=4000 & alt <= 50000);
+Q.alt = alt(alt>=4000 & alt <= 50000);
 Q.Zmes2 = Q.alt';
 
 Q.f = 1e6./(Y.F);
@@ -73,13 +73,13 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=1000 & ANalt <= 4000);
+Q.Eba = Eba(ANalt>=500 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=4000);
-Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=4000);
-Q.ANalt = ANalt(ANalt>=1000);
+Q.JHnewa= JHnewa(ANalt>=500 & ANalt <=6000);
+Q.JLnewa= JLnewa(ANalt>=500 & ANalt <=6000);
+Q.ANalt = ANalt(ANalt>=500);
 % Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 4000);
+Q.Zmes1 = ANalt(ANalt>=500 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -103,7 +103,10 @@ Q.n4=length(Q.JLnewa);
 
 %% Define grid sizes
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*30:70000;% Retrieval grid
+Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:6000;
+Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*15:60000;
+Q.Zret =[Z1 Z2];
+% Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:60000;% Retrieval grid
 disp('Defined grids ')
 
 % slopeDT= (1-0.1)/(Q.Zret(1)-Q.Zret(end));
@@ -141,7 +144,7 @@ disp('Defined grids ')
 obj2 = Gravity(Q.Zmes, 46.82);
 Q.grav = obj2.accel;
 Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
-Q.z0 = 25000;            
+Q.z0 = 30000;            
 [Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);  
 disp('a priori temperature profile is loaded ')
 
@@ -219,7 +222,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
              [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,12);
-             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,8);
+             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,12);
           
              r1 = ones(1,go11-1).* JHv(1);
              r2 = ones(1,go11-1).* JHv(end);
@@ -241,25 +244,25 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 4000
+                    if Q.Zmes1(i) <= 3000
                         Q.YYa(i) = Q.JLav(i);
                     else
-                        Q.YYa(i) = 10.*Q.JLav(i);
+                        Q.YYa(i) = .1.*Q.JLav(i);
                     end
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes1(i) <= 4000
+                    if  Q.Zmes1(i) <= 3000
                         Q.YYYa(i) = Q.JHav(i);
                     else
-                        Q.YYYa(i) = 10.*Q.JHav(i);
+                        Q.YYYa(i) = .1.*Q.JHav(i);
                     end
                 end
 
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 8000
+            if Q.Zmes2(i) <= 6000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = JLreal(i);
@@ -267,14 +270,14 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 8000
+            if  Q.Zmes2(i) <= 6000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = JHreal(i);
             end
         end
 
-%         Q.Yvar =[YYY YY JHav JLav];
+%          Q.Yvar =[Q.YYY Q.YY Q.JHav Q.JLav];
 %         Q.Yvar =[JHreal JLreal];
 
 % % HEre I linearlize the covariance
@@ -285,7 +288,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %  Q.YYYa = slope.*Q.JHav;
 %   Q.YYa  =slope.*Q.JLav;
 
-Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
+ Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 Q.yvar = diag(Q.Yvar);
                 
                 

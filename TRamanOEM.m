@@ -321,7 +321,7 @@ T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
                      
                       subplot(1,3,3)
-                     plot(abs(T_dg-Q.Tsonde2),Q.Zret./1000,'r',abs(X.x(1:m) - T_dg'),Q.Zret./1000,'b',abs(X.x(1:m) - Q.Tsonde2'),Q.Zret./1000,'g')
+                     plot((T_dg-Q.Tsonde2),Q.Zret./1000,'r',( T_dg' - X.x(1:m)),Q.Zret./1000,'b',(X.x(1:m) - Q.Tsonde2'),Q.Zret./1000,'g')
  
                      grid on;
                      xlabel('Temperature residuals (K)')
