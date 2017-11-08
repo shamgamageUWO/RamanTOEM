@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 8;
+Q.coaddalt = 20;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -36,8 +36,8 @@ Q.shots = 1800;
 
 Q.deadtimeJL = 3.9e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
-Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (.1 .*Q.deadtimeJH).^2;
+Q.CovDTJL = (1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (1 .*Q.deadtimeJH).^2;
 
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -58,13 +58,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=500);
+Q.Eb = Eb(alt>=50);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=500);
-Q.JLnew= JLnew(alt>=500);
-Q.JH_DS =JH_DS(alt>=500);
-Q.JL_DS =JL_DS(alt>=500);
-Q.alt = alt(alt>=500);
+Q.JHnew= JHnew(alt>=50);
+Q.JLnew= JLnew(alt>=50);
+Q.JH_DS =JH_DS(alt>=50);
+Q.JL_DS =JL_DS(alt>=50);
+Q.alt = alt(alt>=50);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -207,7 +207,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 % Q.CLa = CJLa;
 % Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;
@@ -255,8 +255,8 @@ Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 % above 2 km use the counts
 
 % Q.yvar = diag(Q.y);
-             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
-             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,12);
+             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,8);
+             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,8);
 % 
 % 
 %             
@@ -300,7 +300,7 @@ Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 8000
+            if Q.Zmes2(i) <= 6000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) =  Q.JLnew(i);
@@ -308,7 +308,7 @@ Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 8000
+            if  Q.Zmes2(i) <= 6000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) =  Q.JHnew(i);
