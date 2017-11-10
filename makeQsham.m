@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 50;
+Q.coaddalt = 20;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -83,7 +83,7 @@ disp('Loaded RALMO measurements ')
 % deltaZ = (Q.Zmes(2)-Q.Zmes(1));
 % Z1 = Q.Zmes(1):deltaZ*5:2000;
 % Z2=2000:deltaZ*10:55000;
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:55000;% Retrieval grid
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:55000;% Retrieval grid
 disp(' Grids Defined')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -147,10 +147,14 @@ Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimatio
 %%%%%
 
 % Calculate the aerosol attenuation NoT USINH+G THIS FOR NOW
-[alphaAer] = asrShamFastCom(Q);
- Q.alpha_aero = alphaAer;
-% total transmission air 
-Q.Tr = Total_Transmission(Q);
+%                         [alphaAer, odaer] = asrShamFastCom(Q);
+%                          Q.alpha_aero = alphaAer;
+%                          Q.odaer = odaer;
+%                         % total transmission air 
+%                         Q.Tr = Total_Transmission(Q);
+
+[Tr1,Tr2] = TransmissionFastCom(Q);
+Q.Tr = Tr2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
 % [R,R_fit] = Restimationnew(Q);
@@ -193,8 +197,8 @@ end
 
                         Q.y = [Q.JHnew ;Q.JLnew];
 
-             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,8);
-             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,8);
+             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
+             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,12);
 % 
 % 
 %             
@@ -209,7 +213,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 6000
+                 if Q.Zmes2(i) <= 5000
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -217,7 +221,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 6000
+                 if  Q.Zmes2(i) <= 5000
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);

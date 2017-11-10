@@ -1,13 +1,5 @@
 % this is first get S3 file with asr content
-function [alphaAer, odaer ] = asrShamFastCom(Q)
-% first load S3.mat 
-
-% % open S0 matfile according to the given date
-% datadirS3='/Users/sham/Desktop';
-% % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
-% file = 'S3';
-% folderpath = [datadirS3 filesep  file];
-% load(folderpath);
+function [Tr1,Tr2] = TransmissionFastCom(Q)
 date = Q.date_in;
 [year,month,day] = getYMDFromDate(date);
  yr = num2str(year);
@@ -26,8 +18,6 @@ config = setup('adt.conf');
  config.t0 = datenum (['20170921'], 'yyyymmdd'); % needto change daily
 config = getCalibration(config);
 
-% Now run the aerosol code
-% asr =AerosolScatteringRatio03(S3,config );
 
 asr =BackScatteringRatio03_local(S3,config );
 
@@ -36,8 +26,6 @@ asr =BackScatteringRatio03_local(S3,config );
 % Load beta molecular values here 
 % Max's Codes ( all are now in the same directory as QpackSham)
 zN = Q.Zmes;
-% P = Q.Psonde;
-% T = Q.Tsonde;
 P = Q.Pdigi;%Q.Pressi;
 T = Q.Ti;
 lambda_rec= 354.7; % nm
@@ -48,14 +36,9 @@ lambda_em = 354.7;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% These from BOB- WVOEM.m
-in.LRfree = 50; % was 20 on 0305, 0308 50, 200905-6 50
-in.LRpbl = 80; % 50 on 0305; was 80 on otherwise
-in.LRtranHeight = 2300; % this is the height to the BL
-% % inputs for ralmo data
-% in.go = 3; % plus/minus in.go points in pieceWise
-% in.slope = 34; %30.14; %35; % 2015 37.88; 34 is adhoc, (30+38)/2
-% in.slopeA = in.slope ./ 3; % 3 is nominal, not accurate 2.75; 
-
+in.LRfree = 20; % was 20 on 0305, 0308 50, 200905-6 50
+in.LRpbl = 50; % 50 on 0305; was 80 on otherwise
+in.LRtranHeight = 1000; % this is the height to the BL
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% These lines are from BOB - WV - makeQ.m
@@ -81,9 +64,9 @@ asrDATAs(fneg) = 1;
 
 
 alphaAer = LR' .* (beta_mol .* (asrDATAs-1));
-znoAer = find(zN > 15000); % was 3000 for 20130122
+znoAer = find(zN > 7000); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
-'asr set to 0 > 15000'
+'asr set to 0 > 7000'
     fl0 = find(alphaAer <= 0);
     alphaAer(fl0) = 1e-12;
     
@@ -96,3 +79,46 @@ alphaAer(znoAer) = 1e-12;
     odaer = cumtrapz(zN,alphaAer) +odnorm;
     
     
+
+Lambda = 354.7* (10^-3);
+
+NA = 6.02214129 *(10^23) ;% Avergadro Number mol?1
+M = 28.9645 * (10^-3); % molar mass - Mair	28.9645 g.mol-1 Molecular mass of dry air kg/mol
+A = 4.02*10^(-28);
+B = -0.3228;
+C = 0.389;
+D = 0.09426;
+N0 = 2.504e25;%(m^-3)
+ScaleHeight= 8.771e3;
+
+
+% Molecular Transmission 
+
+exponent = 4+B+C*Lambda+D/Lambda;
+sigma_Rcm2 = A / Lambda^(exponent);
+sigmaNicolet = sigma_Rcm2*1e-4;%m2
+Nmol = (NA/M).* Q.rho ; % mol m-3
+
+% alpha_aero = Q.alpha_aero';% m^-1 this is aerosol coefficient given in Povey etal
+%  alpha_aero(isnan(alpha_aero))=0;
+sigma_tot = Nmol*sigmaNicolet+ alphaAer';
+Tr1 = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
+ 
+ 
+ 
+ 
+ 
+ 
+ %%
+% Molecular transmission
+tauMol = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet));
+tauAer = exp(-2.*odaer);
+Tr2 = tauMol.*tauAer';
+% figure;plot(Q.Zmes./1000,Tr1,'r',Q.Zmes./1000,Tr,'b')
+
+
+%% Method 2
+% intnBaro = ScaleHeight .* N0 .* (1 - exp(-(zN(1)./ScaleHeight))); 
+% tauMolBobn0 = exp(-2.*sigmaNicolet.*intnBaro);
+% tauMolBob = tauMolBobn0 .* exp(-2.*cumtrapz(sigmaNicolet.*Nmol));
+% Tr3 = tauMolBob.*tauAer';

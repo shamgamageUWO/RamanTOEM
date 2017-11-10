@@ -171,9 +171,11 @@ DT_JL
 % %                     Ttradi = real(Q.bb./(Q.aa-lnQ));
 % %
 % Tsonde = interp1(Zsonde,Tsonde,Q.Zret);Q.Tsonde2
+ind = Q.Zret<=25000;
+Toem=X.x(1:m);
                     figure;
                     subplot(1,2,1)
-                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Tsonde2,Q.Zret./1000,'b',Q.Ttradi,Q.Zret./1000,'m')
+                    plot(Q.Ta(ind),Q.Zret(ind)./1000,'g',Toem(ind),Q.Zret(ind)./1000,'r',Q.Tsonde2(ind),Q.Zret(ind)./1000,'b',Q.Ttradi(ind),Q.Zret(ind)./1000,'m')
 % plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Tsonde,Q.Zret./1000,'b',Q.Traditional(Q.Zmes<=25000),Q.Zmes(Q.Zmes<=25000)./1000,'m')
 % 
                     grid on;
@@ -183,13 +185,13 @@ DT_JL
                     % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
                     xlabel('Temperature (K)')
                     ylabel('Altitude(km)')
-                    legend('T a priori','T OEM','T sonde','T Traditional','T analog')
+                    legend('T a priori','T OEM','T sonde','T Traditional')
                     hold off;
 % 
 %                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 % 
                      subplot(1,2,2)
-                     plot(X.x(1:m) - (Q.Tsonde2'),Q.Zret./1000);
+                     plot((Toem(ind) - Q.Tsonde2(ind)'),Q.Zret(ind)./1000);
                      %,'r',Q.Traditional(Q.Zmes<=25000) - (Q.Tsonde(Q.Zmes<=25000)'),Q.Zmes(Q.Zmes<=25000)./1000,'b')
 %                      legend('T OEM - T sonde','T traditional - T sonde')
                      grid on;
@@ -270,7 +272,7 @@ DT_JL
                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
                      
                       subplot(1,3,3)
-                     plot(abs(Q.Ttradi-Q.Tsonde2),Q.Zret./1000,'r',abs(X.x(1:m) - Q.Ttradi'),Q.Zret./1000,'b',abs(X.x(1:m) - Q.Tsonde2'),Q.Zret./1000,'g')
+                     plot((Q.Ttradi-Q.Tsonde2),Q.Zret./1000,'r',( Q.Ttradi' - X.x(1:m) ),Q.Zret./1000,'b',(X.x(1:m) - Q.Tsonde2'),Q.Zret./1000,'g')
  
                      grid on;
                      xlabel('Temperature residuals (K)')

@@ -25,10 +25,28 @@ exponent = 4+B+C*Lambda+D/Lambda;
 sigma_Rcm2 = A / Lambda^(exponent);
 sigmaNicolet = sigma_Rcm2*1e-4;%m2
 Nmol = (NA/M).* Q.rho ; % mol m-3
-alpha_aero = Q.alpha_aero';% m^-1 this is aerosol coefficient given in Povey etal
- alpha_aero(isnan(alpha_aero))=0;
-% sigma_tot = Nmol*sigmaNicolet;
-sigma_tot = Nmol*sigmaNicolet+ alpha_aero;
-% %  Tr1 = exp(-2.*cumtrapz(Q.Zmes,alpha_aero)); % Molecular transmission
-%  Tr = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet)); % Molecular transmission
- Tr = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
+             alpha_aero = Q.alpha_aero';% m^-1 this is aerosol coefficient given in Povey etal
+            %  alpha_aero(isnan(alpha_aero))=0;
+            sigma_tot = Nmol*sigmaNicolet+ alpha_aero;
+            % 
+            % % %  Tr1 = exp(-2.*cumtrapz(Q.Zmes,alpha_aero)); % Molecular transmission
+            % %  Tr = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet)); % Molecular transmission
+              Tr1 = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
+ 
+ 
+ 
+ 
+ 
+ 
+ %%
+% Molecular transmission
+tauMol = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet));
+tauAer = exp(-2.*Q.odaer);
+Tr = tauMol.*tauAer';
+% figure;plot(Q.Zmes./1000,Tr1,'r',Q.Zmes./1000,Tr,'b')
+
+
+% % %% Method 2
+% % intnBaro = ScaleHeight .* N0 .* (1 - exp(-(zN(1)./ScaleHeight))); 
+% % 
+% % tauMolBob = exp(-2.*sigmaNicolet.*intnBaro);
