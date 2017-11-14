@@ -64,9 +64,9 @@ asrDATAs(fneg) = 1;
 
 
 alphaAer = LR' .* (beta_mol .* (asrDATAs-1));
-znoAer = find(zN > 7000); % was 3000 for 20130122
+znoAer = find(zN > 12000); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
-'asr set to 0 > 7000'
+'asr set to 0 > 12000'
     fl0 = find(alphaAer <= 0);
     alphaAer(fl0) = 1e-12;
     

@@ -80,10 +80,11 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Define grid sizes
-% deltaZ = (Q.Zmes(2)-Q.Zmes(1));
-% Z1 = Q.Zmes(1):deltaZ*5:2000;
-% Z2=2000:deltaZ*10:55000;
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:55000;% Retrieval grid
+ deltaZ = (Q.Zmes(2)-Q.Zmes(1));
+ Z1 = Q.Zmes(1):deltaZ*10:6000;
+ Z2= 5000:deltaZ*5:55000;
+ Q.Zret = [Z1 Z2];
+%    Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:55000;% Retrieval grid
 disp(' Grids Defined')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -197,8 +198,8 @@ end
 
                         Q.y = [Q.JHnew ;Q.JLnew];
 
-             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
-             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,12);
+             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,8);
+             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,8);
 % 
 % 
 %             
@@ -213,7 +214,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 5000
+                 if Q.Zmes2(i) <= 4000
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -221,7 +222,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 5000
+                 if  Q.Zmes2(i) <= 4000
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);

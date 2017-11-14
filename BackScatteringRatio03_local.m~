@@ -33,9 +33,7 @@ JH = CorrBkg(JH1,150,0,1);
 Mo = JH + JL;
 
 % ELASTIC SIGNAL
-Eb2 = data.Eb.(what).Signal(:,2:31);
-Eb2 = nanmean(Eb2');
-Eb2=Eb2';
+Eb2 = data.Eb.(what).Signal(:,2:31);     
 Eb1 = CorrBkg(Eb2,150,0,1);
 % interpolate the elastic signal to the JH and JL height vector
 Eb=time_res_vector(Eb1,z_j,z_bsr)';
