@@ -21,23 +21,23 @@ NA = 6.02214129 *(10^23) ;% Avergadro Number mol?1
 M = 28.9645 * (10^-3); 
 Q.date_in = date_in;%20110616; % daytime 20110816
 Q.time_in = time_in;%23; % 11
-Q.Csum =  2.8077e+18;
-Q.CLfac = 10^-2;
-Q.CHfac = 10^-2;
+% Q.Csum =  2.8077e+18;
+% Q.CLfac = 10^-2;
+% Q.CHfac = 10^-2;
 Q.coaddalt = 20;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
-Q.altbinsize = 3.75;%m
+% Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
-Q.ScaleFactor = 150/3.75;
+% Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
 Q.deadtimeJL = 2.4e-9; % 4ns
-Q.deadtimeJH = 1.5e-9; % 4ns
+Q.deadtimeJH = 1.35e-9; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (.1 .*Q.deadtimeJH).^2;
+Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 
 % Q.deltaT = 5; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -61,13 +61,13 @@ Ebalt = Y.Ebalt;
 
 alt = Y.alt;
 Q.binzise = Y.binsize;
-Q.JHnew= JHnew(alt>=50  & alt <=50000);
-Q.JLnew= JLnew(alt>=50 & alt <=50000);
-Q.JH_DS =JH_DS(alt>=50 & alt <=50000);
-Q.JL_DS =JL_DS(alt>=50 & alt <=50000);
-Q.alt = alt(alt>=50 & alt <=50000);
-Q.Eb = Eb(Ebalt>=50 & Ebalt <=50000);
-Q.Ebalt = Ebalt(Ebalt>=50 & Ebalt <=50000);
+Q.JHnew= JHnew(alt>=500  & alt <=50000);
+Q.JLnew= JLnew(alt>=500  & alt <=50000);
+Q.JH_DS =JH_DS(alt>=500  & alt <=50000);
+Q.JL_DS =JL_DS(alt>=500  & alt <=50000);
+Q.alt = alt(alt>=500  & alt <=50000);
+Q.Eb = Eb(Ebalt>=500  & Ebalt <=50000);
+Q.Ebalt = Ebalt(Ebalt>=500  & Ebalt <=50000);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -80,11 +80,12 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Define grid sizes
+k = find(Q.Zmes<=10000);
  deltaZ = (Q.Zmes(2)-Q.Zmes(1));
- Z1 = Q.Zmes(1):deltaZ*10:6000;
- Z2= 5000:deltaZ*5:55000;
- Q.Zret = [Z1 Z2];
-%    Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:55000;% Retrieval grid
+Z1 = Q.Zmes(1):deltaZ*2:Q.Zmes(115);
+Z2= Q.Zmes(115):deltaZ*10:55000;   
+  Q.Zret = [Z1 Z2];
+%  Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:55000;% Retrieval grid
 disp(' Grids Defined')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -158,9 +159,9 @@ Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimatio
 Q.Tr = Tr2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-% [R,R_fit] = Restimationnew(Q);
-% Q.R = R_fit;
-Q.R = 0.8359;
+[R,R_fit] = Restimationnew(Q);
+Q.R = R_fit;
+% Q.R = 0.8359;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
@@ -175,7 +176,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 if flag ==1
     Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
@@ -214,7 +215,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 4000
+                 if Q.Zmes2(i) <= 5000
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -222,7 +223,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 4000
+                 if  Q.Zmes2(i) <= 5000
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);

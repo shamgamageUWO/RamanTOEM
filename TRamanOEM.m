@@ -180,7 +180,7 @@ Toem=X.x(1:m);
 % 
                     grid on;
                     hold on
-                    [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
+                    [fillhandle,msg]=jbfilly(Q.Zret(ind)./1000,upper(ind)',lower(ind)',rand(1,3),rand(1,3),0,0.5);
                     %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
                     % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
                     xlabel('Temperature (K)')
