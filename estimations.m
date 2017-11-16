@@ -1,4 +1,4 @@
-function [CJL] = estimations(Q)
+function [CJL,OV] = estimations(Q)
 
 
 
@@ -87,7 +87,7 @@ CJH = fitJH(1);
     %     %  OVz = (JLnew + JHnew- Bg_JL_real- Bg_JH_real)./(JLwoOV + JHwoOV)';
     %     % figure;plot(Q.Zmes./1000,OVz,'b'); hold on;
 %     
-%      JLwoOV = ((CJL.*JL));
+      JLwoOV = ((CJL.*JL));
 %      JHwoOV1 = ((Q.R.*CJL.*JH));
 %      JHwoOV2 = ((CJH.*JH));
 % % %     
@@ -97,7 +97,7 @@ CJH = fitJH(1);
 % 
 % % %     
 % % %     % It is now mean of the overlap as the a priori
-%       OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
+       OVzd = (SJL)./(JLwoOV )';
 %       OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV1 )';
 %       OVz3d = (Q.JHnew - Q.BaJH)./(JHwoOV2 )';
 % 
@@ -112,24 +112,27 @@ CJH = fitJH(1);
 
 % %     
 % %     OVzd = (OVz1d+OVz2d)./2;
-% %     OVzd = smooth(OVzd,5);
+   OVza = smooth(OVzd,5);
 % %     
 % %     OVza = (OVz1a+OVz2a)./2;
 % OVza = OVz1a;
 % %     OVza = smooth(OVza,10);
 %     normfac = OVza(end);
 %     OVnw = OVza./normfac;
-% %     plot(Q.Zmes1./1000,OVnw,'y')
+%      figure;plot(Q.Zmes./1000,OVza,'y')
+%      hold on
 %     
-% %      OVza(OVza>=1)=1;
+%      OVza(OVza>=1)=1;
 % %     OVz = [OVza;OVzd]; 
-%      OV = interp1(Q.Zmes1,OVnw,Q.Zret); % this is to smooth
-%      OV(isnan(OV))=1;
-%     OV(OV>=1)=1;
+      OV = interp1(Q.Zmes,OVza,Q.Zret); % this is to smooth
+     OV(isnan(OV))=1;
+    OV(OV>=1)=1;
+     OV(Q.Zret>=5000)=1;
 %     h = find(Q.Zret>=4500);
 % %     h = find(OV==1);
 %     OV(h(1):end)=1;
-%   plot(Q.Zret./1000,OV,'y')
+%    plot(Q.Zret./1000,OV,'r')
+%    hold off
 % hold off;
 % legend('Before interpolation','After interpolation','Final OV smoothed')
 
