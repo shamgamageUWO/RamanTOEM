@@ -11,12 +11,12 @@ function [S_aT]=TestTempCov(Zj,Ta)
 %   lengthcT1 = 100;
 %   lengthcT2 = 1000;
   lengthcT = 1000; % =3000; % only need m of these
-   Tfac = 15;
-%  Tfac1 = .01*Ta(Zj<=3000);
-%  Tfac2 = .1*Ta(Zj>=3000);
-%  Tfac = [Tfac1 Tfac2];
-%  Tmodvar = Tfac.^2;
-  Tmodvar = (Tfac.*ones(size(Ta))).^2;
+%    Tfac = 35;
+ Tfac1 = .1*Ta(Zj<=5000);
+ Tfac2 = .6*Ta(Zj>=5000);
+  Tfac = [Tfac1 Tfac2];
+   Tmodvar = Tfac.^2;
+%   Tmodvar = (Tfac.*ones(size(Ta))).^2;
  vars2 = Tmodvar;
   lc = lengthcT.*ones(1,m);
 % lc1 = lengthcT1.*ones(1,length(Tfac1));

@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 % Q.Csum =  2.8077e+18;
 % Q.CLfac = 10^-2;
 % Q.CHfac = 10^-2;
-Q.coaddalt = 20;
+Q.coaddalt = 10;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -34,8 +34,8 @@ Q.Clight = 299792458; %ISSI value
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJL = 2.4e-9; % 4ns
 Q.deadtimeJH = 1.35e-9; % 4ns
+Q.deadtimeJL = 1.35e-9; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 
@@ -80,13 +80,13 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Define grid sizes
-% k = find(Q.Zmes<=7000);
-% h = k(end);
-%  deltaZ = (Q.Zmes(2)-Q.Zmes(1));
-% Z1 = Q.Zmes(1):deltaZ*5:Q.Zmes(h);
-% Z2= Q.Zmes(h):deltaZ*10:55000;   
-%   Q.Zret = [Z1 Z2];
-   Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:55000;% Retrieval grid
+k = find(Q.Zmes<=6000);
+h = k(end);
+ deltaZ = (Q.Zmes(2)-Q.Zmes(1));
+Z1 = Q.Zmes(1):deltaZ*5:Q.Zmes(h);
+Z2= Q.Zmes(h):deltaZ*10:55000;   
+  Q.Zret = [Z1 Z2];
+%    Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:55000;% Retrieval grid
 disp(' Grids Defined')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -201,8 +201,8 @@ end
 
                         Q.y = [Q.JHnew ;Q.JLnew];
 
-             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,24);
-             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,24);
+             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
+             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,12);
 % 
 % 
 %             
@@ -217,7 +217,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 5000
+                 if Q.Zmes2(i) <= 6000
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -225,7 +225,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 5000
+                 if  Q.Zmes2(i) <= 6000
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);
