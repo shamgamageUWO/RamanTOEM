@@ -61,6 +61,12 @@ JH1 = JH  + BJH;
 %          figure;plot(JL_C-JL_dtc,Q.Zmes./1000,'b')
         JH_dtc = JH_C ./ (1 + JHHz.*(DT_JH));
         
+%              JL_dtc = JL_C .*exp(-JLHz.* DT_JL); % non-paralyzable
+% % %          figure;plot(JL_C-JL_dtc,Q.Zmes./1000,'b')
+%          JH_dtc = JH_C .*exp(-JHHz.*DT_JH);
+%         
+        
+        
 %           % 4. Convert to counts
 %            JL = JL_dtc.*(1./Q.f);
 %            JH = JH_dtc.*(1./Q.f);

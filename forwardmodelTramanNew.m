@@ -1,6 +1,6 @@
 % This code is to create synthetic data using the US standard data
 
-function [JL,JH,A_Zi_d,B_Zi_d,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x)
+function [JL,JH,x,y]=forwardmodelTramanNew(Q,x)
 
 m = length(Q.Zret);
 x_a = x(1:m);
@@ -56,17 +56,22 @@ JH1 = JH  + BJH;
         JHHz = (JH_C.*Q.f);
         JLHz = (JL_C.*Q.f);
 %         figure;semilogx(JLHz./1e6,Q.Zmes./1000,'r',JHHz./1e6,Q.Zmes./1000,'b')
+
+y = Q.JLnew./(Q.deltatime.*Q.coaddalt);
+x = JH_C;
+x = x(Q.Zmes>=10000 & Q.Zmes<=15000);
+y = y(Q.Zmes>=10000 & Q.Zmes<=15000);
         % 3. Apply DT
-        JL_dtc = JL_C .*exp(-JLHz.* DT_JL); % non-paralyzable
-%          figure;plot(JL_C-JL_dtc,Q.Zmes./1000,'b')
-        JH_dtc = JH_C .*exp(-JHHz.*DT_JH);
-        
-%           % 4. Convert to counts
-%            JL = JL_dtc.*(1./Q.f);
-%            JH = JH_dtc.*(1./Q.f);
-       % 5. Scale bacl to coadded signal    
-       JL = JL_dtc.*(Q.deltatime.*Q.coaddalt);
-       JH = JH_dtc.*(Q.deltatime.*Q.coaddalt);
+%         JL_dtc = JL_C .*exp(-JLHz.* DT_JL); % non-paralyzable
+% %          figure;plot(JL_C-JL_dtc,Q.Zmes./1000,'b')
+%         JH_dtc = JH_C .*exp(-JHHz.*DT_JH);
+%         
+% %           % 4. Convert to counts
+% %            JL = JL_dtc.*(1./Q.f);
+% %            JH = JH_dtc.*(1./Q.f);
+%        % 5. Scale bacl to coadded signal    
+%        JL = JL_dtc.*(Q.deltatime.*Q.coaddalt);
+%        JH = JH_dtc.*(Q.deltatime.*Q.coaddalt);
        
 % figure;plot(JL1-JL,Q.Zmes./1000,'b')
 % hold off;
