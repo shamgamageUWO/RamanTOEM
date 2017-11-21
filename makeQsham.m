@@ -34,10 +34,10 @@ Q.Clight = 299792458; %ISSI value
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJH = 1e-9; % 4ns
-Q.deadtimeJL = 1.35e-9; % 4ns
-Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
+Q.deadtimeJH = 1e-25; % 4ns
+Q.deadtimeJL = 1e-25; % 4ns
+Q.CovDTJL = (1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (1.*Q.deadtimeJH).^2;
 
 % Q.deltaT = 5; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
