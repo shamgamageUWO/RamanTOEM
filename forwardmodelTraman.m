@@ -8,8 +8,8 @@ BJH = x(m+1);
 BJL = x(m+2);
 CJL = x(m+3);
 OV = x(m+4:end-2);
-DT_JH = x(end-1);
-DT_JL = x(end); % deadtimes
+DT_JH = x(end-1)*1e-9;
+DT_JL = x(end)*1e-9; % deadtimes
 
 
 % interpolation

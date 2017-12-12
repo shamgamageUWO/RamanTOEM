@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 % Q.Csum =  2.8077e+18;
 % Q.CLfac = 10^-2;
 % Q.CHfac = 10^-2;
-Q.coaddalt = 10;
+Q.coaddalt = 20;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -34,10 +34,10 @@ Q.Clight = 299792458; %ISSI value
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJH = 1e-25; % 4ns
-Q.deadtimeJL = 1e-25; % 4ns
-Q.CovDTJL = (1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (1.*Q.deadtimeJH).^2;
+Q.deadtimeJH = 3; % 4ns
+Q.deadtimeJL = 1.5; % 4ns
+Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 
 % Q.deltaT = 5; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -61,13 +61,13 @@ Ebalt = Y.Ebalt;
 
 alt = Y.alt;
 Q.binzise = Y.binsize;
-Q.JHnew= JHnew(alt>=1000  & alt <=50000);
-Q.JLnew= JLnew(alt>=1000 & alt <=50000);
-Q.JH_DS =JH_DS(alt>=1000  & alt <=50000);
-Q.JL_DS =JL_DS(alt>=1000  & alt <=50000);
-Q.alt = alt(alt>=1000  & alt <=50000);
-Q.Eb = Eb(Ebalt>=1000  & Ebalt <=50000);
-Q.Ebalt = Ebalt(Ebalt>=1000  & Ebalt <=50000);
+Q.JHnew= JHnew(alt>=1000  & alt <=45000);
+Q.JLnew= JLnew(alt>=1000 & alt <=45000);
+Q.JH_DS =JH_DS(alt>=1000  & alt <=45000);
+Q.JL_DS =JL_DS(alt>=1000  & alt <=45000);
+Q.alt = alt(alt>=1000  & alt <=45000);
+Q.Eb = Eb(Ebalt>=1000  & Ebalt <=45000);
+Q.Ebalt = Ebalt(Ebalt>=1000  & Ebalt <=45000);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -80,13 +80,13 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Define grid sizes
-k = find(Q.Zmes<=6000);
-h = k(end);
- deltaZ = (Q.Zmes(2)-Q.Zmes(1));
-Z1 = Q.Zmes(1):deltaZ*5:Q.Zmes(h);
-Z2= Q.Zmes(h):deltaZ*10:55000;   
-  Q.Zret = [Z1 Z2];
-%    Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:55000;% Retrieval grid
+% k = find(Q.Zmes<=3000);
+% h = k(end);
+%  deltaZ = (Q.Zmes(2)-Q.Zmes(1));
+% Z1 = Q.Zmes(1):deltaZ*2:Q.Zmes(h);
+% Z2= Q.Zmes(h):deltaZ*4:50000;   
+%   Q.Zret = [Z1 Z2];
+      Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:50000;% Retrieval grid
 disp(' Grids Defined')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,7 +120,7 @@ disp(' Grids Defined')
 obj2 = Gravity(Q.Zmes, 46.82);
 Q.grav = obj2.accel;
 Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
-Q.z0 = 30000;            
+Q.z0 = 35000;            
 [Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);           
 disp('a priori temperature profile is loaded ')
 
@@ -172,8 +172,8 @@ disp('R is calibrated ')
 % OVnw = interp1(z,epsi,Q.Zret,'linear');
 % OVnw(isnan(OVnw))=1;
 % Q.OVa = OVnw;
-%  Q.OVa = ones(1,length(Q.Ta));
-Q.OVa = OV;
+    Q.OVa = ones(1,length(Q.Ta));
+%    Q.OVa = OV;
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
@@ -217,7 +217,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 6000
+                 if Q.Zmes2(i) <= 3500
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -225,7 +225,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 6000
+                 if  Q.Zmes2(i) <= 3500
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);
@@ -251,25 +251,25 @@ JLt = Q.JL_DS-Q.BaJL;
 Q_Digi = JLt./JHt;
 Tprofiledg = 1./log(Q_Digi);
 
-%             y_d = (Q.Tsonde);
-%             y_d = y_d( Q.Zmes>=1000 & Q.Zmes<=10000);
-%             x_d = 1./Tprofiledg( Q.Zmes>=1000 & Q.Zmes<=10000);
-% 
-%             ftdg=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
-%             fodg = fitoptions('method','NonlinearLeastSquares','Robust','On');
-%             set(fodg, 'StartPoint',[350, 0.3]);
-% 
-% 
-%             [f_dg,gofdg] = fit(x_d,y_d',ftdg,fodg);
-%             Q.a_dg = f_dg.a;
-%             Q.b_dg = f_dg.b;
+            y_d = (Q.Tsonde);
+            y_d = y_d( Q.Zmes>=4000 & Q.Zmes<=8000);
+            x_d = 1./Tprofiledg( Q.Zmes>=4000 & Q.Zmes<=8000);
 
-Q.a_dg = 399.8616;
-Q.b_dg = 0.5247;
+            ftdg=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
+            fodg = fitoptions('method','NonlinearLeastSquares','Robust','On');
+            set(fodg, 'StartPoint',[350, 0.3]);
+
+
+            [f_dg,gofdg] = fit(x_d,y_d',ftdg,fodg);
+            Q.a_dg = f_dg.a;
+            Q.b_dg = f_dg.b;
+
+% Q.a_dg = 399.8616;
+% Q.b_dg = 0.5247;
 
 Tradi= real(Q.a_dg./(1./Tprofiledg +Q.b_dg));
 Q.Ttradi = interp1(Q.Zmes,Tradi,Q.Zret,'linear');
-
+% figure;plot(Q.Ttradi,Q.Zmes,Q.Tsonde,Q.Zmes,'r')
 
 end
 

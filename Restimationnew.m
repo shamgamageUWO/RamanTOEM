@@ -85,7 +85,7 @@ R =  Digital_ratio'.*Ratio_diff;
 
 
  Alt = Q.Zmes2;
- ind1 = Alt >= 10000 & Alt< 15000;
+ ind1 = Alt >= 4000 & Alt< 8000; % I am changing this too
 % 
  x = 1./Ratio_diff(ind1);
  y = Digital_ratio(ind1);

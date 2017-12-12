@@ -84,6 +84,10 @@ JL = S0.Channel(11).Signal;
 JH = S0.Channel(3).Signal;
 Eb = S0.Channel(10).Signal(:,2:31);
 Ebalt = S0.Channel(10).Range;
+
+JL_L = S0.Channel(12).Signal;
+JH_L = S0.Channel(4).Signal;
+
 % MHZ to Counts conversion constant 
 Y.binsize = S0.Channel(11).BinSize;
 F = 1800.* (Y.binsize./150);
@@ -93,11 +97,26 @@ F = 1800.* (Y.binsize./150);
 JL = F.*JL; % single scans
 JH = F.*JH;
 Eb = F.*Eb;
+JL_L = F.*JL_L; % single scans
+JH_L = F.*JH_L;
 
  %% coaddding 30mints
 JL = nansum(JL');
 JH = nansum(JH');
 Eb = nansum(Eb');
+JL_L = nansum(JL_L');
+JH_L = nansum(JH_L');
+% figure;plot(JL,alt./1000,'r',JL_L,alt./1000,'b',JH,alt./1000,'g',JH_L,alt./1000,'black')
+% figure;plot(JL./JL_L,alt./1000,'r',JH./JH_L,alt./1000,'b')
+% %MHZ
+
+% jlh = JL./F; % single scans
+% jhh = JH./F;
+% jll = JL_L./F; % single scans
+% jhl = JH_L./F;
+
+
+
 % Coadd in alt
 
 [JH, JHzc] = coadd(JH, alt, Q.coaddalt);
@@ -119,8 +138,8 @@ bkg_ind2 = alt>50e3;
 
         
         % 3. Apply DT correction
-        JL_dtc = JLn ./ (1 - JLnwn.*(Q.deadtimeJL.*1e6)); % non-paralyzable
-        JH_dtc = JHn ./ (1 - JHnwn.*(Q.deadtimeJH).*1e6);
+        JL_dtc = JLn ./ (1 - JLnwn.*(Q.deadtimeJL.*1e6.*1e-9)); % non-paralyzable
+        JH_dtc = JHn ./ (1 - JHnwn.*(Q.deadtimeJH).*1e6.*1e-9);
 
 % %           % 4. Convert to counts
 %            JLC = JL_dtc.*(1./Q.f);

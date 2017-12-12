@@ -44,67 +44,17 @@ Kb_JL = zeros(n,1);
     
    Kb_JH(1:n1) = dJHdbg;
    Kb_JH(n1+1:n) = 0;
-%    Jdt1(n1+n2+1:n1+n2+n3) = 0;
-%    Jdt1(n1+n2+n3+1:n) = 0;
-   
    Kb_JL(1:n1) = 0;
    Kb_JL(n1+1:n) = dJLdbg;
-% Kb_JH1 = (((1-DT_JH.*JH).^2))'; %ones(n1,1).* 
-% Kb_JL1 =  (((1-DT_JL.*JL).^2))'; %ones(n2,1).*
 
-
-% Kb_JHa =  ones(n3,1); 
-% Kb_JLa =  ones(n4,1);
-%zeros(n-n2,1)]; % fix the lengths
 
 % Jacobian for CL
 
-% Analytical Method Using R and the deadtime term should be included
-% OV = x(end+1-(Q.OVlength):end);
-
- 
-%% Note here first set of altitude dependent terms such as Ti, OV are related to the analog channel. don't get confused with the indices here.
-%                 %% Digital
-%                 KCL11 = ((A_Zi_d.*Diff_JL_i(n3+1:end))./Ti(n3+1:end)).*((1-Q.deadtime.*JL).^2);%.*exp(logCJL);
-%                 KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i(n3+1:end))./Ti(n3+1:end)).*((1-Q.deadtime.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
-%                 %             KCL = [KCL22 KCL11];
-% 
-% 
-%                 %% Analog
-%                 KCLa11 = ((A_Zi_an.*Diff_JL_i(1:n3))./Ti(1:n3));%.*exp(logCJL);
-%                 KCLa22 = ((Q.Ra.*A_Zi_an.*Diff_JH_i(1:n3))./Ti(1:n3));%.*exp(logCJL); %% Note I have applied the cutoff for JH here
-%                 %             KCLa = [KCLa22 KCLa11];
-%                 %             KCL = KCL .* exp(logCJL); % this is done as I'm retrieving log of CJL now CJL
-
-
-
-%% Digital    
-% Numerical
 
 [dJHdc,dJLdc] =  deriC(Q,x,@forwardmodelTraman);
     
 KCL1(1:n1) = dJHdc;
-%    Jdt1(n1+1:n) = 0;
-%    Jdt1(n1+n2+1:n1+n2+n3) = 0;
-%    Jdt1(n1+n2+n3+1:n) = 0;
-   
-%    Jdt2(1:n1) = 0;
 KCL1(n1+1:n) = dJLdc;
-%    Jdt2(n1+n2+1:n) = 0;
-%    Jdt2(n1+n2+n3+1:n) = 0;
-% j
-% disp('ok')
-
-
-% Analytical
-%             KCL11 = ((A_Zi_d.*Diff_JL_i)./Ti).*((1-DT_JL.*JL).^2);%.*exp(logCJL);
-%             KCL22 = ((Q.R.*A_Zi_d.*Diff_JH_i)./Ti).*((1-DT_JH.*JH).^2);%.*exp(logCJL); %% Note I have applied the cutoff for JH here
-%             KCL = [KCL22 KCL11];
-            
-            
-%% Analog            
-%             KCLa11 = ((A_Zi_an.*Diff_JL_i(1:Q.n3))./Ti(1:Q.n3));%.*exp(logCJL);
-%             KCLa22 = ((Q.Ra.*A_Zi_an.*Diff_JH_i(1:Q.n3))./Ti(1:Q.n3));
 
 
 JOV = zeros(n,m);

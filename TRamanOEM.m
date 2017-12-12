@@ -43,8 +43,8 @@ BJL = X.x(m+2);
 % CJLa = X.x(end-2);
 % BJHa = X.x(end-4);
 % BJLa = X.x(end-3);
-DT_JH = X.x(end-1);
-DT_JL = X.x(end); % deadtimes
+DT_JH = X.x(end-1)*1e-9;
+DT_JL = X.x(end)*1e-9; % deadtimes
 
 'X.cost'
 X.cost
@@ -108,14 +108,36 @@ DT_JL
                     figure;
                     subplot(2,1,1)
                     plot(X.J(1:n1,1:m),Q.Zmes./1000)
-                    xlabel('Jacobian - JH')
+                    xlabel('Temperature Jacobian - JH')
                     ylabel('Altitude (km)')
 
                     subplot(2,1,2)
                     plot(X.J(n1+1:n1+n2,1:m),Q.Zmes./1000)
-                    xlabel('Jacobian - JL')
+                    xlabel('Temperature Jacobian - JL')
+                    ylabel('Altitude (km)')
+                    
+                  figure;
+                    subplot(2,1,1)
+                    plot(X.J(1:n1,m+4:end-2),Q.Zmes./1000)
+                    xlabel('OV Jacobian - JH')
                     ylabel('Altitude (km)')
 
+                    subplot(2,1,2)
+                    plot(X.J(n1+1:n1+n2,m+4:end-2),Q.Zmes./1000)
+                    xlabel('OV Jacobian - JL')
+                    ylabel('Altitude (km)')
+                    
+                    figure;
+                    subplot(2,1,1)
+                    semilogx(X.J(1:n1,end-1),Q.Zmes./1000)
+                    xlabel('DT Jacobian - JH')
+                    ylabel('Altitude (km)')
+
+                    subplot(2,1,2)
+                    semilogx(X.J(n1+1:n1+n2,end),Q.Zmes./1000)
+                    xlabel('DTJacobian - JL')
+                    ylabel('Altitude (km)')
+                    
 %                     subplot(2,2,1)
 %                     plot(X.J(n1+n2+1:n1+n2+n3,1:m),Q.Zmes./1000)
 %                     xlabel('Jacobian - JHa')
@@ -164,7 +186,16 @@ DT_JL
                     err = X.e(1:m);
                     upper = err+ X.x(1:m);
                     lower =  X.x(1:m)-err;
-% 
+
+                    % Uncertainty for Ta and Traditional
+                    Ta_UP = Q.Tsonde2 + 0.1.*Q.Tsonde2;
+                    Ta_DW = Q.Tsonde2 - 0.1.*Q.Tsonde2;
+                    
+                    Tr_UP = Q.Ttradi + 0.1.*Q.Ttradi;
+                    Tr_DW = Q.Ttradi - 0.1.*Q.Ttradi;
+                    
+                    
+                    
 % [Tsonde,Zsonde,Psonde] = get_sonde_RS92(20120718,00);
 % Zsonde = Zsonde-491; % altitude correction
 % %                     lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
@@ -181,7 +212,9 @@ Toem=X.x(1:m);
                     grid on;
                     hold on
                     [fillhandle,msg]=jbfilly(Q.Zret(ind)./1000,upper(ind)',lower(ind)',rand(1,3),rand(1,3),0,0.5);
-                    %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
+%                     [fillhandle,msg]=jbfilly(Q.Zret(ind)./1000,Ta_UP(ind),Ta_DW(ind),rand(1,3),rand(1,3),0,0.5);
+%                     [fillhandle,msg]=jbfilly(Q.Zret(ind)./1000,Tr_UP(ind),Tr_DW(ind),rand(1,3),rand(1,3),0,0.5);
+%                     %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
                     % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
                     xlabel('Temperature (K)')
                     ylabel('Altitude(km)')
@@ -191,7 +224,7 @@ Toem=X.x(1:m);
 %                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 % 
                      subplot(1,2,2)
-                     plot((Toem(ind) - Q.Tsonde2(ind)'),Q.Zret(ind)./1000);
+                     plot((Toem(ind) - Q.Tsonde2(ind)'),Q.Zret(ind)./1000,(Toem(ind) - Q.Ta(ind)'),Q.Zret(ind)./1000,'r');
                      %,'r',Q.Traditional(Q.Zmes<=25000) - (Q.Tsonde(Q.Zmes<=25000)'),Q.Zmes(Q.Zmes<=25000)./1000,'b')
 %                      legend('T OEM - T sonde','T traditional - T sonde')
                      grid on;
