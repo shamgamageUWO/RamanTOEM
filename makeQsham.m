@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 8;
+Q.coaddalt = 10;
  Q.Rgas = 8.3145;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -35,8 +35,8 @@ Q.shots = 1800;
 
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.7e-9; % 4ns
-Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
+Q.CovDTJL = (1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (1.*Q.deadtimeJH).^2;
 
 % Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -73,13 +73,13 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=500 & ANalt <= 6000);
+Q.Eba = Eba(ANalt>=1000 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=500 & ANalt <=6000);
-Q.JLnewa= JLnewa(ANalt>=500 & ANalt <=6000);
-Q.ANalt = ANalt(ANalt>=500);
+Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=6000);
+Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=6000);
+Q.ANalt = ANalt(ANalt>=1000);
 % Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=500 & ANalt <= 6000);
+Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -103,10 +103,10 @@ Q.n4=length(Q.JLnewa);
 
 %% Define grid sizes
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:6000;
-Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*15:60000;
-Q.Zret =[Z1 Z2];
-% Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:60000;% Retrieval grid
+% Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:6000;
+% Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*15:60000;
+% Q.Zret =[Z1 Z2];
+ Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:60000;% Retrieval grid
 disp('Defined grids ')
 
 % slopeDT= (1-0.1)/(Q.Zret(1)-Q.Zret(end));
@@ -221,8 +221,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
 
-             [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,12);
-             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,12);
+             [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,8);
+             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,8);
           
              r1 = ones(1,go11-1).* JHv(1);
              r2 = ones(1,go11-1).* JHv(end);
@@ -232,8 +232,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,12);
- [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,12);
+ [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,8);
+ [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,8);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);

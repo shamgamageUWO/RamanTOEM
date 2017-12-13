@@ -27,7 +27,7 @@ OV_Zia = interp1(Q.Zret,OV,Q.Zmes1,'linear');
 %%
 % Constants
 kb = 1.38064852*10^-23;
-area = pi * (0.3^2);
+% area = pi * (0.3^2);
 % Transmission
 R_tr_i = (Q.Tr);
 
@@ -48,11 +48,11 @@ Pa = exp(Pdigia);
 
 % ind1 = Q.Zmes>3.8e3 & Q.Zmes<5e3; %JL
 
-A_Zi_an = (area .* OV_Zia .*R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2);
-B_Zi_an = (area .*R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2); % No overlap
+A_Zi_an = ( OV_Zia .*R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2);
+B_Zi_an = (R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2); % No overlap
 
-A_Zi_d = (area .* OV_Zid .*R_tr_id .*Pd)./(kb * Q.Zmes2 .^2);
-B_Zi_d = (area .*R_tr_id .*Pd)./(kb * Q.Zmes2 .^2); % No overlap
+A_Zi_d = (OV_Zid .*R_tr_id .*Pd)./(kb * Q.Zmes2 .^2);
+B_Zi_d = (R_tr_id .*Pd)./(kb * Q.Zmes2 .^2); % No overlap
 
 %% loading cross sections
 load('DiffCrossSections.mat');

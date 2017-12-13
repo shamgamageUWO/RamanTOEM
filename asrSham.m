@@ -35,7 +35,7 @@ lambda_em = 354.7;
 %% These from BOB- WVOEM.m
 in.LRfree = 20; % was 20 on 0305, 0308 50, 200905-6 50
 in.LRpbl = 50; % 50 on 0305; was 80 on otherwise
-in.LRtranHeight = 2000; % this is the height to the BL
+in.LRtranHeight = 1800; % this is the height to the BL
 % 3 is nominal, not accurate 2.75; 
 
 
@@ -65,9 +65,9 @@ asrDATAs(fneg) = 1;
 
 
 alphaAer = LR' .* (beta_mol .* (asrDATAs-1));
-znoAer = find(zN > 10000); % was 3000 for 20130122
+znoAer = find(zN > 8000); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
-'asr set to 0 > 10000'
+'asr set to 0 > 8000'
     fl0 = find(alphaAer <= 0);
     alphaAer(fl0) = 1e-12;
 
