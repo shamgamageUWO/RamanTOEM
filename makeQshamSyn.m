@@ -1,4 +1,4 @@
-function [Q] = makeQsham( date_in,time_in,flag)
+function [Q] = makeQshamSyn( date_in,time_in,flag)
 % makeQ(in)
 
 % -Usage-
