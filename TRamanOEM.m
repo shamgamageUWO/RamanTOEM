@@ -1,4 +1,4 @@
-function [X,R,Q,O,S_a,Se,xa]=TRamanOEM( date_in,time_in,flag)
+function [X,R,Q,O,S_a,Se,xa,S_b]=TRamanOEM( date_in,time_in,flag)
 tic
 [O,Q,R,S_a,Se,xa] = InputsForOEM( date_in,time_in,flag);
 xa = xa';
@@ -9,6 +9,7 @@ n = Q.n1+Q.n2+Q.n3+Q.n4;
 n1 = Q.n1;
 n2 = Q.n2;
 n3 = Q.n3;
+n4= Q.n4;
 y = Q.y;
 % 
 yJH = smooth(y(1:n1),100);
@@ -328,50 +329,64 @@ T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
                          legend('Traditional-Sonde','OEM - Traditional','OEM - Sonde') 
 
-                    
-                    
-%                     figure;plot(X.eo(1:length(Q.Zret)),Q.Zret./1000)
-%                     xlabel('Temperature Stat error (K)')
-%                     ylabel( ' Alt (km)')
-% (mchanA+1:2*mchanA))./y(mchanA+1:2*mchanA)
+R =bparameterjacobians (Q,X);
+
+S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
+S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5));%DegF for OV
+
 %                     %% Percent difference of background, lidar calibration constant retrievals and the true
 % 
 %                     percent_BG_JH = ((Q.Bg_JH_real -BJH)./BJH).*100
 %                     percent_BG_JL = ((Q.Bg_JL_real -BJL)./BJL).*100
 %                     percent_CJL = ((Q.CL -CJL)./CJL).*100
-%                     % percent_CJLTrue = ((Q.CL*(1.05) -CJL)./CJL).*100
-%                     Degree_of_freedom_Temperature = trace(X.A(1:m,1:m))
 %                     % e = cputime
 %                     toc
 % 
 % 
 %                     % %  %%
 %                     % % % calculate error matrices
-%                     % % dfacP = 0.1; % ISSI recommend
-%                     % % dfacR = 0.1; % ISSI recommend
-%                     % % dfacAir = 0.01; % BOb code
-%                     % % dfacaero = 0.01;
+                    dfacP = 0.1; % ISSI recommend
+                    dfacR = 0.1; % ISSI recommend
+                    dfacRa = 0.1; % ISSI recommend
+                    dfacAir = 0.01; % BOb code
+                    dfacaero = 0.01;
 %                     % % dfacDT = 0.1;
+%                     % % Pressure error
+                    SP1 = (dfacP.*Q.Pressi(n3+1:end)).^2;
+                    SP2 = (dfacP.*Q.Pressi(1:n3)).^2;% for 2 digital channels
+                    SP = [SP1 SP1 SP2 SP2];
+                    S_P = diag(SP);
+                    
+%                     % % R  and Ra error
+                    SR1 = (dfacR.*Q.R).^2;
+                    SR1= SR1.*ones(n1,1);
+                    SR2 = zeros(n2+n3+n4,1);
+                    SR = [SR1 ;SR2];
+                    S_R = diag(SR);
+                    
+                    SRa1 = (dfacRa.*Q.Ra).^2;
+                    SRa1= SRa1.*ones(n3,1);
+                    SRa2 = zeros(n4,1);
+                    ss = zeros(n1+n2,1);
+                    SRa = [ss ;SRa1;SRa2];
+                    S_Ra = diag(SRa);
 %                     % %
-%                     % % SP = (dfacP.*Q.Pressi).^2;
-%                     % % SP = [SP SP];
-%                     % % SP = diag(SP);
+                    Sair1 = (dfacAir.*Q.Nmol(n3+1:end)).^2;
+                    Sair2 = (dfacAir.*Q.Nmol(1:n3)).^2;
+                    Sair = [Sair1 Sair1 Sair2 Sair2];
+                    S_air = diag(Sair);
 %                     % %
-%                     % % SR = (dfacR.*Q.R).^2;
-%                     % %
-%                     % % Sair = (dfacAir.*Q.Nmol).^2;
-%                     % % Sair = [Sair Sair];
-%                     % % Sair = diag(Sair);
-%                     % %
-%                     % % Saero = (dfacaero.*Q.alpha_aero').^2;
-%                     % % Saero = [Saero Saero];
-%                     % % Saero = diag(Saero);
+                    Saero1 = (dfacaero.*Q.alpha_aero(n3+1:end)').^2;
+                    Saero2 = (dfacaero.*Q.alpha_aero(1:n3)').^2;
+                    Saero = [Saero1 Saero1 Saero2 Saero2];
+                    S_aero = diag(Saero);
 %                     % %
 %                     % % SDT = (dfacDT.*Q.deadtime).^2;
 %                     % %
 %                     % %
-%                     % % SxP = X.G*R.JPress*SP*R.JPress'*X.G';
-%                     % % SxR = X.G*R.JR*SR*R.JR'*X.G';
-%                     % % SxAir = X.G*R.Jnair*Sair*R.Jnair'*X.G';
-%                     % % Sxaero = X.G*R.Jaero*Saero*R.Jaero'*X.G';
+S_b.SxP = X.G*R.JPress*S_P*R.JPress'*X.G';
+S_b.SxR = X.G*R.JR*S_R*R.JR'*X.G';
+S_b.SxRa = X.G*R.JRa*S_Ra*R.JRa'*X.G';
+S_b.SxAir = X.G*R.Jnair*S_air*R.Jnair'*X.G';
+S_b.Sxaero = X.G*R.Jaero*S_aero*R.Jaero'*X.G';
 %                     % % SxDT = X.G*R.JDT*SDT*R.JDT'*X.G';

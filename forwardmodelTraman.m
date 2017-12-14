@@ -36,12 +36,12 @@ R_tr_ia = interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
 
 
 
-[Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Ti,Q.Pressi,0,Q.grav',Q.MoR);
-Pdigid = interp1(Q.Zmes,log(Pdigi),Q.Zmes2,'linear');
-Pdigia = interp1(Q.Zmes,log(Pdigi),Q.Zmes1,'linear');
+% [Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Ti,Q.Pressi,0,Q.grav',Q.MoR);
+% Pdigid = interp1(Q.Zmes,log(Pdigi),Q.Zmes2,'linear');
+% Pdigia = interp1(Q.Zmes,log(Pdigi),Q.Zmes1,'linear');
 
-Pd = exp(Pdigid);
-Pa = exp(Pdigia);
+Pd = Q.Pressi(1+length(Q.JHnewa):end);%exp(Pdigid);
+Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
 
 % Define the first part of the equation 
 % N1 = length(Q.Zmes1);
