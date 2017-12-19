@@ -38,7 +38,7 @@ lambda_em = 354.7;
 %% These from BOB- WVOEM.m
 LRfree = 50; % was 20 on 0305, 0308 50, 200905-6 50
 LRpbl = 80; % 50 on 0305; was 80 on otherwise
-LRtranHeight = 1900; % this is the height to the BL
+LRtranHeight = 2300; % this is the height to the BL
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% These lines are from BOB - WV - makeQ.m
@@ -103,7 +103,7 @@ Nmol = (NA/M).* Q.rho ; % mol m-3
 %  alpha_aero(isnan(alpha_aero))=0;
 sigma_tot = Nmol*sigmaNicolet+ alphaAer';
 Tr1 = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
- 
+%  Q.alphaAer=alphaAer; 
  
  
  

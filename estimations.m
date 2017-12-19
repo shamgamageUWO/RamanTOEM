@@ -3,7 +3,7 @@ function [CJL,OV] = estimations(Q)
 
 
 Zi = Q.Zmes;
-ind1 = Zi>=3000 & Zi< 6000;% I am changing this for now !!
+ind1 = Zi>=5000 & Zi< 10000;% I am changing this for now !!
 ind2 = Zi>=2000 & Zi< 2200;
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

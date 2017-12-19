@@ -68,7 +68,7 @@ vars2 = Tmodvar ;
 
 for i = 1:m
     for j = 1:m
-         if Zj(i)< 60000 % this is to force the ov to go to 1.
+         if Zj(i)< 3000 % this is to force the ov to go to 1.
 %             disp('ok')
             sigprod = sqrt(vars2(i).*vars2(j));
             diffz = Zj(i) - Zj(j);
