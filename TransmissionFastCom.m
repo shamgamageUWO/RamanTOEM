@@ -21,6 +21,7 @@ config = getCalibration(config);
 
 asr =BackScatteringRatio03_local(S3,config );
 
+figure;plot(asr.profile,asr.z./1000)
 
 %% 
 % Load beta molecular values here 
