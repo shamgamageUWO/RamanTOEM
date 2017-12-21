@@ -15,14 +15,16 @@ DT_JL = x(end); % deadtimes
 
 
 % interpolation
-Td = interp1(Q.Zret,x_a,Q.Zmes2,'linear'); % T on data grid (digital)
-Ta = interp1(Q.Zret,x_a,Q.Zmes1,'linear');
+% Td = interp1(Q.Zret,x_a,Q.Zmes2,'linear'); % T on data grid (digital)
+% Ta = interp1(Q.Zret,x_a,Q.Zmes1,'linear');
 Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear');
+Td= Ti(end-length(Q.JHnew)+1:end);
+Ta= Ti(1:length(Q.JHnewa));
 
+OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
 
-
-OV_Zid = interp1(Q.Zret,OV,Q.Zmes2,'linear');
-OV_Zia = interp1(Q.Zret,OV,Q.Zmes1,'linear');
+OV_Zid = OV_Zi(end-length(Q.JHnew)+1:end);%interp1(Q.Zret,OV,Q.Zmes2,'linear');
+OV_Zia = OV_Zi(1:length(Q.JHnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
 
 %%
 % Constants
@@ -31,8 +33,8 @@ kb = 1.38064852*10^-23;
 % Transmission
 R_tr_i = (Q.Tr);
 
-R_tr_id = interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
-R_tr_ia = interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
+R_tr_id = R_tr_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
+R_tr_ia = R_tr_i(1:length(Q.JHnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
 
 
 
@@ -40,7 +42,7 @@ R_tr_ia = interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
 % Pdigid = interp1(Q.Zmes,log(Pdigi),Q.Zmes2,'linear');
 % Pdigia = interp1(Q.Zmes,log(Pdigi),Q.Zmes1,'linear');
 
-Pd = Q.Pressi(1+length(Q.JHnewa):end);%exp(Pdigid);
+Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
 Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
 
 % Define the first part of the equation 
@@ -60,11 +62,11 @@ Diff_JH_i = interp1(T,Diff_JH,Ti,'linear');
 Diff_JL_i = interp1(T,Diff_JL,Ti,'linear');
 
 
-dJHd = interp1(Q.Zmes,Diff_JH_i,Q.Zmes2,'linear');
-dJLd = interp1(Q.Zmes,Diff_JL_i,Q.Zmes2,'linear');
+dJHd = Diff_JH_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,Diff_JH_i,Q.Zmes2,'linear');
+dJLd = Diff_JL_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,Diff_JL_i,Q.Zmes2,'linear');
 
-dJHa = interp1(Q.Zmes,Diff_JH_i,Q.Zmes1,'linear');
-dJLa = interp1(Q.Zmes,Diff_JL_i,Q.Zmes1,'linear');
+dJHa = Diff_JH_i(1:length(Q.JHnewa));%interp1(Q.Zmes,Diff_JH_i,Q.Zmes1,'linear');
+dJLa = Diff_JL_i(1:length(Q.JHnewa));%interp1(Q.Zmes,Diff_JL_i,Q.Zmes1,'linear');
 
 
 % toc
