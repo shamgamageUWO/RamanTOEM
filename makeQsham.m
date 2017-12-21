@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 % Q.Csum =  2.8077e+18;
 % Q.CLfac = 10^-2;
 % Q.CHfac = 10^-2;
-Q.coaddalt = 20;
+Q.coaddalt = 10;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -34,8 +34,8 @@ Q.Clight = 299792458; %ISSI value
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJH = 3; % 4ns
-Q.deadtimeJL = 1.5; % 4ns
+Q.deadtimeJH = 2; % 4ns
+Q.deadtimeJL = 3.8; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 
@@ -178,7 +178,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 if flag ==1
     Q.CovBJL = ((Y.bg_JL_std)).^2; % day time

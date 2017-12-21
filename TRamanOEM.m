@@ -1,4 +1,4 @@
-function [X,R,Q,O,S_a,Se,xa,S]=TRamanOEM( date_in,time_in,flag)
+function [X,R,Q,O,S_a,Se,xa]=TRamanOEM( date_in,time_in,flag)
 tic
 [O,Q,R,S_a,Se,xa] = InputsForOEM( date_in,time_in,flag);
 xa = xa';
@@ -43,8 +43,8 @@ BJL = X.x(m+2);
 % CJLa = X.x(end-2);
 % BJHa = X.x(end-4);
 % BJLa = X.x(end-3);
-DT_JH = X.x(end-1)*1e-9;
-DT_JL = X.x(end)*1e-9; % deadtimes
+% DT_JH = X.x(end-1)*1e-9;
+% DT_JL = X.x(end)*1e-9; % deadtimes
 
 'X.cost'
 X.cost
@@ -64,11 +64,11 @@ Q.BaJL
 'OEM-CL'
 CJL
 
-'DT-JH'
-DT_JH
-
-'DT-JL'
-DT_JL
+% 'DT-JH'
+% DT_JH
+% 
+% 'DT-JL'
+% DT_JL
 
 %CJL = exp(logCJL)
 
@@ -106,37 +106,37 @@ DT_JL
 % % 
 % %                     %% Plot Temperature Jacobians
                     figure;
-                    subplot(3,2,1)
+                    subplot(2,2,1)
                     plot(X.J(1:n1,1:m),Q.Zmes./1000)
                     xlabel('Temperature Jacobian - JH')
                     ylabel('Altitude (km)')
 
-                    subplot(3,2,2)
+                    subplot(2,2,2)
                     plot(X.J(n1+1:n1+n2,1:m),Q.Zmes./1000)
                     xlabel('Temperature Jacobian - JL')
                     ylabel('Altitude (km)')
                     
 %                   figure;
-                    subplot(3,2,3)
-                    plot(X.J(1:n1,m+4:end-2),Q.Zmes./1000)
+                    subplot(2,2,3)
+                    plot(X.J(1:n1,m+4:end),Q.Zmes./1000)
                     xlabel('OV Jacobian - JH')
                     ylabel('Altitude (km)')
 
-                    subplot(3,2,4)
-                    plot(X.J(n1+1:n1+n2,m+4:end-2),Q.Zmes./1000)
+                    subplot(2,2,4)
+                    plot(X.J(n1+1:n1+n2,m+4:end),Q.Zmes./1000)
                     xlabel('OV Jacobian - JL')
                     ylabel('Altitude (km)')
                     
-%                     figure;
-                    subplot(3,2,5)
-                    semilogx(X.J(1:n1,end-1),Q.Zmes./1000)
-                    xlabel('DT Jacobian - JH')
-                    ylabel('Altitude (km)')
-
-                    subplot(3,2,6)
-                    semilogx(X.J(n1+1:n1+n2,end),Q.Zmes./1000)
-                    xlabel('DTJacobian - JL')
-                    ylabel('Altitude (km)')
+% %                     figure;
+%                     subplot(3,2,5)
+%                     semilogx(X.J(1:n1,end-1),Q.Zmes./1000)
+%                     xlabel('DT Jacobian - JH')
+%                     ylabel('Altitude (km)')
+% 
+%                     subplot(3,2,6)
+%                     semilogx(X.J(n1+1:n1+n2,end),Q.Zmes./1000)
+%                     xlabel('DTJacobian - JL')
+%                     ylabel('Altitude (km)')
                     
 %                     subplot(2,2,1)
 %                     plot(X.J(n1+n2+1:n1+n2+n3,1:m),Q.Zmes./1000)
@@ -236,7 +236,7 @@ Toem=X.x(1:m);
 % 
                     figure;
                     subplot(1,2,1)
-                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-2),Q.Zret./1000,'r')
+                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end),Q.Zret./1000,'r')
                     grid on;
                     xlabel('OV')
                     ylabel('Altitude(km)')
@@ -246,7 +246,7 @@ Toem=X.x(1:m);
                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
                     subplot(1,2,2)
-                    plot((((-Q.OVa')+X.x(m+4:end-2) )./X.x(m+4:end-2)).*100,Q.Zret./1000)
+                    plot((((-Q.OVa')+X.x(m+4:end) )./X.x(m+4:end)).*100,Q.Zret./1000)
                     grid on;
                     xlabel('OV residuals(OV OEM - OV a priori) (%)')
                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
@@ -284,28 +284,28 @@ Toem=X.x(1:m);
                     ylabel('Altitude (km)')
 
 
-                    
+                   Toem_e= X.eo(1:m);
                         figure; 
                       subplot(1,3,1)
-                     plot(X.x(1:m) - (Q.Tsonde2'),Q.Zret./1000)
+                     plot(Toem(ind) - (Q.Tsonde2(ind)'),Q.Zret(ind)./1000)
                      hold on;
-                     plot(X.eo(1:m),Q.Zret./1000,'r',-X.eo(1:m),Q.Zret./1000,'r')
+                     plot(Toem_e(ind),Q.Zret(ind)./1000,'r',-Toem_e(ind),Q.Zret(ind)./1000,'r')
                      hold off;
                      grid on;
                      xlabel('Temperature residuals(T OEM - T sonde) (K)')
                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
                      
                     subplot(1,3,2)
-                     plot(X.x(1:m) - (Q.Ttradi'),Q.Zret./1000)
+                     plot(Toem(ind) - (Q.Ttradi(ind)'),Q.Zret(ind)./1000)
                      hold on;
-                     plot(X.eo(1:m),Q.Zret./1000,'r',-X.eo(1:m),Q.Zret./1000,'r')
+                     plot(Toem_e(ind),Q.Zret(ind)./1000,'r',-Toem_e(ind),Q.Zret(ind)./1000,'r')
                      hold off;
                      grid on;
                      xlabel('Temperature residuals(T OEM - T traditional) (K)')
                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
                      
                       subplot(1,3,3)
-                     plot((Q.Ttradi-Q.Tsonde2),Q.Zret./1000,'r',( Q.Ttradi' - X.x(1:m) ),Q.Zret./1000,'b',(X.x(1:m) - Q.Tsonde2'),Q.Zret./1000,'g')
+                     plot((Q.Ttradi(ind)-Q.Tsonde2(ind)),Q.Zret(ind)./1000,'r',( Q.Ttradi(ind)' - Toem(ind) ),Q.Zret(ind)./1000,'b',(Toem(ind) - Q.Tsonde2(ind)'),Q.Zret(ind)./1000,'g')
  
                      grid on;
                      xlabel('Temperature residuals (K)')
@@ -346,51 +346,53 @@ Toem=X.x(1:m);
 
 
 
-R =bparameterjacobians (Q,X);
 
-degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
-degF2 = trace(X.A(m+4:end-2,m+4:end-2));%DegF for OV
 
-%                     %% Percent difference of background, lidar calibration constant retrievals and the true
-% 
-%                     percent_BG_JH = ((Q.Bg_JH_real -BJH)./BJH).*100
-%                     percent_BG_JL = ((Q.Bg_JL_real -BJL)./BJL).*100
-%                     percent_CJL = ((Q.CL -CJL)./CJL).*100
-%                     % e = cputime
-%                     toc
-% 
-% 
-%                     % %  %%
-%                     % % % calculate error matrices
-                    dfacP = 0.1; % ISSI recommend
-                    dfacR = 0.1; % ISSI recommend
-                    dfacAir = 0.01; % BOb code
-%                     dfacaero = 0.01;
-%                     % % dfacDT = 0.1;
-%                     % % Pressure error
-                    SP1 = (dfacP.*Q.Pressi).^2;
-                    SP = [SP1 SP1];
-                    S_P = diag(SP);
-                    
-%                     % % R  and Ra error
-                    SR = (dfacR.*Q.R).^2;
-%                     SRa = (dfacRa.*Q.Ra).^2;
-%                     % %
-                    Sair1 = (dfacAir.*Q.Nmol).^2;
-                    Sair = [Sair1 Sair1];
-                    S_air = diag(Sair);
+degF1 = trace(X.A(1:m,1:m)) %DegF for Temperature 
+degF2 = trace(X.A(m+4:end,m+4:end))%DegF for OV
+
+
+
+% R =bparameterjacobians (Q,X);%                     %% Percent difference of background, lidar calibration constant retrievals and the true
+% % 
+% %                     percent_BG_JH = ((Q.Bg_JH_real -BJH)./BJH).*100
+% %                     percent_BG_JL = ((Q.Bg_JL_real -BJL)./BJL).*100
+% %                     percent_CJL = ((Q.CL -CJL)./CJL).*100
+% %                     % e = cputime
+% %                     toc
+% % 
+% % 
+% %                     % %  %%
+% %                     % % % calculate error matrices
+%                     dfacP = 0.1; % ISSI recommend
+%                     dfacR = 0.1; % ISSI recommend
+%                     dfacAir = 0.01; % BOb code
+% %                     dfacaero = 0.01;
+% %                     % % dfacDT = 0.1;
+% %                     % % Pressure error
+%                     SP1 = (dfacP.*Q.Pressi).^2;
+%                     SP = [SP1 SP1];
+%                     S_P = diag(SP);
+%                     
+% %                     % % R  and Ra error
+%                     SR = (dfacR.*Q.R).^2;
+% %                     SRa = (dfacRa.*Q.Ra).^2;
 % %                     % %
-%                     Saero1 = (dfacaero.*Q.alphaAer').^2;
-%                     Saero = [Saero1 Saero1];
-%                     S_aero = diag(Saero);
-%                     % %
-%                     % % SDT = (dfacDT.*Q.deadtime).^2;
-%                     % %
-%                     % %
-S.SxP = X.G*R.JPress*S_P*R.JPress'*X.G';
-S.SxR = X.G*R.JR*SR*R.JR'*X.G';
-% S.SxRa = X.G*R.JRa*SRa*R.JRa'*X.G';
-S.SxAir = X.G*R.Jnair*S_air*R.Jnair'*X.G';
-% S.Sxaero = X.G*R.Jaero*S_aero*R.Jaero'*X.G';
-%                     % % SxDT = X.G*R.JDT*SDT*R.JDT'*X.G';
+%                     Sair1 = (dfacAir.*Q.Nmol).^2;
+%                     Sair = [Sair1 Sair1];
+%                     S_air = diag(Sair);
+% % %                     % %
+% %                     Saero1 = (dfacaero.*Q.alphaAer').^2;
+% %                     Saero = [Saero1 Saero1];
+% %                     S_aero = diag(Saero);
+% %                     % %
+% %                     % % SDT = (dfacDT.*Q.deadtime).^2;
+% %                     % %
+% %                     % %
+% S.SxP = X.G*R.JPress*S_P*R.JPress'*X.G';
+% S.SxR = X.G*R.JR*SR*R.JR'*X.G';
+% % S.SxRa = X.G*R.JRa*SRa*R.JRa'*X.G';
+% S.SxAir = X.G*R.Jnair*S_air*R.Jnair'*X.G';
+% % S.Sxaero = X.G*R.Jaero*S_aero*R.Jaero'*X.G';
+% %                     % % SxDT = X.G*R.JDT*SDT*R.JDT'*X.G';
 
