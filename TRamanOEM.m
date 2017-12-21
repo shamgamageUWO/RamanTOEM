@@ -299,12 +299,15 @@ T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
                     ylabel('Altitude (km)')
                     
                     
-                    
+           in= Q.Zret<=25000;
+          Toem= X.x(1:m);
+          Toem_e=X.eo(1:m);
+           
                     figure; 
                       subplot(1,3,1)
-                     plot(X.x(1:m) - (Q.Tsonde2'),Q.Zret./1000)
+                     plot(Toem(in) - (Q.Tsonde2(in)'),Q.Zret(in)./1000)
                      hold on;
-                     plot(X.eo(1:m),Q.Zret./1000,'r',-X.eo(1:m),Q.Zret./1000,'r')
+                     plot(Toem_e(in),Q.Zret(in)./1000,'r',-Toem_e(in),Q.Zret(in)./1000,'r')
                      hold off;
                      grid on;
                      xlabel('Temperature residuals(T OEM - T sonde) (K)')
@@ -313,16 +316,16 @@ T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
 %                      T = X.x(1:m);
                      
                     subplot(1,3,2)
-                     plot(X.x(1:m) - T_dg',Q.Zret./1000)
+                     plot(Toem(in) - T_dg(in)',Q.Zret(in)./1000)
                      hold on;
-                     plot(X.eo(1:m),Q.Zret./1000,'r',-X.eo(1:m),Q.Zret./1000,'r')
+                     plot(Toem_e(in),Q.Zret(in)./1000,'r',-Toem_e(in),Q.Zret(in)./1000,'r')
                      hold off;
                      grid on;
                      xlabel('Temperature residuals(T OEM - T digital traditional) (K)')
                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
                      
                       subplot(1,3,3)
-                     plot((T_dg-Q.Tsonde2),Q.Zret./1000,'r',( T_dg' - X.x(1:m)),Q.Zret./1000,'b',(X.x(1:m) - Q.Tsonde2'),Q.Zret./1000,'g')
+                     plot((T_dg(in)-Q.Tsonde2(in)),Q.Zret(in)./1000,'r',( T_dg(in)' - Toem(in)),Q.Zret(in)./1000,'b',(Toem(in) - Q.Tsonde2(in)'),Q.Zret(in)./1000,'g')
  
                      grid on;
                      xlabel('Temperature residuals (K)')
@@ -332,7 +335,7 @@ T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
 R =bparameterjacobians (Q,X);
 
 S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
-S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5));%DegF for OV
+S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV
 
 %                     %% Percent difference of background, lidar calibration constant retrievals and the true
 % 
@@ -389,4 +392,12 @@ S_b.SxR = X.G*R.JR*S_R*R.JR'*X.G';
 S_b.SxRa = X.G*R.JRa*S_Ra*R.JRa'*X.G';
 S_b.SxAir = X.G*R.Jnair*S_air*R.Jnair'*X.G';
 S_b.Sxaero = X.G*R.Jaero*S_aero*R.Jaero'*X.G';
+
+% figure;plot(S_b.SxP,Q.Zret./1000,'r',S_b.SxR,Q.Zret./1000,'b',S_b.SxRa,Q.Zret./1000,'g')
+% hold on;
+% plot(S_b.SxAir,Q.Zret./1000,'m',S_b.Sxaero,Q.Zret./1000,'black')
+% xlabel('Covariance')
+% ylabel('Alt(km)')
+% legend('Pressure','R','Ra','Air density','Aerosol')
+
 %                     % % SxDT = X.G*R.JDT*SDT*R.JDT'*X.G';

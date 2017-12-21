@@ -15,16 +15,18 @@ yr = num2str(year);
 % tf1=[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f',tfixed1)];
 % tf2=[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f',tfixed2)];
 
+% if sonde time is 23 that means sameday midnight sonde, if the sonde time
+% is 00 then previous midnight
 
-
-% if tin>5 && tin<17
-% time= 12;
-% elseif tin == 0
-%     time = 0;
-% else
-% day = day+1;
-% time =0;
-% end
+tin = time;
+if tin>5 && tin<17
+time= 12;
+elseif tin == 0
+    day = day-1;
+    time = 0;
+else
+time =0;
+end
 
 
 % here have to decide which sonde need to be used

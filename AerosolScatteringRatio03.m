@@ -20,9 +20,23 @@ lambda2 = data.Eb.Photon.Wavelength;
 % range vector
 z  = data.Eb.(what).Range;
 
+% Sham adding these lines here
+g = hour(data.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
+Minute = minute(data.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
+
+% from 2300 to 2330
+starttime=find(g==23 & Minute==00);
+endtime=find(g==23 & Minute==30);
+
+JL = nanmean(data.JL.(what).Signal(:,starttime:endtime)');
+JH = nanmean(data.JH.(what).Signal(:,starttime:endtime)');
+
+JL=JL';
+JH=JH';
+
 % signals
-JL = data.JL.(what).SignalMean;
-JH = data.JH.(what).SignalMean;
+% JL = data.JL.(what).SignalMean;
+% JH = data.JH.(what).SignalMean;
 
 % Background correction
 bkg_ind = z > 45e3 & z<50e3;
@@ -33,7 +47,9 @@ JH = CorrBkg(JH,sum(bkg_ind),0,1);
 Mo = JH + JL;
 
 % ELASTIC SIGNAL
-Eb = data.Eb.(what).SignalMean;     
+% Eb = data.Eb.(what).SignalMean; 
+Eb = nanmean(data.Eb.(what).Signal(:,starttime:endtime)');
+Eb=Eb';
 Eb = CorrBkg(Eb,sum(bkg_ind),0,1);
 
 % signal ratio
@@ -56,18 +72,18 @@ R = calibration * C_N .* Eb./Mo .* dTr ;
 % Signal*Shots is matrix to vector multiplication to get the number of
 % counts per bin for the averaged time defined by the number of laser shots
 ScaleFactor = 150/data.JL.Photon.BinSize;
-Shots       = data.JL.Photon.Shots;
-JLsum       = data.JL.(what).Signal * Shots / ScaleFactor;
+Shots       = data.JL.Photon.Shots(starttime:endtime);
+JLsum       = data.JL.(what).Signal(:,starttime:endtime) * Shots / ScaleFactor;
 JLsig       = CorrBkg(JLsum, 166, 0, 1);
 
 ScaleFactor = 150/data.JH.Photon.BinSize;
-Shots       = data.JH.Photon.Shots;
-JHsum       = data.JH.(what).Signal * Shots / ScaleFactor;
+Shots       = data.JH.Photon.Shots(starttime:endtime);
+JHsum       = data.JH.(what).Signal(:,starttime:endtime) * Shots / ScaleFactor;
 JHsig       = CorrBkg(JHsum, 166, 0, 1);
 
 ScaleFactor = 150/data.Eb.Photon.BinSize;
-Shots       = data.Eb.Photon.Shots;
-Ebsum       = data.Eb.(what).Signal * Shots / ScaleFactor;
+Shots       = data.Eb.Photon.Shots(starttime:endtime);
+Ebsum       = data.Eb.(what).Signal(:,starttime:endtime) * Shots / ScaleFactor;
 Ebsig       = CorrBkg(Ebsum, 166, 0, 1);
 
 sigma   = Ebsig./(JLsig + JHsig) .* sqrt( (Ebsum./(Ebsig.^2)) + ((JLsum+JHsum)./((JLsig+JHsig).^2)) );

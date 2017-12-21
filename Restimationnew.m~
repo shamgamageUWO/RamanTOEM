@@ -32,8 +32,8 @@ N1 = length(Q.JHnewa);
 %     bkg_JH = JHnew(ind1);
 %      BaJH_t = nanmean(bkg_JH);
 
-JHnew = JHnew-BaJH_t;
-JLnew = JLnew-BaJL_t;
+JHnew = Q.JH_DS-Q.BaJH;
+JLnew = Q.JL_DS-Q.BaJL;
 JHnewa = Q.JHnewa-Q.BaJHa;
 JLnewa = Q.JLnewa-Q.BaJLa;
 
@@ -41,53 +41,65 @@ JLnewa = Q.JLnewa-Q.BaJLa;
 
 %% loading cross sections
 load('DiffCrossSections.mat');
-Diff_JHi = interp1(T,Diff_JH,Q.Tsonde,'linear');
-Diff_JLi = interp1(T,Diff_JL,Q.Tsonde,'linear');
+Td = interp1(Q.Zret,Q.Tsonde2,Q.Zmes2,'linear'); % T on data grid (digital)
+Ta = interp1(Q.Zret,Q.Tsonde2,Q.Zmes1,'linear');
 
-Ratio_diff = Diff_JLi./Diff_JHi;
+
+Diff_JHia = interp1(T,Diff_JH,Ta,'linear');
+Diff_JLia = interp1(T,Diff_JL,Ta,'linear');
+
+Diff_JHid = interp1(T,Diff_JH,Td,'linear');
+Diff_JLid = interp1(T,Diff_JL,Td,'linear');
+
+
+Ratio_diff_a = Diff_JLia./Diff_JHia; % analog
+Ratio_diff_d = Diff_JLid./Diff_JHid; % digi
+
+
+% Diff_JHi = interp1(T,Diff_JH,Q.Tsonde,'linear');
 
 Digital_ratio = JHnew ./JLnew ;
 Analog_ratio = JHnewa./JLnewa;
 
-R =  Digital_ratio'.*Ratio_diff(Q.d_alti_Diff+1:end);
-Ra = Analog_ratio'.* Ratio_diff(1:N1);
+R =  Digital_ratio'.*Ratio_diff_d;
+Ra = Analog_ratio'.* Ratio_diff_a;
 
-X1 = Q.Zmes2./1000;
-X2 = Q.Zmes1./1000;
-Y1 = R;
-Y2 = Ra;
+% X1 = Q.Zmes2./1000;
+% X2 = Q.Zmes1./1000;
+% Y1 = R;
+% Y2 = Ra;
 
-figure1 = figure;
-
-% Create axes
-axes1 = axes('Parent',figure1);
-hold(axes1,'on');
-
-% Create semilogx
-plot(X1,Y1,'DisplayName','R','Color',[1 0 0]);
-
-% Create semilogx
-plot(X2,Y2,'DisplayName','Ra','Color',[0 0 1]);
-
-% Create xlabel
-xlabel('Altitude (km)');
-
-% Create ylabel
-ylabel('R and Ra');
-
-% Uncomment the following line to preserve the X-limits of the axes
-% xlim(axes1,[0 20]);
-box(axes1,'on');
-% Set the remaining axes properties
-set(axes1,'FontSize',20,'XMinorTick','on','XScale','linear');
-% Create legend
-legend(axes1,'show');
+% figure1 = figure;
+% 
+% % Create axes
+% axes1 = axes('Parent',figure1);
+% hold(axes1,'on');
+% 
+% % Create semilogx
+% plot(X1,Y1,'DisplayName','R','Color',[1 0 0]);
+% 
+% % Create semilogx
+% plot(X2,Y2,'DisplayName','Ra','Color',[0 0 1]);
+% 
+% % Create xlabel
+% xlabel('Altitude (km)');
+% 
+% % Create ylabel
+% ylabel('R and Ra');
+% 
+% % Uncomment the following line to preserve the X-limits of the axes
+% % xlim(axes1,[0 20]);
+% box(axes1,'on');
+% % Set the remaining axes properties
+% set(axes1,'FontSize',20,'XMinorTick','on','XScale','linear');
+% % Create legend
+% legend(axes1,'show');
 
 
  Alt = Q.Zmes2;
  ind1 = Alt >= 8000 & Alt< 10000;
 % 
- x = 1./Ratio_diff(ind1);
+ x = 1./Ratio_diff_d(ind1);
  y = Digital_ratio(ind1);
 % 
  f = fittype({'x'});
@@ -97,11 +109,16 @@ R_fit = fit3(1);
 
 % %% analog
 Alt2 = Q.Zmes1;
-ind2 = Alt2 >= 1000 & Alt2 <= 1200;
- xa = 1./Ratio_diff(ind2);
+ind2 = Alt2 >= 2000 & Alt2 <= 2200;
+ xa = 1./Ratio_diff_a(ind2);
  ya = Analog_ratio(ind2);
 
 fa = fittype({'x'});
 fit3a = fit(xa',ya,fa,'Robust','on');
 Ra_fit = fit3a(1);
+
+figure;plot(x,y,'r',xa,ya,'b')
+xlabel('Ratio of Diff crosssections')
+ylabel('Counts ratio')
+
 %%

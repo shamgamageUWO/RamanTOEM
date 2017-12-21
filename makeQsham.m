@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 24;
+Q.coaddalt = 10;
  Q.Rgas = 8.3145;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -73,13 +73,13 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=1000 & ANalt <= 6000);
+Q.Eba = Eba(ANalt>=1000 & ANalt <= 4000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=6000);
-Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=6000);
+Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=4000);
+Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=4000);
 Q.ANalt = ANalt(ANalt>=1000);
 % Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 6000);
+Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 4000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -106,7 +106,7 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 % Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:6000;
 % Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*15:60000;
 % Q.Zret =[Z1 Z2];
- Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:50000;% Retrieval grid
+ Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:50000;% Retrieval grid
 disp('Defined grids ')
 
 % slopeDT= (1-0.1)/(Q.Zret(1)-Q.Zret(end));
@@ -144,12 +144,16 @@ disp('Defined grids ')
 obj2 = Gravity(Q.Zmes, 46.82);
 Q.grav = obj2.accel;
 Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
-Q.z0 = 30000;            
+Q.z0 = 35000;            
 [Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);  
 disp('a priori temperature profile is loaded ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
+Tsonde = Tsonde(Zsonde<=35000);
+Psonde = Psonde(Zsonde<=35000);
+Zsonde = Zsonde(Zsonde<=35000);
+
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
 Psonde = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr 
 Q.Psonde = exp(Psonde);
@@ -221,8 +225,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
 
-             [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,8);
-             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,8);
+             [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,12);
+             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,12);
           
              r1 = ones(1,go11-1).* JHv(1);
              r2 = ones(1,go11-1).* JHv(end);
@@ -232,7 +236,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,8);
+ [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,12);
  [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,12);
 
             ar1 = ones(1,go1-1).* JHav(1);
@@ -262,7 +266,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 5000
+            if Q.Zmes2(i) <= 6000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = JLreal(i);
@@ -270,7 +274,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 5000
+            if  Q.Zmes2(i) <= 6000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = JHreal(i);

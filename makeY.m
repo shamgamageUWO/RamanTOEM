@@ -3,17 +3,18 @@
 
 function [Y] = makeY(Q)
 
-% open S0 matfile according to the given date
-datadirS3='/Users/sham/Desktop';
+
+
+
+ date = Q.date_in;
+[year,month,day] = getYMDFromDate(date);
+ yr = num2str(year);
+
+ % open S0 matfile according to the given date
+datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
 % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
 file = 'S0';
-folderpath = [datadirS3 filesep  file];
 
-
-% date = Q.date_in;
-% [year,month,day] = getYMDFromDate(date);
-%  yr = num2str(year);
-% 
 %  
 % %% Load S3 data files 
 % 
@@ -21,9 +22,11 @@ folderpath = [datadirS3 filesep  file];
 % 
 % cleanmacpollution(datadirS3); % this is to remove DS_store.dat files from the data folder
 % 
-% Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
+ Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
 % 
-% folderpath = [datadirS3 filesep  Dateofthefolder];
+ folderpath = [datadirS3 filesep  Dateofthefolder filesep  file];
+%  folderpath = [datadirS3 filesep  file];
+ 
 % folders = dirFiles(folderpath);
 % lengthfolders = length(folders);
 % 
@@ -62,6 +65,8 @@ folderpath = [datadirS3 filesep  file];
 % times = zeros(1,scans);
 % shots = zeros(1,scans);
 % bins = zeros(1,scans);
+
+
 
 load(folderpath);
 
@@ -230,10 +235,11 @@ alt_an = alt_an(1+zAoffset:end);
 alt = JHzc;
 Alt = JHazc;
 
-%    figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r')%,Eb,Ebzc./1000,'g') 
-%   xlabel('30min and 40bin  Coadded signal (Counts/bin/time)')
-%   ylabel('Alt (km)')
-%   legend('JL','JH')
+   figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g') 
+  xlabel('30min Coadded signal')
+  ylabel('Alt (km)')
+  legend('JL','JH','Eb')
+  
 % Save in a new mat file
 bkg_ind1 = alt>50e3;% & alt<60e3;
 bkg_ind2 = Alt>50e3;

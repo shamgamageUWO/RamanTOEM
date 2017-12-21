@@ -1,22 +1,34 @@
 % this is first get S3 file with asr content
 function [alphaAer] = asrSham(Q)
 % first load S3.mat 
+ date = Q.date_in;
+[year,month,day] = getYMDFromDate(date);
+ yr = num2str(year);
 
-% open S0 matfile according to the given date
-datadirS3='/Users/sham/Desktop';
+ % open S0 matfile according to the given date
+datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
 % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
 file = 'S3';
-folderpath = [datadirS3 filesep  file];
+ Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
+% 
+ folderpath = [datadirS3 filesep  Dateofthefolder filesep  file];
+% % open S0 matfile according to the given date
+% datadirS3='/Users/sham/Desktop';
+% % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
+% file = 'S3';
+% folderpath = [datadirS3 filesep  file];
 load(folderpath);
 
 % now run the config file
 config = setup('ralmo.conf');
-config.t0 = datenum (['20110909'], 'yyyymmdd');
+config.t0 = datenum (['date'], 'yyyymmdd');
 config = getCalibration(config);
 
 % Now run the aerosol code
 asr =AerosolScatteringRatio03(S3,config );
-
+figure;plot(asr.profile,(asr.z)./1000);
+xlabel('asr profile')
+ylabel('Alt(km)')
 %% 
 % Load beta molecular values here 
 % Max's Codes ( all are now in the same directory as QpackSham)
@@ -35,7 +47,7 @@ lambda_em = 354.7;
 %% These from BOB- WVOEM.m
 in.LRfree = 50; % was 20 on 0305, 0308 50, 200905-6 50
 in.LRpbl = 80; % 50 on 0305; was 80 on otherwise
-in.LRtranHeight = 1800; % this is the height to the BL
+in.LRtranHeight = 2000; % this is the height to the BL
 % 3 is nominal, not accurate 2.75; 
 
 
