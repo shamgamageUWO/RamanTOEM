@@ -11,7 +11,7 @@ function [S_aT]=TestTempCov(Zj,Ta)
   lengthcT1 = 100;
   lengthcT2 = 1000;
   lengthcT = 1000; % =3000; % only need m of these
-     Tfac = 30;
+     Tfac = 35;
 %  Tfac1 = .1*Ta(Zj<=7000);
 %  Tfac2 = .5*Ta(Zj>=7000);
 %   Tfac = [Tfac1 Tfac2];

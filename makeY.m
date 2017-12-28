@@ -127,7 +127,14 @@ alt = JHzc;
 
 bkg_ind1 = alt>50e3;% & alt<60e3;
 bkg_ind2 = alt>50e3;
-
+ind_i = alt<10e3;
+  figure;
+  subplot(1,2,1)
+semilogx(JH(ind_i),JHzc(ind_i)./1000,'r',JL(ind_i),JLzc(ind_i)./1000,'b',Eb(ind_i),Ebzc(ind_i)./1000,'g')
+  xlabel('30min coadded signal Counts')
+  ylabel('Alt (km)')
+  legend('JH','JL','Eb')
+  
 % Desaturate and find the true background first
      % 1. Make the Co added counts to avg counts
         JHn = JH./(deltatime.*Q.coaddalt);
@@ -136,10 +143,15 @@ bkg_ind2 = alt>50e3;
         JHnwn = (JHn./F);
         JLnwn = (JLn./F);
 
-        
+
+  subplot(1,2,2)
+  plot(JHnwn(ind_i),JHzc(ind_i)./1000,'r',JLnwn(ind_i),JLzc(ind_i)./1000,'b')
+  xlabel('30min averaged counts in MHz')
+  ylabel('Alt (km)')
+  legend('JH','JL')
         % 3. Apply DT correction
         JL_dtc = JLn ./ (1 - JLnwn.*(Q.deadtimeJL.*1e6.*1e-9)); % non-paralyzable
-        JH_dtc = JHn ./ (1 - JHnwn.*(Q.deadtimeJH).*1e6.*1e-9);
+        JH_dtc = JHn ./ (1 - JHnwn.*(Q.deadtimeJH.*1e6.*1e-9));
 
 % %           % 4. Convert to counts
 %            JLC = JL_dtc.*(1./Q.f);

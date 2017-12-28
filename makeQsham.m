@@ -61,13 +61,13 @@ Ebalt = Y.Ebalt;
 
 alt = Y.alt;
 Q.binzise = Y.binsize;
-Q.JHnew= JHnew(alt>=550  & alt <=45000);
-Q.JLnew= JLnew(alt>=550 & alt <=45000);
-Q.JH_DS =JH_DS(alt>=550  & alt <=45000);
-Q.JL_DS =JL_DS(alt>=550  & alt <=45000);
-Q.alt = alt(alt>=550  & alt <=45000);
-Q.Eb = Eb(Ebalt>=550  & Ebalt <=45000);
-Q.Ebalt = Ebalt(Ebalt>=550  & Ebalt <=45000);
+Q.JHnew= JHnew(alt>=600  & alt <=45000);
+Q.JLnew= JLnew(alt>=600 & alt <=45000);
+Q.JH_DS =JH_DS(alt>=600  & alt <=45000);
+Q.JL_DS =JL_DS(alt>=600  & alt <=45000);
+Q.alt = alt(alt>=600  & alt <=45000);
+Q.Eb = Eb(Ebalt>=600  & Ebalt <=45000);
+Q.Ebalt = Ebalt(Ebalt>=600  & Ebalt <=45000);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -201,8 +201,8 @@ end
 
                         Q.y = [Q.JHnew ;Q.JLnew];
 
-             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,8);
-             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,8);
+             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
+             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,12);
 % 
 % 
 %             
