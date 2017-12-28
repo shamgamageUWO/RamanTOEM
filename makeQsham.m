@@ -61,13 +61,13 @@ Ebalt = Y.Ebalt;
 
 alt = Y.alt;
 Q.binzise = Y.binsize;
-Q.JHnew= JHnew(alt>=1000  & alt <=45000);
-Q.JLnew= JLnew(alt>=1000 & alt <=45000);
-Q.JH_DS =JH_DS(alt>=1000  & alt <=45000);
-Q.JL_DS =JL_DS(alt>=1000  & alt <=45000);
-Q.alt = alt(alt>=1000  & alt <=45000);
-Q.Eb = Eb(Ebalt>=1000  & Ebalt <=45000);
-Q.Ebalt = Ebalt(Ebalt>=1000  & Ebalt <=45000);
+Q.JHnew= JHnew(alt>=550  & alt <=45000);
+Q.JLnew= JLnew(alt>=550 & alt <=45000);
+Q.JH_DS =JH_DS(alt>=550  & alt <=45000);
+Q.JL_DS =JL_DS(alt>=550  & alt <=45000);
+Q.alt = alt(alt>=550  & alt <=45000);
+Q.Eb = Eb(Ebalt>=550  & Ebalt <=45000);
+Q.Ebalt = Ebalt(Ebalt>=550  & Ebalt <=45000);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -157,7 +157,7 @@ Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimatio
 %                         Q.Tr = Total_Transmission(Q);
 
 [Tr1,Tr2] = TransmissionFastCom(Q);
-Q.Tr = Tr2;
+Q.Tr = Tr1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
 [R,R_fit] = Restimationnew(Q);
@@ -178,7 +178,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 if flag ==1
     Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
@@ -217,7 +217,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 4000
+                 if Q.Zmes2(i) <= 6000
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -225,7 +225,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 4000
+                 if  Q.Zmes2(i) <= 6000
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);

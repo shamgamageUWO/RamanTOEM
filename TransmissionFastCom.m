@@ -21,7 +21,12 @@ config = getCalibration(config);
 
 asr =BackScatteringRatio03_local(S3,config );
 
-
+figure;
+subplot(1,2,1)
+plot(asr.profile,asr.z./1000)
+hold on;
+xlabel('asr profile')
+ylabel('alt(km)')
 %% 
 % Load beta molecular values here 
 % Max's Codes ( all are now in the same directory as QpackSham)
@@ -70,6 +75,14 @@ alphaAer(znoAer) = 1e-12;
     fl0 = find(alphaAer <= 0);
     alphaAer(fl0) = 1e-12;
     
+ 
+    plot(asrDATA,zN./1000)
+    legend('raw asr','fixing ')
+    hold off
+ subplot(1,2,2)
+ semilogx(alphaAer,zN./1000)
+ xlabel('alpha aerosol- log scale')
+ylabel('alt(km)')
     
  %% Bob WVOEM, makeQ 324
      alphaCorErr = 0;
