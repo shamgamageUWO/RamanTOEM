@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 % Q.Csum =  2.8077e+18;
 % Q.CLfac = 10^-2;
 % Q.CHfac = 10^-2;
-Q.coaddalt = 20;
+Q.coaddalt = 10;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -34,8 +34,8 @@ Q.Clight = 299792458; %ISSI value
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJH = 3; % 4ns
-Q.deadtimeJL = 1.5; % 4ns
+Q.deadtimeJH = 2; % 4ns
+Q.deadtimeJL = 3.8; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 
@@ -120,7 +120,7 @@ disp(' Grids Defined')
 obj2 = Gravity(Q.Zmes, 46.82);
 Q.grav = obj2.accel;
 Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
-Q.z0 = 35000;            
+Q.z0 = 30000;            
 [Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);           
 disp('a priori temperature profile is loaded ')
 
@@ -178,7 +178,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 if flag ==1
     Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
@@ -201,8 +201,8 @@ end
 
                         Q.y = [Q.JHnew ;Q.JLnew];
 
-             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,8);
-             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,8);
+             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
+             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,12);
 % 
 % 
 %             
@@ -217,7 +217,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 4000
+                 if Q.Zmes2(i) <= 6000
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -225,7 +225,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 4000
+                 if  Q.Zmes2(i) <= 6000
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);
