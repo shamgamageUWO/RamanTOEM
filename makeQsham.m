@@ -178,7 +178,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 if flag ==1
     Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
@@ -201,8 +201,8 @@ end
 
                         Q.y = [Q.JHnew ;Q.JLnew];
 
-             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
-             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,12);
+             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,24);
+             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,24);
 % 
 % 
 %             
