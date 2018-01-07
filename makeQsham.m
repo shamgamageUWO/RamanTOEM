@@ -35,8 +35,8 @@ Q.shots = 1800;
 
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.7e-9; % 4ns
-Q.CovDTJL = (.01.*Q.deadtimeJL).^2;
-Q.CovDTJH = (.01.*Q.deadtimeJH).^2;
+Q.CovDTJL = (1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (1.*Q.deadtimeJH).^2;
 
 % Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -73,13 +73,13 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=1000 & ANalt <= 6000);
+Q.Eba = Eba(ANalt>=1000 & ANalt <= 4000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=6000);
-Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=6000);
+Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=4000);
+Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=4000);
 Q.ANalt = ANalt(ANalt>=1000);
 % Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 6000);
+Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 4000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -106,7 +106,7 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 % Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:6000;
 % Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*15:60000;
 % Q.Zret =[Z1 Z2];
- Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:50000;% Retrieval grid
+ Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:50000;% Retrieval grid
 disp('Defined grids ')
 
 % slopeDT= (1-0.1)/(Q.Zret(1)-Q.Zret(end));
@@ -144,7 +144,7 @@ disp('Defined grids ')
 obj2 = Gravity(Q.Zmes, 46.82);
 Q.grav = obj2.accel;
 Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
-Q.z0 = 35000;            
+Q.z0 = 30000;            
 [Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);  
 disp('a priori temperature profile is loaded ')
 
@@ -248,7 +248,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 6000
+                    if Q.Zmes1(i) <= 4000
                         Q.YYa(i) = Q.JLav(i);
                     else
                         Q.YYa(i) = .1.*Q.JLav(i);
@@ -256,7 +256,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes1(i) <= 6000
+                    if  Q.Zmes1(i) <= 4000
                         Q.YYYa(i) = Q.JHav(i);
                     else
                         Q.YYYa(i) = .1.*Q.JHav(i);

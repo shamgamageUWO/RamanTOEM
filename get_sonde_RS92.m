@@ -22,10 +22,11 @@ tin = time;
 if tin>5 && tin<17
 time= 12;
 elseif tin == 0
-    day = day-1;
+   
     time = 0;
 else
 time =0;
+ day = day+1;
 end
 
 

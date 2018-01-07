@@ -34,6 +34,8 @@ JH = nanmean(data.JH.(what).Signal(:,starttime:endtime)');
 JL=JL';
 JH=JH';
 
+% figure;semilogx(JL,z./1000,'b',JH,z./1000,'m')
+
 % signals
 % JL = data.JL.(what).SignalMean;
 % JH = data.JH.(what).SignalMean;
@@ -64,6 +66,8 @@ dTr = 1;
 % BSR
 R = calibration * C_N .* Eb./Mo .* dTr ;
 
+% figure;plot(R,z./1000,'r')
+% hold on;
 
 % error estimate
 
@@ -95,6 +99,7 @@ sigma   = Ebsig./(JLsig + JHsig) .* sqrt( (Ebsum./(Ebsig.^2)) + ((JLsum+JHsum)./
 z_ref = [60:30:12000]';
 [Rf sigma_f dz] = deal(nan(size(z_ref)));
 
+% plot(Rf,z_ref./1000,'b')
 
 for i = 1:length(z_ref)
     
@@ -120,6 +125,10 @@ for i = 1:length(z_ref)
     
     
 end
+% plot(Rf,z./1000,'g')
+% hold off
+% legend('R','Rf before filter','Rf after filter')
+
 
 % vertical resolution
 dz = NDACC_ResolDF(G(:,1))*data.Eb.Photon.BinSize*ones(size(z_ref));
