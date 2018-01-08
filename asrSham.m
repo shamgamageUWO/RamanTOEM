@@ -35,7 +35,7 @@ lambda_em = 354.7;
 %% These from BOB- WVOEM.m
 in.LRfree = 20; % was 20 on 0305, 0308 50, 200905-6 50
 in.LRpbl = 50; % 50 on 0305; was 80 on otherwise
-in.LRtranHeight = 1500; % this is the height to the BL
+in.LRtranHeight = 2000; % this is the height to the BL
 % % inputs for ralmo data
 % in.go = 3; % plus/minus in.go points in pieceWise
 % in.slope = 34; %30.14; %35; % 2015 37.88; 34 is adhoc, (30+38)/2
@@ -106,7 +106,7 @@ asrDATAs(fneg) = 1;
     % asrDATAs(fneg) = 1;
 
 alphaAer = LR' .* (beta_mol .* (asrDATAs-1));
-znoAer = find(zN > 5000); % was 3000 for 20130122
+znoAer = find(zN > 8000); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
 'asr set to 0 > 5000'
     fl0 = find(alphaAer <= 0);
