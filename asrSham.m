@@ -1,12 +1,16 @@
 % this is first get S3 file with asr content
 function [alphaAer] = asrSham(Q)
 % first load S3.mat 
-
+ date = Q.date_in;
+[year,month,day] = getYMDFromDate(date);
+ yr = num2str(year);
 % open S0 matfile according to the given date
-datadirS3='/Users/sham/Desktop';
+datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';
 % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
 file = 'S3';
-folderpath = [datadirS3 filesep  file];
+ Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
+% 
+ folderpath = [datadirS3 filesep  Dateofthefolder filesep  file];
 load(folderpath);
 
 % now run the config file
@@ -108,7 +112,7 @@ asrDATAs(fneg) = 1;
 alphaAer = LR' .* (beta_mol .* (asrDATAs-1));
 znoAer = find(zN > 8000); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
-'asr set to 0 > 5000'
+'asr set to 0 > 8000'
     fl0 = find(alphaAer <= 0);
     alphaAer(fl0) = 1e-12;
 

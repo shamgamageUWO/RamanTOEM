@@ -3,17 +3,38 @@
 
 function [Y] = makeY(Q)
 
-% open S0 matfile according to the given date
-datadirS3='/Users/sham/Desktop';
+ date = Q.date_in;
+[year,month,day] = getYMDFromDate(date);
+ yr = num2str(year);
+
+ % open S0 matfile according to the given date
+datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
 % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
 file = 'S0';
-folderpath = [datadirS3 filesep  file];
 
-
-% date = Q.date_in;
-% [year,month,day] = getYMDFromDate(date);
-%  yr = num2str(year);
+%  
+% %% Load S3 data files 
 % 
+% datadirS3 = '/Users/sham/Documents/MATLAB/RALMO_Data/RALMO/S3files';
+% 
+% cleanmacpollution(datadirS3); % this is to remove DS_store.dat files from the data folder
+% 
+ Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
+% 
+ folderpath = [datadirS3 filesep  Dateofthefolder filesep  file];
+%  folderpath = [datadirS3 filesep  file];
+ 
+% % open S0 matfile according to the given date
+% datadirS3='/Users/sham/Desktop';
+% % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
+% file = 'S0';
+% folderpath = [datadirS3 filesep  file];
+% 
+% 
+% % date = Q.date_in;
+% % [year,month,day] = getYMDFromDate(date);
+% %  yr = num2str(year);
+% % 
 %  
 % %% Load S3 data files 
 % 

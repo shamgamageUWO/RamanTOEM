@@ -36,8 +36,8 @@ Q.shots = 1800;
 
 Q.deadtimeJL = 3.9e-9; % 4ns
 Q.deadtimeJH = 3.8e-9; % 4ns
-Q.CovDTJL = (1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (1 .*Q.deadtimeJH).^2;
+Q.CovDTJL = (.001.*Q.deadtimeJL).^2;
+Q.CovDTJH = (.001 .*Q.deadtimeJH).^2;
 
 Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap

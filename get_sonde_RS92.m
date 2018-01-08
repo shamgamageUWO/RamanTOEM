@@ -16,15 +16,17 @@ yr = num2str(year);
 % tf2=[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f',tfixed2)];
 
 
+tin = time;
+if tin>5 && tin<17
+time= 12;
+elseif tin == 0
+    time = 0;
+   
+else
 
-% if tin>5 && tin<17
-% time= 12;
-% elseif tin == 0
-%     time = 0;
-% else
-% day = day+1;
-% time =0;
-% end
+time =0;
+ day = day+1;
+end
 
 
 % here have to decide which sonde need to be used
