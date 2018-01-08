@@ -34,8 +34,8 @@ Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJL = 3.9e-9; % 4ns
-Q.deadtimeJH = 3.8e-9; % 4ns
+Q.deadtimeJL = 3.8e-9; % 4ns
+Q.deadtimeJH = 3.7e-9; % 4ns
 Q.CovDTJL = (.001.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.001 .*Q.deadtimeJH).^2;
 
@@ -58,13 +58,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=50);
+Q.Eb = Eb(alt>=1000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=50);
-Q.JLnew= JLnew(alt>=50);
-Q.JH_DS =JH_DS(alt>=50);
-Q.JL_DS =JL_DS(alt>=50);
-Q.alt = alt(alt>=50);
+Q.JHnew= JHnew(alt>=1000);
+Q.JLnew= JLnew(alt>=1000);
+Q.JH_DS =JH_DS(alt>=1000);
+Q.JL_DS =JL_DS(alt>=1000);
+Q.alt = alt(alt>=1000);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -207,7 +207,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
 % Q.CLa = CJLa;
 % Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 % Q.CHa = CJHa;

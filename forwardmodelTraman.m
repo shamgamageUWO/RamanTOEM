@@ -7,9 +7,9 @@ x_a = x(1:m);
 BJH = x(m+1);
 BJL = x(m+2);
 CJL = x(m+3);
-OV = x(m+4:end-2);
-DT_JH = x(end-1);
-DT_JL = x(end); % deadtimes
+OV = x(m+4:end);
+DT_JH = Q.deadtimeJH;
+DT_JL = Q.deadtimeJL; % deadtimes
 
 
 % interpolation
@@ -25,8 +25,8 @@ area = pi * (0.3^2);
 % Transmission
 R_tr_i = (Q.Tr);
 
-A_Zi_d = (area .* OV_Zi .*R_tr_i .*Pdigi)./(kb * Q.Zmes2 .^2);
-B_Zi_d = (area .*R_tr_i .*Pdigi)./(kb * Q.Zmes2 .^2); % No overlap
+A_Zi_d = ( OV_Zi .*R_tr_i .*Pdigi)./(kb * Q.Zmes2 .^2);
+B_Zi_d = (R_tr_i .*Pdigi)./(kb * Q.Zmes2 .^2); % No overlap
 
 %% loading cross sections
 load('DiffCrossSections.mat');
