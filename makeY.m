@@ -197,6 +197,9 @@ Eb = nansum(Eb');
 
 N = length(JH);
 
+
+figure;plot(JL./(30.*F),alt./1000,'r',JH./(30.*F),alt./1000,'b')
+
 % % %% Fix off set 
 % % zAoffset = 10; % bins ie 10*3.75 = 37.5m 
 % JH= JH(1:N-zAoffset); % already in counts ./ (y2HzRaw./1e6);
