@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 % Q.Csum =  2.8077e+18;
 % Q.CLfac = 10^-2;
 % Q.CHfac = 10^-2;
-Q.coaddalt = 10;
+Q.coaddalt = 25;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -86,7 +86,7 @@ disp('Loaded RALMO measurements ')
 % Z1 = Q.Zmes(1):deltaZ*5:Q.Zmes(h);
 % Z2= Q.Zmes(h):deltaZ*10:50000;   
 %  Q.Zret = [Z1 Z2];
-       Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:50000;% Retrieval grid
+       Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:50000;% Retrieval grid
 disp(' Grids Defined')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -178,7 +178,7 @@ Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 Q.CL = CJL;
-Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
 if flag ==1
     Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
@@ -201,8 +201,8 @@ end
 
                         Q.y = [Q.JHnew ;Q.JLnew];
 
-             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,12);
-             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,12);
+             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,4);
+             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,4);
 % 
 % 
 %             

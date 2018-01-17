@@ -76,11 +76,19 @@ fff = find(zN < in.LRtranHeight);
 LR(fff) = in.LRpbl;
 asrDATAs = smooth(asrDATA,11); %asrDATA; %smooth(asrDATA,90); %was 45
 
-fneg = find(asrDATAs < 1);
-asrDATAs(fneg) = 1;
 
 
-alphaAer = LR' .* (beta_mol .* (asrDATAs-1));
+[fneg,I] = min(asrDATAs);
+ diff = 1-fneg;
+ fneg2 = find(asrDATAs < 1);
+ fneg3 = find(asrDATAs >= 1);
+ asrDATAs(fneg2) = 1;
+asrDATAs(fneg3)  = asrDATAs(fneg3) + diff;
+asrDATAnew =  asrDATAs;
+
+
+
+alphaAer = LR' .* (beta_mol .* (asrDATAnew-1));
 znoAer = find(zN > 15000); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
 'asr set to 0 > 15000'

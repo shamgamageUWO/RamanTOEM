@@ -22,6 +22,7 @@ config = getCalibration(config);
 asr =BackScatteringRatio03_local(S3,config );
 
 
+
 %% 
 % Load beta molecular values here 
 % Max's Codes ( all are now in the same directory as QpackSham)
@@ -36,14 +37,18 @@ lambda_em = 354.7;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% These from BOB- WVOEM.m
-in.LRfree = 20; % was 20 on 0305, 0308 50, 200905-6 50
-in.LRpbl = 50; % 50 on 0305; was 80 on otherwise
-in.LRtranHeight = 2500; % this is the height to the BL
+LRfree = 50; % was 20 on 0305, 0308 50, 200905-6 50
+LRpbl = 80; % 50 on 0305; was 80 on otherwise
+LRtranHeight = 2300; % this is the height to the BL
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% These lines are from BOB - WV - makeQ.m
 
 asrDATA = interp1(asr.z,asr.profile,zN,'linear');
+figure;
+subplot(1,2,1)
+plot(asrDATA(zN<12000),zN(zN<12000)./1000)
+
 flow = find(zN < asr.z(1));
 if ~isempty(flow)
  asrDATA(flow) = asrDATA(flow(end)+1);
@@ -54,19 +59,31 @@ if ~isempty(fhi)
 end
 
 
-LR = in.LRfree * ones(size(asrDATA));
-fff = find(zN < in.LRtranHeight);
-LR(fff) = in.LRpbl;
-asrDATAs = smooth(asrDATA,11); %asrDATA; %smooth(asrDATA,90); %was 45
-
-fneg = find(asrDATAs < 1);
-asrDATAs(fneg) = 1;
+LR = LRfree * ones(size(asrDATA));
+fff = find(zN < LRtranHeight);
+LR(fff) = LRpbl;
+asrDATAs = smooth(asrDATA,20); %asrDATA; %smooth(asrDATA,90); %was 45
 
 
-alphaAer = LR' .* (beta_mol .* (asrDATAs-1));
-znoAer = find(zN > 7000); % was 3000 for 20130122
+
+[fneg,I] = min(asrDATAs);
+ diff = 1-fneg;
+ fneg2 = find(asrDATAs < 1);
+ fneg3 = find(asrDATAs >= 1);
+ asrDATAs(fneg2) = 1;
+asrDATAs(fneg3)  = asrDATAs(fneg3) + diff;
+asrDATAnew =  asrDATAs;
+d = find(zN > 8000); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
-'asr set to 0 > 7000'
+
+
+subplot(1,2,2)
+plot(asrDATAnew(zN<12000),zN(zN<12000)./1000)
+
+alphaAer = LR' .* (beta_mol .* (asrDATAnew -1));
+znoAer = find(zN > 8000); % was 3000 for 20130122
+alphaAer(znoAer) = 1e-12;
+'asr set to 0 > 8000'
     fl0 = find(alphaAer <= 0);
     alphaAer(fl0) = 1e-12;
     
@@ -103,7 +120,7 @@ Nmol = (NA/M).* Q.rho ; % mol m-3
 %  alpha_aero(isnan(alpha_aero))=0;
 sigma_tot = Nmol*sigmaNicolet+ alphaAer';
 Tr1 = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
- 
+%  Q.alphaAer=alphaAer; 
  
  
  

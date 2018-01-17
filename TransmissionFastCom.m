@@ -21,7 +21,7 @@ config = getCalibration(config);
 
 asr =BackScatteringRatio03_local(S3,config );
 
-figure;plot(asr.profile,asr.z./1000)
+
 
 %% 
 % Load beta molecular values here 
@@ -45,6 +45,10 @@ LRtranHeight = 2300; % this is the height to the BL
 %% These lines are from BOB - WV - makeQ.m
 
 asrDATA = interp1(asr.z,asr.profile,zN,'linear');
+figure;
+subplot(1,2,1)
+plot(asrDATA(zN<12000),zN(zN<12000)./1000)
+
 flow = find(zN < asr.z(1));
 if ~isempty(flow)
  asrDATA(flow) = asrDATA(flow(end)+1);
@@ -58,13 +62,25 @@ end
 LR = LRfree * ones(size(asrDATA));
 fff = find(zN < LRtranHeight);
 LR(fff) = LRpbl;
-asrDATAs = smooth(asrDATA,11); %asrDATA; %smooth(asrDATA,90); %was 45
-
-fneg = find(asrDATAs < 1);
-asrDATAs(fneg) = 1;
+asrDATAs = smooth(asrDATA,20); %asrDATA; %smooth(asrDATA,90); %was 45
 
 
-alphaAer = LR' .* (beta_mol .* (asrDATAs-1));
+
+[fneg,I] = min(asrDATAs);
+ diff = 1-fneg;
+ fneg2 = find(asrDATAs < 1);
+ fneg3 = find(asrDATAs >= 1);
+ asrDATAs(fneg2) = 1;
+asrDATAs(fneg3)  = asrDATAs(fneg3) + diff;
+asrDATAnew =  asrDATAs;
+d = find(zN > 6000); % was 3000 for 20130122
+asrDATAnew(d) = 1;
+
+
+subplot(1,2,2)
+plot(asrDATAnew(zN<12000),zN(zN<12000)./1000)
+
+alphaAer = LR' .* (beta_mol .* (asrDATAnew -1));
 znoAer = find(zN > 8000); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
 'asr set to 0 > 8000'
