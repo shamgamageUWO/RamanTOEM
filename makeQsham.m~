@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 8;
+Q.coaddalt = 10;
  Q.Rgas = 8.3145;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -57,13 +57,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=4000 & alt <= 50000);
+Q.Eb = Eb(alt>=2000 & alt <= 40000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=4000 & alt <= 50000);
-Q.JLnew= JLnew(alt>=4000 & alt <= 50000);
-Q.JH_DS =JH_DS(alt>=4000 & alt <= 50000);
-Q.JL_DS =JL_DS(alt>=4000 & alt <= 50000);
-Q.alt = alt(alt>=4000 & alt <= 50000);
+Q.JHnew= JHnew(alt>=2000 & alt <= 40000);
+Q.JLnew= JLnew(alt>=2000 & alt <= 40000);
+Q.JH_DS =JH_DS(alt>=2000 & alt <= 40000);
+Q.JL_DS =JL_DS(alt>=2000 & alt <= 40000);
+Q.alt = alt(alt>=2000 & alt <= 40000);
 Q.Zmes2 = Q.alt';
 
 Q.f = 1e6./(Y.F);
@@ -73,13 +73,13 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=500 & ANalt <= 6000);
+Q.Eba = Eba(ANalt>=1000 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=500 & ANalt <=6000);
-Q.JLnewa= JLnewa(ANalt>=500 & ANalt <=6000);
-Q.ANalt = ANalt(ANalt>=500);
+Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=6000);
+Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=6000);
+Q.ANalt = ANalt(ANalt>=1000);
 % Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=500 & ANalt <= 6000);
+Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -103,8 +103,10 @@ Q.n4=length(Q.JLnewa);
 
 %% Define grid sizes
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Z1 = 
-Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:60000;% Retrieval grid
+% Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:6000;
+% Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*15:60000;
+% Q.Zret =[Z1 Z2];
+ Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:50000;% Retrieval grid
 disp('Defined grids ')
 
 % slopeDT= (1-0.1)/(Q.Zret(1)-Q.Zret(end));
@@ -148,6 +150,10 @@ disp('a priori temperature profile is loaded ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
+Tsonde = Tsonde(Zsonde<=35000);
+Psonde = Psonde(Zsonde<=35000);
+Zsonde = Zsonde(Zsonde<=35000);
+
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
 Psonde = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr 
 Q.Psonde = exp(Psonde);

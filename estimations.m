@@ -6,7 +6,7 @@ Zi = Q.Zmes;
 Za = Q.Zmes1;%analog
 Zd = Q.Zmes2;%digital
 
-ind1 = Zd>=8000 & Zd< 10000;
+ind1 = Zd>=6000 & Zd< 8000;
 
 ind2 = Za>=1500 & Za< 2000;
 % ind3 = Zi

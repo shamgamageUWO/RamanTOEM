@@ -26,7 +26,9 @@ config = getCalibration(config);
 
 % Now run the aerosol code
 asr =AerosolScatteringRatio03(S3,config );
-figure;plot(asr.profile,(asr.z)./1000);
+figure;
+subplot(1,2,1)
+plot(asr.profile,(asr.z)./1000);
 xlabel('asr profile')
 ylabel('Alt(km)')
 %% 
@@ -47,7 +49,7 @@ lambda_em = 354.7;
 %% These from BOB- WVOEM.m
 in.LRfree = 50; % was 20 on 0305, 0308 50, 200905-6 50
 in.LRpbl = 80; % 50 on 0305; was 80 on otherwise
-in.LRtranHeight = 2000; % this is the height to the BL
+in.LRtranHeight = 1000; % this is the height to the BL
 % 3 is nominal, not accurate 2.75; 
 
 
@@ -68,15 +70,29 @@ end
 LR = in.LRfree * ones(size(asrDATA));
 fff = find(zN < in.LRtranHeight);
 LR(fff) = in.LRpbl;
-asrDATAs = smooth(asrDATA,15); %asrDATA; %smooth(asrDATA,90); %was 45
+asrDATAs = smooth(asrDATA,10); %asrDATA; %smooth(asrDATA,90); %was 45
+
+
+[fneg,I] = min(asrDATAs);
+ diff = 1-fneg;
+ fneg2 = find(asrDATAs < 1);
+ fneg3 = find(asrDATAs >= 1);
+ asrDATAs(fneg2) = 1;
+asrDATAs(fneg3)  = asrDATAs(fneg3) + diff;
+asrDATAnew =  asrDATAs;
+% 
+% fneg = find(asrDATAs < 1);
+% asrDATAs(fneg) = 1;
 
 
 
-fneg = find(asrDATAs < 1);
-asrDATAs(fneg) = 1;
 
+subplot(1,2,2)
+plot(asrDATAnew(zN<=12000),(zN(zN<=12000))./1000);
+xlabel('asr profile after fixing the diff')
+ylabel('Alt(km)')
 
-alphaAer = LR' .* (beta_mol .* (asrDATAs-1));
+alphaAer = LR' .* (beta_mol .* (asrDATAnew-1));
 znoAer = find(zN > 8000); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
 'asr set to 0 > 8000'

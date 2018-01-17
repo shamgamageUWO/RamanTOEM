@@ -235,10 +235,11 @@ alt_an = alt_an(1+zAoffset:end);
 alt = JHzc;
 Alt = JHazc;
 
-   figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g') 
+   figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'r') 
+  xlabel('30min Coadded signal') 
   xlabel('30min Coadded signal')
   ylabel('Alt (km)')
-  legend('JL','JH','Eb')
+  legend('JL','JH','Eb','JL an','JH an')
   
 % Save in a new mat file
 bkg_ind1 = alt>50e3;% & alt<60e3;

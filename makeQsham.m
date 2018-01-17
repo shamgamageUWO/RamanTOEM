@@ -35,8 +35,8 @@ Q.shots = 1800;
 
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.7e-9; % 4ns
-Q.CovDTJL = (1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (1.*Q.deadtimeJH).^2;
+Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 
 % Q.deltaT = 10; %2 K
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -57,13 +57,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=3000 & alt <= 40000);
+Q.Eb = Eb(alt>=2000 & alt <= 40000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=3000 & alt <= 40000);
-Q.JLnew= JLnew(alt>=3000 & alt <= 40000);
-Q.JH_DS =JH_DS(alt>=3000 & alt <= 40000);
-Q.JL_DS =JL_DS(alt>=3000 & alt <= 40000);
-Q.alt = alt(alt>=3000 & alt <= 40000);
+Q.JHnew= JHnew(alt>=2000 & alt <= 40000);
+Q.JLnew= JLnew(alt>=2000 & alt <= 40000);
+Q.JH_DS =JH_DS(alt>=2000 & alt <= 40000);
+Q.JL_DS =JL_DS(alt>=2000 & alt <= 40000);
+Q.alt = alt(alt>=2000 & alt <= 40000);
 Q.Zmes2 = Q.alt';
 
 Q.f = 1e6./(Y.F);
@@ -73,13 +73,13 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=1000 & ANalt <= 4000);
+Q.Eba = Eba(ANalt>=500 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=4000);
-Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=4000);
-Q.ANalt = ANalt(ANalt>=1000);
+Q.JHnewa= JHnewa(ANalt>=500 & ANalt <=6000);
+Q.JLnewa= JLnewa(ANalt>=500 & ANalt <=6000);
+Q.ANalt = ANalt(ANalt>=500);
 % Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 4000);
+Q.Zmes1 = ANalt(ANalt>=500 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
