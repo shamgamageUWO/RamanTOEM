@@ -1,19 +1,32 @@
-function H = TraditionalTemperature
+function H = TraditionalTemperature(date,time)
 %% RALMO Traditional Temperature new code 
 %% All channels are added
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load S0 and S3 mat files for the date needed
-datadirS0='/Users/sham/Desktop';
-% datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
-file1 = 'S0';
-folderpath1 = [datadirS0 filesep  file1];
 
+[year,month,day] = getYMDFromDate(date);
+ yr = num2str(year);
+datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
+file = 'S0';
+ Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
+% 
+ folderpath1 = [datadirS3 filesep  Dateofthefolder filesep  file];
 
-
-datadirS3='/Users/sham/Desktop';
-% datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
-file = 'S3';
-folderpath = [datadirS3 filesep  file];
+filename = 'S3.mat';
+folderpath = [datadirS3 filesep  Dateofthefolder filesep filename];
+% load(folderpath);
+% 
+% % datadirS0='/Users/sham/Desktop';
+% % % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
+% % file1 = 'S0';
+% % folderpath1 = [datadirS0 filesep  file1];
+% 
+% 
+% 
+% datadirS3='/Users/sham/Desktop';
+% % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
+% file = 'S3';
+% folderpath = [datadirS3 filesep  file];
 
 load(folderpath1);
 load(folderpath);
@@ -98,7 +111,7 @@ N = length(JH);
 % alt = alt(1:N-zAoffset);
 % alt_an = alt_an(1+zAoffset:end);
 
-coaddalt = 40;
+coaddalt = 10;
 [JH, JHzc] = coadd(JH, alt, coaddalt);
 [JL, JLzc] = coadd(JL, alt, coaddalt);
 [Eb, Ebzc] = coadd(Eb, alt, coaddalt);
@@ -200,7 +213,7 @@ Tprofilean = 1./log(Q_an);
 Tprofiledg = 1./log(Q_Digi);
 Tprofilecm = 1./log(Q_Com);
 
-[Tsonde,Zsonde,Psonde] = get_sonde_RS92(20120718,00);
+[Tsonde,Zsonde,Psonde] = get_sonde_RS92(date,time);
 
 % figure;plot(Tsonde,Zsonde,'g')
 Zsonde = Zsonde-491;

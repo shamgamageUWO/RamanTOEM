@@ -18,14 +18,14 @@ file = 'S3';
 % file = 'S3';
 % folderpath = [datadirS3 filesep  file];
 load(folderpath);
-
+tin =Q.time_in;
 % now run the config file
 config = setup('ralmo.conf');
 config.t0 = datenum (['date'], 'yyyymmdd');
 config = getCalibration(config);
 
 % Now run the aerosol code
-asr =AerosolScatteringRatio03(S3,config );
+asr =AerosolScatteringRatio03(S3,config,tin );
 figure;
 subplot(1,2,1)
 plot(asr.profile,(asr.z)./1000);
@@ -49,7 +49,7 @@ lambda_em = 354.7;
 %% These from BOB- WVOEM.m
 in.LRfree = 50; % was 20 on 0305, 0308 50, 200905-6 50
 in.LRpbl = 80; % 50 on 0305; was 80 on otherwise
-in.LRtranHeight = 1000; % this is the height to the BL
+in.LRtranHeight = 1200; % this is the height to the BL
 % 3 is nominal, not accurate 2.75; 
 
 

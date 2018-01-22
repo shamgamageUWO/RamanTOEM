@@ -183,29 +183,36 @@ DT_JL
                     err = X.e(1:m);
                     upper = err+ X.x(1:m);
                     lower =  X.x(1:m)-err;
-% 
-%                      [Tsonde,Zsonde,Psonde] = get_sonde_RS92(20120718,00);
-%                      Zsonde = Zsonde-491; % altitude correction
-% %                     lnQ = log(Q.y(1:Q.n1)./Q.y(Q.n1+1:end));
-% %                     Ttradi = real(Q.bb./(Q.aa-lnQ));
-% % 
-%                     Tsonde = interp1(Zsonde,Tsonde,Q.Zret);
-load('TraditionalTemperature20110909.mat');
-T_an = interp1(H.alt_an,H.T_an,Q.Zret);
-T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
+                    
+% load traditional temperature profiles
+date = Q.date_in;
+time = Q.time_in;
+[year,month,day] = getYMDFromDate(date);
+yr = num2str(year);
+datadirS3 = '/Users/sham/Downloads/OEM-Sham-Code-Jan-2017/QpackSham/TraditionalTemperature';
+filename =[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f',time)];
+folderpath = [datadirS3 filesep filename];
+load(folderpath);
+
+ T_an = interp1(H.alt_an,H.T_an,Q.Zret);
+ T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
+ T_cm = interp1(H.alt_com,H.T_cm,Q.Zret);
+
+
 
                     figure;
 %                     subplot(1,2,1)
                     plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Tsonde2,Q.Zret./1000,'b');
                     hold on
-                    plot(T_an(Q.Zret<=10000),Q.Zret(Q.Zret<=10000)./1000,'black',T_dg(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'y')
+                    plot(T_an(Q.Zret<=10000),Q.Zret(Q.Zret<=10000)./1000,'black',T_dg(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'y', T_cm(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'c')
+                    grid on;
                     grid on;
                     [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
                     %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
                     % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
                     xlabel('Temperature (K)')
                     ylabel('Altitude(km)')
-                    legend('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital')
+                    legend('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital','TraditionalCombined')
                     hold off;
 % 
 %                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
@@ -332,7 +339,7 @@ T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
                          legend('Traditional-Sonde','OEM - Traditional','OEM - Sonde') 
 
-R =bparameterjacobians (Q,X);
+R1 =bparameterjacobians (Q,X);
 
 S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
 S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV
@@ -348,9 +355,9 @@ S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV
 % 
 %                     % %  %%
 %                     % % % calculate error matrices
-                    dfacP = 0.1; % ISSI recommend
-                    dfacR = 0.1; % ISSI recommend
-                    dfacRa = 0.1; % ISSI recommend
+                    dfacP = 0.01; % ISSI recommend
+                    dfacR = 0.01; % ISSI recommend
+                    dfacRa = 0.01; % ISSI recommend
                     dfacAir = 0.01; % BOb code
                     dfacaero = 0.01;
 %                     % % dfacDT = 0.1;
@@ -387,17 +394,33 @@ S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV
 %                     % % SDT = (dfacDT.*Q.deadtime).^2;
 %                     % %
 %                     % %
-S_b.SxP = X.G*R.JPress*S_P*R.JPress'*X.G';
-S_b.SxR = X.G*R.JR*S_R*R.JR'*X.G';
-S_b.SxRa = X.G*R.JRa*S_Ra*R.JRa'*X.G';
-S_b.SxAir = X.G*R.Jnair*S_air*R.Jnair'*X.G';
-S_b.Sxaero = X.G*R.Jaero*S_aero*R.Jaero'*X.G';
+S_b.SxP = X.G*R1.JPress*S_P*R1.JPress'*X.G';
+S_b.SxR = X.G*R1.JR*S_R*R1.JR'*X.G';
+S_b.SxRa = X.G*R1.JRa*S_Ra*R1.JRa'*X.G';
+S_b.SxAir = X.G*R1.Jnair*S_air*R1.Jnair'*X.G';
+S_b.Sxaero = X.G*R1.Jaero*S_aero*R1.Jaero'*X.G';
 
-% figure;plot(S_b.SxP,Q.Zret./1000,'r',S_b.SxR,Q.Zret./1000,'b',S_b.SxRa,Q.Zret./1000,'g')
-% hold on;
-% plot(S_b.SxAir,Q.Zret./1000,'m',S_b.Sxaero,Q.Zret./1000,'black')
-% xlabel('Covariance')
-% ylabel('Alt(km)')
-% legend('Pressure','R','Ra','Air density','Aerosol')
+% Errors
 
-%                     % % SxDT = X.G*R.JDT*SDT*R.JDT'*X.G';
+P = diag(S_b.SxP);
+Rc = diag(S_b.SxR);
+Ra = diag(S_b.SxRa);
+Air = diag(S_b.SxAir);
+Aero = diag(S_b.Sxaero);
+
+total_err_T = sqrt( X.eo(1:m).^2 + P(1:m) + Rc(1:m)+ Ra(1:m) + Air(1:m) + Aero(1:m));
+
+% Errors for Temperature
+figure;
+plot(X.eo(1:m),Q.Zret./1000,'r')
+hold on;
+plot(sqrt(P(1:m)),Q.Zret./1000,'--*')
+plot(sqrt(Rc(1:m)),Q.Zret./1000,'--^')
+plot(sqrt(Ra(1:m)),Q.Zret./1000,'--+')
+plot(sqrt(Air(1:m)),Q.Zret./1000,'--o')
+plot(sqrt(Aero(1:m)),Q.Zret./1000,'--s')
+plot(total_err_T,Q.Zret/1000,'black')
+xlabel('Uncertainty')
+ylabel('Altitude (km)')
+legend('Statistical','Pressure','R','Ra','Air density','Aerosol','Total Error')
+

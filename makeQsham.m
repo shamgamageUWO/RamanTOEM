@@ -57,13 +57,13 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=2000 & alt <= 40000);
+Q.Eb = Eb(alt>=4000 & alt <= 40000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=2000 & alt <= 40000);
-Q.JLnew= JLnew(alt>=2000 & alt <= 40000);
-Q.JH_DS =JH_DS(alt>=2000 & alt <= 40000);
-Q.JL_DS =JL_DS(alt>=2000 & alt <= 40000);
-Q.alt = alt(alt>=2000 & alt <= 40000);
+Q.JHnew= JHnew(alt>=4000 & alt <= 40000);
+Q.JLnew= JLnew(alt>=4000 & alt <= 40000);
+Q.JH_DS =JH_DS(alt>=4000 & alt <= 40000);
+Q.JL_DS =JL_DS(alt>=4000 & alt <= 40000);
+Q.alt = alt(alt>=4000 & alt <= 40000);
 Q.Zmes2 = Q.alt';
 
 Q.f = 1e6./(Y.F);
@@ -248,7 +248,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 4000
+                    if Q.Zmes1(i) <= 6000
                         Q.YYa(i) = Q.JLav(i);
                     else
                         Q.YYa(i) = .1.*Q.JLav(i);
@@ -256,7 +256,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes1(i) <= 4000
+                    if  Q.Zmes1(i) <= 6000
                         Q.YYYa(i) = Q.JHav(i);
                     else
                         Q.YYYa(i) = .1.*Q.JHav(i);
@@ -266,7 +266,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 10000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = JLreal(i);
@@ -274,7 +274,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
+            if  Q.Zmes2(i) <= 10000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = JHreal(i);

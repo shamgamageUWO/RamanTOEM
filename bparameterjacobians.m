@@ -16,10 +16,16 @@ DT_JL = x(end); % deadtimes
 
 % data structure
 mdata = length(Q.y);
+n1=length(Q.JLnew);
+n2=length(Q.JLnewa);
 % FM 
-[yJH,yJL,yJHA,yJLA] = forwardmodelTraman(Q,x);
-n1=length(yJH);
-n2=length(yJHA);
+yJH = X.yf(1:n1)';
+yJL = X.yf(n1+1:2*n1)';
+yJHA = X.yf(2*n1+1:end-n2)';
+yJLA = X.yf(end-n2+1:end)';
+
+% [yJH,yJL,yJHA,yJLA] = forwardmodelTraman(Q,x);
+
 % yJH = Q.JHnew;
 % yJL = Q.JLnew;
 % yJHA = Q.JHnewa;
@@ -51,23 +57,23 @@ dSJLdPD = ((yJL - BJL)./Q.Pressi(n2+1:end)) .* DTDJL;
 dSJHdPA = ((yJHA - BJHa)./Q.Pressi(1:n2)); %analog
 dSJLdPA = ((yJLA - BJLa)./Q.Pressi(1:n2));
 
-    figure;
-    subplot(2,2,1)
-    plot(dSJHdPD,Q.Zmes2./1000)
-    xlabel('J- Pressure - JH')
-    ylabel('Alt (km)')
-    subplot(2,2,2)
-    plot(dSJLdPD,Q.Zmes2./1000)
-    xlabel('J- Pressure - JL')
-    ylabel('Alt (km)')
-    subplot(2,2,3)
-    plot(dSJHdPA,Q.Zmes1./1000)
-    xlabel('J- Pressure - JHa')
-    ylabel('Alt (km)')
-    subplot(2,2,4)
-    plot(dSJLdPA,Q.Zmes1./1000)
-    xlabel('J- Pressure - JLa')
-    ylabel('Alt (km)')
+%     figure;
+%     subplot(2,2,1)
+%     plot(dSJHdPD,Q.Zmes2./1000)
+%     xlabel('J- Pressure - JH')
+%     ylabel('Alt (km)')
+%     subplot(2,2,2)
+%     plot(dSJLdPD,Q.Zmes2./1000)
+%     xlabel('J- Pressure - JL')
+%     ylabel('Alt (km)')
+%     subplot(2,2,3)
+%     plot(dSJHdPA,Q.Zmes1./1000)
+%     xlabel('J- Pressure - JHa')
+%     ylabel('Alt (km)')
+%     subplot(2,2,4)
+%     plot(dSJLdPA,Q.Zmes1./1000)
+%     xlabel('J- Pressure - JLa')
+%     ylabel('Alt (km)')
 
 JPress = [dSJHdPD';dSJLdPD';dSJHdPA';dSJLdPA'];
 R.JPress = diag(JPress);
@@ -85,15 +91,15 @@ dss = zeros(2*n1,1);
 JRa = [dss;dSJHdRa';dSJLdRa];
 R.JRa = diag(JRa);
 
-    figure; 
-subplot(1,2,1)
-    plot(dSJHdR,Q.Zmes2./1000)
-    xlabel('J- R - JH')
-    ylabel('Alt (km)')
-subplot(1,2,2)
-    plot(dSJHdRa,Q.Zmes1./1000)
-    xlabel('J- R - JHa')
-    ylabel('Alt (km)')
+%     figure; 
+% subplot(1,2,1)
+%     plot(dSJHdR,Q.Zmes2./1000)
+%     xlabel('J- R - JH')
+%     ylabel('Alt (km)')
+% subplot(1,2,2)
+%     plot(dSJHdRa,Q.Zmes1./1000)
+%     xlabel('J- R - JHa')
+%     ylabel('Alt (km)')
 
 
 
@@ -116,23 +122,23 @@ Jnair = [dSJHdnair';dSJLdnair';dSJHdnairA';dSJLdnairA'];
 
 R.Jnair  = diag(Jnair);
 
-    figure;
-    subplot(2,2,1)
-    plot(dSJHdnair,Q.Zmes2./1000)
-    xlabel('J- nair - JH')
-    ylabel('Alt (km)')
-    subplot(2,2,2)
-    plot(dSJHdnair,Q.Zmes2./1000)
-    xlabel('J- nair - JL')
-    ylabel('Alt (km)')
-    subplot(2,2,3)
-    plot(dSJHdnairA,Q.Zmes1./1000)
-    xlabel('J- nair - JHa')
-    ylabel('Alt (km)')
-    subplot(2,2,4)
-    plot(dSJHdnairA,Q.Zmes1./1000)
-    xlabel('J- nair - JLa')
-    ylabel('Alt (km)')
+%     figure;
+%     subplot(2,2,1)
+%     plot(dSJHdnair,Q.Zmes2./1000)
+%     xlabel('J- nair - JH')
+%     ylabel('Alt (km)')
+%     subplot(2,2,2)
+%     plot(dSJHdnair,Q.Zmes2./1000)
+%     xlabel('J- nair - JL')
+%     ylabel('Alt (km)')
+%     subplot(2,2,3)
+%     plot(dSJHdnairA,Q.Zmes1./1000)
+%     xlabel('J- nair - JHa')
+%     ylabel('Alt (km)')
+%     subplot(2,2,4)
+%     plot(dSJHdnairA,Q.Zmes1./1000)
+%     xlabel('J- nair - JLa')
+%     ylabel('Alt (km)')
 
 
 %%% aerosol scattering jacobian
@@ -146,23 +152,23 @@ dSJLdnaeroA = (-2.*deltaZ .* (yJLA - BJLa));
 Jaero = [dSJHdnaero' ;dSJLdnaero';dSJHdnaeroA';dSJLdnaeroA'];
 R.Jaero  = diag(Jaero);
 
-    figure;
-    subplot(2,2,1)
-    plot(dSJHdnaero,Q.Zmes2./1000)
-    xlabel('J- aero - JH')
-    ylabel('Alt (km)')
-    subplot(2,2,2)
-    plot(dSJLdnaero,Q.Zmes2./1000)
-    xlabel('J- aero - JL')
-    ylabel('Alt (km)')
-    subplot(2,2,3)
-    plot(dSJHdnaeroA,Q.Zmes1./1000)
-    xlabel('J- aero - JHa')
-    ylabel('Alt (km)')
-    subplot(2,2,4)
-    plot(dSJLdnaeroA,Q.Zmes1./1000)
-    xlabel('J- aero - JLa')
-    ylabel('Alt (km)')
+%     figure;
+%     subplot(2,2,1)
+%     plot(dSJHdnaero,Q.Zmes2./1000)
+%     xlabel('J- aero - JH')
+%     ylabel('Alt (km)')
+%     subplot(2,2,2)
+%     plot(dSJLdnaero,Q.Zmes2./1000)
+%     xlabel('J- aero - JL')
+%     ylabel('Alt (km)')
+%     subplot(2,2,3)
+%     plot(dSJHdnaeroA,Q.Zmes1./1000)
+%     xlabel('J- aero - JHa')
+%     ylabel('Alt (km)')
+%     subplot(2,2,4)
+%     plot(dSJLdnaeroA,Q.Zmes1./1000)
+%     xlabel('J- aero - JLa')
+%     ylabel('Alt (km)')
 
 %%% deadtime jacobian
 

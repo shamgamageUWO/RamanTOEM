@@ -118,8 +118,8 @@ fit3a = fit(xa',ya,fa,'Robust','on');
 Ra_fit = fit3a(1);
 
 figure;plot(Q.Zmes2./1000,R,'r',Q.Zmes1./1000,Ra,'b')
-xlabel('R')
-ylabel('Alt(km)')
+xlabel('Alt(km)')
+ylabel('R or Ra')
 legend('R','Ra')
 
 %%

@@ -74,10 +74,10 @@ load(folderpath);
 % disp('Start time')
 g = hour(S0.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
 Minute = minute(S0.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
-
+tin =Q.time_in;
 % from 2300 to 2330
-starttime=find(g==23 & Minute==00);
-endtime=find(g==23 & Minute==30);
+starttime=find(g==tin & Minute==00);
+endtime=find(g==tin & Minute==30);
 % start =  [g(1) Minute(1)];
 % start
 
@@ -235,7 +235,8 @@ alt_an = alt_an(1+zAoffset:end);
 alt = JHzc;
 Alt = JHazc;
 
-   figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'r') 
+  figure;
+  semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'r') 
   xlabel('30min Coadded signal') 
   xlabel('30min Coadded signal')
   ylabel('Alt (km)')
