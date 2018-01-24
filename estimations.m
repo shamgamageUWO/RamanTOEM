@@ -91,39 +91,39 @@ CJHa = fitJHa(1);
     %     %  OVz = (JLnew + JHnew- Bg_JL_real- Bg_JH_real)./(JLwoOV + JHwoOV)';
     %     % figure;plot(Q.Zmes./1000,OVz,'b'); hold on;
 %     
-%      JLwoOV = ((CJL.*JL));
-%      JHwoOV1 = ((Q.R.*CJL.*JH));
-%      JHwoOV2 = ((CJH.*JH));
-% % %     
-%     JLawoOV = ((CJLa.*JLa));
-%      JHawoOV1 = ((Q.Ra.*CJLa.*JHa));
+%       JLwoOV = ((CJL.*JL));
+%       JHwoOV1 = ((Q.R.*CJL.*JH));
+% %      JHwoOV2 = ((CJH.*JH));
+% % % %     
+%      JLawoOV = ((CJLa.*JLa));
+%       JHawoOV1 = ((Q.Ra.*CJLa.*JHa));
 %     JHawoOV2 = ((CJHa.*JHa));
 % 
 % % %     
 % % %     % It is now mean of the overlap as the a priori
-%       OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
+%        OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
 %       OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV1 )';
-%       OVz3d = (Q.JHnew - Q.BaJH)./(JHwoOV2 )';
+% %       OVz3d = (Q.JHnew - Q.BaJH)./(JHwoOV2 )';
+% % 
+% %    
+% %       
+% %       
+%       OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
+%       OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV1 )';
+% %      OVz3a = (Q.JHnewa - Q.BaJHa)./(JHawoOV2 )';
+% % %    figure;plot(Q.Zmes2./1000,OVz1d,'r',Q.Zmes2./1000,OVz2d,'b',Q.Zmes2./1000,OVz3d,'g')
+%   figure;plot(Q.Zmes1./1000,OVz1a,'r',Q.Zmes1./1000,OVz2a,'g',Q.Zmes2./1000,OVz1d,'r',Q.Zmes2./1000,OVz2d,'b')
 % 
-%    
-%       
-%       
-%      OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
-%      OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV1 )';
-%      OVz3a = (Q.JHnewa - Q.BaJHa)./(JHawoOV2 )';
-% %    figure;plot(Q.Zmes2./1000,OVz1d,'r',Q.Zmes2./1000,OVz2d,'b',Q.Zmes2./1000,OVz3d,'g')
-% %   figure;plot(Q.Zmes1./1000,OVz1a,'r',Q.Zmes1./1000,OVz3a,'g',Q.Zmes2./1000,OVz1d,'m',Q.Zmes2./1000,OVz3d,'black')
-
-% %     
-% %     OVzd = (OVz1d+OVz2d)./2;
-% %     OVzd = smooth(OVzd,5);
-% %     
-% %     OVza = (OVz1a+OVz2a)./2;
-% OVza = OVz1a;
-% %     OVza = smooth(OVza,10);
-%     normfac = OVza(end);
-%     OVnw = OVza./normfac;
-% %     plot(Q.Zmes1./1000,OVnw,'y')
+% % %     
+%      OVzd = (OVz1d+OVz2d)./2;
+% % %     OVzd = smooth(OVzd,5);
+% % %     
+%      OVza = (OVz1a+OVz2a)./2;
+% % OVza = OVz1a;
+%      OVza = smooth(OVza,10);
+%    normfac = OVza(end);
+%      OVnw = OVza./normfac;
+%     plot(Q.Zmes1./1000,OVnw,'y')
 %     
 % %      OVza(OVza>=1)=1;
 % %     OVz = [OVza;OVzd]; 

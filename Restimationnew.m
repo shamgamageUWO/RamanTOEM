@@ -109,7 +109,7 @@ R_fit = fit3(1);
 
 % %% analog
 Alt2 = Q.Zmes1;
-ind2 = Alt2 >= 2000 & Alt2 <= 2200;
+ind2 = Alt2 >= 600 & Alt2 <= 800;
  xa = 1./Ratio_diff_a(ind2);
  ya = Analog_ratio(ind2);
 

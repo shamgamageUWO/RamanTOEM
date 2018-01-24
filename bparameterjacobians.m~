@@ -52,14 +52,12 @@ DTDJL = ((1-DT_JL.*yJL).^2);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Pressure Jacobian 
 % JPress =zeros(mdata,n);
-% Pressure = Q.Pressi;
-Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
-Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
-
-dSJHdPD = ((yJH - BJH)./Pd) .* DTDJH; %digital
-dSJLdPD = ((yJL - BJL)./Pd) .* DTDJL;
-dSJHdPA = ((yJHA - BJHa)./Pa); %analog
-dSJLdPA = ((yJLA - BJLa)./Pa);
+Pressure = Q.Pressi;
+P_Digi = 
+dSJHdPD = ((yJH - BJH)./Q.Pressi(n2+1:end)) .* DTDJH; %digital
+dSJLdPD = ((yJL - BJL)./Q.Pressi(n2+1:end)) .* DTDJL;
+dSJHdPA = ((yJHA - BJHa)./Q.Pressi(1:n2)); %analog
+dSJLdPA = ((yJLA - BJLa)./Q.Pressi(1:n2));
 
 %     figure;
 %     subplot(2,2,1)

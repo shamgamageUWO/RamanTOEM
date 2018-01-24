@@ -57,13 +57,16 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-Q.Eb = Eb(alt>=2000 & alt <= 40000);
+a1=4000;
+a2 =30;
+
+Q.Eb = Eb(alt>=a1 & alt <= 40000);
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=2000 & alt <= 40000);
-Q.JLnew= JLnew(alt>=2000 & alt <= 40000);
-Q.JH_DS =JH_DS(alt>=2000 & alt <= 40000);
-Q.JL_DS =JL_DS(alt>=2000 & alt <= 40000);
-Q.alt = alt(alt>=2000 & alt <= 40000);
+Q.JHnew= JHnew(alt>=a1 & alt <= 40000);
+Q.JLnew= JLnew(alt>=a1 & alt <= 40000);
+Q.JH_DS =JH_DS(alt>=a1 & alt <= 40000);
+Q.JL_DS =JL_DS(alt>=a1 & alt <= 40000);
+Q.alt = alt(alt>=a1 & alt <= 40000);
 Q.Zmes2 = Q.alt';
 
 Q.f = 1e6./(Y.F);
@@ -73,13 +76,13 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=1000 & ANalt <= 6000);
+Q.Eba = Eba(ANalt>=a2 & ANalt <= 6000);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=1000 & ANalt <=6000);
-Q.JLnewa= JLnewa(ANalt>=1000 & ANalt <=6000);
-Q.ANalt = ANalt(ANalt>=1000);
+Q.JHnewa= JHnewa(ANalt>=a2 & ANalt <=6000);
+Q.JLnewa= JLnewa(ANalt>=a2 & ANalt <=6000);
+Q.ANalt = ANalt(ANalt>=a2);
 % Q.Zmes = Q.ANalt';
-Q.Zmes1 = ANalt(ANalt>=1000 & ANalt <= 6000);
+Q.Zmes1 = ANalt(ANalt>=a2 & ANalt <= 6000);
 Q.Zmes1 = Q.Zmes1';
 %  Q.YYYa = Y.YYYa(ANalt>=100 & ANalt <= 5000);
 %  Q.YYa  = Y.YYa(ANalt>=100 & ANalt <= 5000);
@@ -106,7 +109,7 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 % Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:6000;
 % Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*15:60000;
 % Q.Zret =[Z1 Z2];
- Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:50000;% Retrieval grid
+ Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:50000;% Retrieval grid
 disp('Defined grids ')
 
 % slopeDT= (1-0.1)/(Q.Zret(1)-Q.Zret(end));
@@ -175,11 +178,11 @@ disp('R is calibrated ')
 %% Estimating background and lidar constant wrt a priori 
 
 [CJL, CJLa,CJHa,CJH] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-% load('ovmodeldata.mat');
-% OVnw = interp1(z,epsi,Q.Zret,'linear');
-% OVnw(isnan(OVnw))=1;
-% Q.OVa = OVnw;
- Q.OVa = ones(1,length(Q.Ta));
+load('ralmoFixedOverlap.mat')
+ OVnw = interp1(ralmoO.zoverlap,ralmoO.overlap,Q.Zret,'linear');
+ OVnw(isnan(OVnw))=1;
+ Q.OVa = OVnw;
+%  Q.OVa = ones(1,length(Q.Ta));
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
 
@@ -225,8 +228,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
 
-             [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,8);
-             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,8);
+             [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,12);
+             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,12);
           
              r1 = ones(1,go11-1).* JHv(1);
              r2 = ones(1,go11-1).* JHv(end);
@@ -248,7 +251,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
                 for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 3000
+                    if Q.Zmes1(i) <= 6000
                         Q.YYa(i) = Q.JLav(i);
                     else
                         Q.YYa(i) = .1.*Q.JLav(i);
@@ -256,7 +259,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
                 end
                 
                 for i = 1: length(Q.JHav)
-                    if  Q.Zmes1(i) <= 3000
+                    if  Q.Zmes1(i) <= 6000
                         Q.YYYa(i) = Q.JHav(i);
                     else
                         Q.YYYa(i) = .1.*Q.JHav(i);
@@ -266,7 +269,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 10000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = JLreal(i);
@@ -274,7 +277,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
+            if  Q.Zmes2(i) <= 10000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = JHreal(i);
