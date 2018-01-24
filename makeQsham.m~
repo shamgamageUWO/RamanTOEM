@@ -58,7 +58,7 @@ alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
 a1=4000;
-a2 =30;
+a2 =20;
 
 Q.Eb = Eb(alt>=a1 & alt <= 40000);
 Q.Eb(Q.Eb <=0)= rand();
@@ -226,10 +226,11 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
                         Q.y = [Q.JHnew Q.JLnew Q.JHnewa Q.JLnewa]';
 
+b1 = 8;
+b2 = 8;
 
-
-             [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,12);
-             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,12);
+             [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,b1);
+             [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,b1);
           
              r1 = ones(1,go11-1).* JHv(1);
              r2 = ones(1,go11-1).* JHv(end);
@@ -239,8 +240,8 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,12);
- [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,12);
+ [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,b2);
+ [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,b2);
 
             ar1 = ones(1,go1-1).* JHav(1);
             ar2 = ones(1,go1-1).* JHav(end);

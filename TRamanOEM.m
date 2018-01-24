@@ -149,7 +149,10 @@ DT_JL
 % 
 %                     %% Plot Avg Kenerl
 % 
-                    response = sum(X.A(1:m,1:m));
+%                     response = sum(X.A(1:m,1:m));
+                    unit = ones(size(Q.Zret));
+                    response = (X.A(1:m,1:m))*unit';
+
                     % Vertical resolution
                     width = zeros(size(Q.Zret));
                     for j = 1:m % fini

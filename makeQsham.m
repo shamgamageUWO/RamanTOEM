@@ -57,8 +57,8 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-a1=3000;
-a2 =60;
+a1=4000;
+a2 =20;
 
 Q.Eb = Eb(alt>=a1 & alt <= 40000);
 Q.Eb(Q.Eb <=0)= rand();
@@ -270,7 +270,7 @@ b2 = 8;
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 8000
+            if Q.Zmes2(i) <= 10000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = JLreal(i);
@@ -278,7 +278,7 @@ b2 = 8;
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 8000
+            if  Q.Zmes2(i) <= 10000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = JHreal(i);
