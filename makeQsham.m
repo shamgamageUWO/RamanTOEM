@@ -59,6 +59,8 @@ Eb = Y.Eb;
 Q.binzise = Y.binsize;
 a1=4000;
 a2 =20;
+b1 = 8;
+b2 = 8;
 
 Q.Eb = Eb(alt>=a1 & alt <= 40000);
 Q.Eb(Q.Eb <=0)= rand();
@@ -226,8 +228,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
                         Q.y = [Q.JHnew Q.JLnew Q.JHnewa Q.JLnewa]';
 
-b1 = 8;
-b2 = 8;
+
 
              [JHv,go11] =bobpoissontest(JHreal,Q.Zmes2,b1);
              [JLv,go] =bobpoissontest(JLreal,Q.Zmes2,b1);

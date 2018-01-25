@@ -146,10 +146,9 @@ DT_JL
 %                     xlabel('Jacobian - JLa')
 %                     ylabel('Altitude (km)')
 % 
-% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     %% Plot Avg Kenerl
-% 
-%                     response = sum(X.A(1:m,1:m));
+                    response = sum(X.A(1:m,1:m));
                     unit = ones(size(Q.Zret));
                     response = (X.A(1:m,1:m))*unit';
 
@@ -166,7 +165,7 @@ DT_JL
 
                     figure;
                     subplot(1,2,1)
-                    set(gca,'fontsize',16)
+%                     set(gca,'fontsize',16)
                     % hold on;
                     plot(X.A(1:m,1:m),Q.Zret(1:m)./1000)
                     grid on;
@@ -174,19 +173,37 @@ DT_JL
                     plot(response,Q.Zret./1000,'r')
                     % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
                     hold off;
-                    xlabel('Avgeraging Kernels')
-                    ylabel('Altitude(km)')
+                    xlabel('Tempertaure - Avgeraging Kernels')
+                    ylabel('Altitude ( km )')
 
                     subplot(1,2,2)
                     plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
                     grid on;
-                    xlabel('Vertical Resolution (km)')
-                    ylabel('Altitude(km)')
+                    xlabel('Vertical Resolution ( km )')
+                    ylabel('Altitude ( km )')
+                    
+                    
+                    
+                    
+%                     OVresponse = (X.A(m+4:end-5,m+4:end-5))*unit';
+                    figure;
+                    plot(X.A(m+4:end-5,m+4:end-5),Q.Zret(1:m)./1000)
+%                     grid on;
+%                     hold on;
+%                     plot(OVresponse,Q.Zret./1000,'r')
+                    % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
+%                     hold off;
+                    xlabel('Overlap - Avgeraging Kernels')
+                    ylabel('Altitude ( km )')
+                    
 %                     %
                     err = X.e(1:m);
                     upper = err+ X.x(1:m);
                     lower =  X.x(1:m)-err;
+
                     
+                    
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                    
 % load traditional temperature profiles
 date = Q.date_in;
 time = Q.time_in;
@@ -194,55 +211,88 @@ time = Q.time_in;
 yr = num2str(year);
 datadirS3 = '/Users/sham/Downloads/OEM-Sham-Code-Jan-2017/QpackSham/TraditionalTemperature';
 filename =[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f',time)];
-folderpath = [datadirS3 filesep filename];
+folderpath = [datadirS3 filesep filename]
 load(folderpath);
 
- T_an = interp1(H.alt_an,H.T_an,Q.Zret);
- T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
- T_cm = interp1(H.alt_com,H.T_cm,Q.Zret);
+T_an = interp1(H.alt_an,H.T_an,Q.Zret);
+T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
+T_cm = interp1(H.alt_com,H.T_cm,Q.Zret);
 
+% T1 = interp1(H.alt_an,H.T_an,Q.Zmes1);
+% T2 = interp1(H.alt_digi,H.T_dg,Q.Zmes2);
+% TT =[T1 T2];
+% T_all = interp1(H.alt_digi,H.T_dg,Q.Zret);
 
-
-                    figure;
+figure;
 %                     subplot(1,2,1)
-                    plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Tsonde2,Q.Zret./1000,'b');
-                    hold on
-                    plot(T_an(Q.Zret<=10000),Q.Zret(Q.Zret<=10000)./1000,'black',T_dg(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'y', T_cm(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'c')
-                    grid on;
-                    grid on;
-                    [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
-                    %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
-                    % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
-                    xlabel('Temperature (K)')
-                    ylabel('Altitude(km)')
-                    legend('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital','TraditionalCombined')
-                    hold off;
+plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Tsonde2,Q.Zret./1000,'b');
+hold on
+plot(T_an(Q.Zret<=10000),Q.Zret(Q.Zret<=10000)./1000,'black',T_dg(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'y', T_cm(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'c')
+grid on;
+grid on;
+[fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
+%  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
+% jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
+xlabel('Temperature (K)')
+ylabel('Altitude(km)')
+legend('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital','TraditionalCombined')
+hold off;
+
+
+
+in= Q.Zret<=25000;
+Toem= X.x(1:m);
+Toem_e=X.eo(1:m);
+in2 = Q.Zret<=6000;
+in3= Q.Zret>=4000 & Q.Zret<=25000;
+
+figure;
+subplot(1,3,1)
+plot(Toem(in) - (Q.Tsonde2(in)'),Q.Zret(in)./1000)
+hold on;
+plot(Toem_e(in),Q.Zret(in)./1000,'r',-Toem_e(in),Q.Zret(in)./1000,'r')
+hold off;
+grid on;
+xlabel('Temperature residuals(T OEM - T sonde) (K)')
+ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+
+%                      T = X.x(1:m);
+
+subplot(1,3,2)
+plot(Toem(in3) - T_dg(in3)',Q.Zret(in3)./1000,'b')
+hold on;
+plot(Toem(in2) - T_an(in2)',Q.Zret(in2)./1000,'black')
+plot(Toem_e(in3),Q.Zret(in3)./1000,'r',-Toem_e(in3),Q.Zret(in3)./1000,'r')
+plot(Toem_e(in2),Q.Zret(in2)./1000,'r',-Toem_e(in2),Q.Zret(in2)./1000,'r')
+hold off;
+grid on;
+xlabel('Temperature residuals(T OEM - T digital traditional) (K)')
+ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+
+subplot(1,3,3)
+plot((T_dg(in3)-Q.Tsonde2(in3)),Q.Zret(in3)./1000,'r',( T_dg(in3)' - Toem(in3)),Q.Zret(in3)./1000,'b',(Toem(in) - Q.Tsonde2(in)'),Q.Zret(in)./1000,'g')
+hold on
+plot(( T_an(in2)' - Toem(in2)),Q.Zret(in2)./1000,'y',(T_an(in2)-Q.Tsonde2(in2)),Q.Zret(in2)./1000,'black');
+grid on;
+hold off
+xlabel('Temperature residuals (K)')
+ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OEM - Traditional analog','Traditional analog-Sonde')
+
+
 % 
-%                     %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
-% % 
-%                      subplot(1,2,2)
-%                      plot(X.x(1:m) - (Q.Tsonde2'),Q.Zret./1000)
-%                      hold on;
-%                     plot(-X.eo(1:m),Q.Zret./1000,'r',X.eo(1:m),Q.Zret./1000,'r')
-% %                     xlabel('Temperature Stat error (K)')
-% %                     ylabel( ' Alt (km)')
-%                      grid on;
-%                      xlabel('Temperature residuals(T OEM - T sonde) (K)')
-% %                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
-% %                     %  xlabel('Temperature Percent Error (%)')
-%                      ylabel('Altitude(km)')%  ylabel('Altitude(km)')
-% 
-% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+%        Overlap
                     figure;
                     subplot(1,2,1)
                     plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-5),Q.Zret./1000,'r')
                     grid on;
                     xlabel('OV')
-                    ylabel('Altitude(km)')
+                    ylabel('Altitude ( km )')
                     legend('OV a priori','OV OEM')
 
 
-                    %  Treal = interp1(Q.Zmes,Q.Treal,Q.Zret,'linear');
 
                     subplot(1,2,2)
                     plot((((-Q.OVa')+X.x(m+4:end-5) )./X.x(m+4:end-5)).*100,Q.Zret./1000)
@@ -250,13 +300,11 @@ load(folderpath);
                     xlabel('OV residuals(OV OEM - OV a priori) (%)')
                     %  plot(((X.x(1:m) - (Treal'))./(Treal')).*100,Q.Zret./1000)
                     %  xlabel('Temperature Percent Error (%)')
-                    ylabel('Altitude(km)')%  ylabel('Altitude(km)')
-% 
-%                     %  subplot(1,3,3)
-%                     %  plot(Q.Ta - Treal,Q.Zret./1000)
-%                     %  xlabel('Temperature residuals (T a priori - T real) (K)')
-%                     %  ylabel('Altitude(km)')
-% 
+                    ylabel('Altitude ( km )')%  ylabel('Altitude(km)')
+
+                    
+                    
+%  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %% Residual plots
                     figure;
                     subplot(2,2,1)
@@ -291,7 +339,6 @@ load(folderpath);
 %                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
                     plot(-(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
                     
-%plot(-(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJHa)).*100,Q.Zmes1./1000,'r');
 
                     hold off
                     xlabel('JH - analog counts residual(%)')
@@ -308,40 +355,13 @@ load(folderpath);
                     xlabel('JL - analog counts residual(%)')
                     ylabel('Altitude (km)')
                     
-                    
-           in= Q.Zret<=25000;
-          Toem= X.x(1:m);
-          Toem_e=X.eo(1:m);
-           
-                    figure; 
-                      subplot(1,3,1)
-                     plot(Toem(in) - (Q.Tsonde2(in)'),Q.Zret(in)./1000)
-                     hold on;
-                     plot(Toem_e(in),Q.Zret(in)./1000,'r',-Toem_e(in),Q.Zret(in)./1000,'r')
-                     hold off;
-                     grid on;
-                     xlabel('Temperature residuals(T OEM - T sonde) (K)')
-                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
-                     
-%                      T = X.x(1:m);
-                     
-                    subplot(1,3,2)
-                     plot(Toem(in) - T_dg(in)',Q.Zret(in)./1000)
-                     hold on;
-                     plot(Toem_e(in),Q.Zret(in)./1000,'r',-Toem_e(in),Q.Zret(in)./1000,'r')
-                     hold off;
-                     grid on;
-                     xlabel('Temperature residuals(T OEM - T digital traditional) (K)')
-                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
-                     
-                      subplot(1,3,3)
-                     plot((T_dg(in)-Q.Tsonde2(in)),Q.Zret(in)./1000,'r',( T_dg(in)' - Toem(in)),Q.Zret(in)./1000,'b',(Toem(in) - Q.Tsonde2(in)'),Q.Zret(in)./1000,'g')
- 
-                     grid on;
-                     xlabel('Temperature residuals (K)')
-                     ylabel('Altitude(km)')%  ylabel('Altitude(km)')
-                         legend('Traditional-Sonde','OEM - Traditional','OEM - Sonde') 
 
+                    
+                
+                    
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%   b parameters and errors
+                    
 R1 =bparameterjacobians (Q,X);
 
 S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
@@ -358,15 +378,17 @@ S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV
 % 
 %                     % %  %%
 %                     % % % calculate error matrices
-                    dfacP = 0.01; % ISSI recommend
+                    dfacP1 = 0.1;
+                    dfacP2 = 0.01;% ISSI recommend
                     dfacR = 0.01; % ISSI recommend
                     dfacRa = 0.01; % ISSI recommend
                     dfacAir = 0.01; % BOb code
                     dfacaero = 0.01;
 %                     % % dfacDT = 0.1;
+
 %                     % % Pressure error
-                    SP1 = (dfacP.*Q.Pressi(n3+1:end)).^2;
-                    SP2 = (dfacP.*Q.Pressi(1:n3)).^2;% for 2 digital channels
+                    SP1 = (dfacP1.*Q.Pressi(end-n1+1:end)).^2;
+                    SP2 = (dfacP2.*Q.Pressi(1:n3)).^2;% for 2 digital channels
                     SP = [SP1 SP1 SP2 SP2];
                     S_P = diag(SP);
                     
@@ -383,20 +405,19 @@ S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV
                     ss = zeros(n1+n2,1);
                     SRa = [ss ;SRa1;SRa2];
                     S_Ra = diag(SRa);
-%                     % %
+                    
+%                     % % air
                     Sair1 = (dfacAir.*Q.Nmol(n3+1:end)).^2;
                     Sair2 = (dfacAir.*Q.Nmol(1:n3)).^2;
                     Sair = [Sair1 Sair1 Sair2 Sair2];
                     S_air = diag(Sair);
-%                     % %
+%                     % % aerosol
                     Saero1 = (dfacaero.*Q.alpha_aero(n3+1:end)').^2;
                     Saero2 = (dfacaero.*Q.alpha_aero(1:n3)').^2;
                     Saero = [Saero1 Saero1 Saero2 Saero2];
                     S_aero = diag(Saero);
-%                     % %
-%                     % % SDT = (dfacDT.*Q.deadtime).^2;
-%                     % %
-%                     % %
+%                  
+
 S_b.SxP = X.G*R1.JPress*S_P*R1.JPress'*X.G';
 S_b.SxR = X.G*R1.JR*S_R*R1.JR'*X.G';
 S_b.SxRa = X.G*R1.JRa*S_Ra*R1.JRa'*X.G';
@@ -411,6 +432,7 @@ Ra = diag(S_b.SxRa);
 Air = diag(S_b.SxAir);
 Aero = diag(S_b.Sxaero);
 
+
 total_err_T = sqrt( X.eo(1:m).^2 + P(1:m) + Rc(1:m)+ Ra(1:m) + Air(1:m) + Aero(1:m));
 
 % Errors for Temperature
@@ -423,7 +445,22 @@ plot(sqrt(Ra(1:m)),Q.Zret./1000,'--+')
 plot(sqrt(Air(1:m)),Q.Zret./1000,'--o')
 plot(sqrt(Aero(1:m)),Q.Zret./1000,'--s')
 plot(total_err_T,Q.Zret/1000,'black')
-xlabel('Uncertainty')
+xlabel('Temperature Uncertainty')
 ylabel('Altitude (km)')
 legend('Statistical','Pressure','R','Ra','Air density','Aerosol','Total Error')
 
+% Errors for Overlap
+total_err_OV = sqrt( X.eo(m+4:end-5).^2 + P(m+4:end-5) + Rc(m+4:end-5)+ Ra(m+4:end-5) + Air(m+4:end-5) + Aero(m+4:end-5));
+
+figure;
+plot(X.eo(m+4:end-5),Q.Zret./1000,'r')
+hold on;
+plot(sqrt(P(m+4:end-5)),Q.Zret./1000,'--*')
+plot(sqrt(Rc(m+4:end-5)),Q.Zret./1000,'--^')
+plot(sqrt(Ra(m+4:end-5)),Q.Zret./1000,'--+')
+plot(sqrt(Air(m+4:end-5)),Q.Zret./1000,'--o')
+plot(sqrt(Aero(m+4:end-5)),Q.Zret./1000,'--s')
+plot(total_err_OV,Q.Zret/1000,'black')
+xlabel('Overlap Uncertainty')
+ylabel('Altitude (km)')
+legend('Statistical','Pressure','R','Ra','Air density','Aerosol','Total Error')

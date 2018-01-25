@@ -64,7 +64,7 @@ vars2 = Tmodvar ;
  
  
  
- 
+
 
 for i = 1:m
     for j = 1:m

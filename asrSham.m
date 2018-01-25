@@ -77,8 +77,8 @@ asrDATAs = smooth(asrDATA,10); %asrDATA; %smooth(asrDATA,90); %was 45
  diff = 1-fneg;
  fneg2 = find(asrDATAs < 1);
  fneg3 = find(asrDATAs >= 1);
- asrDATAs(fneg2) = 1;
 asrDATAs(fneg3)  = asrDATAs(fneg3) + diff;
+asrDATAs(fneg2) = 1;
 asrDATAnew =  asrDATAs;
 % 
 % fneg = find(asrDATAs < 1);
