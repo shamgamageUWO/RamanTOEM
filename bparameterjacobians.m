@@ -53,13 +53,13 @@ DTDJL = ((1-DT_JL.*yJL).^2);
 %%% Pressure Jacobian 
 % JPress =zeros(mdata,n);
 % Pressure = Q.Pressi;
-Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
-Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
-
-dSJHdPD = ((yJH - BJH)./Pd) .* DTDJH; %digital
-dSJLdPD = ((yJL - BJL)./Pd) .* DTDJL;
-dSJHdPA = ((yJHA - BJHa)./Pa); %analog
-dSJLdPA = ((yJLA - BJLa)./Pa);
+% Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
+% Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
+% 
+% dSJHdPD = ((yJH - BJH)./Pd) .* DTDJH; %digital
+% dSJLdPD = ((yJL - BJL)./Pd) .* DTDJL;
+% dSJHdPA = ((yJHA - BJHa)./Pa); %analog
+% dSJLdPA = ((yJLA - BJLa)./Pa);
 
 %     figure;
 %     subplot(2,2,1)
@@ -79,8 +79,8 @@ dSJLdPA = ((yJLA - BJLa)./Pa);
 %     xlabel('J- Pressure - JLa')
 %     ylabel('Alt (km)')
 
-JPress = [dSJHdPD';dSJLdPD';dSJHdPA';dSJLdPA'];
-R.JPress = diag(JPress);
+% JPress = [dSJHdPD';dSJLdPD';dSJHdPA';dSJLdPA'];
+% R.JPress = diag(JPress);
 
 %%% R jacobian
 % JR = zeros(mdata,n);

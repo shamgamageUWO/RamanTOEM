@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 10;
+Q.coaddalt = 5;
  Q.Rgas = 8.3145;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -57,10 +57,12 @@ JH_DS = Y.JH_DS;
 alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
-a1=4000;
-a2 =20;
+
+a1 = 4000;
+a2 = 140;
 b1 = 8;
 b2 = 8;
+c1 = 8; % retrieval bin size
 
 Q.Eb = Eb(alt>=a1 & alt <= 40000);
 Q.Eb(Q.Eb <=0)= rand();
@@ -111,7 +113,7 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 % Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:6000;
 % Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*15:60000;
 % Q.Zret =[Z1 Z2];
- Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:50000;% Retrieval grid
+ Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:50000;% Retrieval grid
 disp('Defined grids ')
 
 % slopeDT= (1-0.1)/(Q.Zret(1)-Q.Zret(end));
@@ -151,6 +153,9 @@ Q.grav = obj2.accel;
 Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
 Q.z0 = 30000;            
 [Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);  
+
+Q.P0 = p0A; % po pressure
+
 disp('a priori temperature profile is loaded ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
@@ -180,8 +185,12 @@ disp('R is calibrated ')
 %% Estimating background and lidar constant wrt a priori 
 
 [CJL, CJLa,CJHa,CJH] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+% load('OverlapSham.mat')
+% OVnw = interp1(OverlapSham.z,OverlapSham.OVsmooth,Q.Zret,'linear');
+% 
 load('ralmoFixedOverlap.mat')
- OVnw = interp1(ralmoO.zoverlap,ralmoO.overlap,Q.Zret,'linear');
+OVnw = interp1(ralmoO.zoverlap,ralmoO.overlap,Q.Zret,'linear');
+
  OVnw(isnan(OVnw))=1;
  Q.OVa = OVnw;
 %  Q.OVa = ones(1,length(Q.Ta));

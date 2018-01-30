@@ -179,6 +179,10 @@ JL = F.*JL; % single scans
 JH = F.*JH;
 Eb = F.*Eb; % single scans
 
+% JL_an = F.*JL_an; % single scans   %% Adding these from bobs code this isto match the units
+% JH_an = F.*JH_an;
+% Eb_an = F.*Eb_an; % single scans
+
 % figure;
 % subplot(1,2,1)
 % semilogx(JL,alt./1000,JH,alt./1000)
@@ -236,7 +240,7 @@ alt = JHzc;
 Alt = JHazc;
 
   figure;
-  semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'r') 
+  semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'black') 
   xlabel('30min Coadded signal') 
   xlabel('30min Coadded signal')
   ylabel('Alt (km)')

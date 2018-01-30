@@ -148,7 +148,7 @@ DT_JL
 % 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     %% Plot Avg Kenerl
-                    response = sum(X.A(1:m,1:m));
+%                     response = sum(X.A(1:m,1:m));
                     unit = ones(size(Q.Zret));
                     response = (X.A(1:m,1:m))*unit';
 
@@ -173,7 +173,7 @@ DT_JL
                     plot(response,Q.Zret./1000,'r')
                     % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
                     hold off;
-                    xlabel('Tempertaure - Avgeraging Kernels')
+                    xlabel('Temperature - Averaging Kernels')
                     ylabel('Altitude ( km )')
 
                     subplot(1,2,2)
@@ -193,7 +193,7 @@ DT_JL
 %                     plot(OVresponse,Q.Zret./1000,'r')
                     % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
 %                     hold off;
-                    xlabel('Overlap - Avgeraging Kernels')
+                    xlabel('Overlap - Averaging Kernels')
                     ylabel('Altitude ( km )')
                     
 %                     %
@@ -253,7 +253,7 @@ hold on;
 plot(Toem_e(in),Q.Zret(in)./1000,'r',-Toem_e(in),Q.Zret(in)./1000,'r')
 hold off;
 grid on;
-xlabel('Temperature residuals(T OEM - T sonde) (K)')
+xlabel('T(T OEM - T sonde) (K)')
 ylabel('Altitude(km)')%  ylabel('Altitude(km)')
 
 %                      T = X.x(1:m);
@@ -266,7 +266,7 @@ plot(Toem_e(in3),Q.Zret(in3)./1000,'r',-Toem_e(in3),Q.Zret(in3)./1000,'r')
 plot(Toem_e(in2),Q.Zret(in2)./1000,'r',-Toem_e(in2),Q.Zret(in2)./1000,'r')
 hold off;
 grid on;
-xlabel('Temperature residuals(T OEM - T digital traditional) (K)')
+xlabel('(T OEM - T digital traditional) (K)')
 ylabel('Altitude(km)')%  ylabel('Altitude(km)')
 
 subplot(1,3,3)
@@ -378,8 +378,8 @@ S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV
 % 
 %                     % %  %%
 %                     % % % calculate error matrices
-                    dfacP1 = 0.1;
-                    dfacP2 = 0.01;% ISSI recommend
+%                     dfacP1 = 0.1;
+%                     dfacP2 = 0.1;% ISSI recommend
                     dfacR = 0.01; % ISSI recommend
                     dfacRa = 0.01; % ISSI recommend
                     dfacAir = 0.01; % BOb code
@@ -387,10 +387,10 @@ S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV
 %                     % % dfacDT = 0.1;
 
 %                     % % Pressure error
-                    SP1 = (dfacP1.*Q.Pressi(end-n1+1:end)).^2;
-                    SP2 = (dfacP2.*Q.Pressi(1:n3)).^2;% for 2 digital channels
-                    SP = [SP1 SP1 SP2 SP2];
-                    S_P = diag(SP);
+%                     SP1 = (dfacP1.*Q.Pressi(end-n1+1:end)).^2;
+%                     SP2 = (dfacP2.*Q.Pressi(1:n3)).^2;% for 2 digital channels
+%                     SP = [SP1 SP1 SP2 SP2];
+%                     S_P = diag(SP);
                     
 %                     % % R  and Ra error
                     SR1 = (dfacR.*Q.R).^2;
@@ -418,7 +418,7 @@ S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV
                     S_aero = diag(Saero);
 %                  
 
-S_b.SxP = X.G*R1.JPress*S_P*R1.JPress'*X.G';
+% S_b.SxP = X.G*R1.JPress*S_P*R1.JPress'*X.G';
 S_b.SxR = X.G*R1.JR*S_R*R1.JR'*X.G';
 S_b.SxRa = X.G*R1.JRa*S_Ra*R1.JRa'*X.G';
 S_b.SxAir = X.G*R1.Jnair*S_air*R1.Jnair'*X.G';
@@ -426,20 +426,20 @@ S_b.Sxaero = X.G*R1.Jaero*S_aero*R1.Jaero'*X.G';
 
 % Errors
 
-P = diag(S_b.SxP);
+% P = diag(S_b.SxP);
 Rc = diag(S_b.SxR);
 Ra = diag(S_b.SxRa);
 Air = diag(S_b.SxAir);
 Aero = diag(S_b.Sxaero);
 
 
-total_err_T = sqrt( X.eo(1:m).^2 + P(1:m) + Rc(1:m)+ Ra(1:m) + Air(1:m) + Aero(1:m));
+total_err_T = sqrt( X.eo(1:m).^2  + Rc(1:m)+ Ra(1:m) + Air(1:m) + Aero(1:m));
 
 % Errors for Temperature
 figure;
 plot(X.eo(1:m),Q.Zret./1000,'r')
 hold on;
-plot(sqrt(P(1:m)),Q.Zret./1000,'--*')
+% plot(sqrt(P(1:m)),Q.Zret./1000,'--*')
 plot(sqrt(Rc(1:m)),Q.Zret./1000,'--^')
 plot(sqrt(Ra(1:m)),Q.Zret./1000,'--+')
 plot(sqrt(Air(1:m)),Q.Zret./1000,'--o')
@@ -447,15 +447,15 @@ plot(sqrt(Aero(1:m)),Q.Zret./1000,'--s')
 plot(total_err_T,Q.Zret/1000,'black')
 xlabel('Temperature Uncertainty')
 ylabel('Altitude (km)')
-legend('Statistical','Pressure','R','Ra','Air density','Aerosol','Total Error')
+legend('Statistical','R','Ra','Air density','Aerosol','Total Error')
 
 % Errors for Overlap
-total_err_OV = sqrt( X.eo(m+4:end-5).^2 + P(m+4:end-5) + Rc(m+4:end-5)+ Ra(m+4:end-5) + Air(m+4:end-5) + Aero(m+4:end-5));
+total_err_OV = sqrt( X.eo(m+4:end-5).^2  + Rc(m+4:end-5)+ Ra(m+4:end-5) + Air(m+4:end-5) + Aero(m+4:end-5));
 
 figure;
 plot(X.eo(m+4:end-5),Q.Zret./1000,'r')
 hold on;
-plot(sqrt(P(m+4:end-5)),Q.Zret./1000,'--*')
+% plot(sqrt(P(m+4:end-5)),Q.Zret./1000,'--*')
 plot(sqrt(Rc(m+4:end-5)),Q.Zret./1000,'--^')
 plot(sqrt(Ra(m+4:end-5)),Q.Zret./1000,'--+')
 plot(sqrt(Air(m+4:end-5)),Q.Zret./1000,'--o')
@@ -463,4 +463,4 @@ plot(sqrt(Aero(m+4:end-5)),Q.Zret./1000,'--s')
 plot(total_err_OV,Q.Zret/1000,'black')
 xlabel('Overlap Uncertainty')
 ylabel('Altitude (km)')
-legend('Statistical','Pressure','R','Ra','Air density','Aerosol','Total Error')
+legend('Statistical','R','Ra','Air density','Aerosol','Total Error')
