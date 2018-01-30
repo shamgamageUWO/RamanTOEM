@@ -1,4 +1,4 @@
-function [X,R,Q,O,S_a,Se,xa,S]=TRamanOEM( date_in,time_in,flag)
+function [X,R,Q,O,S_a,Se,xa]=TRamanOEM( date_in,time_in,flag)
 tic
 [O,Q,R,S_a,Se,xa] = InputsForOEM( date_in,time_in,flag);
 xa = xa';
@@ -346,7 +346,7 @@ Toem=X.x(1:m);
 
 
 
-R =bparameterjacobians (Q,X);
+% R =bparameterjacobians (Q,X);
 
 degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
 degF2 = trace(X.A(m+4:end-2,m+4:end-2));%DegF for OV
@@ -362,35 +362,35 @@ degF2 = trace(X.A(m+4:end-2,m+4:end-2));%DegF for OV
 % 
 %                     % %  %%
 %                     % % % calculate error matrices
-                    dfacP = 0.1; % ISSI recommend
-                    dfacR = 0.1; % ISSI recommend
-                    dfacAir = 0.01; % BOb code
-%                     dfacaero = 0.01;
-%                     % % dfacDT = 0.1;
-%                     % % Pressure error
-                    SP1 = (dfacP.*Q.Pressi).^2;
-                    SP = [SP1 SP1];
-                    S_P = diag(SP);
-                    
-%                     % % R  and Ra error
-                    SR = (dfacR.*Q.R).^2;
-%                     SRa = (dfacRa.*Q.Ra).^2;
-%                     % %
-                    Sair1 = (dfacAir.*Q.Nmol).^2;
-                    Sair = [Sair1 Sair1];
-                    S_air = diag(Sair);
+%                     dfacP = 0.1; % ISSI recommend
+%                     dfacR = 0.1; % ISSI recommend
+%                     dfacAir = 0.01; % BOb code
+% %                     dfacaero = 0.01;
+% %                     % % dfacDT = 0.1;
+% %                     % % Pressure error
+%                     SP1 = (dfacP.*Q.Pressi).^2;
+%                     SP = [SP1 SP1];
+%                     S_P = diag(SP);
+%                     
+% %                     % % R  and Ra error
+%                     SR = (dfacR.*Q.R).^2;
+% %                     SRa = (dfacRa.*Q.Ra).^2;
 % %                     % %
-%                     Saero1 = (dfacaero.*Q.alphaAer').^2;
-%                     Saero = [Saero1 Saero1];
-%                     S_aero = diag(Saero);
-%                     % %
-%                     % % SDT = (dfacDT.*Q.deadtime).^2;
-%                     % %
-%                     % %
-S.SxP = X.G*R.JPress*S_P*R.JPress'*X.G';
-S.SxR = X.G*R.JR*SR*R.JR'*X.G';
-% S.SxRa = X.G*R.JRa*SRa*R.JRa'*X.G';
-S.SxAir = X.G*R.Jnair*S_air*R.Jnair'*X.G';
+%                     Sair1 = (dfacAir.*Q.Nmol).^2;
+%                     Sair = [Sair1 Sair1];
+%                     S_air = diag(Sair);
+% % %                     % %
+% %                     Saero1 = (dfacaero.*Q.alphaAer').^2;
+% %                     Saero = [Saero1 Saero1];
+% %                     S_aero = diag(Saero);
+% %                     % %
+% %                     % % SDT = (dfacDT.*Q.deadtime).^2;
+% %                     % %
+% %                     % %
+% S.SxP = X.G*R.JPress*S_P*R.JPress'*X.G';
+% S.SxR = X.G*R.JR*SR*R.JR'*X.G';
+% % S.SxRa = X.G*R.JRa*SRa*R.JRa'*X.G';
+% S.SxAir = X.G*R.Jnair*S_air*R.Jnair'*X.G';
 % S.Sxaero = X.G*R.Jaero*S_aero*R.Jaero'*X.G';
 %                     % % SxDT = X.G*R.JDT*SDT*R.JDT'*X.G';
 

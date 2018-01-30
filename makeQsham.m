@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 % Q.Csum =  2.8077e+18;
 % Q.CLfac = 10^-2;
 % Q.CHfac = 10^-2;
-Q.coaddalt = 25;
+Q.coaddalt = 10;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -34,8 +34,8 @@ Q.Clight = 299792458; %ISSI value
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJH = 2; % 4ns
-Q.deadtimeJL = 3.8; % 4ns
+Q.deadtimeJH = 3; % 4ns
+Q.deadtimeJL = 3; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 
@@ -61,13 +61,13 @@ Ebalt = Y.Ebalt;
 
 alt = Y.alt;
 Q.binzise = Y.binsize;
-Q.JHnew= JHnew(alt>=1000  & alt <=45000);
-Q.JLnew= JLnew(alt>=1000 & alt <=45000);
-Q.JH_DS =JH_DS(alt>=1000  & alt <=45000);
-Q.JL_DS =JL_DS(alt>=1000  & alt <=45000);
-Q.alt = alt(alt>=1000  & alt <=45000);
-Q.Eb = Eb(Ebalt>=1000  & Ebalt <=45000);
-Q.Ebalt = Ebalt(Ebalt>=1000  & Ebalt <=45000);
+Q.JHnew= JHnew(alt>=200  & alt <=45000);
+Q.JLnew= JLnew(alt>=200 & alt <=45000);
+Q.JH_DS =JH_DS(alt>=200  & alt <=45000);
+Q.JL_DS =JL_DS(alt>=200  & alt <=45000);
+Q.alt = alt(alt>=200  & alt <=45000);
+Q.Eb = Eb(Ebalt>=200  & Ebalt <=45000);
+Q.Ebalt = Ebalt(Ebalt>=200  & Ebalt <=45000);
 Q.Zmes2 = Q.alt';
 Q.Zmes = Q.Zmes2;
 Q.f = 1e6./(Y.F);
@@ -86,7 +86,7 @@ disp('Loaded RALMO measurements ')
 % Z1 = Q.Zmes(1):deltaZ*5:Q.Zmes(h);
 % Z2= Q.Zmes(h):deltaZ*10:50000;   
 %  Q.Zret = [Z1 Z2];
-       Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:50000;% Retrieval grid
+       Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*10:50000;% Retrieval grid
 disp(' Grids Defined')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -168,11 +168,12 @@ disp('R is calibrated ')
 %% Estimating background and lidar constant wrt a priori 
 
 [CJL,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-%  load('ovmodeldata.mat');
-% OVnw = interp1(z,epsi,Q.Zret,'linear');
-% OVnw(isnan(OVnw))=1;
-% Q.OVa = OVnw;
-    Q.OVa = ones(1,length(Q.Ta));
+load('ralmoFixedOverlap.mat')
+OVnw = interp1(ralmoO.zoverlap,ralmoO.overlap,Q.Zret,'linear');
+
+ OVnw(isnan(OVnw))=1;
+ Q.OVa = OVnw;
+%     Q.OVa = ones(1,length(Q.Ta));
 %    Q.OVa = OV;
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
@@ -201,8 +202,8 @@ end
 
                         Q.y = [Q.JHnew ;Q.JLnew];
 
-             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,4);
-             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,4);
+             [JHv,go1] =bobpoissontest(Q.JHnew',Q.Zmes2,8);
+             [JLv,go] =bobpoissontest(Q.JLnew',Q.Zmes2,8);
 % 
 % 
 %             

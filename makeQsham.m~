@@ -24,7 +24,7 @@ Q.time_in = time_in;%23; % 11
 % Q.Csum =  2.8077e+18;
 % Q.CLfac = 10^-2;
 % Q.CHfac = 10^-2;
-Q.coaddalt = 20;
+Q.coaddalt = 5;
 Q.Rgas = 8.3145;
 % Q.Rate = 30;%Hz
 Q.t_bin = 60;%s
@@ -34,7 +34,7 @@ Q.Clight = 299792458; %ISSI value
 Q.shots = 1800;
 % Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
-Q.deadtimeJH = 3; % 4ns
+Q.deadtimeJH = 2; % 4ns
 Q.deadtimeJL = 1.5; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
@@ -80,13 +80,13 @@ disp('Loaded RALMO measurements ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Define grid sizes
-% k = find(Q.Zmes<=3000);
+% k = find(Q.Zmes<=4000);
 % h = k(end);
 %  deltaZ = (Q.Zmes(2)-Q.Zmes(1));
-% Z1 = Q.Zmes(1):deltaZ*2:Q.Zmes(h);
-% Z2= Q.Zmes(h):deltaZ*4:50000;   
-%   Q.Zret = [Z1 Z2];
-      Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:50000;% Retrieval grid
+% Z1 = Q.Zmes(1):deltaZ*5:Q.Zmes(h);
+% Z2= Q.Zmes(h):deltaZ*10:50000;   
+%  Q.Zret = [Z1 Z2];
+       Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*5:50000;% Retrieval grid
 disp(' Grids Defined')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -168,11 +168,12 @@ disp('R is calibrated ')
 %% Estimating background and lidar constant wrt a priori 
 
 [CJL,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-%  load('ovmodeldata.mat');
-% OVnw = interp1(z,epsi,Q.Zret,'linear');
-% OVnw(isnan(OVnw))=1;
-% Q.OVa = OVnw;
-    Q.OVa = ones(1,length(Q.Ta));
+load('ralmoFixedOverlap.mat')
+OVnw = interp1(ralmoO.zoverlap,ralmoO.overlap,Q.Zret,'linear');
+
+ OVnw(isnan(OVnw))=1;
+ Q.OVa = OVnw;
+%     Q.OVa = ones(1,length(Q.Ta));
 %    Q.OVa = OV;
 Q.OVlength = length(Q.OVa);
 Q.COVa = OVCov(Q.Zret,Q.OVa);
@@ -217,7 +218,7 @@ end
 
             
              for i = 1: length(Q.JLv)
-                 if Q.Zmes2(i) <= 2300
+                 if Q.Zmes2(i) <= 6000
                      Q.YY(i) = Q.JLv(i);
                  else
                      Q.YY(i) =  Q.JLnew(i);
@@ -225,7 +226,7 @@ end
              end
              
              for i = 1: length(Q.JHv)
-                 if  Q.Zmes2(i) <= 2300
+                 if  Q.Zmes2(i) <= 6000
                      Q.YYY(i) = Q.JHv(i);
                  else
                      Q.YYY(i) =  Q.JHnew(i);
@@ -252,7 +253,7 @@ Q_Digi = JLt./JHt;
 Tprofiledg = 1./log(Q_Digi);
 
             y_d = (Q.Tsonde);
-            y_d = y_d( Q.Zmes>=3000 & Q.Zmes<=8000);
+            y_d = y_d( Q.Zmes>=4000 & Q.Zmes<=8000);
             x_d = 1./Tprofiledg( Q.Zmes>=4000 & Q.Zmes<=8000);
 
             ftdg=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
