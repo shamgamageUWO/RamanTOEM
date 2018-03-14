@@ -1,4 +1,4 @@
-function [CJL, CJLa,CJHa,CJH] = estimations(Q)
+function C = estimations(Q)
 
 
 
@@ -8,7 +8,7 @@ Zd = Q.Zmes2;%digital
 
 ind1 = Zd>=6000 & Zd< 8000;
 
-ind2 = Za>=1800 & Za< 2000;
+ind2 = Za>=1000 & Za< 2000;% 1800 was changed
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -38,12 +38,12 @@ yJH= SJH(ind1);
 xJH =JH(ind1);
 
 fL = fittype({'x'});
-fitJL = fit(xJL',yJL,fL,'Robust','on');
-CJL = fitJL(1);
+[fitJL,C.GJL] = fit(xJL',yJL,fL,'Robust','on');
+C.CJL = fitJL(1);
 
 fH = fittype({'x'});
-fitJH = fit(xJH',yJH,fH,'Robust','on');
-CJH = fitJH(1);
+[fitJH,C.GJH] = fit(xJH',yJH,fH,'Robust','on');
+C.CJH = fitJH(1);
 
 yJLa = SJLa(ind2);
 xJLa = JLa(ind2);
@@ -51,12 +51,12 @@ yJHa = SJHa(ind2);
 xJHa = JHa(ind2);
 
 fLa = fittype({'x'});
-fitJLa = fit(xJLa',yJLa,fLa,'Robust','on');
-CJLa = fitJLa(1);
+[fitJLa,C.GJLa] = fit(xJLa',yJLa,fLa,'Robust','on');
+C.CJLa = fitJLa(1);
 
 fHa = fittype({'x'});
-fitJHa = fit(xJHa',yJHa,fHa,'Robust','on');
-CJHa = fitJHa(1);
+[fitJHa,C.GJHa] = fit(xJHa',yJHa,fHa,'Robust','on');
+C.CJHa = fitJHa(1);
 
 % When using Z = 8km and Za = 1.5km
 % CJL= SJL(187)./JL(187);

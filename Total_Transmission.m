@@ -25,9 +25,17 @@ exponent = 4+B+C*Lambda+D/Lambda;
 sigma_Rcm2 = A / Lambda^(exponent);
 sigmaNicolet = sigma_Rcm2*1e-4;%m2
 Nmol = (NA/M).* Q.rho ; % mol m-3
-alpha_aero = Q.alpha_aero';% m^-1 this is aerosol coefficient given in Povey etal
+alpha_aero = Q.alpha_aero';
+odaer = Q.odaer';
+
+tauMol = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet));
+tauAer = exp(-2.*odaer);
+Tr1 = tauMol.*tauAer';
+% m^-1 this is aerosol coefficient given in Povey etal
 % alpha_aero(isnan(alpha_aero))=0;
+
 sigma_tot = Nmol*sigmaNicolet+ alpha_aero;
+
 % %  Tr1 = exp(-2.*cumtrapz(Q.Zmes,alpha_aero)); % Molecular transmission
 %  Tr = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet)); % Molecular transmission
  Tr = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission

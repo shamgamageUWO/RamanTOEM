@@ -14,22 +14,92 @@ DT_JH = x(end-1);
 DT_JL = x(end); % deadtimes
 
 
+
+
+% interpolation
+% Td = interp1(Q.Zret,x_a,Q.Zmes2,'linear'); % T on data grid (digital)
+% Ta = interp1(Q.Zret,x_a,Q.Zmes1,'linear');
+Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear');
+Td= Ti(end-length(Q.JHnew)+1:end);
+Ta= Ti(1:length(Q.JHnewa));
+
+OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
+
+OV_Zid = OV_Zi(end-length(Q.JHnew)+1:end);%interp1(Q.Zret,OV,Q.Zmes2,'linear');
+OV_Zia = OV_Zi(1:length(Q.JHnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
+
+%%
+% Constants
+kb = 1.38064852*10^-23;
+% area = pi * (0.3^2);
+% Transmission
+R_tr_i = (Q.Tr);
+
+R_tr_id = R_tr_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
+R_tr_ia = R_tr_i(1:length(Q.JHnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
+
+Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
+Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
+
+
+
+A_Zi_an = ( OV_Zia .*R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2);
+A_Zi_d = (OV_Zid .*R_tr_id .*Pd)./(kb * Q.Zmes2 .^2);
+
+%% loading cross sections
+load('DiffCrossSections.mat');
+Diff_JH_i = interp1(T,Diff_JH,Ti,'linear');
+Diff_JL_i = interp1(T,Diff_JL,Ti,'linear');
+
+
+dJHd = Diff_JH_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,Diff_JH_i,Q.Zmes2,'linear');
+dJLd = Diff_JL_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,Diff_JL_i,Q.Zmes2,'linear');
+
+dJHa = Diff_JH_i(1:length(Q.JHnewa));%interp1(Q.Zmes,Diff_JH_i,Q.Zmes1,'linear');
+dJLa = Diff_JL_i(1:length(Q.JHnewa));%interp1(Q.Zmes,Diff_JL_i,Q.Zmes1,'linear');
+
+
+% toc
+
+
+CJH = (Q.R).* CJL;
+CJHa = (Q.Ra).* CJLa;
+% 
+
+JL = (CJL.* A_Zi_d .* dJLd)./(Td);
+JH = (CJH.* A_Zi_d .* dJHd)./(Td);
+
+JLa = (CJLa.* A_Zi_an .* dJLa )./(Ta );
+JHa = (CJHa.* A_Zi_an .* dJHa )./(Ta );
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
 % data structure
 mdata = length(Q.y);
 n1=length(Q.JLnew);
 n2=length(Q.JLnewa);
+
+
+
+
+
+
 % FM 
-yJH = X.yf(1:n1)';
-yJL = X.yf(n1+1:2*n1)';
-yJHA = X.yf(2*n1+1:end-n2)';
-yJLA = X.yf(end-n2+1:end)';
+% yJH = X.yf(1:n1)';
+% yJL = X.yf(n1+1:2*n1)';
+% yJHA = X.yf(2*n1+1:end-n2)';
+% yJLA = X.yf(end-n2+1:end)';
 
 % [yJH,yJL,yJHA,yJLA] = forwardmodelTraman(Q,x);
 
-% yJH = Q.JHnew;
-% yJL = Q.JLnew;
-% yJHA = Q.JHnewa;
-% yJLA = Q.JLnewa;
+yJH = Q.JHnew;
+yJL = Q.JLnew;
+yJHA = Q.JHnewa;
+yJLA = Q.JLnewa;
  deltaZ = Q.Zmes1(2) - Q.Zmes1(1);
 % oem retrievals
 n = length(X.x);
@@ -51,15 +121,16 @@ DTDJL = ((1-DT_JL.*yJL).^2);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Pressure Jacobian 
-% JPress =zeros(mdata,n);
+%  JPress =zeros(mdata,n);
 % Pressure = Q.Pressi;
-% Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
-% Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
-% 
-% dSJHdPD = ((yJH - BJH)./Pd) .* DTDJH; %digital
-% dSJLdPD = ((yJL - BJL)./Pd) .* DTDJL;
-% dSJHdPA = ((yJHA - BJHa)./Pa); %analog
-% dSJLdPA = ((yJLA - BJLa)./Pa);
+%  Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
+%  Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
+% P0=Q.P0;
+
+dSJHdPD = ((JH)./Pd) .* DTDJH; %digital
+dSJLdPD = ((JL)./Pd) .* DTDJL;
+dSJHdPA = ((JHa)./Pa); %analog
+dSJLdPA = ((JLa )./Pa);
 
 %     figure;
 %     subplot(2,2,1)
@@ -79,17 +150,17 @@ DTDJL = ((1-DT_JL.*yJL).^2);
 %     xlabel('J- Pressure - JLa')
 %     ylabel('Alt (km)')
 
-% JPress = [dSJHdPD';dSJLdPD';dSJHdPA';dSJLdPA'];
-% R.JPress = diag(JPress);
+JPress = [dSJHdPD';dSJLdPD';dSJHdPA';dSJLdPA'];
+R.JPress = diag(JPress);
 
 %%% R jacobian
 % JR = zeros(mdata,n);
-dSJHdR = ((yJH - BJH)./Q.R ) .* DTDJH;
+dSJHdR = ((JH)./Q.R ) .* DTDJH;
 dSJLdR = zeros(n1+2*n2,1);
 JR = [dSJHdR';dSJLdR];
 R.JR = diag(JR);
 
-dSJHdRa = ((yJHA - BJHa)./Q.Ra );
+dSJHdRa = ((JHa)./Q.Ra );
 dSJLdRa = zeros(n2,1);
 dss = zeros(2*n1,1);
 JRa = [dss;dSJHdRa';dSJLdRa];
@@ -108,19 +179,16 @@ R.JRa = diag(JRa);
 
 
 %%% Air density (in the transmission) jacobian
-Lambda = 354.7* (10^-3); 
-A = 4.02*10^(-28);
-B = -0.3228;
-C = 0.389;
-D = 0.09426;
-exponent = 4+B+C*Lambda+D/Lambda;
-sigma_Rcm2 = A / Lambda^(exponent);
-sigma = sigma_Rcm2*1e-4;%m2
 
-dSJHdnair = (-2.*deltaZ.* sigma.* (yJH - BJH)) .* DTDJH;
-dSJLdnair = (-2.*deltaZ.* sigma.* (yJL - BJL)) .* DTDJL;
-dSJHdnairA = (-2.*deltaZ.* sigma.* (yJHA - BJHa));
-dSJLdnairA = (-2.*deltaZ.* sigma.* (yJLA - BJLa));
+
+% dSJHdnair = (-2.*deltaZ.* sigma.* (JH)) .* DTDJH;
+% dSJLdnair = (-2.*deltaZ.* sigma.* (JL)) .* DTDJL;
+% dSJHdnairA = (-2.*deltaZ.* sigma.* (JHa));
+% dSJLdnairA = (-2.*deltaZ.* sigma.* (JLa));
+dSJHdnair = (-2.*(Q.Nmol(end-n1+1:end).*JH)) .* DTDJH;
+dSJLdnair = (-2.*(Q.Nmol(end-n1+1:end).*JL)) .* DTDJL;
+dSJHdnairA = (-2.*(Q.Nmol(1:n2).*JHa));
+dSJLdnairA = (-2.*(Q.Nmol(1:n2).*JLa));
 
 Jnair = [dSJHdnair';dSJLdnair';dSJHdnairA';dSJLdnairA'];
 
@@ -147,10 +215,10 @@ R.Jnair  = diag(Jnair);
 
 %%% aerosol scattering jacobian
 
-dSJHdnaero = (-2.*deltaZ .* (yJH - BJH)) .* DTDJH;
-dSJLdnaero = (-2.*deltaZ .* (yJL - BJL)) .* DTDJL;
-dSJHdnaeroA = (-2.*deltaZ .* (yJHA - BJHa));
-dSJLdnaeroA = (-2.*deltaZ .* (yJLA - BJLa));
+dSJHdnaero = (-2.*(JH)) .* DTDJH;
+dSJLdnaero = (-2.*(JL)) .* DTDJL;
+dSJHdnaeroA = (-2.*(JHa));
+dSJLdnaeroA = (-2.* (JLa));
 
 
 Jaero = [dSJHdnaero' ;dSJLdnaero';dSJHdnaeroA';dSJLdnaeroA'];

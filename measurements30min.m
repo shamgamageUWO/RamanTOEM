@@ -1,12 +1,12 @@
 % this is to read S0.mat files and pick the measurements from 11-11.30pm
 % Save the JL,JH,Eb and alt in seperate structure 
 
-function [Y] = makeY(Q)
+function [Y] = measurements30min(date)
 
 
 
 
- date = Q.date_in;
+%  date = Q.date_in;
 [year,month,day] = getYMDFromDate(date);
  yr = num2str(year);
 
@@ -74,20 +74,9 @@ load(folderpath);
 % disp('Start time')
 g = hour(S0.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
 Minute = minute(S0.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
-tin =Q.time_in;
+% tin =Q.time_in;
 % from 2300 to 2330
-starttime=find(g==tin & Minute==00);
-endtime=find(g==tin & Minute==30);
-% start =  [g(1) Minute(1)];
-% start
-
-%
-% disp('End time')
-% gg = hour(S0.GlobalParameters.End);
-% endtime =  [g(end) Minute(end)];
-% endtime;
-
-% pick the measurements from 11-11.30
+tin = [10; 11 ;12];
 %% Digital Channels
 JL=[];
 JH=[];
@@ -106,105 +95,48 @@ alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 %% Load the analog channel measurements too 
 % figure;
 %   hold on;
+k = 1:30:length(g);
 
-
-JL = S0.Channel(12).Signal(:,starttime:endtime);%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
-JH = S0.Channel(4).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
-Eb= S0.Channel(10).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
-
-
-
-JL_an = S0.Channel(11).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
-JH_an = S0.Channel(3).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
-Eb_an = S0.Channel(9).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
-JL_an = JL_an';
-JH_an = JH_an';
-
-Y.YYa = (std(JL_an)).^2;
-Y.YYYa = (std(JH_an)).^2;
-
-% for i = 1: length(g)
-%     if g(i)== 23 && (00 <= Minute(i)<=30)
-%         JL(:,i) = S0.Channel(12).Signal(:,i); % change these for S0 format
-%         JH(:,i) = S0.Channel(4).Signal(:,i);
-%         JL_an(:,i) = S0.Channel(11).Signal(:,i);
-%         JH_an(:,i) = S0.Channel(3).Signal(:,i);
-%         single_scan_JL_Counts(:,i) = JL(:,i).*1800.*(S0.Channel(12).BinSize./150);
-% %         semilogx(JL(:,i),alt);
-% %         'pause here'
-% %         pause   
-%     end 
-% end
-% hold off
-% single_scan_JL_MHz = S0.Channel(4).Signal(:,20);
-% single_scan_JL_Counts = single_scan_JL_MHz.*1800.*(S0.Channel(12).BinSize./150);
-% 
-% figure;semilogx(single_scan_JL_MHz,alt,'r',single_scan_JL_Counts,alt,'b')
-%   xlabel('Single Scan')
-%   ylabel('Alt (km)')
-%   legend('JL_ MHz','JL_Counts/bin/time')
-% 
-% mean_scan_JL_MHz = nanmean(S0.Channel(4).Signal');
-% mean_scan_JL_Counts = mean_scan_JL_MHz.*1800.*(S0.Channel(12).BinSize./150);
-% 
-% figure;semilogx(mean_scan_JL_MHz,alt,'r',mean_scan_JL_Counts,alt,'b')
-%   xlabel('Mean Scan')
-%   ylabel('Alt (km)')
-%   legend('JL_ MHz','JL_Counts/bin/time')  
-%   
-  
-% 
-% figure;plot(nanmean(S0.Channel(12).Signal'),alt,'b',nanmean(S0.Channel(4).Signal'),alt,'r')
-%   xlabel('Counts(MHz)')
-%   ylabel('Alt (km)')
-%   legend('JL digital','JH digital')
-% %   
-%   figure;plot(nanmean(S0.Channel(11).Signal'),alt,'b',nanmean(S0.Channel(3).Signal'),alt,'r')
-%   xlabel('Counts(MHz)')
-%   ylabel('Alt (km)')
-%   legend('JL ana','JH ana')
-
-% MHZ to Counts conversion constant 
 Y.binsize = S0.Channel(12).BinSize;
 F = 1800.* (Y.binsize./150);
 
-% % Apply DS to find true background
-%         JL_dtc = (F.*JL) ./ (1 - JL.*(Q.deadtimeJL.*1e6)); % non-paralyzable
-%         JH_dtc = (F.*JH) ./ (1 - JH.*(Q.deadtimeJH.*1e6));
+JL = F.*S0.Channel(12).Signal; % single scans
+JH = F.*S0.Channel(4).Signal;
+Eb = F.*S0.Channel(10).Signal; % single scans
 
-       
-% Coadd in time
-% Eb= S0.Channel(2).Signal; % this is over night signal
-JL = F.*JL; % single scans
-JH = F.*JH;
-Eb = F.*Eb; % single scans
 
-% JL_an = F.*JL_an; % single scans   %% Adding these from bobs code this isto match the units
-% JH_an = F.*JH_an;
-% Eb_an = F.*Eb_an; % single scans
 
-% figure;
-% subplot(1,2,1)
-% semilogx(JL,alt./1000,JH,alt./1000)
-% xlabel('Counts')
-% ylabel('Alt (km)')
-% legend('JL digital','JH digital')
+for i = 1:length(k)
+% starttime(i)=find(g==tin(i) & Minute==00);
+% endtime(i)= starttime(i)+58;%find(g==tin(i) & Minute==59);
+
+JL(:,i) = nansum(JL(:,k(i):k(i)+30)');%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
+JH(:,i) = nansum(JH(:,k(i):k(i)+30)');%20120717(:,1347:1377);%(:,961:990);
+Eb(:,i)= nansum(Eb(:,k(i):k(i)+30)');%20120717(:,1347:1377);%(:,961:990);
+
+
+JL_an(:,i) = nansum(S0.Channel(11).Signal(:,k(i):k(i)+30)');%20120717(:,1347:1377);%(:,961:990);
+JH_an(:,i) = nansum(S0.Channel(3).Signal(:,k(i):k(i)+30)');%20120717(:,1347:1377);%(:,961:990);
+Eb_an(:,i) = nansum(S0.Channel(9).Signal(:,k(i):k(i)+30)');%20120717(:,1347:1377);%(:,961:990);
+%JL_an = JL_an';
+%JH_an = JH_an';
+end
+
+
+
+
+% Y.YYa = (std(JL_an)).^2;
+% Y.YYYa = (std(JH_an)).^2;
+
+
+%  %% coaddding 30mints
+% JL = nansum(JL');
+% JH = nansum(JH');
+% Eb = nansum(Eb');
 % 
-% subplot(1,2,2)
-% semilogx(JL_an,alt_an./1000,JH_an,alt_an./1000)
-% xlabel('Counts')
-% ylabel('Alt (km)')
-% legend('JL analog','JH analog')
-
-% figure;plot(nanmean(JL'),alt,'b',nanmean(JH'),alt,'r')
- %% coaddding 30mints
-JL = nansum(JL');
-JH = nansum(JH');
-Eb = nansum(Eb');
-
-JL_an = nansum(JL_an);
-JH_an = nansum(JH_an);
-Eb_an = nansum(Eb_an');
+% JL_an = nansum(JL_an);
+% JH_an = nansum(JH_an);
+% Eb_an = nansum(Eb_an');
 
 N = length(JH);
 

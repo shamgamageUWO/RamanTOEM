@@ -1,4 +1,4 @@
-function [R,Ra,R_fit,Ra_fit] = Restimationnew(Q)
+function [R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q)
 % JHnew = Q.JHnew-Q.BaJH;
 % JLnew = Q.JLnew-Q.BaJL;
 % JHnewa = Q.JHnewa-Q.BaJHa;
@@ -103,19 +103,21 @@ Ra = Analog_ratio'.* Ratio_diff_a;
  y = Digital_ratio(ind1);
 % 
  f = fittype({'x'});
-fit3 = fit(x',y,f,'Robust','on');
+[fit3,GR] = fit(x',y,f,'Robust','on');
 R_fit = fit3(1);
+dfacR = GR.rmse;
 % 
 
 % %% analog
 Alt2 = Q.Zmes1;
-ind2 = Alt2 >= 600 & Alt2 <= 800;
+ind2 = Alt2 >= 1000 & Alt2 <= 1200;
  xa = 1./Ratio_diff_a(ind2);
  ya = Analog_ratio(ind2);
 
 fa = fittype({'x'});
-fit3a = fit(xa',ya,fa,'Robust','on');
+[fit3a,GRa] = fit(xa',ya,fa,'Robust','on');
 Ra_fit = fit3a(1);
+dfacRa = GRa.rmse;
 
 % figure;plot(Q.Zmes2./1000,R,'r',Q.Zmes1./1000,Ra,'b')
 % xlabel('Alt(km)')

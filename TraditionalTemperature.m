@@ -218,6 +218,8 @@ Tprofilecm = 1./log(Q_Com);
 % figure;plot(Tsonde,Zsonde,'g')
 Zsonde = Zsonde-491;
 
+% Zsonde = Zsonde(Zsonde>=3);
+% Tsonde = Zsonde(Zsonde>=3);
 T_digi = interp1(Zsonde,Tsonde,alt,'linear');
 T_an = interp1(Zsonde,Tsonde,alt_an,'linear');
 T_Com = interp1(Zsonde,Tsonde,Alt,'linear');
@@ -225,17 +227,17 @@ T_Com = interp1(Zsonde,Tsonde,Alt,'linear');
 
 % figure;plot(Q_Digi,(1./T_digi),'r',Q_an,(1./T_an),'b',Q_Com,(1./T_Com),'g')
 y_d = (T_digi);
-y_d = y_d( alt>=4000 & alt<=10000);
-x_d = 1./Tprofiledg( alt>=4000 & alt<=10000);
+y_d = y_d( alt>=3000 & alt<=6000);
+x_d = 1./Tprofiledg( alt>=3000 & alt<=6000);
 
 y_a = (T_an);
-y_a = y_a( alt_an>=1500 & alt_an<=3000);
-x_a = 1./Tprofilean( alt_an>=1500 & alt_an<=3000);
+y_a = y_a( alt_an>=1000 & alt_an<=2000);
+x_a = 1./Tprofilean( alt_an>=1000 & alt_an<=2000);
 
 
 y_c = (T_Com);
-y_c = y_c( Alt>=4000 & Alt<=10000);
-x_c = 1./Tprofilecm( Alt>=4000 & Alt<=10000);
+y_c = y_c( Alt>=3000 & Alt<=6000);
+x_c = 1./Tprofilecm( Alt>=3000 & Alt<=6000);
 
 
 
