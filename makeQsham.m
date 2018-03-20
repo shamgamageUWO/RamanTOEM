@@ -52,27 +52,29 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-alt_d0 = 5000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
 alt_df = 32000; % Digital Channel ending altitude
 alt_a0 = 50;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
-b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
-b2 = 12; % Bin size for piecewise cov for analog 20110705  2011080223 24
+b1 = 4; % Bin size for piecewise cov for digital 20110705 2011080223 8
+b2 = 4; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 3; % retrieval bin size
 c2 = 2.*c1;
 c3 = 2.*c2;
 
 % For asr
 Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50
-Q.LRpbl = 50; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 200; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
+Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
+Q.ASRcutoffheight = 1400; % 20110909 1400
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load raw measurements
 [Y] = makeY(Q);
+Q.Dateofthefolder = Y.Dateofthefolder;
 
 % Digital measurements 2km above
 JHnew = Y.JH;
@@ -92,6 +94,9 @@ Q.JL_DS =JL_DS(alt>=alt_d0 & alt <= alt_df);
 Q.alt = alt(alt>=alt_d0 & alt <= alt_df);
 Q.Zmes2 = Q.alt';
 
+% Zmes = alt(alt>=alt_a0 & alt <= alt_df);
+% Q.Zmes = Zmes';
+
 Q.f = 1e6./(Y.F);
 
 % Analog measurements
@@ -106,7 +111,8 @@ Q.JLnewa= JLnewa(ANalt>=alt_a0 & ANalt <=alt_af);
 Q.ANalt = ANalt(ANalt>=alt_a0);
 Q.Zmes1 = ANalt(ANalt>=alt_a0 & ANalt <= alt_af);
 Q.Zmes1 = Q.Zmes1';
-Q.Zmes = [Q.Zmes1 Q.Zmes2];
+
+ Q.Zmes = [Q.Zmes1 Q.Zmes2]; %% Fix this here ..one range should fix the asr
 
 % Backgrounds
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -286,8 +292,10 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             ar4 = ones(1,go2-1).* JLav(end);
             Q.JHav = [ar1 JHav ar2];
             Q.JLav = [ar3 JLav ar4];
-
-
+            
+% Q.JHav = autocorr(JHrealan,length(JHrealan)-1);
+% Q.JLav = autocorr(JLrealan,length(JLrealan)-1);
+            
                 for i = 1: length(Q.JLav)
                     if Q.Zmes1(i) <= 6000
                         Q.YYa(i) = Q.JLav(i);
@@ -353,7 +361,8 @@ Q.yvar = diag(Q.Yvar);
                 
                 
 
-
+Q.JLanalogstd = Y.YYa;
+Q.JHanalogstd = Y.YYYa;
 
 disp('Estimations for CJL, backgrounds and overlap done ')
 disp('makeQ complete ')

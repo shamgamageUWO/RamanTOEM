@@ -9,8 +9,8 @@ function [alphaAer,odaer] = asrSham(Q)
 datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
 % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
 file = 'S3';
- Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
-% 
+%  Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
+ Dateofthefolder = Q.Dateofthefolder;
  folderpath = [datadirS3 filesep  Dateofthefolder filesep  file];
 % % open S0 matfile according to the given date
 % datadirS3='/Users/sham/Desktop';
@@ -92,20 +92,20 @@ LR(fff) = Q.LRpbl;
 asrDATAs = smooth(asrDATA,100); %asrDATA; %smooth(asrDATA,90); %was 45
 
 % 
-% [fneg,I] = min(asrDATAs(zN<10000));
-%  if fneg<0
-%   'diffrence is less than 0'
-%      stop
-%  end 
-%  
-%  diff = 1-fneg;
-%   asrDATAs = asrDATAs + diff;
+[fneg,I] = min(asrDATAs(zN<5000));
+ if fneg<0
+  'diffrence is less than 0'
+     stop
+ end 
+ 
+ diff = 1-fneg;
+  asrDATAs = asrDATAs + diff;
  fneg2 = find(asrDATAs < 1);
  asrDATAs(fneg2) = 1;
 %   fneg3 = find(asrDATAs >= 1);
 %  asrDATAs(fneg3)  = asrDATAs(fneg3) + diff;
-asrDATAs(zN>=12000) = 1;
-% asrDATAs(zN>= 2100 & zN<=10000) = 1;
+ asrDATAs(zN>=Q.ASRcutoffheight) = 1;
+%  asrDATAs(zN>= 1500 & zN<=9500) = 1;
 asrDATAnew =  asrDATAs;
 % 
 % fneg = find(asrDATAs < 1);
@@ -113,8 +113,11 @@ asrDATAnew =  asrDATAs;
 
 
 plot(asrDATAnew,zN./1000,'r'); 
-xlabel('asr profile')
-ylabel('Alt(km)')
+xlabel('ASR profile')
+ylabel('Altitude (km)')
+title( Q.Dateofthefolder);
+  set(gca,'fontsize',20)
+
 hold off;
 
 % subplot(1,2,2)

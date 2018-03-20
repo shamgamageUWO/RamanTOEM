@@ -91,6 +91,9 @@ plot(total_err_T,Q.Zret/1000,'black')
 xlabel('Temperature Uncertainty')
 ylabel('Altitude (km)')
 legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Aerosol Extinction','Total Error')
+ title( Q.Dateofthefolder);
+  set(gca,'fontsize',16)
+
 
 % Errors for Overlap
 total_err_OV = sqrt( X.eo(m+4:end-5).^2 + P(m+4:end-5) + Rc(m+4:end-5)+ Ra(m+4:end-5) + Air(m+4:end-5) + Aero(m+4:end-5));
@@ -107,3 +110,5 @@ plot(total_err_OV.*1e2,Q.Zret/1000,'black')
 xlabel('Overlap Uncertainty (%)')
 ylabel('Altitude (km)')
 legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Aerosol Extinction','Total Error')
+ title( Q.Dateofthefolder);
+  set(gca,'fontsize',16)

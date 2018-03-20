@@ -97,7 +97,7 @@ Ra = Analog_ratio'.* Ratio_diff_a;
 
 
  Alt = Q.Zmes2;
- ind1 = Alt >= 8000 & Alt< 10000;
+ ind1 = Alt >= 6000 & Alt< 8000;
 % 
  x = 1./Ratio_diff_d(ind1);
  y = Digital_ratio(ind1);

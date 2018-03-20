@@ -48,7 +48,7 @@ DT_JH = X.x(end-1);
 DT_JL = X.x(end); % deadtimes
 
 'X.cost'
-X.cost
+X.cost(end)
 
 'OEM-BG-JH'
 BJH
@@ -175,13 +175,16 @@ DT_JL
                     hold off;
                     xlabel('Temperature - Averaging Kernels')
                     ylabel('Altitude ( km )')
+ title( Q.Dateofthefolder);
+  set(gca,'fontsize',16)
 
                     subplot(1,2,2)
                     plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
                     grid on;
                     xlabel('Vertical Resolution ( km )')
                     ylabel('Altitude ( km )')
-                    
+                      set(gca,'fontsize',16)
+
                     
                     
                     
@@ -195,7 +198,9 @@ DT_JL
 %                     hold off;
                     xlabel('Overlap - Averaging Kernels')
                     ylabel('Altitude ( km )')
-                    
+                     title( Q.Dateofthefolder);
+  set(gca,'fontsize',16)
+
 %                     %
                     err = X.e(1:m);
                     upper = err+ X.x(1:m);
@@ -237,34 +242,37 @@ T_cm = interp1(H.alt_com,H.T_cm,Q.Zret);
 % ylabel('Altitude(km)')
 % legend('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital','TraditionalCombined')
 % hold off;
-
+Toem= X.x(1:m);
 % Create axes
-axes1 = axes('Parent',figure);
-hold(axes1,'on');
-
+% axes1 = axes('Parent',figure);
+% hold(axes1,'on');
+figure;
+subplot(1,2,1)
 % Create plot
-plot(Q.Ta,Q.Zret./1000,'DisplayName','T a priori','LineWidth',1,...
+plot(Q.Ta(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'DisplayName','T a priori','LineWidth',1,...
     'Color',[0 0.498039215803146 0]);
 
-% Create plot
-plot(X.x(1:m),Q.Zret./1000,'DisplayName','T OEM','Color',[1 0 0]);
+hold on;
 
 % Create plot
-plot(Q.Tsonde2,Q.Zret./1000,'DisplayName','T sonde','Color',[0 0 1]);
+plot(Toem(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'DisplayName','T OEM','Color',[1 0 0]);
 
 % Create plot
-plot(T_an(Q.Zret<=10000),Q.Zret(Q.Zret<=10000)./1000,'DisplayName','Traditionalanalog','LineWidth',1,'Color',[0 0 0]);
+plot(Q.Tsonde2(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'DisplayName','T sonde','Color',[0 0 1]);
 
 % Create plot
-plot(T_dg(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
+plot(T_an(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','Traditionalanalog','LineWidth',1,'Color',[0 0 0]);
+
+% Create plot
+plot(T_dg(Q.Zret<=25000),Q.Zret(Q.Zret<=25000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
     'Color',[0.929411768913269 0.694117665290833 0.125490203499794]);
 
 % Create plot
-plot(T_cm(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'DisplayName','TraditionalCombined','LineWidth',1,...
+plot(T_cm(Q.Zret<=25000),Q.Zret(Q.Zret<=25000)./1000,'DisplayName','TraditionalCombined','LineWidth',1,...
     'Color',[0.854901969432831 0.701960802078247 1]);
 
 % [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
-jbfilly(Q.Zret./1000,upper',lower',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
+jbfilly(Q.Zret(Q.Zret<=30000)./1000,upper(Q.Zret<=30000)',lower(Q.Zret<=30000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
 
 % Create xlabel
 xlabel('Temperature (K)');
@@ -272,16 +280,53 @@ xlabel('Temperature (K)');
 % Create ylabel
 ylabel('Altitude(km)');
 
-box(axes1,'on');
-grid(axes1,'on');
+% box(axes1,'on');
+% grid(axes1,'on');
 % Create legend
-legend(axes1,'show');
+% legend(axes1,'show');
+legend ('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital','TraditionalCombined')
+ title( Q.Dateofthefolder);
+  set(gca,'fontsize',16)
 
 
+hold off;
+
+subplot(1,2,2)
+plot(Q.Ta(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','T a priori','LineWidth',1,...
+    'Color',[0 0.498039215803146 0]);
+hold on;
+plot(Toem(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','T OEM','Color',[1 0 0]);
+
+
+% Create plot
+plot(Q.Tsonde2(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','T sonde','Color',[0 0 1]);
+
+% % Create plot
+% plot(T_an(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','Traditionalanalog','LineWidth',1,'Color',[0 0 0]);
+% 
+% % Create plot
+% plot(T_dg(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
+%     'Color',[0.929411768913269 0.694117665290833 0.125490203499794]);
+% 
+% % Create plot
+% plot(T_cm(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','TraditionalCombined','LineWidth',1,...
+%     'Color',[0.854901969432831 0.701960802078247 1]);
+
+% [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
+jbfilly(Q.Zret(Q.Zret<=5000)./1000,upper(Q.Zret<=5000)',lower(Q.Zret<=5000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
+
+% Create xlabel
+xlabel('Temperature (K)');
+
+% Create ylabel
+ylabel('Altitude(km)');
+legend ('T a priori','T OEM','T sonde')
+  set(gca,'fontsize',16)
+
+hold off;
 
 
 in= Q.Zret<=25000;
-Toem= X.x(1:m);
 Toem_e=X.eo(1:m);
 in2 = Q.Zret<=6000;
 in3= Q.Zret>=4000 & Q.Zret<=25000;
@@ -295,6 +340,10 @@ hold off;
 grid on;
 xlabel('(T OEM - T sonde) (K)')
 ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+ title( Q.Dateofthefolder);
+   set(gca,'fontsize',16)
+
+
 
 %                      T = X.x(1:m);
 
@@ -308,6 +357,8 @@ hold off;
 grid on;
 xlabel('(T OEM - T digital traditional) (K)')
 ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+  set(gca,'fontsize',16)
+
 
 subplot(1,3,3)
 plot((T_dg(in3)-Q.Tsonde2(in3)),Q.Zret(in3)./1000,'r',( T_dg(in3)' - Toem(in3)),Q.Zret(in3)./1000,'b',(Toem(in) - Q.Tsonde2(in)'),Q.Zret(in)./1000,'g')
@@ -318,6 +369,8 @@ hold off
 xlabel('Temperature residuals (K)')
 ylabel('Altitude(km)')%  ylabel('Altitude(km)')
 legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OEM - Traditional analog','Traditional analog-Sonde')
+  set(gca,'fontsize',16)
+
 
 
 % 
@@ -331,6 +384,10 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     xlabel('OV')
                     ylabel('Altitude ( km )')
                     legend('OV a priori','OV OEM')
+                                         title( Q.Dateofthefolder);
+                                           set(gca,'fontsize',16)
+
+
 
 
 
@@ -358,6 +415,10 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     hold off
                     xlabel('JH digital counts residual(%)')
                     ylabel('Altitude (km)')
+                    title( Q.Dateofthefolder);
+                      set(gca,'fontsize',16)
+
+
 
                     subplot(2,2,2)
                     grid on;
@@ -369,6 +430,8 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     hold off
                     xlabel('JL digital counts residual(%)')
                     ylabel('Altitude (km)')
+                      set(gca,'fontsize',16)
+
 
 
                     subplot(2,2,3)
@@ -383,6 +446,8 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     hold off
                     xlabel('JH - analog counts residual(%)')
                     ylabel('Altitude (km)')
+                      set(gca,'fontsize',16)
+
 
                     subplot(2,2,4)
                     grid on;
@@ -394,12 +459,15 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     hold off
                     xlabel('JL - analog counts residual(%)')
                     ylabel('Altitude (km)')
-                    
+                      set(gca,'fontsize',16)
+
+                     
 
                     
-    S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
+S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
 S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV            
-                    
+ 
+errors;
 % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %   b parameters and errors
 %                     

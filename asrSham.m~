@@ -92,7 +92,7 @@ LR(fff) = Q.LRpbl;
 asrDATAs = smooth(asrDATA,50); %asrDATA; %smooth(asrDATA,90); %was 45
 
 % 
-[fneg,I] = min(asrDATAs(zN<10000));
+[fneg,I] = min(asrDATAs(zN<5000));
  if fneg<0
   'diffrence is less than 0'
      stop
@@ -104,8 +104,8 @@ asrDATAs = smooth(asrDATA,50); %asrDATA; %smooth(asrDATA,90); %was 45
  asrDATAs(fneg2) = 1;
 %   fneg3 = find(asrDATAs >= 1);
 %  asrDATAs(fneg3)  = asrDATAs(fneg3) + diff;
-asrDATAs(zN>=12000) = 1;
-% asrDATAs(zN>= 2100 & zN<=10000) = 1;
+ asrDATAs(zN>=Q.ASRcutoffg) = 1;
+%  asrDATAs(zN>= 1500 & zN<=9500) = 1;
 asrDATAnew =  asrDATAs;
 % 
 % fneg = find(asrDATAs < 1);
