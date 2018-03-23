@@ -21,7 +21,7 @@ load(folderpath);
 tin =Q.time_in;
 % now run the config file
 config = setup('ralmo.conf');
-config.t0 = datenum (['date'], 'yyyymmdd');
+config.t0 = datenum ([num2str(date)], 'yyyymmdd');
 config = getCalibration(config);
 
 % Now run the aerosol code
@@ -91,17 +91,20 @@ fff = find(zN < Q.LRtranHeight);
 LR(fff) = Q.LRpbl;
 asrDATAs = smooth(asrDATA,100); %asrDATA; %smooth(asrDATA,90); %was 45
 
+fneg = find(asrDATAs < 1);
+asrDATAs(fneg) = 1;
+
 % 
-[fneg,I] = min(asrDATAs(zN<5000));
- if fneg<0
-  'diffrence is less than 0'
-     stop
- end 
- 
- diff = 1-fneg;
-  asrDATAs = asrDATAs + diff;
- fneg2 = find(asrDATAs < 1);
- asrDATAs(fneg2) = 1;
+% [fneg,I] = min(asrDATAs(zN<2000));
+%  if fneg<0
+%   'diffrence is less than 0'
+%      stop
+%  end 
+%  
+%  diff = 1-fneg;
+%   asrDATAs = asrDATAs + diff;
+%  fneg2 = find(asrDATAs < 1);
+%  asrDATAs(fneg2) = 1;
 %   fneg3 = find(asrDATAs >= 1);
 %  asrDATAs(fneg3)  = asrDATAs(fneg3) + diff;
  asrDATAs(zN>=Q.ASRcutoffheight) = 1;

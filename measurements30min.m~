@@ -184,10 +184,9 @@ Y.bajh = nanmean(Y.ACFJH(:,1:1590)');
 Y.bdjh = nanmean(Y.ACFJH(:,1600,:)');
 
 figure;subplot(1,2,1)
-plot(Y.LagsJHd,Y.bajl,Y.LagsJHd,Y.bdjl)
+plot(Y.LagsJHd,Y.bajl,Y.LagsJHd,Y.bdjl,Y.LagsJHd,Y.bajh,Y.LagsJHd,Y.bdjh)
 legend('analog jl','digital jl')
-subplot(1,2,2)
-plot(Y.LagsJHd,Y.bajh,Y.LagsJHd,Y.bdjh)
+
 legend('analog jh','digital jh')
 
 %%

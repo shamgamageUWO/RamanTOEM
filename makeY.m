@@ -247,6 +247,7 @@ Alt = JHazc;
   legend('JL - Digital','JH - Digital','Eb - Digital','JL - Analog','JH - Analog')
 title( Dateofthefolder);
   set(gca,'fontsize',20)
+  
 % Save in a new mat file
 bkg_ind1 = alt>50e3;% & alt<60e3;
 bkg_ind2 = Alt>50e3;

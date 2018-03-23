@@ -65,10 +65,10 @@ c3 = 2.*c2;
 % For asr
 Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50
 Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRtranHeight = 5000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
-Q.ASRcutoffheight = 1400; % 20110909 1400
+Q.ASRcutoffheight = 12000; % 20110909 1400
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
