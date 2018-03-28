@@ -102,15 +102,15 @@ alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 Y.binsize = S0.Channel(12).BinSize;
 F = 1800.* (Y.binsize./150);
 
-JL = F.*S0.Channel(12).Signal; % single scans
-JH = F.*S0.Channel(4).Signal;
-Eb = F.*S0.Channel(10).Signal; % single scans
+% JL = F.*S0.Channel(12).Signal; % single scans
+% JH = F.*S0.Channel(4).Signal;
+% Eb = F.*S0.Channel(10).Signal; % single scans
 
 
 
-JL = S0.Channel(12).Signal(:,starttime:endtime);%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
-JH = S0.Channel(4).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
-Eb= S0.Channel(10).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
+JL = F.*F.*S0.Channel(12).Signal(:,starttime:endtime);%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
+JH = F.*S0.Channel(4).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
+Eb= F.*S0.Channel(10).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
 
 
 
@@ -135,12 +135,32 @@ Y.alt = alt(1:N-zAoffset);
 Y.alt_an = alt_an(1+zAoffset:end);
 
 for i = 1:length(Y.alt_an)
-[Y.ACFJL(:,i),Y.LagsJL] = autocorr(Y.JL_an(:,i));
-[Y.ACFJH(:,i),Y.LagsJH] = autocorr(Y.JH_an(:,i));
-[Y.ACFJLd(i,:),Y.LagsJLd] = autocorr(Y.JL(i,:));
-[Y.ACFJHd(i,:),Y.LagsJHd] = autocorr(Y.JH(i,:));
+[Y.ACFJL(:,i),Y.LagsJL] = autocorr(Y.JL_an(:,i),29);
+[Y.ACFJH(:,i),Y.LagsJH] = autocorr(Y.JH_an(:,i),29);
+[Y.ACFJLd(i,:),Y.LagsJLd] = autocorr(Y.JL(i,:),29);
+[Y.ACFJHd(i,:),Y.LagsJHd] = autocorr(Y.JH(i,:),29);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% vaJL_12km = nansum(Y.JL(3200,:)')
+
+Y.varJL = nansum(Y.JL');
+% Y.normVarJL = Y.varJL/norm(Y.varJL);
+% Y.Norm_vaJL_12km = Y.normVarJL(3200) 
+Y.ACFJL_12km = Y.ACFJL(:,3200);
+Y.varACF = 1./Y.ACFJL_12km;
+disp('Digital Variance at 12km_Measurements ')
+Y.varJL(3200)
+
+disp('Digital Variance at 12km_ACF')
+Y.varACF(1)
+
+figure;
+subplot(1,2,1)
+plot(Y.LagsJL,Y.ACFJL_12km)
+subplot(1,2,2)
+plot(Y.LagsJL,1./Y.ACFJL_12km)
+
+
 
 figure;
 subplot(2,2,1)

@@ -65,15 +65,16 @@ c3 = 2.*c2;
 % For asr
 Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50
 Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 5000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
-Q.ASRcutoffheight = 12000; % 20110909 1400
+Q.ASRcutoffheight = 5000; % 20110909 1400
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load raw measurements
-[Y] = makeY(Q);
+% [Y] = makeY(Q);
+[Y] = makeYNEW(Q);
 Q.Dateofthefolder = Y.Dateofthefolder;
 
 % Digital measurements 2km above
@@ -108,6 +109,8 @@ Q.Eba = Eba(ANalt>=alt_a0 & ANalt <= alt_af);
 Q.Eba(Q.Eba <=0)= rand();
 Q.JHnewa= JHnewa(ANalt>=alt_a0 & ANalt <=alt_af);
 Q.JLnewa= JLnewa(ANalt>=alt_a0 & ANalt <=alt_af);
+Q.JLanalogstd = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+Q.JHanalogstd = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
 Q.ANalt = ANalt(ANalt>=alt_a0);
 Q.Zmes1 = ANalt(ANalt>=alt_a0 & ANalt <= alt_af);
 Q.Zmes1 = Q.Zmes1';
@@ -293,24 +296,23 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             Q.JHav = [ar1 JHav ar2];
             Q.JLav = [ar3 JLav ar4];
             
-% Q.JHav = autocorr(JHrealan,length(JHrealan)-1);
-% Q.JLav = autocorr(JLrealan,length(JLrealan)-1);
-            
-                for i = 1: length(Q.JLav)
-                    if Q.Zmes1(i) <= 6000
-                        Q.YYa(i) = Q.JLav(i);
-                    else
-                        Q.YYa(i) = .1.*Q.JLav(i);
-                    end
-                end
-                
-                for i = 1: length(Q.JHav)
-                    if  Q.Zmes1(i) <= 6000
-                        Q.YYYa(i) = Q.JHav(i);
-                    else
-                        Q.YYYa(i) = .1.*Q.JHav(i);
-                    end
-                end
+
+%             
+%                                 for i = 1: length(Q.JLav)
+%                                     if Q.Zmes1(i) <= 6000
+%                                         Q.YYa(i) = Q.JLav(i);
+%                                     else
+%                                         Q.YYa(i) = .1.*Q.JLav(i);
+%                                     end
+%                                 end
+%                                 
+%                                 for i = 1: length(Q.JHav)
+%                                     if  Q.Zmes1(i) <= 6000
+%                                         Q.YYYa(i) = Q.JHav(i);
+%                                     else
+%                                         Q.YYYa(i) = .1.*Q.JHav(i);
+%                                     end
+%                                 end
 
             
             
@@ -356,13 +358,15 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %  Q.YYYa = slope.*Q.JHav;
 %   Q.YYa  =slope.*Q.JLav;
 
- Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
+Q.YYYa =Q.JHanalogstd';
+Q.YYa = Q.JLanalogstd';
+
+  Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 Q.yvar = diag(Q.Yvar);
                 
                 
 
-Q.JLanalogstd = Y.YYa;
-Q.JHanalogstd = Y.YYYa;
+
 
 disp('Estimations for CJL, backgrounds and overlap done ')
 disp('makeQ complete ')

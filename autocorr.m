@@ -153,7 +153,7 @@ F    =  fft(Series-mean(Series) , nFFT);
 F    =  F .* conj(F);
 ACF  =  ifft(F);
 ACF  =  ACF(1:(nLags + 1));         % Retain non-negative lags.
-ACF  =  ACF ./ ACF(1);     % Normalize.
+% ACF  =  ACF ./ ACF(1);     % Normalize.
 ACF  =  real(ACF);
 
 %
