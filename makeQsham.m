@@ -56,24 +56,24 @@ alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
 alt_df = 32000; % Digital Channel ending altitude
 alt_a0 = 50;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
-b1 = 4; % Bin size for piecewise cov for digital 20110705 2011080223 8
-b2 = 4; % Bin size for piecewise cov for analog 20110705  2011080223 24
+b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
+Q.b2 = 8; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 3; % retrieval bin size
 c2 = 2.*c1;
 c3 = 2.*c2;
 
 % For asr
 Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50
-Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRpbl = 50; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
+Q.LRtranHeight = 5000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
-Q.ASRcutoffheight = 5000; % 20110909 1400
+Q.ASRcutoffheight = 8000; % 20110909 1400
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load raw measurements
-% [Y] = makeY(Q);
+%  [Y] = makeY(Q);
 [Y] = makeYNEW(Q);
 Q.Dateofthefolder = Y.Dateofthefolder;
 
@@ -109,8 +109,8 @@ Q.Eba = Eba(ANalt>=alt_a0 & ANalt <= alt_af);
 Q.Eba(Q.Eba <=0)= rand();
 Q.JHnewa= JHnewa(ANalt>=alt_a0 & ANalt <=alt_af);
 Q.JLnewa= JLnewa(ANalt>=alt_a0 & ANalt <=alt_af);
-Q.JLanalogstd = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
-Q.JHanalogstd = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+% Q.JLanalogstd = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+% Q.JHanalogstd = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
 Q.ANalt = ANalt(ANalt>=alt_a0);
 Q.Zmes1 = ANalt(ANalt>=alt_a0 & ANalt <= alt_af);
 Q.Zmes1 = Q.Zmes1';
@@ -286,15 +286,15 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,b2);
- [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,b2);
-
-            ar1 = ones(1,go1-1).* JHav(1);
-            ar2 = ones(1,go1-1).* JHav(end);
-            ar3 = ones(1,go2-1).* JLav(1);
-            ar4 = ones(1,go2-1).* JLav(end);
-            Q.JHav = [ar1 JHav ar2];
-            Q.JLav = [ar3 JLav ar4];
+%  [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,b2);
+%  [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,b2);
+% 
+%             ar1 = ones(1,go1-1).* JHav(1);
+%             ar2 = ones(1,go1-1).* JHav(end);
+%             ar3 = ones(1,go2-1).* JLav(1);
+%             ar4 = ones(1,go2-1).* JLav(end);
+%             Q.JHav = [ar1 JHav ar2];
+%             Q.JLav = [ar3 JLav ar4];
             
 
 %             
@@ -317,7 +317,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 8000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = JLreal(i);
@@ -325,7 +325,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
+            if  Q.Zmes2(i) <= 8000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = JHreal(i);
@@ -358,10 +358,20 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %  Q.YYYa = slope.*Q.JHav;
 %   Q.YYa  =slope.*Q.JLav;
 
-Q.YYYa =Q.JHanalogstd';
-Q.YYa = Q.JLanalogstd';
+% load('Variance20110909.mat');
+% % jlav= interp1(K.alt,K.VaJLSingle,Q.Zmes1,'linear');
+% % jhav= interp1(K.alt,K.VaJHSingle,Q.Zmes1,'linear');
+% jlavv= interp1(K.alt,K.L,Q.Zmes1,'linear');
+% jhavv= interp1(K.alt,K.H,Q.Zmes1,'linear');
 
-  Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
+
+ 
+Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+Q.YYa =Q.YYa';
+Q.YYYa =Q.YYYa';
+
+Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 Q.yvar = diag(Q.Yvar);
                 
                 

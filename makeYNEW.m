@@ -33,59 +33,20 @@ file = 'S0';
 %                 if lengthfolders ~= 1
 % 
 %                     if lengthfolders == 0
-%                         sprintf('There are no folders of RALMO data for this date: \n')
-%                         return
-%                     end
-%                     sprintf('There is more than one folder of RALMO data for this date: \n')
-%                     disp(folders)
-% 
-%                     folder = input('Please type in the name of the folder you want, without quotes. \n','s');
-%                     if isempty(folder)
-%                         sprintf('Default is the first one')
-% 
-% 
-%                         folder =(folders{1});
-%                     end
-%                     folderpath = [datadir filesep folder];
-%                 else
-%                     
-%                     folders = folders{1};
-%                     folderpath = [folderpath  filesep folders];
-%                     
-%                 end
-% 
-% files = dirFiles(folderpath);
-% files = sort(files);
-% 
-% scans = length(files);
-% if ~(0 < scans)
-% %     error('NODATA:RawCountsem', ['No RALMO data is available for the date ' num2str(date)]);
-% end
-% 
-% times = zeros(1,scans);
-% shots = zeros(1,scans);
+
 % bins = zeros(1,scans);
 
 
 
 load(folderpath);
 
-% Display the start and end times of the lidar measurment
-% disp('Start time')
+
 g = hour(S0.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
 Minute = minute(S0.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
 tin =Q.time_in;
 % from 2300 to 2330
 starttime=find(g==tin & Minute==00);
 endtime=find(g==tin & Minute==30);
-% start =  [g(1) Minute(1)];
-% start
-
-%
-% disp('End time')
-% gg = hour(S0.GlobalParameters.End);
-% endtime =  [g(end) Minute(end)];
-% endtime;
 
 % pick the measurements from 11-11.30
 %% Digital Channels
@@ -104,8 +65,7 @@ alt = S0.Channel(4).Range;
 Alte = S0.Channel(2).Range ; % for Eb channel they have a different binzise
 alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 %% Load the analog channel measurements too 
-% figure;
-%   hold on;
+
 
 
 JL = S0.Channel(12).Signal(:,starttime:endtime);%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
@@ -165,12 +125,40 @@ Eb = nansum(Eb');
         JHa(i,:) = JH_an(i,:) - bkg_Han(i);
     end
     
-    for i = 1:length(alt_an)
-        stdJLaa(:,i) = var(JLa(:,i));
-        stdJHaa(:,i) = var(JHa(:,i));
-    end
-    
+%     for i = 1:length(alt_an)
+%         stdJLaa(:,i) = std(JLa(:,i));
+%         stdJHaa(:,i) = std(JHa(:,i));
+%     end
+La = JLa(:,alt_an<=12000);
+Ha = JHa(:,alt_an<=12000);
+alt_a = alt_an(alt_an<=12000);
+for i = 1:length(bkg_Lan)
+    [varL(i,:),g] = bobpoissontest(La(i,:),alt_a',Q.b2);
+    [varH(i,:),g] = bobpoissontest(Ha(i,:),alt_a',Q.b2);
+end
 
+% figure;
+% subplot(1,2,1)
+% plot(varL)
+% subplot(1,2,2)
+% plot(varH)
+
+Ya = nansum(varL);
+YYa = nansum(varH);
+
+% 
+% MeanLvar = mean(varL);
+% MeanHvar = mean(varH);
+% 
+r111 = ones(1,g-1).* YYa(1);
+r211 = ones(1,g-1).* YYa(end);
+r311 = ones(1,g-1).* Ya(1);
+r411 = ones(1,g-1).* Ya(end);
+YYYa = [r111 YYa  r211];
+YYa = [r311 Ya  r411];
+
+[Y.YYYa, zz] = coadd(YYYa, alt_a, Q.coaddalt);
+[Y.YYa, zz] = coadd(YYa, alt_a, Q.coaddalt);
 
 JL_an = nansum(JL_an);
 JH_an = nansum(JH_an);
@@ -188,8 +176,14 @@ Eb_an = nansum(Eb_an');
 alt = JHzc;
 Alt = JHazc;
 
-stdJHa = interp1(alt_an,stdJHaa,JHazc,'spline');
-stdJLa = interp1(alt_an,stdJLaa,JHazc,'spline');
+% stdJHa = interp1(alt_an,stdJHaa,JHazc,'spline');
+% stdJLa = interp1(alt_an,stdJLaa,JHazc,'spline');
+% 
+% % Signal to noise
+% JL_P = ((stdJLa./JL_an)).*100;
+% JH_P = ((stdJHa./JH_an)).*100;
+% figure;plot(JL_P,JLazc./1000,'r',JH_P,JLazc./1000,'b')
+
 
   figure;
   semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'black') 
@@ -298,8 +292,8 @@ Y.bg_length1a = bg_length1an;
 Y.bg_length2a = bg_length2an;
 Y.alt_an = Alt;
 Y.F = F;
-Y.YYa = stdJLa;
-Y.YYYa = stdJHa;
+% Y.YYa = JL_P.*JL_an;
+% Y.YYYa = JH_P.*JH_an;
 Y.Dateofthefolder  = Dateofthefolder ;
 
 % save('data.mat','-struct','Y');

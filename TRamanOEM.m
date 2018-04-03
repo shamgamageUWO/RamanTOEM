@@ -440,7 +440,7 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     plot(((y(n1+n2+1:n1+n2+n3) - X.yf(n1+n2+1:n1+n2+n3))./X.yf(n1+n2+1:n1+n2+n3)).*100 ,Q.Zmes1./1000)
                     hold on
 %                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
-                    plot(-(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(Q.YYYa'./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+                    plot(-(sqrt(Q.YYYa')./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(Q.YYYa')./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
                     
 
                     hold off
@@ -453,7 +453,7 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     grid on;
                     plot(((y(n1+n2+n3+1:end) - X.yf(n1+n2+n3+1:end))./X.yf(n1+n2+n3+1:end)).*100 ,Q.Zmes1./1000)
                     hold on;
-                    plot(-(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(Q.YYa'./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
+                    plot(-(sqrt(Q.YYa')./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(sqrt(Q.YYa')./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
                     %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
 
                     hold off
