@@ -61,14 +61,15 @@ Q.b2 = 8; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 3; % retrieval bin size
 c2 = 2.*c1;
 c3 = 2.*c2;
+c4 = 2.*c3;
 
 % For asr
-Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50
+Q.LRfree = 22; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
 Q.LRpbl = 50; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 5000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
-Q.ASRcutoffheight = 8000; % 20110909 1400
+Q.ASRcutoffheight = 11000; % 20110909 1400
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -135,8 +136,9 @@ Q.n4=length(Q.JLnewa);
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:6000;
 Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
-Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:40000;
-Q.Zret =[Z1 Z2 Z3];
+Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
+Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:40000;
+Q.Zret =[Z1 Z2 Z3 Z4];
 disp('Defined grids ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
