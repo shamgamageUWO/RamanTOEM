@@ -84,7 +84,7 @@ for i = 1:m
             %          Sa_T(i,j) = Ta(i);
             %         end
          else
-             S_OV(i,i) = 1e-4;
+             S_OV(i,i) = 1e-3;
          end
     end
 end
