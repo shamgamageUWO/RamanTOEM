@@ -165,7 +165,7 @@ DT_JL
 
                     figure;
                     subplot(1,2,1)
-%                     set(gca,'fontsize',16)
+                    %                     set(gca,'fontsize',16)
                     % hold on;
                     plot(X.A(1:5:m,1:5:m),Q.Zret(1:5:m)./1000)
                     grid on;
@@ -175,32 +175,27 @@ DT_JL
                     hold off;
                     xlabel('Temperature - Averaging Kernels')
                     ylabel('Altitude ( km )')
- title( Q.Dateofthefolder);
-  set(gca,'fontsize',16)
-
+                    title( Q.Dateofthefolder);
+                    set(gca,'fontsize',16)
+                    
                     subplot(1,2,2)
-                    plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
-                    grid on;
-                    xlabel('Vertical Resolution ( km )')
+                    plot(X.A(m+4:5:end-5,m+4:5:end-5),Q.Zret(1:5:m)./1000)
+                    
+                    xlabel('Overlap - Averaging Kernels')
                     ylabel('Altitude ( km )')
-                      set(gca,'fontsize',16)
+                    title( Q.Dateofthefolder);
+                    set(gca,'fontsize',16)
 
                     
                     
                     
 %                     OVresponse = (X.A(m+4:end-5,m+4:end-5))*unit';
-                    figure;
-                    plot(X.A(m+4:5:end-5,m+4:5:end-5),Q.Zret(1:5:m)./1000)
-%                     grid on;
-%                     hold on;
-%                     plot(OVresponse,Q.Zret./1000,'r')
-                    % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
-%                     hold off;
-                    xlabel('Overlap - Averaging Kernels')
-                    ylabel('Altitude ( km )')
-                     title( Q.Dateofthefolder);
-  set(gca,'fontsize',16)
-
+                figure;
+                plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
+                grid on;
+                xlabel('Vertical Resolution ( km )')
+                ylabel('Altitude ( km )')
+                set(gca,'fontsize',16)
 %                     %
                     err = X.e(1:m);
                     upper = err+ X.x(1:m);
@@ -216,7 +211,7 @@ time = Q.time_in;
 yr = num2str(year);
 datadirS3 = '/Users/sham/Downloads/OEM-Sham-Code-Jan-2017/QpackSham/TraditionalTemperature';
 filename =[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f',time)];
-folderpath = [datadirS3 filesep filename]
+folderpath = [datadirS3 filesep filename];
 load(folderpath);
 
 T_an = interp1(H.alt_an,H.T_an,Q.Zret);

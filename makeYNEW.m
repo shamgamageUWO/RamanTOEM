@@ -185,14 +185,14 @@ Alt = JHazc;
 % figure;plot(JL_P,JLazc./1000,'r',JH_P,JLazc./1000,'b')
 
 
-  figure;
-  semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'black') 
-  xlabel('30min Coadded signal') 
-  xlabel('30min Coadded signal')
-  ylabel('Altitude (km)')
-  legend('JL - Digital','JH - Digital','Eb - Digital','JL - Analog','JH - Analog')
-title( Dateofthefolder);
-  set(gca,'fontsize',20)
+%   figure;
+%   semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'black') 
+%   xlabel('30min Coadded signal') 
+%   xlabel('30min Coadded signal')
+%   ylabel('Altitude (km)')
+%   legend('JL - Digital','JH - Digital','Eb - Digital','JL - Analog','JH - Analog')
+% title( Dateofthefolder);
+%   set(gca,'fontsize',20)
   
 % Save in a new mat file
 bkg_ind1 = alt>50e3;% & alt<60e3;
@@ -211,7 +211,24 @@ bkg_ind2 = Alt>50e3;
         % 2. Convert counts to MHz
         JHnwn = (JHn./F);
         JLnwn = (JLn./F);
-
+  figure;
+  subplot(1,2,1)
+  semilogx(JLnwn,alt./1000,'b',JHnwn,alt./1000,'r')
+  xlabel('Digital Signal (MHz)')
+  ylabel('Altitude (km)')
+title( Dateofthefolder);
+  set(gca,'fontsize',16)
+  subplot(1,2,2)
+  semilogx(JL_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'b',JH_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'r') 
+  xlabel('Analog Signal (mV)')
+  ylabel('Altitude (km)')
+title( Dateofthefolder);
+  set(gca,'fontsize',16)
+  
+  figure;
+  semilogx(Eb,Ebzc./1000,'g')
+    xlabel('Eb digital')
+  ylabel('Altitude (km)')
         
         % 3. Apply DT correction
         JL_dtc = JLn ./ (1 - JLnwn.*(Q.deadtimeJL.*1e6)); % non-paralyzable

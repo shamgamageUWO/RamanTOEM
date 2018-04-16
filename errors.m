@@ -80,14 +80,14 @@ total_err_T = sqrt( X.eo(1:m).^2 + P(1:m)  + Rc(1:m)+ Ra(1:m) + Air(1:m) + Aero(
 
 % Errors for Temperature
 figure;
-plot(X.eo(1:m),Q.Zret./1000,'r')
+semilogx(X.eo(1:m),Q.Zret./1000,'r')
 hold on;
- plot(sqrt(P(1:m)),Q.Zret./1000,'--*')
-plot(sqrt(Rc(1:m)),Q.Zret./1000,'--^')
-plot(sqrt(Ra(1:m)),Q.Zret./1000,'--+')
-plot(sqrt(Air(1:m)),Q.Zret./1000,'--o')
-plot(sqrt(Aero(1:m)),Q.Zret./1000,'--s')
-plot(total_err_T,Q.Zret/1000,'black')
+semilogx(sqrt(P(1:m)),Q.Zret./1000,'--*')
+semilogx(sqrt(Rc(1:m)),Q.Zret./1000,'--^')
+semilogx(sqrt(Ra(1:m)),Q.Zret./1000,'--+')
+semilogx(sqrt(Air(1:m)),Q.Zret./1000,'--o')
+semilogx(sqrt(Aero(1:m)),Q.Zret./1000,'--s')
+semilogx(total_err_T,Q.Zret/1000,'black')
 xlabel('Temperature Uncertainty (K)')
 ylabel('Altitude (km)')
 legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Aerosol Extinction','Total Error')
