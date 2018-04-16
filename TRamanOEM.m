@@ -171,14 +171,25 @@ DT_JL
                     grid on;
                     hold on;
                     plot(response,Q.Zret./1000,'r')
-                    % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
                     hold off;
+                    grid off;
                     xlabel('Temperature - Averaging Kernels')
                     ylabel('Altitude ( km )')
  title( Q.Dateofthefolder);
   set(gca,'fontsize',16)
 
-                    subplot(1,2,2)
+  
+        
+                 subplot(1,2,2)
+                 grid on;
+                    plot(X.A(m+4:5:end-5,m+4:5:end-5),Q.Zret(1:5:m)./1000)
+                    grid off;
+                    xlabel('Overlap - Averaging Kernels')
+                    ylabel('Altitude ( km )')
+                     title( Q.Dateofthefolder);
+  set(gca,'fontsize',16)
+  
+                   figure;
                     plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
                     grid on;
                     xlabel('Vertical Resolution ( km )')
@@ -189,17 +200,7 @@ DT_JL
                     
                     
 %                     OVresponse = (X.A(m+4:end-5,m+4:end-5))*unit';
-                    figure;
-                    plot(X.A(m+4:5:end-5,m+4:5:end-5),Q.Zret(1:5:m)./1000)
-%                     grid on;
-%                     hold on;
-%                     plot(OVresponse,Q.Zret./1000,'r')
-                    % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
-%                     hold off;
-                    xlabel('Overlap - Averaging Kernels')
-                    ylabel('Altitude ( km )')
-                     title( Q.Dateofthefolder);
-  set(gca,'fontsize',16)
+          
 
 %                     %
                     err = X.e(1:m);
@@ -301,18 +302,6 @@ plot(Toem(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','T OEM','Color'
 % Create plot
 plot(Q.Tsonde2(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','T sonde','Color',[0 0 1]);
 
-% % Create plot
-% plot(T_an(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','Traditionalanalog','LineWidth',1,'Color',[0 0 0]);
-% 
-% % Create plot
-% plot(T_dg(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
-%     'Color',[0.929411768913269 0.694117665290833 0.125490203499794]);
-% 
-% % Create plot
-% plot(T_cm(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','TraditionalCombined','LineWidth',1,...
-%     'Color',[0.854901969432831 0.701960802078247 1]);
-
-% [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
 jbfilly(Q.Zret(Q.Zret<=5000)./1000,upper(Q.Zret<=5000)',lower(Q.Zret<=5000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
 
 % Create xlabel
@@ -466,7 +455,12 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     
 S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
 S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV            
- 
+
+figure;
+semilogx(Q.alpha_aero,Q.Zmes./1000)
+     xlabel('Aerosol Extinction (m^-^1')
+                    ylabel('Altitude (km)')
+                      set(gca,'fontsize',16)
 errors;
 % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %   b parameters and errors

@@ -239,14 +239,7 @@ alt_an = alt_an(1+zAoffset:end);
 alt = JHzc;
 Alt = JHazc;
 
-  figure;
-  semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'black') 
-  xlabel('30min Coadded signal') 
-  xlabel('30min Coadded signal')
-  ylabel('Altitude (km)')
-  legend('JL - Digital','JH - Digital','Eb - Digital','JL - Analog','JH - Analog')
-title( Dateofthefolder);
-  set(gca,'fontsize',20)
+
   
 % Save in a new mat file
 bkg_ind1 = alt>50e3;% & alt<60e3;
@@ -261,12 +254,27 @@ bkg_ind2 = Alt>50e3;
      % 1. Make the Co added counts to avg counts
         JHn = JH./(Q.deltatime.*Q.coaddalt);
         JLn = JL./(Q.deltatime.*Q.coaddalt);
+
         
         % 2. Convert counts to MHz
         JHnwn = (JHn./F);
         JLnwn = (JLn./F);
 
-        
+          figure;
+  subplot(1,2,1)
+%   semilogx(JL,alt./1000,'b',JH,alt./1000,'r'),Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'black') 
+  semilogx(JLnwn,alt./1000,'b',JHnwn,alt./1000,'r')
+  xlabel('Photon Counts (MHz)') 
+  
+  subplt(1,2,2)
+  plot(JL_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'b',JH_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'r') 
+  xlabel('Analog Signal (mV)')
+  ylabel('Altitude (km)')
+%   legend('JL - Digital','JH - Digital','Eb - Digital','JL - Analog','JH - Analog')
+title( Dateofthefolder);
+  set(gca,'fontsize',20)
+  
+  figure;plot(Eb,Ebzc./1000,'g')
         % 3. Apply DT correction
         JL_dtc = JLn ./ (1 - JLnwn.*(Q.deadtimeJL.*1e6)); % non-paralyzable
         JH_dtc = JHn ./ (1 - JHnwn.*(Q.deadtimeJH).*1e6);
@@ -317,34 +325,8 @@ bg_Eban= nanmean(bkg_Eban);
 
 bg_length1an = length(bkg_JHan);
 bg_length2an = length(bkg_JLan);
-%%
-%    findBH = find(zzN > zHback);
-%     backHA = mean(SHcoaddA(findBH(1):end)-in.Aoffset);
-%     findBN = find(zzN > zNback);
-%     backNA = mean(SNcoaddA(findBN(1):end)-in.Aoffset);
-%     if in.varAVA
-%         backVarHA = (std(SHcoaddA(findBH(1):end)-in.Aoffset)...
-%          ./ sqrt(length(SHcoaddA(findBH(1):end)))).^2;
-%         backVarNA = (std(SNcoaddA(findBN(1):end)-in.Aoffset)...
-%          ./ sqrt(length(SNcoaddA(findBN(1):end)))).^2;
-%     else
-%         backVarHA = (std(SHcoaddA(findBH(1):end)-in.Aoffset)).^2;
-%         backVarNA = (std(SNcoaddA(findBN(1):end)-in.Aoffset)).^2;
-%     end
-% JLanwithoutBG = JL_an-bg_JLan;
-% JHanwithoutBG = JH_an-bg_JHan;
-% EbanwithoutBG = Eb_an-bg_Eban;
-% 
-%   figure;semilogx(JL,alt./1000,'b',JH,alt./1000,'r')%,Eb,Ebzc./1000,'g') 
-%   xlabel('Photon Counts')
-%   ylabel('Alt (km)')
-%   legend('JL','JH')
-% hold on;
-%         
-%     figure;subplot(1,2,1)
-%     semilogx(JL_an,Ebazc./1000,'m',JH_an,Ebazc./1000,'black',Eb_an,Ebazc./1000,'r')
-%     subplot(1,2,2)
-%     semilogx(Eb,alt./1000,'r',JL,alt./1000,'b',JH,alt./1000,'g')
+
+
 
 %% Digital
 Y.JL = JL ;

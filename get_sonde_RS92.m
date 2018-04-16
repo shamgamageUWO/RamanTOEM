@@ -1,6 +1,6 @@
 % This is to get the radiosonde files
 
-function [Tsonde,Zsonde,Psonde] = get_sonde_RS92(date,time)
+function [Tsonde,Zsonde,Psonde,RH] = get_sonde_RS92(date,time)
 % date =20110607;
 % tin=20110607110917; % format yyyymmddHHMMSS;
 % tfi=20110607181927;
@@ -77,6 +77,7 @@ if exist(file, 'file')
         Zsonde = rs92.z; % RALMO height
         Psonde = rs92.P;
         Psonde = Psonde.*100; % unit conversion hetaPas to Pascal
+        RH = rs92.RH;
         fclose(fid);
         
 else
