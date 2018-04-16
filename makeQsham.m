@@ -52,12 +52,12 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-alt_d0 = 3000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
 alt_df = 30000; % Digital Channel ending altitude
 alt_a0 = 50;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
-Q.b2 = 8; % Bin size for piecewise cov for analog 20110705  2011080223 24
+Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 3; % retrieval bin size
 c2 = 2.*c1;
 c3 = 2.*c2;
@@ -66,7 +66,7 @@ c4 = 2.*c3;
 % For asr
 Q.LRfree = 25; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
 Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 1500; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRtranHeight = 4000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
 Q.ASRcutoffheight = 12000; % 20110909 1400
@@ -74,8 +74,8 @@ Q.ASRcutoffheight = 12000; % 20110909 1400
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load raw measurements
-%   [Y] = makeY(Q);
- [Y] = makeYNEW(Q);
+%    [Y] = makeY(Q);
+  [Y] = makeYNEW(Q);
 % [Y]=makeYFFT(Q);
 Q.Dateofthefolder = Y.Dateofthefolder;
 
@@ -369,10 +369,10 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
  
-Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
-Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
-Q.YYa =Q.YYa';
-Q.YYYa =Q.YYYa';
+                Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYa =Q.YYa';
+                Q.YYYa =Q.YYYa';
 
 Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 Q.yvar = diag(Q.Yvar);

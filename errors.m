@@ -88,7 +88,7 @@ plot(sqrt(Ra(1:m)),Q.Zret./1000,'--+')
 plot(sqrt(Air(1:m)),Q.Zret./1000,'--o')
 plot(sqrt(Aero(1:m)),Q.Zret./1000,'--s')
 plot(total_err_T,Q.Zret/1000,'black')
-xlabel('Temperature Uncertainty')
+xlabel('Temperature Uncertainty (K)')
 ylabel('Altitude (km)')
 legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Aerosol Extinction','Total Error')
  title( Q.Dateofthefolder);
