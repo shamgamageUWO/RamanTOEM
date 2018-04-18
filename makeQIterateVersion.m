@@ -1,4 +1,4 @@
-function [Q] = makeQsham( date_in,time_in,flag)
+function [Q] = makeQIterateVersion( date_in,time_in,flag,Input)
 
 % -Usage-
 %	[Q,y,yvar] = makeQ(in)
@@ -66,19 +66,18 @@ c4 = 2.*c3;
 % For asr
 Q.LRfree = 50; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
 Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRtranHeight = 1400; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
-Q.ASRcutoffheight = 1400; % 20110909 1400 20110802 day 11km
+Q.ASRcutoffheight = 12000; % 20110909 1400 20110802 day 11km
 Q.asrsmoothing = 100; % 100 for 20110802 day, 
 Q.OVCOV_6above = 1e-4; % 1e-4 for clear 1e-2/3 for cloud relax this 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load raw measurements
 %    [Y] = makeY(Q);
-%   [Y] = makeYNEW(Q);
-
-[Y] = makeYNEWCov(Q);
+[Y]=makeYNEWIterateVersion(Q);
+% [Y]=makeYFFT(Q);
 Q.Dateofthefolder = Y.Dateofthefolder;
 
 % Digital measurements 2km above
@@ -187,33 +186,36 @@ xlabel('Aerosol Extinction (m^-^1)')
 ylabel('Altitude (km')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-[R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
-Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
-Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
-Q.GR = dfacR ; % ISSI recommend
-Q.GRa = dfacRa;
+% [R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
+% Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
+% Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
+% Q.GR = dfacR ; % ISSI recommend
+% Q.GRa = dfacRa;
+% disp('R is calibrated ')
+Q.R = Input.R;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
+Q.Ra = Input.Ra;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
+Q.GR = Input.dfacR ; % ISSI recommend
+Q.GRa = Input.dfacRa;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 
-C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-Q.CL = C.CJL;
-Q.CLa =C.CJLa;
+% C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+% Q.CL = C.CJL;
+% Q.CLa =C.CJLa;
+Q.CL = Input.CJL;
+Q.CLa =Input.CJLa;
 Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
-% load('OverlapSham.mat')
-% OVnw = interp1(OverlapSham.z,OverlapSham.OVsmooth,Q.Zret,'linear');
-% 
-% load('ralmoFixedOverlap.mat')
-% OVnw = interp1(ralmoO.zoverlap,ralmoO.overlap,Q.Zret,'linear');
-% OVnw(isnan(OVnw))=1;
-% Q.OVa = OVnw;
-% %  Q.OVa = ones(1,length(Q.Ta));
-% Q.OVlength = length(Q.OVa);
-% Q.COVa = OVCov(Q.Zret,Q.OVa);
 
 
+                                        load('OVDay.mat')
+                                        OVnw = interp1(OVDay.Z,OVDay.OV,Q.Zret,'linear');
+                                        OVnw(isnan(OVnw))=1;
+                                        Q.OVa = OVnw;
+                                        Q.OVlength = length(Q.OVa);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.OVCOV_6above);
 
 
 
@@ -224,35 +226,18 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                                         if flag ==1
                                         Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
                                         Q.CovBJH = ((Y.bg_JH_std)).^2;
-                                        load('OVDay.mat')
-                                        OVnw = interp1(OVDay.Z,OVDay.OV,Q.Zret,'linear');
-                                        OVnw(isnan(OVnw))=1;
-                                        Q.OVa = OVnw;
-                                        %  Q.OVa = ones(1,length(Q.Ta));
                                         Q.OVlength = length(Q.OVa);
                                         Q.COVa = OVCov(Q.Zret,Q.OVa,Q.OVCOV_6above);
                                         disp('Daytime retrieval')
                                         else 
                                         Q.CovBJL = ((Y.bg_JL_std/sqrt(Y.bg_length2))).^2;
                                         Q.CovBJH = ((Y.bg_JH_std/sqrt(Y.bg_length1))).^2;
-%                                         load('ralmoFixedOverlap.mat')
-%                                         OVnw = interp1(ralmoO.zoverlap,ralmoO.overlap,Q.Zret,'linear');
-                                        %                                         load('OVNight.mat')
-                                        %                                         OVnw = interp1(OVNight.Z,OVNight.OV,Q.Zret,'linear');
-                                        load('OVDay.mat')
-                                        OVnw = interp1(OVDay.Z,OVDay.OV,Q.Zret,'linear');
-                                        OVnw(isnan(OVnw))=1;
-                                        Q.OVa = OVnw;
-                                        Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.OVCOV_6above);
+
 
                                         disp('Nighttime retrieval')
                                         end 
 
-%%
-                        % this need to be done if there is any zeros in the real measurements
-                        % smooth the signal over 1
-% figure;plot(Q.Zret./1000,Q.OVa)                    
+                   
                         Q.JHnew(Q.JHnew<=0)= round(rand(1)*10);
                         Q.JHnewa(Q.JHnewa<=0)= round(rand(1)*10);
                         Q.JLnew(Q.JLnew<=0)= round(rand(1)*10);
@@ -278,38 +263,9 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
-%  [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,b2);
-%  [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,b2);
-% 
-%             ar1 = ones(1,go1-1).* JHav(1);
-%             ar2 = ones(1,go1-1).* JHav(end);
-%             ar3 = ones(1,go2-1).* JLav(1);
-%             ar4 = ones(1,go2-1).* JLav(end);
-%             Q.JHav = [ar1 JHav ar2];
-%             Q.JLav = [ar3 JLav ar4];
-            
-
-%             
-%                                 for i = 1: length(Q.JLav)
-%                                     if Q.Zmes1(i) <= 6000
-%                                         Q.YYa(i) = Q.JLav(i);
-%                                     else
-%                                         Q.YYa(i) = .1.*Q.JLav(i);
-%                                     end
-%                                 end
-%                                 
-%                                 for i = 1: length(Q.JHav)
-%                                     if  Q.Zmes1(i) <= 6000
-%                                         Q.YYYa(i) = Q.JHav(i);
-%                                     else
-%                                         Q.YYYa(i) = .1.*Q.JHav(i);
-%                                     end
-%                                 end
-
-            
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
+            if Q.Zmes2(i) <= 8000
                 Q.YY(i) = Q.JLv(i);
             else
                 Q.YY(i) = JLreal(i);
@@ -317,45 +273,13 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
         end
 
         for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
+            if  Q.Zmes2(i) <= 8000
                 Q.YYY(i) = Q.JHv(i);
             else
                 Q.YYY(i) = JHreal(i);
             end
         end
         
-%         for i = 1:length( Q.JHnew )
-%             
-%             if  Q.JHnew (i) <= 15
-%                 Q.YYY(i) =  15;
-%             end
-%             if  Q.JLnew (i) <= 10
-%                 Q.YY(i) =  10 ;
-%             end
-%             
-%         end
-%         for i = 1:length( Q.JLnew )
-%             if  Q.JLnew (i) <= 10
-%                 Q.YY(i) =  10 ;
-%             end
-%         end
-%          Q.Yvar =[Q.YYY Q.YY Q.JHav Q.JLav];
-%         Q.Yvar =[JHreal JLreal];
-
-% % HEre I linearlize the covariance
-%  slope = (((0.9-0.7).*Q.Zmes1)/(Q.Zmes1(end)));
-%   slope = (((0.5-0.9).*Q.Zmes1)/(Q.Zmes1(end)))+0.8;
-% % %    Q.YYYa =  Q.JHav;% smmohtenJHa';
-% % %    Q.YYa  = Q.JLav;%smmohtenJLa';
-%  Q.YYYa = slope.*Q.JHav;
-%   Q.YYa  =slope.*Q.JLav;
-
-% load('Variance20110909.mat');
-% % jlav= interp1(K.alt,K.VaJLSingle,Q.Zmes1,'linear');
-% % jhav= interp1(K.alt,K.VaJHSingle,Q.Zmes1,'linear');
-% jlavv= interp1(K.alt,K.L,Q.Zmes1,'linear');
-% jhavv= interp1(K.alt,K.H,Q.Zmes1,'linear');
-
 
  
                 Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);

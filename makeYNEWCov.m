@@ -1,7 +1,7 @@
 % this is to read S0.mat files and pick the measurements from 11-11.30pm
 % Save the JL,JH,Eb and alt in seperate structure 
 
-function [Y] = makeYNEW(Q)
+function [Y] = makeYNEWCov(Q)
 
 
 
@@ -115,50 +115,48 @@ Eb = nansum(Eb');
 
     % Analog variance
 
-    bkg_ind = alt>50e3;% & alt<60e3;
-    bkg_Lan = mean(JL_an(:,bkg_ind)');
-    bkg_Han = mean(JH_an(:,bkg_ind)');
-    
-    % Background removed signal
-    for i = 1:length(bkg_Lan)
-        JLa(i,:) = JL_an(i,:) - bkg_Lan(i);
-        JHa(i,:) = JH_an(i,:) - bkg_Han(i);
-    end
-    
-%     for i = 1:length(alt_an)
-%         stdJLaa(:,i) = std(JLa(:,i));
-%         stdJHaa(:,i) = std(JHa(:,i));
-%     end
-La = JLa(:,alt_an<=12000);
-Ha = JHa(:,alt_an<=12000);
+La = JL_an(:,alt_an<=12000);
+Ha = JH_an(:,alt_an<=12000);
 alt_a = alt_an(alt_an<=12000);
-for i = 1:length(bkg_Lan)
-    [varL(i,:),g] = bobpoissontest(La(i,:),alt_a',Q.b2);
-    [varH(i,:),g] = bobpoissontest(Ha(i,:),alt_a',Q.b2);
+
+for i = 1:length(La)
+[ACFJL(:,i),LagsJL] = autocorr(La(:,i),29);
+[ACFJH(:,i),LagsJH] = autocorr(Ha(:,i),29);
 end
 
-% figure;
-% subplot(1,2,1)
-% plot(varL)
-% subplot(1,2,2)
-% plot(varH)
+for i =1:length(La)
+    Variance_JLa(i) = var(La(:,i));
+    Variance_JHa(i) = var(Ha(:,i));
 
-Ya = nansum(varL);
-YYa = nansum(varH);
+end
+
+
+% Covariance 
+
+ for i =1:length(La)
+    CovVariance_JLa(:,i) =   ACFJL(:,i).*Variance_JLa(i);
+    CovVariance_JHa(:,i) =   ACFJH(:,i).*Variance_JHa(i);
+
+ end 
+
+
+
+Ya =CovVariance_JLa(1,:)./30;
+YYa = CovVariance_JHa(1,:)./30;
 
 % 
 % MeanLvar = mean(varL);
 % MeanHvar = mean(varH);
 % 
-r111 = ones(1,g-1).* YYa(1);
-r211 = ones(1,g-1).* YYa(end);
-r311 = ones(1,g-1).* Ya(1);
-r411 = ones(1,g-1).* Ya(end);
-YYYa = [r111 YYa  r211];
-YYa = [r311 Ya  r411];
+% r111 = ones(1,g-1).* YYa(1);
+% r211 = ones(1,g-1).* YYa(end);
+% r311 = ones(1,g-1).* Ya(1);
+% r411 = ones(1,g-1).* Ya(end);
+% YYYa = [r111 YYa  r211];
+% YYa = [r311 Ya  r411];
 
-[Y.YYYa, zz] = coadd(YYYa, alt_a, Q.coaddalt);
-[Y.YYa, zz] = coadd(YYa, alt_a, Q.coaddalt);
+[Y.YYYa, zz] = coadd(YYa, alt_a, Q.coaddalt);
+[Y.YYa, zz] = coadd(Ya, alt_a, Q.coaddalt);
 
 JL_an = nansum(JL_an);
 JH_an = nansum(JH_an);

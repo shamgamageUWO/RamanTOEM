@@ -89,13 +89,13 @@ end
 LR = Q.LRfree * ones(size(asrDATA));
 fff = find(zN < Q.LRtranHeight);
 LR(fff) = Q.LRpbl;
-asrDATAs = smooth(asrDATA,50); %asrDATA; %smooth(asrDATA,90); %was 45
+asrDATAs = smooth(asrDATA,Q.asrsmoothing); %asrDATA; %smooth(asrDATA,90); %was 45
 
 fneg1 = find(asrDATAs < 1);
 asrDATAs(fneg1) = 1;
 
 % 
- [fneg,I] = min(asrDATAs(zN<4000));
+ [fneg,I] = min(asrDATAs(zN<6000));
  if fneg<0
   'diffrence is less than 0'
      stop

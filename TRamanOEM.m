@@ -1,4 +1,4 @@
-function [X,R,Q,O,S_a,Se,xa,S_b]=TRamanOEM( date_in,time_in,flag)
+function [X,R,Q,O,S_a,Se,xa,S_b,Error]=TRamanOEM( date_in,time_in,flag)
 tic
 [O,Q,R,S_a,Se,xa] = InputsForOEM( date_in,time_in,flag);
 xa = xa';
@@ -187,7 +187,11 @@ DT_JL
                     set(gca,'fontsize',16)
 
                     
-                    
+ S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
+S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5));%DegF for OV            
+
+S_b.CutoffheightT = Q.Zret(round(S_b.degF1));
+S_b.CutoffheightOV = Q.Zret(round(S_b.degF2))                   
                     
 %                     OVresponse = (X.A(m+4:end-5,m+4:end-5))*unit';
                 figure;
@@ -268,6 +272,7 @@ plot(T_cm(Q.Zret<=25000),Q.Zret(Q.Zret<=25000)./1000,'DisplayName','TraditionalC
 
 % [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
 jbfilly(Q.Zret(Q.Zret<=30000)./1000,upper(Q.Zret<=30000)',lower(Q.Zret<=30000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
+
 
 % Create xlabel
 xlabel('Temperature (K)');
@@ -459,11 +464,8 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                      
 
                     
-S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
-S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5))%DegF for OV            
- 
-errors;
-% % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Error = errors(Q,X);  % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %   b parameters and errors
 %                     
 % R1 =bparameterjacobians (Q,X);

@@ -2,7 +2,7 @@
 
 % % % % % Input : US Temperatures
 % % % % % Output : Temperature covariance
-function [S_OV]=OVCov(Zj,OV)
+function [S_OV]=OVCov(Zj,OV,OVCOV_6above)
  Zj = Zj';
 % ind = Zj<15000;
  m = length(OV);
@@ -84,7 +84,7 @@ for i = 1:m
             %          Sa_T(i,j) = Ta(i);
             %         end
          else
-             S_OV(i,i) = 1e-3;
+             S_OV(i,i) = OVCOV_6above; % cloud at 6km use 1e-2
          end
     end
 end

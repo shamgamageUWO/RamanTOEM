@@ -25,46 +25,7 @@ file = 'S0';
  Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
 % 
  folderpath = [datadirS3 filesep  Dateofthefolder filesep  file];
-%  folderpath = [datadirS3 filesep  file];
- 
-% folders = dirFiles(folderpath);
-% lengthfolders = length(folders);
-% 
-%                 if lengthfolders ~= 1
-% 
-%                     if lengthfolders == 0
-%                         sprintf('There are no folders of RALMO data for this date: \n')
-%                         return
-%                     end
-%                     sprintf('There is more than one folder of RALMO data for this date: \n')
-%                     disp(folders)
-% 
-%                     folder = input('Please type in the name of the folder you want, without quotes. \n','s');
-%                     if isempty(folder)
-%                         sprintf('Default is the first one')
-% 
-% 
-%                         folder =(folders{1});
-%                     end
-%                     folderpath = [datadir filesep folder];
-%                 else
-%                     
-%                     folders = folders{1};
-%                     folderpath = [folderpath  filesep folders];
-%                     
-%                 end
-% 
-% files = dirFiles(folderpath);
-% files = sort(files);
-% 
-% scans = length(files);
-% if ~(0 < scans)
-% %     error('NODATA:RawCountsem', ['No RALMO data is available for the date ' num2str(date)]);
-% end
-% 
-% times = zeros(1,scans);
-% shots = zeros(1,scans);
-% bins = zeros(1,scans);
+
 
 
 
@@ -78,14 +39,7 @@ tin =Q.time_in;
 % from 2300 to 2330
 starttime=find(g==tin & Minute==00);
 endtime=find(g==tin & Minute==30);
-% start =  [g(1) Minute(1)];
-% start
 
-%
-% disp('End time')
-% gg = hour(S0.GlobalParameters.End);
-% endtime =  [g(end) Minute(end)];
-% endtime;
 
 % pick the measurements from 11-11.30
 %% Digital Channels
@@ -104,8 +58,7 @@ alt = S0.Channel(4).Range;
 Alte = S0.Channel(2).Range ; % for Eb channel they have a different binzise
 alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 %% Load the analog channel measurements too 
-% figure;
-%   hold on;
+
 
 
 JL = S0.Channel(12).Signal(:,starttime:endtime);%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
@@ -123,54 +76,12 @@ JH_an = JH_an';
 Y.YYa = (std(JL_an)).^2;
 Y.YYYa = (std(JH_an)).^2;
 
-% for i = 1: length(g)
-%     if g(i)== 23 && (00 <= Minute(i)<=30)
-%         JL(:,i) = S0.Channel(12).Signal(:,i); % change these for S0 format
-%         JH(:,i) = S0.Channel(4).Signal(:,i);
-%         JL_an(:,i) = S0.Channel(11).Signal(:,i);
-%         JH_an(:,i) = S0.Channel(3).Signal(:,i);
-%         single_scan_JL_Counts(:,i) = JL(:,i).*1800.*(S0.Channel(12).BinSize./150);
-% %         semilogx(JL(:,i),alt);
-% %         'pause here'
-% %         pause   
-%     end 
-% end
-% hold off
-% single_scan_JL_MHz = S0.Channel(4).Signal(:,20);
-% single_scan_JL_Counts = single_scan_JL_MHz.*1800.*(S0.Channel(12).BinSize./150);
-% 
-% figure;semilogx(single_scan_JL_MHz,alt,'r',single_scan_JL_Counts,alt,'b')
-%   xlabel('Single Scan')
-%   ylabel('Alt (km)')
-%   legend('JL_ MHz','JL_Counts/bin/time')
-% 
-% mean_scan_JL_MHz = nanmean(S0.Channel(4).Signal');
-% mean_scan_JL_Counts = mean_scan_JL_MHz.*1800.*(S0.Channel(12).BinSize./150);
-% 
-% figure;semilogx(mean_scan_JL_MHz,alt,'r',mean_scan_JL_Counts,alt,'b')
-%   xlabel('Mean Scan')
-%   ylabel('Alt (km)')
-%   legend('JL_ MHz','JL_Counts/bin/time')  
-%   
-  
-% 
-% figure;plot(nanmean(S0.Channel(12).Signal'),alt,'b',nanmean(S0.Channel(4).Signal'),alt,'r')
-%   xlabel('Counts(MHz)')
-%   ylabel('Alt (km)')
-%   legend('JL digital','JH digital')
-% %   
-%   figure;plot(nanmean(S0.Channel(11).Signal'),alt,'b',nanmean(S0.Channel(3).Signal'),alt,'r')
-%   xlabel('Counts(MHz)')
-%   ylabel('Alt (km)')
-%   legend('JL ana','JH ana')
+
 
 % MHZ to Counts conversion constant 
 Y.binsize = S0.Channel(12).BinSize;
 F = 1800.* (Y.binsize./150);
 
-% % Apply DS to find true background
-%         JL_dtc = (F.*JL) ./ (1 - JL.*(Q.deadtimeJL.*1e6)); % non-paralyzable
-%         JH_dtc = (F.*JH) ./ (1 - JH.*(Q.deadtimeJH.*1e6));
 
        
 % Coadd in time
@@ -251,9 +162,7 @@ title( Dateofthefolder);
 % Save in a new mat file
 bkg_ind1 = alt>50e3;% & alt<60e3;
 bkg_ind2 = Alt>50e3;
-% bkg_ind3 = Alt>8e3 & Alt<12e3;
-% [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
-% [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
+
 
 % BAckground
 
@@ -290,8 +199,7 @@ bkg_JLan = JL_an(bkg_ind2);
 bkg_JHan = JH_an(bkg_ind2);
 bkg_Eban = Eb_an(bkg_ind2);
 
-% JLnew = JL-bkg_JL;
-% JHnew = JH-bkg_JH;
+
 
 
 %% Digital

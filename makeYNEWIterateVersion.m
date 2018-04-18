@@ -1,7 +1,7 @@
 % this is to read S0.mat files and pick the measurements from 11-11.30pm
 % Save the JL,JH,Eb and alt in seperate structure 
 
-function [Y] = makeYNEW(Q)
+function [Y] = makeYNEWIterateVersion(Q)
 
 
 
@@ -45,8 +45,8 @@ g = hour(S0.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
 Minute = minute(S0.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
 tin =Q.time_in;
 % from 2300 to 2330
-starttime=find(g==tin & Minute==00);
-endtime=find(g==tin & Minute==30);
+starttime=find(g==tin); %% somedays it skips 2mints
+endtime=find(g==tin+1);
 
 % pick the measurements from 11-11.30
 %% Digital Channels
@@ -176,12 +176,30 @@ Eb_an = nansum(Eb_an');
 alt = JHzc;
 Alt = JHazc;
 
+% stdJHa = interp1(alt_an,stdJHaa,JHazc,'spline');
+% stdJLa = interp1(alt_an,stdJLaa,JHazc,'spline');
+% 
+% % Signal to noise
+% JL_P = ((stdJLa./JL_an)).*100;
+% JH_P = ((stdJHa./JH_an)).*100;
+% figure;plot(JL_P,JLazc./1000,'r',JH_P,JLazc./1000,'b')
 
+
+%   figure;
+%   semilogx(JL,alt./1000,'b',JH,alt./1000,'r',Eb,Ebzc./1000,'g',JL_an,Alt./1000,'y',JH_an,Alt./1000,'black') 
+%   xlabel('30min Coadded signal') 
+%   xlabel('30min Coadded signal')
+%   ylabel('Altitude (km)')
+%   legend('JL - Digital','JH - Digital','Eb - Digital','JL - Analog','JH - Analog')
+% title( Dateofthefolder);
+%   set(gca,'fontsize',20)
   
 % Save in a new mat file
 bkg_ind1 = alt>50e3;% & alt<60e3;
 bkg_ind2 = Alt>50e3;
-
+% bkg_ind3 = Alt>8e3 & Alt<12e3;
+% [JLwithoutBG,bkg_JL] = CorrBkg(JL, sum(bkg_ind), 0, 1);
+% [JHwithoutBG,bkg_JH]  = CorrBkg(JH, sum(bkg_ind), 0, 1);
 
 % BAckground
 

@@ -25,48 +25,6 @@ file = 'S0';
  Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
 % 
  folderpath = [datadirS3 filesep  Dateofthefolder filesep  file];
-%  folderpath = [datadirS3 filesep  file];
- 
-% folders = dirFiles(folderpath);
-% lengthfolders = length(folders);
-% 
-%                 if lengthfolders ~= 1
-% 
-%                     if lengthfolders == 0
-%                         sprintf('There are no folders of RALMO data for this date: \n')
-%                         return
-%                     end
-%                     sprintf('There is more than one folder of RALMO data for this date: \n')
-%                     disp(folders)
-% 
-%                     folder = input('Please type in the name of the folder you want, without quotes. \n','s');
-%                     if isempty(folder)
-%                         sprintf('Default is the first one')
-% 
-% 
-%                         folder =(folders{1});
-%                     end
-%                     folderpath = [datadir filesep folder];
-%                 else
-%                     
-%                     folders = folders{1};
-%                     folderpath = [folderpath  filesep folders];
-%                     
-%                 end
-% 
-% files = dirFiles(folderpath);
-% files = sort(files);
-% 
-% scans = length(files);
-% if ~(0 < scans)
-% %     error('NODATA:RawCountsem', ['No RALMO data is available for the date ' num2str(date)]);
-% end
-% 
-% times = zeros(1,scans);
-% shots = zeros(1,scans);
-% bins = zeros(1,scans);
-
-
 
 load(folderpath);
 
@@ -102,15 +60,13 @@ alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 Y.binsize = S0.Channel(12).BinSize;
 F = 1800.* (Y.binsize./150);
 
-JL = F.*S0.Channel(12).Signal; % single scans
-JH = F.*S0.Channel(4).Signal;
-Eb = F.*S0.Channel(10).Signal; % single scans
 
 
 
-JL = S0.Channel(12).Signal(:,starttime:endtime);%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
-JH = S0.Channel(4).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
-Eb= S0.Channel(10).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
+
+JL = F.*F.*S0.Channel(12).Signal(:,starttime:endtime);%20121212(:,1310:1340);20120717(:,1347:1377);%20110909(:,961:990);
+JH = F.*S0.Channel(4).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
+Eb= F.*S0.Channel(10).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961:990);
 
 
 
@@ -135,12 +91,40 @@ Y.alt = alt(1:N-zAoffset);
 Y.alt_an = alt_an(1+zAoffset:end);
 
 for i = 1:length(Y.alt_an)
-[Y.ACFJL(:,i),Y.LagsJL] = autocorr(Y.JL_an(:,i));
-[Y.ACFJH(:,i),Y.LagsJH] = autocorr(Y.JH_an(:,i));
-[Y.ACFJLd(i,:),Y.LagsJLd] = autocorr(Y.JL(i,:));
-[Y.ACFJHd(i,:),Y.LagsJHd] = autocorr(Y.JH(i,:));
+[Y.ACFJL(:,i),Y.LagsJL] = autocorr(Y.JL_an(:,i),29);
+[Y.ACFJH(:,i),Y.LagsJH] = autocorr(Y.JH_an(:,i),29);
+[Y.ACFJLd(i,:),Y.LagsJLd] = autocorr(Y.JL(i,:),29);
+[Y.ACFJHd(i,:),Y.LagsJHd] = autocorr(Y.JH(i,:),29);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% vaJL_12km = nansum(Y.JL(3200,:)')
+
+% Find variance at each height
+
+for i =1:length(Y.alt_an)
+    Variance(i) = var(Y.JL_an(:,i));
+end
+
+    
+
+
+Y.varJL = nansum(Y.JL');
+
+Y.ACFJL_12km = Y.ACFJL(:,3200);
+Y.varACF = 1./Y.ACFJL_12km;
+disp('Digital Variance at 12km_Measurements ')
+Y.varJL(3200)
+
+disp('Digital Variance at 12km_ACF')
+Y.varACF(1)
+
+figure;
+subplot(1,2,1)
+plot(Y.LagsJL,Y.ACFJL_12km)
+subplot(1,2,2)
+plot(Y.LagsJL,1./Y.ACFJL_12km)
+
+
 
 figure;
 subplot(2,2,1)
@@ -184,9 +168,10 @@ Y.bajh = nanmean(Y.ACFJH(:,1:1590)');
 Y.bdjh = nanmean(Y.ACFJH(:,1600,:)');
 
 figure;subplot(1,2,1)
-plot(Y.LagsJHd,Y.bajl,Y.LagsJHd,Y.bdjl,Y.LagsJHd,Y.bajh,Y.LagsJHd,Y.bdjh)
+plot(Y.LagsJHd,Y.bajl,Y.LagsJHd,Y.bdjl)
 legend('analog jl','digital jl')
-
+subplot(1,2,2)
+plot(Y.LagsJHd,Y.bajh,Y.LagsJHd,Y.bdjh)
 legend('analog jh','digital jh')
 
 %%

@@ -1,6 +1,6 @@
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   b parameters and errors
-function Error = errors (Q,X)              
+function Error = errorsIT (Q,X)              
 R1 =bparameterjacobians (Q,X);
 n1 = Q.n1;
 n2 = Q.n2;
@@ -85,21 +85,21 @@ Error.Air_ErrorT =sqrt(Air(1:m));
 Error.Aero_ErrorT =sqrt(Aero(1:m));
 Error.Total_ErrorT =total_err_T;
 
-% Errors for Temperature
-figure;
-semilogx(X.eo(1:m),Q.Zret./1000,'r')
-hold on;
-semilogx(sqrt(P(1:m)),Q.Zret./1000,'--*')
-semilogx(sqrt(Rc(1:m)),Q.Zret./1000,'--^')
-semilogx(sqrt(Ra(1:m)),Q.Zret./1000,'--+')
-semilogx(sqrt(Air(1:m)),Q.Zret./1000,'--o')
-semilogx(sqrt(Aero(1:m)),Q.Zret./1000,'--s')
-semilogx(total_err_T,Q.Zret/1000,'black')
-xlabel('Temperature Uncertainty (K)')
-ylabel('Altitude (km)')
-legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Aerosol Extinction','Total Error')
- title( Q.Dateofthefolder);
-  set(gca,'fontsize',16)
+% % Errors for Temperature
+% figure;
+% semilogx(X.eo(1:m),Q.Zret./1000,'r')
+% hold on;
+% semilogx(sqrt(P(1:m)),Q.Zret./1000,'--*')
+% semilogx(sqrt(Rc(1:m)),Q.Zret./1000,'--^')
+% semilogx(sqrt(Ra(1:m)),Q.Zret./1000,'--+')
+% semilogx(sqrt(Air(1:m)),Q.Zret./1000,'--o')
+% semilogx(sqrt(Aero(1:m)),Q.Zret./1000,'--s')
+% semilogx(total_err_T,Q.Zret/1000,'black')
+% xlabel('Temperature Uncertainty (K)')
+% ylabel('Altitude (km)')
+% legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Aerosol Extinction','Total Error')
+%  title( Q.Dateofthefolder);
+%   set(gca,'fontsize',16)
 
 
 % Errors for Overlap
@@ -113,17 +113,17 @@ Error.Air_ErrorOV =sqrt(Air(m+4:end-5)).*1e2;
 Error.Aero_ErrorOV =sqrt(Aero(m+4:end-5)).*1e2;
 Error.Total_ErrorOV =total_err_OV.*1e2;
 
-figure;
-plot(X.eo(m+4:end-5).*1e2,Q.Zret./1000,'r')
-hold on;
- plot(sqrt(P(m+4:end-5)).*1e2,Q.Zret./1000,'--*')
-plot(sqrt(Rc(m+4:end-5)).*1e2,Q.Zret./1000,'--^')
-plot(sqrt(Ra(m+4:end-5)).*1e2,Q.Zret./1000,'--+')
-plot(sqrt(Air(m+4:end-5)).*1e2,Q.Zret./1000,'--o')
-plot(sqrt(Aero(m+4:end-5)).*1e2,Q.Zret./1000,'--s')
-plot(total_err_OV.*1e2,Q.Zret/1000,'black')
-xlabel('Overlap Uncertainty (%)')
-ylabel('Altitude (km)')
-legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Aerosol Extinction','Total Error')
-title( Q.Dateofthefolder);
-set(gca,'fontsize',16)
+% figure;
+% plot(X.eo(m+4:end-5).*1e2,Q.Zret./1000,'r')
+% hold on;
+%  plot(sqrt(P(m+4:end-5)).*1e2,Q.Zret./1000,'--*')
+% plot(sqrt(Rc(m+4:end-5)).*1e2,Q.Zret./1000,'--^')
+% plot(sqrt(Ra(m+4:end-5)).*1e2,Q.Zret./1000,'--+')
+% plot(sqrt(Air(m+4:end-5)).*1e2,Q.Zret./1000,'--o')
+% plot(sqrt(Aero(m+4:end-5)).*1e2,Q.Zret./1000,'--s')
+% plot(total_err_OV.*1e2,Q.Zret/1000,'black')
+% xlabel('Overlap Uncertainty (%)')
+% ylabel('Altitude (km)')
+% legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Aerosol Extinction','Total Error')
+% title( Q.Dateofthefolder);
+% set(gca,'fontsize',16)

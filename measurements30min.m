@@ -25,48 +25,6 @@ file = 'S0';
  Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
 % 
  folderpath = [datadirS3 filesep  Dateofthefolder filesep  file];
-%  folderpath = [datadirS3 filesep  file];
- 
-% folders = dirFiles(folderpath);
-% lengthfolders = length(folders);
-% 
-%                 if lengthfolders ~= 1
-% 
-%                     if lengthfolders == 0
-%                         sprintf('There are no folders of RALMO data for this date: \n')
-%                         return
-%                     end
-%                     sprintf('There is more than one folder of RALMO data for this date: \n')
-%                     disp(folders)
-% 
-%                     folder = input('Please type in the name of the folder you want, without quotes. \n','s');
-%                     if isempty(folder)
-%                         sprintf('Default is the first one')
-% 
-% 
-%                         folder =(folders{1});
-%                     end
-%                     folderpath = [datadir filesep folder];
-%                 else
-%                     
-%                     folders = folders{1};
-%                     folderpath = [folderpath  filesep folders];
-%                     
-%                 end
-% 
-% files = dirFiles(folderpath);
-% files = sort(files);
-% 
-% scans = length(files);
-% if ~(0 < scans)
-% %     error('NODATA:RawCountsem', ['No RALMO data is available for the date ' num2str(date)]);
-% end
-% 
-% times = zeros(1,scans);
-% shots = zeros(1,scans);
-% bins = zeros(1,scans);
-
-
 
 load(folderpath);
 
@@ -102,9 +60,7 @@ alt_an = S0.Channel(11).Range ; % Note alt = alt_an
 Y.binsize = S0.Channel(12).BinSize;
 F = 1800.* (Y.binsize./150);
 
-% JL = F.*S0.Channel(12).Signal; % single scans
-% JH = F.*S0.Channel(4).Signal;
-% Eb = F.*S0.Channel(10).Signal; % single scans
+
 
 
 
@@ -143,28 +99,26 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % vaJL_12km = nansum(Y.JL(3200,:)')
 
-Y.varJL = nansum(Y.JL');
-% Y.normVarJL = Y.varJL/norm(Y.varJL);
-% Y.Norm_vaJL_12km = Y.normVarJL(3200) 
-Y.ACFJL_12km = Y.ACFJL(:,3200);
-Y.varACF = 1./Y.ACFJL_12km;
-disp('Digital Variance at 12km_Measurements ')
-Y.varJL(3200)
+% Find variance at each height
 
-disp('Digital Variance at 12km_ACF')
-Y.varACF(1)
+for i =1:length(Y.alt_an)
+    Variance_JLa(i) = var(Y.JL_an(:,i));
+    Variance_JHa(i) = var(Y.JH_an(:,i));
 
-figure;
-subplot(1,2,1)
-plot(Y.LagsJL,Y.ACFJL_12km)
-subplot(1,2,2)
-plot(Y.LagsJL,1./Y.ACFJL_12km)
+end
 
 
+% Covariance 
+
+ for i =1:length(Y.alt_an)
+    CovVariance_JLa(:,i) =   Y.ACFJL(:,i).*Variance_JLa(i);
+    CovVariance_JHa(:,i) =   Y.ACFJH(:,i).*Variance_JHa(i);
+
+ end   
 
 figure;
 subplot(2,2,1)
-plot(Y.LagsJL,Y.ACFJL(:,257),Y.LagsJL,Y.ACFJL(:,524),Y.LagsJL,Y.ACFJL(:,790),Y.LagsJL,Y.ACFJL(:,1057),Y.LagsJL,Y.ACFJL(:,1324),Y.LagsJL,Y.ACFJL(:,1590))
+plot(Y.LagsJL,CovVariance_JLa(:,257),Y.LagsJL,CovVariance_JLa(:,524),Y.LagsJL,CovVariance_JLa(:,790),Y.LagsJL,CovVariance_JLa(:,1057),Y.LagsJL,CovVariance_JLa(:,1324),Y.LagsJL,CovVariance_JLa(:,1590))
 xlabel('Lag')
 ylabel('ACF _ JL _ analog')
 legend('1km','2km','3km','4km','5km','6km')
@@ -173,42 +127,88 @@ set(gca,'fontsize',16)
 
 
 subplot(2,2,2)
-plot(Y.LagsJH,Y.ACFJH(:,257),Y.LagsJH,Y.ACFJH(:,524),Y.LagsJH,Y.ACFJH(:,790),Y.LagsJH,Y.ACFJH(:,1057),Y.LagsJH,Y.ACFJH(:,1324),Y.LagsJH,Y.ACFJH(:,1590))
+plot(Y.LagsJH, CovVariance_JHa(:,257),Y.LagsJH, CovVariance_JHa(:,524),Y.LagsJH, CovVariance_JHa(:,790),Y.LagsJH, CovVariance_JHa(:,1057),Y.LagsJH, CovVariance_JHa(:,1324),Y.LagsJH, CovVariance_JHa(:,1590))
 xlabel('Lag')
 ylabel('ACF _ JH _ analog')
 legend('1km','2km','3km','4km','5km','6km')
 title( Dateofthefolder);
 set(gca,'fontsize',16)
 
-
 subplot(2,2,3)
-plot(Y.LagsJLd,Y.ACFJLd(267,:),Y.LagsJLd,Y.ACFJLd(534,:),Y.LagsJLd,Y.ACFJLd(800,:),Y.LagsJLd,Y.ACFJLd(1067,:),Y.LagsJLd,Y.ACFJLd(1334,:),Y.LagsJLd,Y.ACFJLd(1600,:))
-xlabel('Lag')
-ylabel('ACF _ JL _ digital')
-legend('1km','2km','3km','4km','5km','6km')
-title( Dateofthefolder);
-set(gca,'fontsize',16)
-
+semilogx((CovVariance_JLa(1,:))./30,Y.alt_an./1000)
+xlabel('Cov JL analog')
+ylabel('alt ')
 
 subplot(2,2,4)
-plot(Y.LagsJHd,Y.ACFJHd(267,:),Y.LagsJHd,Y.ACFJHd(534,:),Y.LagsJHd,Y.ACFJHd(800,:),Y.LagsJHd,Y.ACFJHd(1067,:),Y.LagsJHd,Y.ACFJHd(1334,:),Y.LagsJHd,Y.ACFJHd(1600,:))
-xlabel('Lag')
-ylabel('ACF _ JH_ digital')
-legend('1km','2km','3km','4km','5km','6km')
-title( Dateofthefolder);
-set(gca,'fontsize',16)
+semilogx((CovVariance_JHa(1,:))./30,Y.alt_an./1000) 
+ xlabel('Cov JH analog')
+ylabel('alt')
+ %%
+% Y.varJL = nansum(Y.JL');
+% 
+% Y.ACFJL_12km = Y.ACFJL(:,3200);
+% Y.varACF = 1./Y.ACFJL_12km;
+% disp('Digital Variance at 12km_Measurements ')
+% Y.varJL(3200)
+% 
+% disp('Digital Variance at 12km_ACF')
+% Y.varACF(1)
 
-Y.bajl = nanmean(Y.ACFJL(:,1:1590)');
-Y.bdjl = nanmean(Y.ACFJL(:,1600,:)');
-Y.bajh = nanmean(Y.ACFJH(:,1:1590)');
-Y.bdjh = nanmean(Y.ACFJH(:,1600,:)');
+% figure;
+% subplot(1,2,1)
+% plot(Y.LagsJL,Y.ACFJL_12km)
+% subplot(1,2,2)
+% plot(Y.LagsJL,1./Y.ACFJL_12km)
 
-figure;subplot(1,2,1)
-plot(Y.LagsJHd,Y.bajl,Y.LagsJHd,Y.bdjl)
-legend('analog jl','digital jl')
-subplot(1,2,2)
-plot(Y.LagsJHd,Y.bajh,Y.LagsJHd,Y.bdjh)
-legend('analog jh','digital jh')
+
+
+% figure;
+% subplot(2,2,1)
+% plot(Y.LagsJL,Y.ACFJL(:,257),Y.LagsJL,Y.ACFJL(:,524),Y.LagsJL,Y.ACFJL(:,790),Y.LagsJL,Y.ACFJL(:,1057),Y.LagsJL,Y.ACFJL(:,1324),Y.LagsJL,Y.ACFJL(:,1590))
+% xlabel('Lag')
+% ylabel('ACF _ JL _ analog')
+% legend('1km','2km','3km','4km','5km','6km')
+% title( Dateofthefolder);
+% set(gca,'fontsize',16)
+% 
+% 
+% subplot(2,2,2)
+% plot(Y.LagsJH,Y.ACFJH(:,257),Y.LagsJH,Y.ACFJH(:,524),Y.LagsJH,Y.ACFJH(:,790),Y.LagsJH,Y.ACFJH(:,1057),Y.LagsJH,Y.ACFJH(:,1324),Y.LagsJH,Y.ACFJH(:,1590))
+% xlabel('Lag')
+% ylabel('ACF _ JH _ analog')
+% legend('1km','2km','3km','4km','5km','6km')
+% title( Dateofthefolder);
+% set(gca,'fontsize',16)
+
+
+% subplot(2,2,3)
+% plot(Y.LagsJLd,Y.ACFJLd(267,:),Y.LagsJLd,Y.ACFJLd(534,:),Y.LagsJLd,Y.ACFJLd(800,:),Y.LagsJLd,Y.ACFJLd(1067,:),Y.LagsJLd,Y.ACFJLd(1334,:),Y.LagsJLd,Y.ACFJLd(1600,:))
+% xlabel('Lag')
+% ylabel('ACF _ JL _ digital')
+% legend('1km','2km','3km','4km','5km','6km')
+% title( Dateofthefolder);
+% set(gca,'fontsize',16)
+% 
+% 
+% subplot(2,2,4)
+% plot(Y.LagsJHd,Y.ACFJHd(267,:),Y.LagsJHd,Y.ACFJHd(534,:),Y.LagsJHd,Y.ACFJHd(800,:),Y.LagsJHd,Y.ACFJHd(1067,:),Y.LagsJHd,Y.ACFJHd(1334,:),Y.LagsJHd,Y.ACFJHd(1600,:))
+% xlabel('Lag')
+% ylabel('ACF _ JH_ digital')
+% legend('1km','2km','3km','4km','5km','6km')
+% title( Dateofthefolder);
+% set(gca,'fontsize',16)
+% 
+% Y.bajl = nanmean(Y.ACFJL(:,1:1590)');
+% Y.bdjl = nanmean(Y.ACFJL(:,1600,:)');
+% Y.bajh = nanmean(Y.ACFJH(:,1:1590)');
+% Y.bdjh = nanmean(Y.ACFJH(:,1600,:)');
+% 
+% figure;subplot(1,2,1)
+% plot(Y.LagsJHd,Y.bajl,Y.LagsJHd,Y.bdjl)
+% legend('analog jl','digital jl')
+% subplot(1,2,2)
+% plot(Y.LagsJHd,Y.bajh,Y.LagsJHd,Y.bdjh)
+% legend('analog jh','digital jh')
 
 %%
 % Y.YYa = (std(JL_an)).^2;

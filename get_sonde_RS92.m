@@ -19,14 +19,15 @@ yr = num2str(year);
 % is 00 then previous midnight
 
 tin = time;
-if tin>5 && tin<17
+if tin>5 && tin<=17
 time= 12;
 elseif tin == 0
    
     time = 0;
 else
 time =0;
- day = day+1;
+ day = day+1; % If date is 20110910 starttime 00 - 05 am then sonde
+%  should be 20110910 00
 end
 
 
