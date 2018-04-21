@@ -55,7 +55,8 @@ Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
                     Sair = [Sair1 ;Sair1 ;Sair2 ;Sair2];
                     S_air = diag(Sair);
 %                     % % aerosol
-                    Saero1 = (dfacaero.*Q.alpha_aero(n3+1:end)').^2;
+
+                    Saero1 = (dfacaero.*Q.alpha_aero(end-n1+1:end)').^2;
                     Saero2 = (dfacaero.*Q.alpha_aero(1:n3)').^2;
                     Saero = [Saero1 Saero1 Saero2 Saero2];
                     S_aero = diag(Saero);

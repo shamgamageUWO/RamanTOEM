@@ -72,7 +72,7 @@ lambda_em = 354.7;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% These lines are from BOB - WV - makeQ.m
 
-asrDATA = interp1(asr.z,asr.profile,zN,'linear');
+asrDATA = interp1(asr.z,asr.profile,zN,'spline');
 % plot(asrDATA,zN./1000,'black');
 
 flow = find(zN < asr.z(1));

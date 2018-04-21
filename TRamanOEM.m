@@ -190,8 +190,8 @@ DT_JL
  S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
 S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5));%DegF for OV            
 
-S_b.CutoffheightT = Q.Zret(round(S_b.degF1));
-S_b.CutoffheightOV = Q.Zret(round(S_b.degF2))                   
+% S_b.CutoffheightT = Q.Zret(response==0.9)
+% S_b.CutoffheightOV = Q.Zret(round(S_b.degF2))                   
                     
 %                     OVresponse = (X.A(m+4:end-5,m+4:end-5))*unit';
                 figure;

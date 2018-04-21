@@ -53,28 +53,32 @@ disp('All the constants are ready')
 
 % Inputs
 alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
-alt_df = 32000; % Digital Channel ending altitude
+alt_df = 30000; % Digital Channel ending altitude
 alt_a0 = 50;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 4; % Bin size for piecewise cov for digital 20110705 2011080223 8
-b2 = 4; % Bin size for piecewise cov for analog 20110705  2011080223 24
+% Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 3; % retrieval bin size
 c2 = 2.*c1;
 c3 = 2.*c2;
+c4 = 2.*c3;
 
 % For asr
-Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50
+Q.LRfree = 22; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
 Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRtranHeight = 3000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
-Q.ASRcutoffheight = 5000; % 20110909 1400
-
+Q.ASRcutoffheight = 12000; % 20110909 1400 20110802 day 11km
+Q.asrsmoothing = 50; % 100 for 20110802 day, 
+Q.OVCOV_6above = 1e-3; % 1e-4 for clear 1e-2/3 for cloud relax this 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load raw measurements
- [Y] = makeY(Q);
-% [Y] = makeYNEW(Q);
+%    [Y] = makeY(Q);
+%    [Y] = makeYNEW(Q);
+[Y] = makeYNEWer(Q);
+% [Y] = makeYNEWCov(Q);
 Q.Dateofthefolder = Y.Dateofthefolder;
 
 % Digital measurements 2km above
@@ -109,13 +113,14 @@ Q.Eba = Eba(ANalt>=alt_a0 & ANalt <= alt_af);
 Q.Eba(Q.Eba <=0)= rand();
 Q.JHnewa= JHnewa(ANalt>=alt_a0 & ANalt <=alt_af);
 Q.JLnewa= JLnewa(ANalt>=alt_a0 & ANalt <=alt_af);
-Q.JLanalogstd = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
-Q.JHanalogstd = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+% Q.JLanalogstd = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+% Q.JHanalogstd = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
 Q.ANalt = ANalt(ANalt>=alt_a0);
 Q.Zmes1 = ANalt(ANalt>=alt_a0 & ANalt <= alt_af);
 Q.Zmes1 = Q.Zmes1';
 
- Q.Zmes = [Q.Zmes1 Q.Zmes2]; %% Fix this here ..one range should fix the asr
+ Q.Zmes = ANalt(ANalt>=alt_a0 & ANalt <= alt_df);
+%  Q.Zmes = [Q.Zmes1 Q.Zmes2]; %% Fix this here ..one range should fix the asr
 
 % Backgrounds
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -135,8 +140,9 @@ Q.n4=length(Q.JLnewa);
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:6000;
 Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
-Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:40000;
-Q.Zret =[Z1 Z2 Z3];
+Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
+Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:40000;
+Q.Zret =[Z1 Z2 Z3 Z4];
 disp('Defined grids ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -167,22 +173,6 @@ Ta = temp; % for now im adding 2K to test
  Q.Ta = (Ta./Ta(1)).* Q.Tsonde2(1);
 Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
 
-            %% Normalize Ta wrt Sondeground temperature
-%             % Q.Ta = (Ta./Ta(1)).* Q.Tsonde2(1);
-%                 lnpress = log(press);
-%                 Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-%                 Pressi =interp1(Q.Zret,lnpress,Q.Zmes,'linear'); %% I am trying to make this looks like psonde
-%                 Pressi = exp(Pressi);
-%                 %%
-%                 Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
-%                 obj2 = Gravity(Q.Zmes, 46.82);
-%                 Q.grav = obj2.accel;
-%                 Q.z0 = 50000;
-%                 [Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Pressi,0,Q.grav',Q.MoR);
-%                 Q.Pressi = Pdigi ;
-%                 Q.P0 = p0A; % po pressure
-
-
 disp('a priori temperature profile is loaded ')
 
 
@@ -193,6 +183,9 @@ Q.alpha_aero = alphaAer;
 Q.odaer = odaer;
 % total transmission air + aerosol 
 Q.Tr = Total_Transmission(Q);
+figure;semilogx(Q.alpha_aero,Q.Zmes./1000)
+xlabel('Aerosol Extinction (m^-^1)')
+ylabel('Altitude (km')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
 [R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
@@ -238,7 +231,7 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                                         Q.OVa = OVnw;
                                         %  Q.OVa = ones(1,length(Q.Ta));
                                         Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.OVCOV_6above);
                                         disp('Daytime retrieval')
                                         else 
                                         Q.CovBJL = ((Y.bg_JL_std/sqrt(Y.bg_length2))).^2;
@@ -252,7 +245,7 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                                         OVnw(isnan(OVnw))=1;
                                         Q.OVa = OVnw;
                                         Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.OVCOV_6above);
 
                                         disp('Nighttime retrieval')
                                         end 
@@ -286,15 +279,15 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
- [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,b2);
- [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,b2);
-
-            ar1 = ones(1,go1-1).* JHav(1);
-            ar2 = ones(1,go1-1).* JHav(end);
-            ar3 = ones(1,go2-1).* JLav(1);
-            ar4 = ones(1,go2-1).* JLav(end);
-            Q.JHav = [ar1 JHav ar2];
-            Q.JLav = [ar3 JLav ar4];
+%  [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,b2);
+%  [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,b2);
+% 
+%             ar1 = ones(1,go1-1).* JHav(1);
+%             ar2 = ones(1,go1-1).* JHav(end);
+%             ar3 = ones(1,go2-1).* JLav(1);
+%             ar4 = ones(1,go2-1).* JLav(end);
+%             Q.JHav = [ar1 JHav ar2];
+%             Q.JLav = [ar3 JLav ar4];
             
 
 %             
@@ -358,16 +351,20 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 %  Q.YYYa = slope.*Q.JHav;
 %   Q.YYa  =slope.*Q.JLav;
 
-load('Variance20110909.mat');
-% jlav= interp1(K.alt,K.VaJLSingle,Q.Zmes1,'linear');
-% jhav= interp1(K.alt,K.VaJHSingle,Q.Zmes1,'linear');
-jlavv= interp1(K.alt,K.L,Q.Zmes1,'linear');
-jhavv= interp1(K.alt,K.H,Q.Zmes1,'linear');
+% load('Variance20110909.mat');
+% % jlav= interp1(K.alt,K.VaJLSingle,Q.Zmes1,'linear');
+% % jhav= interp1(K.alt,K.VaJHSingle,Q.Zmes1,'linear');
+% jlavv= interp1(K.alt,K.L,Q.Zmes1,'linear');
+% jhavv= interp1(K.alt,K.H,Q.Zmes1,'linear');
 
-Q.YYYa =jlavv-;
-Q.YYa = jhavv;
 
- Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
+ 
+                Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYa =Q.YYa';
+                Q.YYYa =Q.YYYa';
+
+Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 Q.yvar = diag(Q.Yvar);
                 
                 

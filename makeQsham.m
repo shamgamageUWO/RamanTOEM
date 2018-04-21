@@ -56,29 +56,29 @@ alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
 alt_df = 30000; % Digital Channel ending altitude
 alt_a0 = 50;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
-b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
-Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
+b1 = 4; % Bin size for piecewise cov for digital 20110705 2011080223 8
+% Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 3; % retrieval bin size
 c2 = 2.*c1;
 c3 = 2.*c2;
 c4 = 2.*c3;
 
 % For asr
-Q.LRfree = 50; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
+Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
 Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRtranHeight = 3000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
-Q.ASRcutoffheight = 1400; % 20110909 1400 20110802 day 11km
-Q.asrsmoothing = 100; % 100 for 20110802 day, 
-Q.OVCOV_6above = 1e-4; % 1e-4 for clear 1e-2/3 for cloud relax this 
+Q.ASRcutoffheight = 12000; % 20110909 1400 20110802 day 11km
+Q.asrsmoothing = 50; % 100 for 20110802 day, 
+Q.OVCOV_6above = 1e-3; % 1e-4 for clear 1e-2/3 for cloud relax this 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load raw measurements
 %    [Y] = makeY(Q);
-%   [Y] = makeYNEW(Q);
-
-[Y] = makeYNEWCov(Q);
+%    [Y] = makeYNEW(Q);
+[Y] = makeYNEWer(Q);
+% [Y] = makeYNEWCov(Q);
 Q.Dateofthefolder = Y.Dateofthefolder;
 
 % Digital measurements 2km above
@@ -119,7 +119,9 @@ Q.ANalt = ANalt(ANalt>=alt_a0);
 Q.Zmes1 = ANalt(ANalt>=alt_a0 & ANalt <= alt_af);
 Q.Zmes1 = Q.Zmes1';
 
- Q.Zmes = [Q.Zmes1 Q.Zmes2]; %% Fix this here ..one range should fix the asr
+ Zmes = ANalt(ANalt>=alt_a0 & ANalt <= alt_df);
+ Q.Zmes = Zmes';
+%  Q.Zmes = [Q.Zmes1 Q.Zmes2]; %% Fix this here ..one range should fix the asr
 
 % Backgrounds
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later

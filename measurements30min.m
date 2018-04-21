@@ -1,9 +1,8 @@
 % this is to read S0.mat files and pick the measurements from 11-11.30pm
 % Save the JL,JH,Eb and alt in seperate structure 
 
-function [Y] = measurements30min(date)
-
-
+function [Y] = measurements30min
+date = 20110909;
 
 
 %  date = Q.date_in;
@@ -90,11 +89,16 @@ Y.Eb_an = Eb_an(:,1+zAoffset:end);
 Y.alt = alt(1:N-zAoffset);
 Y.alt_an = alt_an(1+zAoffset:end);
 
+
+Y.JL_an = Y.JL_an(:,Y.alt_an<=8000);
+Y.JH_an = Y.JH_an(:,Y.alt_an<=8000);
+Y.alt_an = Y.alt_an(Y.alt_an<=8000);
+
 for i = 1:length(Y.alt_an)
-[Y.ACFJL(:,i),Y.LagsJL] = autocorr(Y.JL_an(:,i),29);
-[Y.ACFJH(:,i),Y.LagsJH] = autocorr(Y.JH_an(:,i),29);
-[Y.ACFJLd(i,:),Y.LagsJLd] = autocorr(Y.JL(i,:),29);
-[Y.ACFJHd(i,:),Y.LagsJHd] = autocorr(Y.JH(i,:),29);
+[Y.ACFJL(:,i),Y.LagsJL] = autocorr(Y.JL_an(:,i),10);
+[Y.ACFJH(:,i),Y.LagsJH] = autocorr(Y.JH_an(:,i),10);
+% [Y.ACFJLd(i,:),Y.LagsJLd] = autocorr(Y.JL(i,:),29);
+% [Y.ACFJHd(i,:),Y.LagsJHd] = autocorr(Y.JH(i,:),29);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % vaJL_12km = nansum(Y.JL(3200,:)')
@@ -111,38 +115,123 @@ end
 % Covariance 
 
  for i =1:length(Y.alt_an)
-    CovVariance_JLa(:,i) =   Y.ACFJL(:,i).*Variance_JLa(i);
-    CovVariance_JHa(:,i) =   Y.ACFJH(:,i).*Variance_JHa(i);
+    Y.CovVariance_JLa(:,i) =   Y.ACFJL(:,i).*var(Y.JL_an(:,i));
+    Y.CovVariance_JHa(:,i) =   Y.ACFJH(:,i).*var(Y.JH_an(:,i));
 
  end   
 
+% figure;
+% subplot(2,2,1)
+% plot(Y.LagsJL,Y.CovVariance_JLa(:,257),Y.LagsJL,Y.CovVariance_JLa(:,524),Y.LagsJL,Y.CovVariance_JLa(:,790),Y.LagsJL,Y.CovVariance_JLa(:,1057),Y.LagsJL,Y.CovVariance_JLa(:,1324),Y.LagsJL,Y.CovVariance_JLa(:,1590))
+% xlabel('Lag')
+% ylabel('COV JL _ analog')
+% legend('1km','2km','3km','4km','5km','6km')
+% title( Dateofthefolder);
+% set(gca,'fontsize',16)
+% 
+% 
+% subplot(2,2,2)
+% plot(Y.LagsJH, Y.CovVariance_JHa(:,257),Y.LagsJH, Y.CovVariance_JHa(:,524),Y.LagsJH, Y.CovVariance_JHa(:,790),Y.LagsJH, Y.CovVariance_JHa(:,1057),Y.LagsJH, Y.CovVariance_JHa(:,1324),Y.LagsJH, Y.CovVariance_JHa(:,1590))
+% xlabel('Lag')
+% ylabel('COV _ JH _ analog')
+% legend('1km','2km','3km','4km','5km','6km')
+% title( Dateofthefolder);
+% set(gca,'fontsize',16)
+
+% subplot(2,2,3)
+% semilogx((Y.CovVariance_JLa(1,:))./30,Y.alt_an./1000)
+% xlabel('Cov JL analog')
+% ylabel('alt ')
+% 
+% subplot(2,2,4)
+% semilogx((Y.CovVariance_JHa(1,:))./30,Y.alt_an./1000) 
+%  xlabel('Cov JH analog')
+% ylabel('alt')
+
+
+
+%%
+
+
+for i = 1:30
+    [varL(i,:),g] = bobpoissontest(Y.JL_an(i,:),Y.alt_an',3);
+    [varH(i,:),g] = bobpoissontest(Y.JH_an(i,:),Y.alt_an',3);
+end
+
+
+Ya = nansum(varL);
+YYa = nansum(varH);
+r111 = ones(1,g-1).* YYa(1);
+r211 = ones(1,g-1).* YYa(end);
+r311 = ones(1,g-1).* Ya(1);
+r411 = ones(1,g-1).* Ya(end);
+YYYa = [r111 YYa  r211];
+YYa = [r311 Ya  r411];%JL
+
+[Y.YYYa, al] = coadd(YYYa, Y.alt_an, 4);
+[Y.YYa, al] = coadd(YYa, Y.alt_an,4);
+
+
+% Coadded signal 
+La = nansum(Y.JL_an);
+Ha = nansum(Y.JH_an);
+
+[Ha, JHazc] = coadd(Ha, Y.alt_an, 4);
+[La, JLazc] = coadd(La, Y.alt_an,4);
+
+
+    [varJL,g1] = bobpoissontest(La,Y.alt_an,3);
+    [varJH,g1] = bobpoissontest(Ha,Y.alt_an,3);
+    
+    
+r1 = ones(1,g1-1).* varJH(1);
+r2 = ones(1,g1-1).* varJH(end);
+r3 = ones(1,g1-1).* varJL(1);
+r4 = ones(1,g1-1).* varJL(end);
+Y.Jha = [r1 varJH  r2];
+Y.Jla = [r3 varJL  r4];
+
+% 
+
+
 figure;
-subplot(2,2,1)
-plot(Y.LagsJL,CovVariance_JLa(:,257),Y.LagsJL,CovVariance_JLa(:,524),Y.LagsJL,CovVariance_JLa(:,790),Y.LagsJL,CovVariance_JLa(:,1057),Y.LagsJL,CovVariance_JLa(:,1324),Y.LagsJL,CovVariance_JLa(:,1590))
-xlabel('Lag')
-ylabel('ACF _ JL _ analog')
-legend('1km','2km','3km','4km','5km','6km')
-title( Dateofthefolder);
-set(gca,'fontsize',16)
-
-
-subplot(2,2,2)
-plot(Y.LagsJH, CovVariance_JHa(:,257),Y.LagsJH, CovVariance_JHa(:,524),Y.LagsJH, CovVariance_JHa(:,790),Y.LagsJH, CovVariance_JHa(:,1057),Y.LagsJH, CovVariance_JHa(:,1324),Y.LagsJH, CovVariance_JHa(:,1590))
-xlabel('Lag')
-ylabel('ACF _ JH _ analog')
-legend('1km','2km','3km','4km','5km','6km')
-title( Dateofthefolder);
-set(gca,'fontsize',16)
-
-subplot(2,2,3)
-semilogx((CovVariance_JLa(1,:))./30,Y.alt_an./1000)
-xlabel('Cov JL analog')
+subplot(1,2,1)
+semilogx((Y.CovVariance_JLa(1,:)),Y.alt_an./1000,'r')
+hold on
+semilogx((Y.YYa),al./1000,'y') 
+semilogx(Y.Jla,JLazc./1000','black')
+xlabel('Cov analog JL')
+legend('ACf method','PW for individual','PW coadded')
 ylabel('alt ')
-
-subplot(2,2,4)
-semilogx((CovVariance_JHa(1,:))./30,Y.alt_an./1000) 
- xlabel('Cov JH analog')
+hold off;
+subplot(1,2,2)
+semilogx((Y.CovVariance_JHa(1,:)),Y.alt_an./1000,'b') 
+hold on
+semilogx((Y.YYYa),al./1000,'g') 
+semilogx(Y.Jha,JLazc./1000,'m')
+xlabel('Cov analog JH')
+legend('')
 ylabel('alt')
+legend('ACf method','PW for individual','PW coadded')
+hold off
+
+
+ heights = [2000 4000 6000];
+% 
+for j= 1:length(heights)
+        y = Y.CovVariance_JLa(:,j);
+        x = 0:10;
+        figure;plot(x,y,'b',-x,-y,'b')
+        grid on;
+        hold on;
+%         xx= -x(2:end):x(2:end);
+         xx= [-x(2:end) x(2:end)];
+        p = polyfit(x(2:end),y(2:end)',3);
+        p1 = polyval(p,x);
+        plot(x,p1,'r')
+        hold off;
+end
+
  %%
 % Y.varJL = nansum(Y.JL');
 % 

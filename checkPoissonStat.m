@@ -13,7 +13,7 @@ function xs=checkPoissonStat(r,x_ph)
 % x - counts
 
 % bin size
-N = 6;
+N = 5;
 
 % reshape vectors
 ind = 1:length(r)-mod(length(r),N);
@@ -23,19 +23,19 @@ xsm = reshape(x_ph(ind),N,[]);
 clear xs
 for j=1:size(xsm,2)
     P = polyfit([1:N]',xsm(:,j),1);
-    xs(j) = std(xsm(:,j)-polyval(P,[1:N]'));
+    xs(j) = var(xsm(:,j)-polyval(P,[1:N]'));
 end
 
 
 % plot
 figure;
-plot(r,xm)
-hold
+% plot(r,xm)
+% hold
 plot(r,xs)
 % plot(r,xm./xs)
 grid on, hold
 xlim([0 30])
-legend('sqrt(S)','stdv(S)')
+% legend('sqrt(S)','stdv(S)')
 xlabel('range (km)')
 ylabel('\sigma [-]');
 
