@@ -66,12 +66,12 @@ c4 = 2.*c3;
 % For asr
 Q.LRfree = 50; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
 Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 1400; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRtranHeight = 3000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
 Q.ASRcutoffheight = 12000; % 20110909 1400 20110802 day 11km
 Q.asrsmoothing = 100; % 100 for 20110802 day, 
-Q.OVCOV_6above = 1e-4; % 1e-4 for clear 1e-2/3 for cloud relax this 
+Q.OVCOV_6above = 1e-3; % 1e-4 for clear 1e-2/3 for cloud relax this 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load raw measurements

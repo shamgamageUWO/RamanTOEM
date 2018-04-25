@@ -44,9 +44,10 @@ load(folderpath);
 g = hour(S0.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
 Minute = minute(S0.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
 tin =Q.time_in;
-% from 2300 to 2330
-starttime=find(g==tin & Minute==00);
-endtime=find(g==tin & Minute==30);
+% from 2300 to 2330Q.min1 = 00;
+
+starttime=find(g==tin & Minute==Q.min1);
+endtime=find(g==tin & Minute==Q.min2);
 
 % pick the measurements from 11-11.30
 %% Digital Channels
@@ -80,7 +81,18 @@ Eb_an = S0.Channel(9).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961
 JL_an = JL_an';
 JH_an = JH_an';
 
-
+figure;subplot(2,2,1)
+semilogx(JL_an,alt_an./1000)
+xlabel('JL_an')
+subplot(2,2,2)
+semilogx(JH_an,alt_an./1000)
+xlabel('JH_an')
+subplot(2,2,3)
+semilogx(JL,alt./1000)
+xlabel('JL_dg')
+subplot(2,2,4)
+semilogx(JH,alt./1000)
+xlabel('JH_dg')
 
 
 
@@ -116,7 +128,7 @@ Eb = nansum(Eb');
     % Analog variance
 
 
-for i = 1:30
+for i = 1:Q.deltatime
 % [Ha(:,i), JHazc] = coadd(Y.JH_an(i,:), Y.alt_an,4);
 % [La(:,i), JLazc] = coadd(Y.JL_an(i,:), Y.alt_an,4);   
 
@@ -141,8 +153,8 @@ for i = 1:length(alt_a)
 end
 
 
-Y.YYa = 30.*(smooth(ACF_JL,5));
-Y.YYYa = 30.*(smooth(ACF_JH,5));
+Y.YYa = Q.deltatime.*(smooth(ACF_JL,5));
+Y.YYYa = Q.deltatime.*(smooth(ACF_JH,5));
 
 
 JL_an = nansum(JL_an');
@@ -198,11 +210,11 @@ title( Dateofthefolder);
 title( Dateofthefolder);
   set(gca,'fontsize',16)
   
-  figure;
-  semilogx(Eb,Ebzc./1000,'g')
-    xlabel('Eb digital')
-  ylabel('Altitude (km)')
-        
+%   figure;
+%   semilogx(Eb,Ebzc./1000,'g')
+%     xlabel('Eb digital')
+%   ylabel('Altitude (km)')
+%         
         % 3. Apply DT correction
         JL_dtc = JLn ./ (1 - JLnwn.*(Q.deadtimeJL.*1e6)); % non-paralyzable
         JH_dtc = JHn ./ (1 - JHnwn.*(Q.deadtimeJH).*1e6);

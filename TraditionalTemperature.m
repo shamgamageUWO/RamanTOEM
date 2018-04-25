@@ -274,7 +274,14 @@ H.T_an = real(a_an./(1./Tprofilean +b_an));
 H.T_dg = real(a_dg./(1./Tprofiledg +b_dg));
 H.T_cm = real(a_cm./(1./Tprofilecm +b_cm));
 
+H.a_an =a_an;
+H.b_an =b_an;
 
+H.a_dg = a_dg;
+H.b_dg = b_dg;
+
+H.a_cm = a_cm;
+H.b_cm = b_cm;
 % figure;
 % subplot(1,3,1);plot(f_dg,x_d,y_d)
 % subplot(1,3,2);plot(f_cm,x_c,y_c)

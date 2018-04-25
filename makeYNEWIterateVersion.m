@@ -125,10 +125,7 @@ Eb = nansum(Eb');
         JHa(i,:) = JH_an(i,:) - bkg_Han(i);
     end
     
-%     for i = 1:length(alt_an)
-%         stdJLaa(:,i) = std(JLa(:,i));
-%         stdJHaa(:,i) = std(JHa(:,i));
-%     end
+
 La = JLa(:,alt_an<=12000);
 Ha = JHa(:,alt_an<=12000);
 alt_a = alt_an(alt_an<=12000);
@@ -137,18 +134,12 @@ for i = 1:length(bkg_Lan)
     [varH(i,:),g] = bobpoissontest(Ha(i,:),alt_a',Q.b2);
 end
 
-% figure;
-% subplot(1,2,1)
-% plot(varL)
-% subplot(1,2,2)
-% plot(varH)
+
 
 Ya = nansum(varL);
 YYa = nansum(varH);
 
-% 
-% MeanLvar = mean(varL);
-% MeanHvar = mean(varH);
+
 % 
 r111 = ones(1,g-1).* YYa(1);
 r211 = ones(1,g-1).* YYa(end);

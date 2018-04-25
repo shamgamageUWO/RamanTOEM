@@ -31,24 +31,6 @@ figure;
 plot(asr.profile,(asr.z)./1000); hold on
 
 
-% % % % [fneg,I] = min(asr.profile);
-% % % %  diff = 1-fneg;
-% % % %  if diff<0
-% % % %   'diffrence is less than 0'
-% % % %     
-% % % %     stop
-% % % %  end 
-% % % %  asr.profile = asr.profile + diff;
-% % % %  fneg2 = find(asr.profile < 1);
-% % % % %  fneg3 = find(asrDATAs >= 1);
-% % % % %  asrDATAs(fneg3)  = asrDATAs(fneg3) + diff;
-% % % %  asr.profile(fneg2) = 1;
-
-
-
-
-% xlabel('asr profile')
-% ylabel('Alt(km)')
 %% 
 % Load beta molecular values here 
 % Max's Codes ( all are now in the same directory as QpackSham)
@@ -86,34 +68,44 @@ end
 
 
 
-LR = Q.LRfree * ones(size(asrDATA));
-fff = find(zN < Q.LRtranHeight);
-LR(fff) = Q.LRpbl;
-asrDATAs = smooth(asrDATA,Q.asrsmoothing); %asrDATA; %smooth(asrDATA,90); %was 45
+% s2 = find(asr.profile <2);
+% if zN(s2)< 2000 %BL
+%     LR = 80.*ones(size(asrDATA));
+%     LR(s2) = 80;
+% else
+%    LR = 50.*ones(size(asrDATA));
+%    LR(s2) = 80;
+% end
 
-fneg1 = find(asrDATAs < 1);
-asrDATAs(fneg1) = 1;
+% LR = Q.LRfree * ones(size(asrDATA));
+% fff = find(zN < Q.LRtranHeight);
+% LR(fff) = Q.LRpbl;
+asrDATAs = asrDATA';
+% asrDATAs = smooth(asrDATA,Q.asrsmoothing); %asrDATA; %smooth(asrDATA,90); %was 45
+
+% fneg1 = find(asrDATAs < 1);
+% asrDATAs(fneg1) = 1;
 
 % 
  [fneg,I] = min(asrDATAs(zN<6000));
  if fneg<0
-  'diffrence is less than 0'
-     stop
- end 
-%  
+  'diffrence is less than 0 shift towards 1'
+    diff = 1-fneg;
+   asrDATAs = asrDATAs + diff;
+  
+ else
+   'diffrence is greater than 0 shift away from 1' 
   diff = fneg-1;
    asrDATAs = asrDATAs - diff;
+ end 
 
-%  fneg2 = find(asrDATAs < 1);
-%  asrDATAs(fneg2) = 1;
-%   fneg3 = find(asrDATAs >= 1);
-%  asrDATAs(fneg3)  = asrDATAs(fneg3) + diff;
  asrDATAs(zN>=Q.ASRcutoffheight) = 1;
-%  asrDATAs(zN>= 3000 & zN<=8000) = 1;
+%    asrDATAs(zN>= 1000 & zN<=6000) = 1;
+ fneg1 = find(asrDATAs < 1);
+ asrDATAs(fneg1) = 1;
 asrDATAnew =  asrDATAs;
 % 
-% fneg = find(asrDATAs < 1);
-% asrDATAs(fneg) = 1;
+
 
 
 plot(asrDATAnew,zN./1000,'r'); 
@@ -124,12 +116,20 @@ title( Q.Dateofthefolder);
 
 hold off;
 
-% subplot(1,2,2)
-% plot(asrDATAnew(zN<=12000),(zN(zN<=12000))./1000);
-% xlabel('asr profile after fixing the diff')
-% ylabel('Alt(km)')
+LR = 20.*ones(size(asrDATAs));
+s2 = find(zN <2000);
+LR(s2) = 50;
+s1 = find(asrDATAnew > 2); % find indices asr greater than 2
 
-alphaAer = LR' .* (beta_mol .* (asrDATAnew-1));
+if  zN(s1)>=5000 
+    LR(s1) = 25;
+elseif zN(s1)<5000
+    LR(s1) = 20;
+else
+    LR(s1)= 50;
+end
+
+alphaAer = LR .* (beta_mol .* (asrDATAnew-1));
 znoAer = find(zN > Q.AerosolFreeheight); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
 % 'asr set to 0 > Q.AerosolFreeheight'

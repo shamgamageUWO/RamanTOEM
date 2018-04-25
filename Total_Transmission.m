@@ -1,5 +1,5 @@
 
-function [Tr] = Total_Transmission(Q)
+function [Tr,alpha_mol] = Total_Transmission(Q)
 kb = 1.38064852*10^-23;
 area = pi * (0.3^2);
 Lambda = 354.7* (10^-3);
@@ -10,10 +10,10 @@ A = 4.02*10^(-28);
 B = -0.3228;
 C = 0.389;
 D = 0.09426;
-J_low = [3,4,5,6,7,8,9];
-J_high = [10,11,12,13,14,15];
-J_lowO2 = [5,7,9,11,13];
-J_highO2 = [15,17,19,21];
+% J_low = [3,4,5,6,7,8,9];
+% J_high = [10,11,12,13,14,15];
+% J_lowO2 = [5,7,9,11,13];
+% J_highO2 = [15,17,19,21];
 
 %   CL = x(end-1);
 %   CH = x(end);
@@ -35,6 +35,8 @@ Tr1 = tauMol.*tauAer';
 % alpha_aero(isnan(alpha_aero))=0;
 
 sigma_tot = Nmol*sigmaNicolet+ alpha_aero;
+
+alpha_mol = Nmol*sigmaNicolet;
 
 % %  Tr1 = exp(-2.*cumtrapz(Q.Zmes,alpha_aero)); % Molecular transmission
 %  Tr = exp(-2.*cumtrapz(Q.Zmes,Nmol*sigmaNicolet)); % Molecular transmission

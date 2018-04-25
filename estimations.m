@@ -6,9 +6,9 @@ Zi = Q.Zmes;
 Za = Q.Zmes1;%analog
 Zd = Q.Zmes2;%digital
 
-ind1 = Zd>=6000 & Zd< 8000;
+ind1 = Zd>=4000 & Zd< 5000;% 6-8km
 
-ind2 = Za>=1000 & Za< 2000;% 1800 was changed
+ind2 = Za>=4000 & Za< 5000;% 1800 was changed
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -91,28 +91,28 @@ C.CJHa = fitJHa(1);
     %     %  OVz = (JLnew + JHnew- Bg_JL_real- Bg_JH_real)./(JLwoOV + JHwoOV)';
     %     % figure;plot(Q.Zmes./1000,OVz,'b'); hold on;
 %     
-%       JLwoOV = ((CJL.*JL));
-%       JHwoOV1 = ((Q.R.*CJL.*JH));
+      JLwoOV = ((C.CJL.*JL));
+      JHwoOV1 = ((Q.R.*C.CJL.*JH));
 % %      JHwoOV2 = ((CJH.*JH));
 % % % %     
-%      JLawoOV = ((CJLa.*JLa));
-%       JHawoOV1 = ((Q.Ra.*CJLa.*JHa));
+     JLawoOV = ((C.CJLa.*JLa));
+      JHawoOV1 = ((Q.Ra.*C.CJLa.*JHa));
 %     JHawoOV2 = ((CJHa.*JHa));
 % 
 % % %     
 % % %     % It is now mean of the overlap as the a priori
-%        OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
-%       OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV1 )';
+       OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
+      OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV1 )';
 % %       OVz3d = (Q.JHnew - Q.BaJH)./(JHwoOV2 )';
 % % 
 % %    
 % %       
 % %       
-%       OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
-%       OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV1 )';
+      OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
+      OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV1 )';
 % %      OVz3a = (Q.JHnewa - Q.BaJHa)./(JHawoOV2 )';
 % % %    figure;plot(Q.Zmes2./1000,OVz1d,'r',Q.Zmes2./1000,OVz2d,'b',Q.Zmes2./1000,OVz3d,'g')
-%   figure;plot(Q.Zmes1./1000,OVz1a,'r',Q.Zmes1./1000,OVz2a,'g',Q.Zmes2./1000,OVz1d,'r',Q.Zmes2./1000,OVz2d,'b')
+   figure;plot(Q.Zmes1(Q.Zmes1<6000)./1000,OVz1a(Q.Zmes1<6000),'r',Q.Zmes1(Q.Zmes1<6000)./1000,OVz2a(Q.Zmes1<6000),'g',Q.Zmes2(Q.Zmes2<6000)./1000,OVz1d(Q.Zmes2<6000),'r',Q.Zmes2(Q.Zmes2<6000)./1000,OVz2d(Q.Zmes2<6000),'b')
 % 
 % % %     
 %      OVzd = (OVz1d+OVz2d)./2;

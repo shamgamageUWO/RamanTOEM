@@ -46,8 +46,10 @@ Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
-Q.deltatime = 30;
 Q.Shots = 1800; 
+Q.deltatime = 05;%30;3
+Q.min1 = 05;
+Q.min2 = 09;
 disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -56,7 +58,7 @@ alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
 alt_df = 30000; % Digital Channel ending altitude
 alt_a0 = 50;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
-b1 = 4; % Bin size for piecewise cov for digital 20110705 2011080223 8
+b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
 % Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 3; % retrieval bin size
 c2 = 2.*c1;
@@ -64,13 +66,13 @@ c3 = 2.*c2;
 c4 = 2.*c3;
 
 % For asr
-Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
-Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 3000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+% Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
+% Q.LRpbl = 20; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
+% Q.LRtranHeight = 3000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
 Q.ASRcutoffheight = 12000; % 20110909 1400 20110802 day 11km
-Q.asrsmoothing = 50; % 100 for 20110802 day, 
+% Q.asrsmoothing = 10; % 100 for 20110802 day, 
 Q.OVCOV_6above = 1e-3; % 1e-4 for clear 1e-2/3 for cloud relax this 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -178,29 +180,42 @@ disp('a priori temperature profile is loaded ')
 
 
 
-% Calculate the aerosol attenuation
+% % Calculate the aerosol attenuation
 [alphaAer,odaer] = asrSham(Q);
 Q.alpha_aero = alphaAer;
 Q.odaer = odaer;
-% total transmission air + aerosol 
-Q.Tr = Total_Transmission(Q);
+% 
+% % total transmission air + aerosol 
+[Tr,alpha_mol] = Total_Transmission(Q);
+ Q.Tr = Tr;
+Q.alpha_mol = alpha_mol;
+
+% Q.Tr = ShamasrNew (Q);
 figure;semilogx(Q.alpha_aero,Q.Zmes./1000)
 xlabel('Aerosol Extinction (m^-^1)')
 ylabel('Altitude (km')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-[R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
-Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
-Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
-Q.GR = dfacR ; % ISSI recommend
-Q.GRa = dfacRa;
+    [R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
+    Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
+    Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
+    Q.GR = dfacR ; % ISSI recommend
+    Q.GRa = dfacRa;
+
+
+% % Q.R =0.8102;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
+% % Q.Ra =0.8719;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
+% % Q.GR= 0.0068; % ISSI recommend
+% % Q.GRa= 0.0017 ;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 
-C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-Q.CL = C.CJL;
-Q.CLa =C.CJLa;
+    C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+    Q.CL = C.CJL;
+    Q.CLa =C.CJLa;
+% % Q.CL = 3.8362e+19 ;
+% % Q.CLa= 4.6099e+15;
 Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
