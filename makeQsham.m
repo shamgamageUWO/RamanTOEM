@@ -48,8 +48,8 @@ Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.Shots = 1800; 
 Q.deltatime = 05;%30;3
-Q.min1 = 05;
-Q.min2 = 09;
+Q.min1 = 04;
+Q.min2 = 08;
 disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -73,7 +73,7 @@ c4 = 2.*c3;
 Q.AerosolFreeheight = 12000;%2011080223 17000
 Q.ASRcutoffheight = 12000; % 20110909 1400 20110802 day 11km
 % Q.asrsmoothing = 10; % 100 for 20110802 day, 
-Q.OVCOV_6above = 1e-3; % 1e-4 for clear 1e-2/3 for cloud relax this 
+% Q.OVCOV_6above = 1e-3; % 1e-4 for clear 1e-2/3 for cloud relax this 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load raw measurements
@@ -144,7 +144,7 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:6000;
 Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
 Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
-Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:40000;
+Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:32000;
 Q.Zret =[Z1 Z2 Z3 Z4];
 disp('Defined grids ')
 
@@ -153,13 +153,16 @@ disp('Defined grids ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
-Tsonde = Tsonde(Zsonde<=35000);
-Psonde = Psonde(Zsonde<=35000);
-Zsonde = Zsonde(Zsonde<=35000);
+Tsonde = Tsonde(Zsonde<=32000);
+Psonde = Psonde(Zsonde<=32000);
+Zsonde = Zsonde(Zsonde<=32000);
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
-Psonde = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr
-Q.Psonde = exp(Psonde);
+Psonde1 = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr
+Q.Psonde = exp(Psonde1);
+
+Psonde2= interp1(Zsonde,log(Psonde),Q.Zret,'linear'); % this goes asr
+Q.Psonde2 = exp(Psonde2);
 Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
 
 Q.Pressi = Q.Psonde;
@@ -181,19 +184,14 @@ disp('a priori temperature profile is loaded ')
 
 
 % % Calculate the aerosol attenuation
-[alphaAer,odaer] = asrSham(Q);
-Q.alpha_aero = alphaAer;
-Q.odaer = odaer;
-% 
-% % total transmission air + aerosol 
-[Tr,alpha_mol] = Total_Transmission(Q);
- Q.Tr = Tr;
-Q.alpha_mol = alpha_mol;
+[alpha_aero,odaer] = asrSham(Q);
+ Q.alpha_aero = alpha_aero';%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
 
-% Q.Tr = ShamasrNew (Q);
-figure;semilogx(Q.alpha_aero,Q.Zmes./1000)
-xlabel('Aerosol Extinction (m^-^1)')
-ylabel('Altitude (km')
+% Q.odaer = odaer;
+% 
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
     [R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
@@ -201,14 +199,13 @@ ylabel('Altitude (km')
     Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
     Q.GR = dfacR ; % ISSI recommend
     Q.GRa = dfacRa;
-
-
-% % Q.R =0.8102;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
-% % Q.Ra =0.8719;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
-% % Q.GR= 0.0068; % ISSI recommend
-% % Q.GRa= 0.0017 ;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% % total transmission air + aerosol 
+[alpha_mol] = Transmission(Q);
+Q.alpha_mol = alpha_mol;
+
 %% Estimating background and lidar constant wrt a priori 
 
     C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
@@ -247,7 +244,7 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                                         Q.OVa = OVnw;
                                         %  Q.OVa = ones(1,length(Q.Ta));
                                         Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.OVCOV_6above);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
                                         disp('Daytime retrieval')
                                         else 
                                         Q.CovBJL = ((Y.bg_JL_std/sqrt(Y.bg_length2))).^2;
@@ -261,7 +258,7 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                                         OVnw(isnan(OVnw))=1;
                                         Q.OVa = OVnw;
                                         Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.OVCOV_6above);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
 
                                         disp('Nighttime retrieval')
                                         end 
@@ -295,33 +292,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JLv = [r3 JLv r4];
 
 
-%  [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,b2);
-%  [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,b2);
-% 
-%             ar1 = ones(1,go1-1).* JHav(1);
-%             ar2 = ones(1,go1-1).* JHav(end);
-%             ar3 = ones(1,go2-1).* JLav(1);
-%             ar4 = ones(1,go2-1).* JLav(end);
-%             Q.JHav = [ar1 JHav ar2];
-%             Q.JLav = [ar3 JLav ar4];
-            
 
-%             
-%                                 for i = 1: length(Q.JLav)
-%                                     if Q.Zmes1(i) <= 6000
-%                                         Q.YYa(i) = Q.JLav(i);
-%                                     else
-%                                         Q.YYa(i) = .1.*Q.JLav(i);
-%                                     end
-%                                 end
-%                                 
-%                                 for i = 1: length(Q.JHav)
-%                                     if  Q.Zmes1(i) <= 6000
-%                                         Q.YYYa(i) = Q.JHav(i);
-%                                     else
-%                                         Q.YYYa(i) = .1.*Q.JHav(i);
-%                                     end
-%                                 end
 
             
             
@@ -340,38 +311,7 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
                 Q.YYY(i) = JHreal(i);
             end
         end
-        
-%         for i = 1:length( Q.JHnew )
-%             
-%             if  Q.JHnew (i) <= 15
-%                 Q.YYY(i) =  15;
-%             end
-%             if  Q.JLnew (i) <= 10
-%                 Q.YY(i) =  10 ;
-%             end
-%             
-%         end
-%         for i = 1:length( Q.JLnew )
-%             if  Q.JLnew (i) <= 10
-%                 Q.YY(i) =  10 ;
-%             end
-%         end
-%          Q.Yvar =[Q.YYY Q.YY Q.JHav Q.JLav];
-%         Q.Yvar =[JHreal JLreal];
 
-% % HEre I linearlize the covariance
-%  slope = (((0.9-0.7).*Q.Zmes1)/(Q.Zmes1(end)));
-%   slope = (((0.5-0.9).*Q.Zmes1)/(Q.Zmes1(end)))+0.8;
-% % %    Q.YYYa =  Q.JHav;% smmohtenJHa';
-% % %    Q.YYa  = Q.JLav;%smmohtenJLa';
-%  Q.YYYa = slope.*Q.JHav;
-%   Q.YYa  =slope.*Q.JLav;
-
-% load('Variance20110909.mat');
-% % jlav= interp1(K.alt,K.VaJLSingle,Q.Zmes1,'linear');
-% % jhav= interp1(K.alt,K.VaJHSingle,Q.Zmes1,'linear');
-% jlavv= interp1(K.alt,K.L,Q.Zmes1,'linear');
-% jhavv= interp1(K.alt,K.H,Q.Zmes1,'linear');
 
 
  

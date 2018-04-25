@@ -26,7 +26,7 @@ SJLa = Q.JLnewa - Q.BaJLa;
 % [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
 % Ti = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % T on data grid (digital)
 %     x = [Q.Ta 0 0 1 OVa 0 0 1 1]; Run this to retrieve CJH independently
-    x = [Q.Tsonde2 0 0 1 OVa 0 0 1 0 0]; % coupled analog channels
+    x = [Q.Tsonde2 0 0 1 OVa 0 0 1 0 0 Q.alpha_aero]; % coupled analog channels
 % DTs use to get the synthetic measurements were made to zero as we need
 % corrected counts/true counts without bks
 
@@ -91,28 +91,28 @@ C.CJHa = fitJHa(1);
     %     %  OVz = (JLnew + JHnew- Bg_JL_real- Bg_JH_real)./(JLwoOV + JHwoOV)';
     %     % figure;plot(Q.Zmes./1000,OVz,'b'); hold on;
 %     
-      JLwoOV = ((C.CJL.*JL));
-      JHwoOV1 = ((Q.R.*C.CJL.*JH));
-% %      JHwoOV2 = ((CJH.*JH));
-% % % %     
-     JLawoOV = ((C.CJLa.*JLa));
-      JHawoOV1 = ((Q.Ra.*C.CJLa.*JHa));
-%     JHawoOV2 = ((CJHa.*JHa));
-% 
-% % %     
-% % %     % It is now mean of the overlap as the a priori
-       OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
-      OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV1 )';
-% %       OVz3d = (Q.JHnew - Q.BaJH)./(JHwoOV2 )';
+%       JLwoOV = ((C.CJL.*JL));
+%       JHwoOV1 = ((Q.R.*C.CJL.*JH));
+% % %      JHwoOV2 = ((CJH.*JH));
+% % % % %     
+%      JLawoOV = ((C.CJLa.*JLa));
+%       JHawoOV1 = ((Q.Ra.*C.CJLa.*JHa));
+% %     JHawoOV2 = ((CJHa.*JHa));
 % % 
-% %    
-% %       
-% %       
-      OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
-      OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV1 )';
-% %      OVz3a = (Q.JHnewa - Q.BaJHa)./(JHawoOV2 )';
-% % %    figure;plot(Q.Zmes2./1000,OVz1d,'r',Q.Zmes2./1000,OVz2d,'b',Q.Zmes2./1000,OVz3d,'g')
-   figure;plot(Q.Zmes1(Q.Zmes1<6000)./1000,OVz1a(Q.Zmes1<6000),'r',Q.Zmes1(Q.Zmes1<6000)./1000,OVz2a(Q.Zmes1<6000),'g',Q.Zmes2(Q.Zmes2<6000)./1000,OVz1d(Q.Zmes2<6000),'r',Q.Zmes2(Q.Zmes2<6000)./1000,OVz2d(Q.Zmes2<6000),'b')
+% % % %     
+% % % %     % It is now mean of the overlap as the a priori
+%        OVz1d = (Q.JLnew - Q.BaJL)./(JLwoOV )';
+%       OVz2d = (Q.JHnew - Q.BaJH)./(JHwoOV1 )';
+% % %       OVz3d = (Q.JHnew - Q.BaJH)./(JHwoOV2 )';
+% % % 
+% % %    
+% % %       
+% % %       
+%       OVz1a = (Q.JLnewa - Q.BaJLa)./(JLawoOV )';
+%       OVz2a = (Q.JHnewa - Q.BaJHa)./(JHawoOV1 )';
+% % %      OVz3a = (Q.JHnewa - Q.BaJHa)./(JHawoOV2 )';
+% % % %    figure;plot(Q.Zmes2./1000,OVz1d,'r',Q.Zmes2./1000,OVz2d,'b',Q.Zmes2./1000,OVz3d,'g')
+%    figure;plot(Q.Zmes1(Q.Zmes1<6000)./1000,OVz1a(Q.Zmes1<6000),'r',Q.Zmes1(Q.Zmes1<6000)./1000,OVz2a(Q.Zmes1<6000),'g',Q.Zmes2(Q.Zmes2<6000)./1000,OVz1d(Q.Zmes2<6000),'r',Q.Zmes2(Q.Zmes2<6000)./1000,OVz2d(Q.Zmes2<6000),'b')
 % 
 % % %     
 %      OVzd = (OVz1d+OVz2d)./2;

@@ -2,15 +2,15 @@
 
 % % % % % Input : US Temperatures
 % % % % % Output : Temperature covariance
-function [S_OV]=OVCov(Zj,OV)
+function [S_Aero]=AeroCov(Zj,aero)
  Zj = Zj';
 % ind = Zj<15000;
- m = length(OV);
+ m = length(aero);
  n = m;
- S_OV =zeros(n,n);
+S_Aero =zeros(n,n);
  lengthcT = 100; % =3000; % only need m of these
  lc = lengthcT.*ones(1,m);
- l = size(OV);
+ l = size(aero);
  
   Tfac = .5;
   Tmodvar = (Tfac.*ones(l)).^2;
@@ -68,7 +68,7 @@ function [S_OV]=OVCov(Zj,OV)
 
 for i = 1:m
     for j = 1:m
-         if Zj(i)< 6000 % this is to force the ov to go to 1.
+         if Zj(i)>6000 % this is to force the ov to go to 1.
 %             disp('ok')
             sigprod = sqrt(vars2(i).*vars2(j));
             diffz = Zj(i) - Zj(j);
@@ -79,12 +79,12 @@ for i = 1:m
                 shape(3) = 0;
             end
             
-            S_OV(i,j) = sigprod.*shape(3);
+           S_Aero(i,j) = sigprod.*shape(3);
             %         if i==j
             %          Sa_T(i,j) = Ta(i);
             %         end
          else
-             S_OV(i,i) = 1e-5; % cloud at 6km use 1e-2
+             S_Aero(i,i) = 1e-8; % cloud at 6km use 1e-2
          end
     end
 end

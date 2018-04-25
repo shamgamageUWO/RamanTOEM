@@ -1,4 +1,4 @@
-function [X,R,Q,O,S_a,Se,xa,S_b,Error]=TRamanOEM( date_in,time_in,flag)
+function [X,R,Q,O,S_a,Se,xa,S_b]=TRamanOEM( date_in,time_in,flag)
 tic
 [O,Q,R,S_a,Se,xa] = InputsForOEM( date_in,time_in,flag);
 xa = xa';
@@ -37,15 +37,18 @@ if ~O.linear
     end
 end
 
-CJL = X.x(m+3);
+
 BJH = X.x(m+1);
 BJL = X.x(m+2);
-CJHa = Q.Ra.*X.x(end-2);
-CJLa = X.x(end-2);
-BJHa = X.x(end-4);
-BJLa = X.x(end-3);
-DT_JH = X.x(end-1);
-DT_JL = X.x(end); % deadtimes
+CJL = X.x(m+3);
+OV = X.x(m+4:2*m+3);
+BJHa = X.x(2*m+4);
+BJLa = X.x(2*m+5);
+CJLa = X.x(2*m+6);
+DT_JH = X.x(2*m+7);
+DT_JL = X.x(2*m+8); % deadtimes
+alpha_aero = X.x(2*m+9:end);
+
 
 'X.cost'
 X.cost(end)
@@ -81,8 +84,8 @@ Q.BaJLa
 'OEM-CLa'
 CJLa
 
-'OEM-CHa'
-CJHa
+% 'OEM-CHa'
+% CJHa
 
 'DT-JH'
 DT_JH
@@ -164,7 +167,7 @@ DT_JL
 
 
                     figure;
-                    subplot(1,2,1)
+                    subplot(1,3,1)
                     %                     set(gca,'fontsize',16)
                     % hold on;
                     plot(X.A(1:5:m,1:5:m),Q.Zret(1:5:m)./1000)
@@ -178,17 +181,26 @@ DT_JL
                     title( Q.Dateofthefolder);
                     set(gca,'fontsize',16)
                     
-                    subplot(1,2,2)
-                    plot(X.A(m+4:5:end-5,m+4:5:end-5),Q.Zret(1:5:m)./1000)
+                    subplot(1,3,2)
+                    plot(X.A(m+4:5:2*m+3,m+4:5:2*m+3),Q.Zret(1:5:m)./1000)
                     
                     xlabel('Overlap - Averaging Kernels')
                     ylabel('Altitude ( km )')
                     title( Q.Dateofthefolder);
                     set(gca,'fontsize',16)
+                    
+                    subplot(1,3,3)
+                    plot(X.A(2*m+9:5:end,2*m+9:5:end),Q.Zret(1:5:m)./1000)
+                    
+                    xlabel('Aerosol Extinction - Averaging Kernels')
+                    ylabel('Altitude ( km )')
+                    title( Q.Dateofthefolder);
+                    set(gca,'fontsize',16)
 
                     
- S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
-S_b.degF2 = trace(X.A(m+4:end-5,m+4:end-5));%DegF for OV            
+S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
+S_b.degF2 = trace(X.A(m+4:2*m+3,m+4:2*m+3));%DegF for OV    
+S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end));%DegF for Aerosol 
 
 % S_b.CutoffheightT = Q.Zret(response==0.9)
 % S_b.CutoffheightOV = Q.Zret(round(S_b.degF2))                   
@@ -222,29 +234,9 @@ T_an = interp1(H.alt_an,H.T_an,Q.Zret);
 T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
 T_cm = interp1(H.alt_com,H.T_cm,Q.Zret);
 
-% T1 = interp1(H.alt_an,H.T_an,Q.Zmes1);
-% T2 = interp1(H.alt_digi,H.T_dg,Q.Zmes2);
-% TT =[T1 T2];
-% T_all = interp1(H.alt_digi,H.T_dg,Q.Zret);
 
-
-% %                     subplot(1,2,1)
-% plot(Q.Ta,Q.Zret./1000,'g',X.x(1:m),Q.Zret./1000,'r',Q.Tsonde2,Q.Zret./1000,'b');
-% hold on
-% plot(T_an(Q.Zret<=10000),Q.Zret(Q.Zret<=10000)./1000,'black',T_dg(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'y', T_cm(Q.Zret<=30000),Q.Zret(Q.Zret<=30000)./1000,'c')
-% grid on;
-% grid on;
-% [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
-% %  shadedErrorBar(X.x(1:m),Q.Zret./1000,err,'-r',1);
-% % jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,rand(1,1))
-% xlabel('Temperature (K)')
-% ylabel('Altitude(km)')
-% legend('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital','TraditionalCombined')
-% hold off;
 Toem= X.x(1:m);
-% Create axes
-% axes1 = axes('Parent',figure);
-% hold(axes1,'on');
+
 figure;
 subplot(1,2,1)
 % Create plot
@@ -378,8 +370,8 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
 
 %        Overlap
                     figure;
-%                     subplot(1,2,1)
-                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:end-5),Q.Zret./1000,'r')
+                     subplot(1,2,1)
+                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:2*m+3),Q.Zret./1000,'r')
                     grid on;
                     xlabel('OV')
                     ylabel('Altitude ( km )')
@@ -387,7 +379,14 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                                          title( Q.Dateofthefolder);
                                            set(gca,'fontsize',16)
 
-
+                     subplot(1,2,2)
+                    plot(Q.alpha_aero,Q.Zret./1000,'g',X.x(2*m+9:end),Q.Zret./1000,'r')
+                    grid on;
+                    xlabel('Extinction')
+                    ylabel('Altitude ( km )')
+                    legend('Aerosol Extinction a priori (m^-^1)','OEM aerosol extinction (m^-^1)')
+                                         title( Q.Dateofthefolder);
+                                           set(gca,'fontsize',16)
 
 
 
@@ -465,7 +464,7 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
 
                     
 
-Error = errors(Q,X);  % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Error = errors(Q,X);  % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %   b parameters and errors
 %                     
 % R1 =bparameterjacobians (Q,X);

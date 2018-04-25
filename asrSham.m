@@ -34,9 +34,9 @@ plot(asr.profile,(asr.z)./1000); hold on
 %% 
 % Load beta molecular values here 
 % Max's Codes ( all are now in the same directory as QpackSham)
-zN = Q.Zmes;
-P = Q.Psonde;
-T = Q.Tsonde;
+zN = Q.Zret;
+P = Q.Psonde2;
+T = Q.Tsonde2;
 lambda_rec= 354.7; % nm
 lambda_em = 354.7;
 
@@ -135,6 +135,7 @@ alphaAer(znoAer) = 1e-12;
 % 'asr set to 0 > Q.AerosolFreeheight'
     fl0 = find(alphaAer <= 0);
     alphaAer(fl0) = 1e-12;
+    
     
     
      alphaCorErr = 0;

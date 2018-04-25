@@ -27,8 +27,8 @@ Minute = minute(data.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom
 % from 2300 to 2330
 % tin =Q.time_in;
 
-starttime=find(g==tin & Minute==05);
-endtime=find(g==tin & Minute==09);
+starttime=find(g==tin & Minute==04);
+endtime=find(g==tin & Minute==08);
 
 JL = nanmean(data.JL.(what).Signal(:,starttime:endtime)');
 JH = nanmean(data.JH.(what).Signal(:,starttime:endtime)');

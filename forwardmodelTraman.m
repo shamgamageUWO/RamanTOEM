@@ -6,12 +6,13 @@ x_a = x(1:m);
 BJH = x(m+1);
 BJL = x(m+2);
 CJL = x(m+3);
-OV = x(m+4:end-5);
-BJHa = x(end-4);
-BJLa = x(end-3);
-CJLa = x(end-2);
-DT_JH = x(end-1);
-DT_JL = x(end); % deadtimes
+OV = x(m+4:2*m+3);
+BJHa = x(2*m+4);
+BJLa = x(2*m+5);
+CJLa = x(2*m+6);
+DT_JH = x(2*m+7);
+DT_JL = x(2*m+8); % deadtimes
+alpha_aero = x(2*m+9 :end);
 
 
 % interpolation
@@ -29,26 +30,21 @@ OV_Zia = OV_Zi(1:length(Q.JHnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
 %%
 % Constants
 kb = 1.38064852*10^-23;
-% area = pi * (0.3^2);
-% Transmission
-R_tr_i = (Q.Tr);
+
+% Total calculation Transmission
+alpha_aero1 = interp1(Q.Zret,alpha_aero,Q.Zmes,'linear');
+sigma_tot = Q.alpha_mol + alpha_aero1;
+R_tr_i  = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
+
 
 R_tr_id = R_tr_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
 R_tr_ia = R_tr_i(1:length(Q.JHnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
 
 
 
-% [Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Ti,Q.Pressi,0,Q.grav',Q.MoR);
-% Pdigid = interp1(Q.Zmes,log(Pdigi),Q.Zmes2,'linear');
-% Pdigia = interp1(Q.Zmes,log(Pdigi),Q.Zmes1,'linear');
-
 Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
 Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
 
-% Define the first part of the equation 
-% N1 = length(Q.Zmes1);
-
-% ind1 = Q.Zmes>3.8e3 & Q.Zmes<5e3; %JL
 
 A_Zi_an = ( OV_Zia .*R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2);
 B_Zi_an = (R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2); % No overlap

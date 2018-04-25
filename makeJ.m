@@ -91,6 +91,7 @@ KCL = [KCL1 zeros(1,n3+n4)];
 KCLa1 = [dJHadc dJLadc];
 KCLa = [zeros(1,n1+n2) KCLa1];
 
+%% JOV
 JOV = zeros(n,m);
 
 for jj = 1:m 
@@ -103,6 +104,19 @@ for jj = 1:m
 
 end
 
+%% J_aero
+Jaero = zeros(n,m);
+
+for jj = 1:m 
+   
+   [daeroJH,daeroJL,daeroJHa,daeroJLa] = deriCountsaero(jj,Q,x,@forwardmodelTraman);
+   Jaero(1:n1,jj) = daeroJH;
+   Jaero(n1+1:n1+n2,jj) = daeroJL;
+   Jaero(n1+n2+1:n1+n2+n3,jj) = daeroJHa;
+   Jaero(n1+n2+n3+1:n,jj) = daeroJLa;
+
+end
+
 %% Deadtime jacobian
 Jdt1 = zeros(n,1);
 Jdt2 = zeros(n,1);
@@ -111,85 +125,22 @@ Jdt2 = zeros(n,1);
     
    Jdt1(1:n1) = dJHdt;
    Jdt1(n1+1:n) = 0;
-%    Jdt1(n1+n2+1:n1+n2+n3) = 0;
-%    Jdt1(n1+n2+n3+1:n) = 0;
    
    Jdt2(1:n1) = 0;
    Jdt2(n1+1:n1+n2) = dJLdt;
    Jdt2(n1+n2+1:n) = 0;
-%    Jdt2(n1+n2+n3+1:n) = 0;
-% j
-% disp('ok')
-
-%%
-
-%% Final Jacobian
-% JJ = [ J(1:n,1:m) Kb_JL zeros(n,1);J(n+1:2*n,1:m) zeros(n,1) Kb_JH];last
-% working version
-% JJJH = [ Jc(1:n1,1:m) Kb_JH zeros(n1,1) KCL22' JOV(1:n1,1:m) zeros(n1,3)];
-% JJJL = [Jc(n1+1:n1+n2,1:m) zeros(n2,1) Kb_JL KCL11' JOV(n1+1:n1+n2,1:m) zeros(n1,3) ];
-% JJJHa = [ Jc(n1+n2+1:n1+n2+n3,1:m) zeros(n2,3) JOV(n1+n2+1:n1+n2+n3,1:m) Kb_JHa zeros(n1,1) KCLa22'];
-% JJJLa = [Jc(n1+n2+n3+1:n,1:m) zeros(n3,3) JOV(n1+n2+n3+1:n,1:m) zeros(n1,1) Kb_JLa KCLa11'];
-% 
-% J = [JJJH;JJJL;JJJHa;JJJLa];
-
-
- % When retrieving CJH independtly
- 
-% % % %     J_counts = Jc;
-% % % % 
-% % % %     J_JH = [Kb_JH;zeros(n2+n3+n4,1)];
-% % % % 
-% % % %     J_JL = [zeros(n1,1);Kb_JL;zeros(n3+n4,1)];
-% % % % 
-% % % %     KCL1 = [KCL22 KCL11];
-% % % %     KCL = [KCL1 zeros(1,n3+n4)];
-% % % % 
-% % % %     J_OV = JOV;
-% % % % 
-% % % %     J_JHa = [zeros(n1+n2,1);Kb_JHa;zeros(n4,1)];
-% % % % 
-% % % %     J_JLa = [zeros(n1+n2+n3,1);Kb_JLa];
-% % % % 
-% % % %     % KCLa1 = [KCLa22 KCLa11];
-% % % % 
-% % % %     KCHa = [zeros(1,n1+n2) KCHa zeros(1,n4)];
-% % % %     KCLa = [zeros(1,n1+n2+n3) KCLa];
-% % % % 
-% % % %     J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCHa' KCLa'];
-
-% figure;
-% subplot(1,2,1)
-% plot(J(1:n1,1:m),Q.Zmes./1000)
-% subplot(1,2,2)
-% plot(J(n1+1:end,1:m),Q.Zmes./1000)
-% 
-% figure;
-% subplot(1,2,1)
-% plot(JOV(1:n1,1:m),Q.Zmes./1000)
-% subplot(1,2,2)
-% plot(JOV(n1+1:end,1:m),Q.Zmes./1000)
 
 %% coupled analog
 J_counts = Jc;
-
 J_JH = [Kb_JH'; zeros(n2+n3+n4,1)];
-
 J_JL = [zeros(n1,1);Kb_JL';zeros(n3+n4,1)];
-
-
-
 J_OV = JOV;
-
+J_aero = Jaero;
 J_JHa = [zeros(n1+n2,1);Kb_JHa';zeros(n4,1)];
-
 J_JLa = [zeros(n1+n2+n3,1);Kb_JLa'];
 
 
-
-% KCHa = [zeros(1,n1+n2) KCLa22 zeros(1,n4)];
-% KCLa = [zeros(1,n1+n2+n3) KCLa11];
- 
-J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa' Jdt1 Jdt2];
+%% Total J 
+J = [J_counts J_JH J_JL KCL' J_OV J_JHa J_JLa KCLa' Jdt1 Jdt2 J_aero];
 
 

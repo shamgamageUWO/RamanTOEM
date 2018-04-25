@@ -5,32 +5,7 @@ function [R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q)
 % JLnewa = Q.JLnewa-Q.BaJLa;
 N1 = length(Q.JHnewa);
 
-% % Desaturate the signal
-%         % 1. Make the Co added counts to avg counts
-%         JHn = Q.JHnew./(Q.deltatime.*Q.coaddalt);
-%         JLn = Q.JLnew./(Q.deltatime.*Q.coaddalt);
-%         
-%         % 2. Convert counts to Hz
-%         JHnwn = (JHn.*Q.f);
-%         JLnwn = (JLn.*Q.f);
-% 
-%         
-%         % 3. Apply DT correction
-%         JL_dtc = JLn ./ (1 - JLnwn.*(Q.deadtimeJL)); % non-paralyzable
-%         JH_dtc = JHn ./ (1 - JHnwn.*(Q.deadtimeJH));
-% 
-% 
-% 
-% %        % 5. Scale bacl to coadded signal    
-%        JLnew = JL_dtc.*(Q.deltatime.*Q.coaddalt);
-%        JHnew = JH_dtc.*(Q.deltatime.*Q.coaddalt);
-%        
-%       ind1 = Q.Zmes2>50e3; 
-% %      
-%       bkg_JL = JLnew(ind1);
-%      BaJL_t = nanmean(bkg_JL);
-%     bkg_JH = JHnew(ind1);
-%      BaJH_t = nanmean(bkg_JH);
+
 
 JHnew = Q.JH_DS-Q.BaJH;
 JLnew = Q.JL_DS-Q.BaJL;
