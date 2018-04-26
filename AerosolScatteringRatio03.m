@@ -1,4 +1,4 @@
-function ASRatio = AerosolScatteringRatio03(data, config,tin)
+function ASRatio = AerosolScatteringRatio03(Q,data, config,tin)
 
 % filter width in m
 filter_width = config.ini.dASR.filter_width;
@@ -27,8 +27,8 @@ Minute = minute(data.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom
 % from 2300 to 2330
 % tin =Q.time_in;
 
-starttime=find(g==tin & Minute==04);
-endtime=find(g==tin & Minute==08);
+starttime=find(g==tin & Minute==Q.min1);
+endtime=find(g==tin & Minute==Q.min2);
 
 JL = nanmean(data.JL.(what).Signal(:,starttime:endtime)');
 JH = nanmean(data.JH.(what).Signal(:,starttime:endtime)');

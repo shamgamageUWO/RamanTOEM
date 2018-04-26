@@ -1,4 +1,4 @@
-function [X,R,Q,O,S_a,Se,xa,S_b]=TRamanOEM( date_in,time_in,flag)
+function [X,R,Q,O,S_a,Se,xa,S_b,Error]=TRamanOEM( date_in,time_in,flag)
 tic
 [O,Q,R,S_a,Se,xa] = InputsForOEM( date_in,time_in,flag);
 xa = xa';
@@ -200,7 +200,7 @@ DT_JL
                     
 S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
 S_b.degF2 = trace(X.A(m+4:2*m+3,m+4:2*m+3));%DegF for OV    
-S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end));%DegF for Aerosol 
+S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end))%DegF for Aerosol 
 
 % S_b.CutoffheightT = Q.Zret(response==0.9)
 % S_b.CutoffheightOV = Q.Zret(round(S_b.degF2))                   
@@ -284,17 +284,17 @@ legend ('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital',
 hold off;
 
 subplot(1,2,2)
-plot(Q.Ta(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','T a priori','LineWidth',1,...
+plot(Q.Ta(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','T a priori','LineWidth',1,...
     'Color',[0 0.498039215803146 0]);
 hold on;
-plot(Toem(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','T OEM','Color',[1 0 0]);
+plot(Toem(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','T OEM','Color',[1 0 0]);
 
 
 % Create plot
-plot(Q.Tsonde2(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','T sonde','Color',[0 0 1]);
+plot(Q.Tsonde2(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','T sonde','Color',[0 0 1]);
 
 % % Create plot
-% plot(T_an(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','Traditionalanalog','LineWidth',1,'Color',[0 0 0]);
+ plot(T_an(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','Traditionalanalog','LineWidth',1,'Color',[0 0 0]);
 % 
 % % Create plot
 % plot(T_dg(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
@@ -305,14 +305,14 @@ plot(Q.Tsonde2(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','T sonde',
 %     'Color',[0.854901969432831 0.701960802078247 1]);
 
 % [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
-jbfilly(Q.Zret(Q.Zret<=5000)./1000,upper(Q.Zret<=5000)',lower(Q.Zret<=5000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
-
-% Create xlabel
+jbfilly(Q.Zret(Q.Zret<=6000)./1000,upper(Q.Zret<=6000)',lower(Q.Zret<=6000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
+xlim([250 310])% Create xlabel
 xlabel('Temperature (K)');
 
 % Create ylabel
 ylabel('Altitude(km)');
 legend ('T a priori','T OEM','T sonde')
+
   set(gca,'fontsize',16)
 
 hold off;
@@ -369,25 +369,25 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 
 %        Overlap
-                    figure;
-                     subplot(1,2,1)
-                    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:2*m+3),Q.Zret./1000,'r')
-                    grid on;
-                    xlabel('OV')
-                    ylabel('Altitude ( km )')
-                    legend('OV a priori','OV OEM')
-                                         title( Q.Dateofthefolder);
-                                           set(gca,'fontsize',16)
-
-                     subplot(1,2,2)
-                    plot(Q.alpha_aero,Q.Zret./1000,'g',X.x(2*m+9:end),Q.Zret./1000,'r')
-                    grid on;
-                    xlabel('Extinction')
-                    ylabel('Altitude ( km )')
-                    legend('Aerosol Extinction a priori (m^-^1)','OEM aerosol extinction (m^-^1)')
-                                         title( Q.Dateofthefolder);
-                                           set(gca,'fontsize',16)
-
+    figure;
+    subplot(1,2,1)
+    plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:2*m+3),Q.Zret./1000,'r')
+    grid on;
+    xlabel('OV')
+    ylabel('Altitude ( km )')
+    legend('OV a priori','OV OEM')
+    title( Q.Dateofthefolder);
+    set(gca,'fontsize',16)
+    ylim([0 12])
+    subplot(1,2,2)
+    plot(Q.alpha_aero,Q.Zret./1000,'g',X.x(2*m+9:end),Q.Zret./1000,'r')
+    grid on;
+    xlabel('Extinction')
+    ylabel('Altitude ( km )')
+    legend('Aerosol Extinction a priori (m^-^1)','OEM aerosol extinction (m^-^1)')
+    title( Q.Dateofthefolder);
+    set(gca,'fontsize',16)
+    ylim([0 12])
 
 
 %                     subplot(1,2,2)
@@ -410,26 +410,28 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     hold on
                     plot(-(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r',(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r');
                     %plot(-(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r');
-
+                   ylim([4 30])
+                   grid off
                     hold off
                     xlabel('JH digital counts residual(%)')
                     ylabel('Altitude (km)')
                     title( Q.Dateofthefolder);
-                      set(gca,'fontsize',16)
-
-
-
+                    set(gca,'fontsize',16)
+                    
+                    
+                    
                     subplot(2,2,2)
                     grid on;
                     plot(((y(n1+1:n1+n2) - X.yf(n1+1:n1+n2))./X.yf(n1+1:n1+n2)).*100 ,Q.Zmes2./1000)
                     hold on;
                     plot(-(sqrt(yJL)./X.yf(n1+1:n1+n2)).*100,Q.Zmes2./1000,'r',(sqrt(yJL)./X.yf(n1+1:n1+n2)).*100,Q.Zmes2./1000,'r');
                     %plot(-(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r');
-
+                    ylim([4 30])
+                    grid off;
                     hold off
                     xlabel('JL digital counts residual(%)')
                     ylabel('Altitude (km)')
-                      set(gca,'fontsize',16)
+                    set(gca,'fontsize',16)
 
 
 
@@ -438,33 +440,33 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     % plot(((y(1:Q.n1) - X.yf(1:Q.n1))./y(1:Q.n1)).*100 ,Q.Zmes1(Q.ind)./1000)
                     plot(((y(n1+n2+1:n1+n2+n3) - X.yf(n1+n2+1:n1+n2+n3))./X.yf(n1+n2+1:n1+n2+n3)).*100 ,Q.Zmes1./1000)
                     hold on
-%                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
+                    %                     plot(-(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(yJHa)./X.yf(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
                     plot(-(sqrt(Q.YYYa')./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r',(sqrt(Q.YYYa')./y(n1+n2+1:n1+n2+n3)).*100,Q.Zmes1./1000,'r');
                     
-
+                    grid off
                     hold off
                     xlabel('JH - analog counts residual(%)')
                     ylabel('Altitude (km)')
-                      set(gca,'fontsize',16)
-
-
+                    set(gca,'fontsize',16)
+                    
+                    
                     subplot(2,2,4)
                     grid on;
                     plot(((y(n1+n2+n3+1:end) - X.yf(n1+n2+n3+1:end))./X.yf(n1+n2+n3+1:end)).*100 ,Q.Zmes1./1000)
                     hold on;
                     plot(-(sqrt(Q.YYa')./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r',(sqrt(Q.YYa')./y(n1+n2+n3+1:end)).*100,Q.Zmes1./1000,'r');
                     %plot(-(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r',(1./sqrt(yJLa)).*100,Q.Zmes1./1000,'r');
-
+                    grid off
                     hold off
                     xlabel('JL - analog counts residual(%)')
                     ylabel('Altitude (km)')
-                      set(gca,'fontsize',16)
+                    set(gca,'fontsize',16)
 
                      
 
                     
 
-% Error = errors(Q,X);  % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ Error = errors(Q,X);  % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %   b parameters and errors
 %                     
 % R1 =bparameterjacobians (Q,X);

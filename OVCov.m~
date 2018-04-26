@@ -89,12 +89,14 @@ for i = 1:m
     end
 end
 
-% t = Zj;
-% unitstep = Zj<=6000;
-% quad = (1./t).^2.*unitstep;
-% quad1 = quad./norm(quad); 
-%  S_OV = quad1.*S_OV ;
-
+t = Zj;
+unitstep = Zj<=6000;
+quad = (1./t).^2.*unitstep;
+quad1 = quad./norm(quad);
+ 
+ S_OV = quad1.*S_OV ;
+  k2 = find(~ S_OV(n,n));
+  S_OV(k2) = 1e-10;
 %  S_OV(n,n) = vars2(n);
  
 %   figure;plot(S_OV,Zj)

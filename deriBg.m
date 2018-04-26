@@ -3,8 +3,8 @@ function  [dJHdbg,dJLdbg,dJHadbg,dJLadbg] = deriBg(Q,x,forwardmodelTraman)
 m = length(Q.Zret);
 BJH = x(m+1);
 BJL = x(m+2);
-BJHa = x(end-4);
-BJLa = x(end-3);
+BJHa = x(2*m+4);
+BJLa = x(2*m+5);
 % N = 2*m+6 ;
 
 
@@ -25,8 +25,8 @@ BJLa = x(end-3);
 
     xpert(m+1) = BJH + dn1;
     xpert(m+2) =  BJL + dn2;
-    xpert(end-4) = BJHa + dn3;
-    xpert(end-3) =  BJLa + dn4;
+    xpert(2*m+4) = BJHa + dn3;
+    xpert(2*m+5) =  BJLa + dn4;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];
 
     [y_JL_dT,y_JH_dT,y_JLa_dT,y_JHa_dT]=forwardmodelTraman(Q,xpert);

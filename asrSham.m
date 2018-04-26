@@ -25,7 +25,7 @@ config.t0 = datenum ([num2str(date)], 'yyyymmdd');
 config = getCalibration(config);
 
 % Now run the aerosol code
-asr =AerosolScatteringRatio03(S3,config,tin );
+asr =AerosolScatteringRatio03(Q,S3,config,tin );
 figure;
 % subplot(1,2,1)
 plot(asr.profile,(asr.z)./1000); hold on
@@ -77,17 +77,17 @@ end
 %    LR(s2) = 80;
 % end
 
-% LR = Q.LRfree * ones(size(asrDATA));
+%  LR = Q.LRfree * ones(size(asrDATA));
 % fff = find(zN < Q.LRtranHeight);
 % LR(fff) = Q.LRpbl;
-asrDATAs = asrDATA';
+% asrDATAs = asrDATA';
 % asrDATAs = smooth(asrDATA,Q.asrsmoothing); %asrDATA; %smooth(asrDATA,90); %was 45
 
 % fneg1 = find(asrDATAs < 1);
 % asrDATAs(fneg1) = 1;
 
 % 
- [fneg,I] = min(asrDATAs(zN<6000));
+ [fneg,I] = min(asrDATAs(zN<5000));
  if fneg<0
   'diffrence is less than 0 shift towards 1'
     diff = 1-fneg;
@@ -118,10 +118,10 @@ hold off;
 
 LR = 20.*ones(size(asrDATAs));
 s2 = find(zN <2000);
-LR(s2) = 50;
+LR(s2) = 80;
 s1 = find(asrDATAnew > 2); % find indices asr greater than 2
 
-if  zN(s1)>=5000 
+if  zN(s1)>5000 
     LR(s1) = 25;
 elseif zN(s1)<5000
     LR(s1) = 20;

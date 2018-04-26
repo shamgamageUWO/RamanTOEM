@@ -152,7 +152,8 @@ for i = 1:length(alt_a)
 [ACF_JH(i,:)] = acf(HHa(i,:),0);
 end
 
-
+% Y.YYa = Q.deltatime.*ACF_JL;
+% Y.YYYa = Q.deltatime.*ACF_JH;
 Y.YYa = Q.deltatime.*(smooth(ACF_JL,5));
 Y.YYYa = Q.deltatime.*(smooth(ACF_JH,5));
 

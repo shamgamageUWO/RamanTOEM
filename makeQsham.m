@@ -40,16 +40,16 @@ D = 0.09426;
 exponent = 4+B+C*Lambda+D/Lambda;
 sigma_Rcm2 = A / Lambda^(exponent);
 Q.sigmaNicolet = sigma_Rcm2*1e-4;%m2
-Q.deadtimeJL = 3.8e-9; % 4ns
-Q.deadtimeJH = 3.7e-9; % 4ns
+Q.deadtimeJL = 3.8e-9; % 3.84ns
+Q.deadtimeJH = 3.7e-9; % 3.74ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.Shots = 1800; 
-Q.deltatime = 05;%30;3
-Q.min1 = 04;
-Q.min2 = 08;
+Q.deltatime = 10;%30;3
+Q.min1 = 00;
+Q.min2 = 10;
 disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -66,9 +66,9 @@ c3 = 2.*c2;
 c4 = 2.*c3;
 
 % For asr
-% Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
-% Q.LRpbl = 20; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-% Q.LRtranHeight = 3000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+%  Q.LRfree = 50; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
+%  Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
+%  Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 12000;%2011080223 17000
 Q.ASRcutoffheight = 12000; % 20110909 1400 20110802 day 11km
@@ -312,13 +312,28 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
             end
         end
 
+for i =1:length(Q.JLnew)
+    if Q.JLnew(i) <15
+         Q.YY(i) = 15;
+        Q.JLnew(i) = Q.JLnew(i) + rand*sqrt(20);
+    end
+end
+for i =1:length(Q.JHnew)
+    if Q.JHnew(i) <25
+         Q.YYY(i) = 25;
+        Q.JHnew(i) = Q.JHnew(i) + rand*sqrt(20);
+    end
+end
 
 
- 
-                Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYa =Q.YYa';
-                Q.YYYa =Q.YYYa';
+
+Q.YYa = 0.0025.*ones(1,length(Q.JLnewa)); 
+Q.YYYa = 0.0025.*ones(1,length(Q.JHnewa));
+%                 Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+%                 Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+%                 Q.YYa =Q.YYa';
+%                 Q.YYYa =Q.YYYa';
+                
 
 Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 Q.yvar = diag(Q.Yvar);

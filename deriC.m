@@ -1,7 +1,7 @@
 function [dJHdc,dJLdc,dJHadc,dJLadc] = deriC(Q,x,forwardmodelTraman)
 m = length(Q.Zret);
 CJL = x(m+3);
-CJLa = x(end-2);
+CJLa = x(2*m+6);
 
 
     [y_JL,y_JH,y_JLa,y_JHa]=forwardmodelTraman(Q,x);
@@ -19,7 +19,7 @@ CJLa = x(end-2);
     xpert = x;
 
     xpert(m+3) = CJL + dn1;
-    xpert(end-2) = CJLa + dn2;
+    xpert(2*m+6) = CJLa + dn2;
 %     xpert(end) =  DT_JL + dn2;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];
 
