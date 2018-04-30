@@ -23,7 +23,7 @@ m = length(Q.Ta);
 
 [S_aT]=TestTempCov(Q.Zret,Q.Ta);
 
-[S_aero]=AeroCov(Q.Zret,Q.alpha_aero);
+[S_aero]=AeroCov(Q.Zret,Q.alpha_aero,Q.cutoffOV);
 
 %%
 %%

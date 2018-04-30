@@ -2,7 +2,7 @@
 
 % % % % % Input : US Temperatures
 % % % % % Output : Temperature covariance
-function [S_OV]=OVCov(Zj,OV)
+function [S_OV]=OVCov(Zj,OV,cutoffOV)
  Zj = Zj';
 % ind = Zj<15000;
  m = length(OV);
@@ -68,7 +68,7 @@ function [S_OV]=OVCov(Zj,OV)
 
 for i = 1:m
     for j = 1:m
-         if Zj(i)< 6000 % this is to force the ov to go to 1.
+         if Zj(i)< cutoffOV % this is to force the ov to go to 1.
 %             disp('ok')
             sigprod = sqrt(vars2(i).*vars2(j));
             diffz = Zj(i) - Zj(j);
@@ -88,7 +88,7 @@ for i = 1:m
          end
     end
 end
-
+%%  work on this later , try a sqaure cov function mutiple by the unitstep !
 % t = Zj;
 % unitstep = Zj<=6000;
 % quad = (1./t).^2.*unitstep;

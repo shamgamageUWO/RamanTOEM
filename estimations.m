@@ -6,9 +6,17 @@ Zi = Q.Zmes;
 Za = Q.Zmes1;%analog
 Zd = Q.Zmes2;%digital
 
-ind1 = Zd>=4000 & Zd< 5000;% 6-8km
+cutoffOV = Q.cutoffOV;
 
-ind2 = Za>=4000 & Za< 5000;% 1800 was changed
+if cutoffOV < 5000
+    
+    ind1 = Zd>=3000 & Zd< 4000;% 6-8km
+    ind2 = Za>=3000 & Za< 4000;% 1800 was changed
+else
+    ind1 = Zd>=4000 & Zd< 5000;% 6-8km
+    ind2 = Za>=4000 & Za< 5000;% 1800 was changed
+    
+end
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

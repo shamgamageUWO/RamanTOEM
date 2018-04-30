@@ -214,8 +214,8 @@ S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end))%DegF for Aerosol
                 set(gca,'fontsize',16)
 %                     %
                     err = X.e(1:m);
-                    upper = err+ X.x(1:m);
-                    lower =  X.x(1:m)-err;
+                    upper = real(err+ X.x(1:m));
+                    lower =  real(X.x(1:m)-err);
 
                     
                     
@@ -380,14 +380,15 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
     set(gca,'fontsize',16)
     ylim([0 12])
     subplot(1,2,2)
-    plot(Q.alpha_aero,Q.Zret./1000,'g',X.x(2*m+9:end),Q.Zret./1000,'r')
+    semilogx(exp(Q.alpha_aero),Q.Zret./1000,'g',exp(X.x(2*m+9:end)),Q.Zret./1000,'r')
+%     semilogx((Q.alpha_aero),Q.Zret./1000,'g',(X.x(2*m+9:end)),Q.Zret./1000,'r')
     grid on;
     xlabel('Extinction')
     ylabel('Altitude ( km )')
     legend('Aerosol Extinction a priori (m^-^1)','OEM aerosol extinction (m^-^1)')
     title( Q.Dateofthefolder);
     set(gca,'fontsize',16)
-    ylim([0 12])
+    ylim([0 20])
 
 
 %                     subplot(1,2,2)

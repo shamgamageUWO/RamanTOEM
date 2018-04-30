@@ -36,14 +36,14 @@ g = hour(S0.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
 Minute = minute(S0.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
 
 % from 2300 to 2330
-starttime=find(g==23 & Minute==00);
-endtime=find(g==23 & Minute==30);
+starttime=find(g==time & Minute==00);
+endtime=find(g==time & Minute==30);
 
 g1 = hour(S3.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
 Minute1 = minute(S3.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
 % from 2300 to 2330
-starttime1=find(g1==23 & Minute1==00);
-endtime1=find(g1==23 & Minute1==30);
+starttime1=find(g1==time & Minute1==00);
+endtime1=find(g1==time & Minute1==30);
 
 alt =  S0.Channel(4).Range;
 alt_an = S0.Channel(11).Range ; % Note alt = alt_an
@@ -111,7 +111,7 @@ N = length(JH);
 % alt = alt(1:N-zAoffset);
 % alt_an = alt_an(1+zAoffset:end);
 
-coaddalt = 10;
+coaddalt = 4;
 [JH, JHzc] = coadd(JH, alt, coaddalt);
 [JL, JLzc] = coadd(JL, alt, coaddalt);
 [Eb, Ebzc] = coadd(Eb, alt, coaddalt);

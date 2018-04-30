@@ -85,20 +85,16 @@ figure;subplot(2,2,1)
 grid on;
 semilogx(JL_an,alt_an./1000)
 xlabel('JL_an')
-grid off;
-
 subplot(2,2,2)
 grid on;
 semilogx(JH_an,alt_an./1000)
 xlabel('JH_an')
 grid off;
-
 subplot(2,2,3)
 grid on;
 semilogx(JL,alt./1000)
 xlabel('JL_dg')
 grid off;
-
 subplot(2,2,4)
 grid on;
 semilogx(JH,alt./1000)

@@ -44,6 +44,8 @@ kb = 1.38064852*10^-23;
 % area = pi * (0.3^2);
 % Transmission
 alpha_aero1 = interp1(Q.Zret,alpha_aero,Q.Zmes,'linear');
+alpha_aero1 = exp(alpha_aero1); % retrieving log of aerosol
+
 sigma_tot = Q.alpha_mol + alpha_aero1;
 R_tr_i  = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
 

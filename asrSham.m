@@ -1,5 +1,5 @@
 % this is first get S3 file with asr content
-function [alphaAer,odaer] = asrSham(Q)
+function [alphaAer,odaer,cutoffOV] = asrSham(Q)
 % first load S3.mat 
  date = Q.date_in;
 [year,month,day] = getYMDFromDate(date);
@@ -80,7 +80,7 @@ end
 %  LR = Q.LRfree * ones(size(asrDATA));
 % fff = find(zN < Q.LRtranHeight);
 % LR(fff) = Q.LRpbl;
-% asrDATAs = asrDATA';
+ asrDATAs = asrDATA';
 % asrDATAs = smooth(asrDATA,Q.asrsmoothing); %asrDATA; %smooth(asrDATA,90); %was 45
 
 % fneg1 = find(asrDATAs < 1);
@@ -121,13 +121,22 @@ s2 = find(zN <2000);
 LR(s2) = 80;
 s1 = find(asrDATAnew > 2); % find indices asr greater than 2
 
-if  zN(s1)>5000 
+if  zN(s1(1))>5000 
     LR(s1) = 25;
-elseif zN(s1)<5000
-    LR(s1) = 20;
+elseif zN(s1(1))<5000
+    LR(s1) = 20;     
 else
     LR(s1)= 50;
 end
+
+if zN(s1(1))<6000
+     cutoffOV = zN(s1(1));
+else
+    cutoffOV = 6000;
+end
+
+
+
 
 alphaAer = LR .* (beta_mol .* (asrDATAnew-1));
 znoAer = find(zN > Q.AerosolFreeheight); % was 3000 for 20130122

@@ -98,7 +98,7 @@ sigma   = Ebsig./(JLsig + JHsig) .* sqrt( (Ebsum./(Ebsig.^2)) + ((JLsum+JHsum)./
 %% filtering
 
 % standard altitude grid
-z_ref = [60:30:12000]'; % Sham changed this from 60 to 20. 12000 % 
+z_ref = [60:30:20000]'; % Sham changed this from 60 to 20. 12000 now its 20km as we are retrieving clouds!
 [Rf sigma_f dz] = deal(nan(size(z_ref)));
 
 % plot(Rf,z_ref./1000,'b')

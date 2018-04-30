@@ -47,15 +47,15 @@ Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.Shots = 1800; 
-Q.deltatime = 10;%30;3
+Q.deltatime = 30;%30;3
 Q.min1 = 00;
-Q.min2 = 10;
+Q.min2 = 30;
 disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
-alt_df = 30000; % Digital Channel ending altitude
+alt_d0 = 3000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_df = 25000; % Digital Channel ending altitude
 alt_a0 = 50;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
@@ -70,8 +70,8 @@ c4 = 2.*c3;
 %  Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
 %  Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
-Q.AerosolFreeheight = 12000;%2011080223 17000
-Q.ASRcutoffheight = 12000; % 20110909 1400 20110802 day 11km
+Q.AerosolFreeheight = 20000;%2011080223 17000
+Q.ASRcutoffheight = 20000; % 20110909 1400 20110802 day 11km
 % Q.asrsmoothing = 10; % 100 for 20110802 day, 
 % Q.OVCOV_6above = 1e-3; % 1e-4 for clear 1e-2/3 for cloud relax this 
 
@@ -144,7 +144,7 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:6000;
 Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
 Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
-Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:32000;
+Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:28000;
 Q.Zret =[Z1 Z2 Z3 Z4];
 disp('Defined grids ')
 
@@ -153,9 +153,9 @@ disp('Defined grids ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
-Tsonde = Tsonde(Zsonde<=32000);
-Psonde = Psonde(Zsonde<=32000);
-Zsonde = Zsonde(Zsonde<=32000);
+Tsonde = Tsonde(Zsonde<=30000);
+Psonde = Psonde(Zsonde<=30000);
+Zsonde = Zsonde(Zsonde<=30000);
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
 Psonde1 = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr
@@ -184,9 +184,9 @@ disp('a priori temperature profile is loaded ')
 
 
 % % Calculate the aerosol attenuation
-[alpha_aero,odaer] = asrSham(Q);
- Q.alpha_aero = alpha_aero';%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
-
+[alpha_aero,odaer,cutoffOV] = asrSham(Q);
+ Q.alpha_aero = log(alpha_aero');%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
+Q.cutoffOV = cutoffOV;
 % Q.odaer = odaer;
 % 
 
@@ -244,7 +244,7 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                                         Q.OVa = OVnw;
                                         %  Q.OVa = ones(1,length(Q.Ta));
                                         Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.cutoffOV);
                                         disp('Daytime retrieval')
                                         else 
                                         Q.CovBJL = ((Y.bg_JL_std/sqrt(Y.bg_length2))).^2;
@@ -258,7 +258,7 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                                         OVnw(isnan(OVnw))=1;
                                         Q.OVa = OVnw;
                                         Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.cutoffOV);
 
                                         disp('Nighttime retrieval')
                                         end 
@@ -315,13 +315,13 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 for i =1:length(Q.JLnew)
     if Q.JLnew(i) <15
          Q.YY(i) = 15;
-        Q.JLnew(i) = Q.JLnew(i) + rand*sqrt(20);
+        Q.JLnew(i) = Q.JLnew(i) + rand*sqrt(15);
     end
 end
 for i =1:length(Q.JHnew)
-    if Q.JHnew(i) <25
-         Q.YYY(i) = 25;
-        Q.JHnew(i) = Q.JHnew(i) + rand*sqrt(20);
+    if Q.JHnew(i) <15
+         Q.YYY(i) = 15;
+        Q.JHnew(i) = Q.JHnew(i) + rand*sqrt(15);
     end
 end
 
