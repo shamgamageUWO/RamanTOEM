@@ -41,7 +41,7 @@ exponent = 4+B+C*Lambda+D/Lambda;
 sigma_Rcm2 = A / Lambda^(exponent);
 Q.sigmaNicolet = sigma_Rcm2*1e-4;%m2
 Q.deadtimeJL = 3.8e-9; % 3.84ns
-Q.deadtimeJH = 3.7e-9; % 3.74ns
+Q.deadtimeJH = 3.8e-9; % 3.74ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
@@ -54,9 +54,9 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-alt_d0 = 3000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
 alt_df = 25000; % Digital Channel ending altitude
-alt_a0 = 50;% Analog Channel starting altitude 20110705 150
+alt_a0 = 150;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
 % Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
@@ -185,7 +185,8 @@ disp('a priori temperature profile is loaded ')
 
 % % Calculate the aerosol attenuation
 [alpha_aero,odaer,cutoffOV] = asrSham(Q);
- Q.alpha_aero = log(alpha_aero');%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
+ Q.alpha_aero = (alpha_aero');
+%  Q.alpha_aero = log(alpha_aero');%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
 Q.cutoffOV = cutoffOV;
 % Q.odaer = odaer;
 % 
@@ -194,11 +195,13 @@ Q.cutoffOV = cutoffOV;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-    [R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
+    [R,Ra,R_fit,Ra_fit,dfacR,dfacRa,ind1,ind2] = Restimationnew(Q);
     Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
     Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
     Q.GR = dfacR ; % ISSI recommend
     Q.GRa = dfacRa;
+    Q.ind1 = ind1;
+    Q.ind2 = ind2;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -215,7 +218,6 @@ Q.alpha_mol = alpha_mol;
 % % Q.CLa= 4.6099e+15;
 Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
-
 % load('OverlapSham.mat')
 % OVnw = interp1(OverlapSham.z,OverlapSham.OVsmooth,Q.Zret,'linear');
 % 
@@ -327,12 +329,12 @@ end
 
 
 
-Q.YYa = 0.0025.*ones(1,length(Q.JLnewa)); 
-Q.YYYa = 0.0025.*ones(1,length(Q.JHnewa));
-%                 Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
-%                 Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
-%                 Q.YYa =Q.YYa';
-%                 Q.YYYa =Q.YYYa';
+% Q.YYa = 0.01.*ones(1,length(Q.JLnewa)); 
+% Q.YYYa = 0.01.*ones(1,length(Q.JHnewa));
+                Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYa =Q.YYa';
+                Q.YYYa =Q.YYYa';
                 
 
 Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];

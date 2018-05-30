@@ -38,16 +38,17 @@ Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f
 
 
 
-datadir = '/Users/sham/Documents/MATLAB/RALMO_Data/Sonde/RS92';
-
+% datadir = '/Users/sham/Documents/MATLAB/RALMO_Data/Sonde/RS92';
+datadir='/Volumes/Sham_RALMO/RALMO_DATA/RALMO_Data/Sonde/RS92';
 folder = [datadir filesep Dateofthefolder];
 files = dirFiles(folder);
+%  cleanmacpollution(folder);
 %Find the FLEDfile
 FLEDTfile = strfind(files,'FLEDT.tsv');
 FLEDTfile = find(~cellfun(@isempty,FLEDTfile));
 
 if length(FLEDTfile)>1
-    FLEDTfile = FLEDTfile(1);
+    FLEDTfile = FLEDTfile(2);
 end
   file = [folder filesep files{FLEDTfile}]
 if exist(file, 'file')

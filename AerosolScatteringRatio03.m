@@ -25,7 +25,7 @@ g = hour(data.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
 Minute = minute(data.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
 
 % from 2300 to 2330
-% tin =Q.time_in;
+ tin =Q.time_in;
 
 starttime=find(g==tin & Minute==Q.min1);
 endtime=find(g==tin & Minute==Q.min2);

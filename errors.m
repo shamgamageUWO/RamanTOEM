@@ -99,8 +99,8 @@ semilogx(total_err_T,Q.Zret/1000,'black')
 xlabel('Temperature Uncertainty (K)')
 ylabel('Altitude (km)')
 legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Total Error')
- title( Q.Dateofthefolder);
-  set(gca,'fontsize',16)
+%  title( Q.Dateofthefolder);
+  set(gca,'fontsize',20)
 
 
   %%% This needs to be edited and add errors for aerosol
@@ -116,6 +116,7 @@ Error.Air_ErrorOV =sqrt(Air(m+4:2*m+3)).*1e2;
 Error.Total_ErrorOV =total_err_OV.*1e2;
 
 figure;
+subplot(1,2,1)
 plot(X.eo(m+4:2*m+3).*1e2,Q.Zret./1000,'r')
 hold on;
  plot(sqrt(P(m+4:2*m+3)).*1e2,Q.Zret./1000,'--*')
@@ -124,11 +125,12 @@ plot(sqrt(Ra(m+4:2*m+3)).*1e2,Q.Zret./1000,'--+')
 plot(sqrt(Air(m+4:2*m+3)).*1e2,Q.Zret./1000,'--o')
 % plot(sqrt(Aero(m+4:2*m+3)).*1e2,Q.Zret./1000,'--s')
 plot(total_err_OV.*1e2,Q.Zret/1000,'black')
+hold off
 xlabel('Overlap Uncertainty (%)')
 ylabel('Altitude (km)')
 legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Total Error')
-title( Q.Dateofthefolder);
-set(gca,'fontsize',16)
+% title( Q.Dateofthefolder);
+set(gca,'fontsize',20)
 
 
 
@@ -145,17 +147,18 @@ Error.Air_Errorae =sqrt(Air(2*m+9:end)).*1e2;
 % Error.Aero_Errorae =sqrt(Aero(2*m+9:end)).*1e2;
 Error.Total_Errorae =total_err_ae.*1e2;
 
-figure;
+subplot(1,2,2)
 semilogx(X.eo(2*m+9:end).*1e2,Q.Zret./1000,'r')
 hold on;
- semilogx(sqrt(P(2*m+9:end)).*1e2,Q.Zret./1000,'--*')
+semilogx(sqrt(P(2*m+9:end)).*1e2,Q.Zret./1000,'--*')
 semilogx(sqrt(Rc(2*m+9:end)).*1e2,Q.Zret./1000,'--^')
 semilogx(sqrt(Ra(2*m+9:end)).*1e2,Q.Zret./1000,'--+')
 semilogx(sqrt(Air(2*m+9:end)).*1e2,Q.Zret./1000,'--o')
 % semilogx(sqrt(Aero(2*m+9:end)).*1e2,Q.Zret./1000,'--s')
 semilogx(total_err_ae.*1e2,Q.Zret/1000,'black')
+hold off;
 xlabel('Aerosol Extinction Uncertainty (%)')
 ylabel('Altitude (km)')
 legend('Statistical','Pressure','R','Ra','Sigma Rayleigh','Total Error')
-title( Q.Dateofthefolder);
-set(gca,'fontsize',16)
+% title( Q.Dateofthefolder);
+set(gca,'fontsize',20)

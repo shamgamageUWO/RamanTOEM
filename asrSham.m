@@ -6,8 +6,10 @@ function [alphaAer,odaer,cutoffOV] = asrSham(Q)
  yr = num2str(year);
 
  % open S0 matfile according to the given date
-datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
+% datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
 % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
+
+datadirS3='/Volumes/Sham_RALMO/RALMO_DATA/RALMO_Data/RALMO';
 file = 'S3';
 %  Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
  Dateofthefolder = Q.Dateofthefolder;
@@ -121,22 +123,30 @@ s2 = find(zN <2000);
 LR(s2) = 80;
 s1 = find(asrDATAnew > 2); % find indices asr greater than 2
 
-if  zN(s1(1))>5000 
-    LR(s1) = 25;
-elseif zN(s1(1))<5000
-    LR(s1) = 20;     
-else
-    LR(s1)= 50;
-end
-
-if zN(s1(1))<6000
-     cutoffOV = zN(s1(1));
-else
+%%
+if isempty(s1)
+    s3 = find(zN >=2000);
+    LR(s3) = 50;
     cutoffOV = 6000;
+else
+    
+    if  zN(s1(1))>6000
+        LR(s1(1):end) = 25;
+    elseif zN(s1(1))<6000
+        LR(s1(1):end) = 20;
+    else
+        LR(s1(1):end)= 50;
+    end
+    
+    if zN(s1(1))<6000
+        cutoffOV = zN(s1(1));
+    else
+        cutoffOV = 6000;
+    end
 end
 
 
-
+%%
 
 alphaAer = LR .* (beta_mol .* (asrDATAnew-1));
 znoAer = find(zN > Q.AerosolFreeheight); % was 3000 for 20130122

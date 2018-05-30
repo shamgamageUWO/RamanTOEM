@@ -13,10 +13,10 @@ function [daeroJH,daeroJL,daeroJHa,daeroJLa] = deriCountsaero(j,Q,x,forwardmodel
     end
 %     m=length(Q.Zret);
 %     xa=x(1:m);
-    dn = x(2*m+8+j).*1e-2; % this can go anything smaller than 0.1 even for higher temperatures works ok
+    dn = x(2*m+8+j).*1e-6; % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
     if x(j) == 0 % trap for tau's where tau(1) = 0
-        dn = 1.e-2 .* x(2*m+8+j+1);
+        dn = 1.e-6 .* x(2*m+8+j+1);
     end
     xpert(2*m+8+j) = x(2*m+8+j) + dn;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];

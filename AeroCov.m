@@ -12,7 +12,7 @@ S_Aero =zeros(n,n);
  lc = lengthcT.*ones(1,m);
  l = size(aero);
  
-  Tfac = 1;
+  Tfac = .5;
   Tmodvar = (Tfac.*ones(l)).^2;
 % %  
 %  ll = size(OV);
@@ -43,7 +43,7 @@ for i = 1:m
             %          Sa_T(i,j) = Ta(i);
             %         end
          else
-             S_Aero(i,i) = 1e-4; % cloud at 6km use 1e-2
+             S_Aero(i,i) = 1e-12; % cloud at 6km use 1e-2
          end
     end
 end

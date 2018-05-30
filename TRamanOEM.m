@@ -221,19 +221,24 @@ S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end))%DegF for Aerosol
                     
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                    
 % load traditional temperature profiles
-date = Q.date_in;
-time = Q.time_in;
-[year,month,day] = getYMDFromDate(date);
-yr = num2str(year);
-datadirS3 = '/Users/sham/Downloads/OEM-Sham-Code-Jan-2017/QpackSham/TraditionalTemperature';
-filename =[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f',time)];
-folderpath = [datadirS3 filesep filename];
-load(folderpath);
+% date = Q.date_in;
+% time = Q.time_in;
+% [year,month,day] = getYMDFromDate(date);
+% yr = num2str(year);
+% datadirS3 = '/Users/sham/Downloads/OEM-Sham-Code-Jan-2017/QpackSham/TraditionalTemperature';
+% filename =[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f',time)];
+% folderpath = [datadirS3 filesep filename];
+% load(folderpath);
 
-T_an = interp1(H.alt_an,H.T_an,Q.Zret);
-T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
-T_cm = interp1(H.alt_com,H.T_cm,Q.Zret);
-
+ H = traditionalTraman(Q);
+T_an = interp1(Q.Zmes1,H.T_an,Q.Zret);
+T_dg = interp1(Q.Zmes2,H.T_dg,Q.Zret);
+ 
+% T_an = interp1(H.alt_an,H.T_an,Q.Zret);
+% T_dg = interp1(H.alt_digi,H.T_dg,Q.Zret);
+% T_cm = interp1(H.alt_com,H.T_cm,Q.Zret);
+% T_an = H.T_an;
+% T_dg = H.T_dg;
 
 Toem= X.x(1:m);
 
@@ -259,8 +264,8 @@ plot(T_dg(Q.Zret<=25000),Q.Zret(Q.Zret<=25000)./1000,'DisplayName','TraditionalD
     'Color',[0.929411768913269 0.694117665290833 0.125490203499794]);
 
 % Create plot
-plot(T_cm(Q.Zret<=25000),Q.Zret(Q.Zret<=25000)./1000,'DisplayName','TraditionalCombined','LineWidth',1,...
-    'Color',[0.854901969432831 0.701960802078247 1]);
+% plot(T_cm(Q.Zret<=25000),Q.Zret(Q.Zret<=25000)./1000,'DisplayName','TraditionalCombined','LineWidth',1,...
+%     'Color',[0.854901969432831 0.701960802078247 1]);
 
 % [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
 jbfilly(Q.Zret(Q.Zret<=30000)./1000,upper(Q.Zret<=30000)',lower(Q.Zret<=30000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
@@ -276,7 +281,7 @@ ylabel('Altitude(km)');
 % grid(axes1,'on');
 % Create legend
 % legend(axes1,'show');
-legend ('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital','TraditionalCombined')
+legend ('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital')
  title( Q.Dateofthefolder);
   set(gca,'fontsize',16)
 
@@ -297,8 +302,8 @@ plot(Q.Tsonde2(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','T sonde',
  plot(T_an(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','Traditionalanalog','LineWidth',1,'Color',[0 0 0]);
 % 
 % % Create plot
-% plot(T_dg(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
-%     'Color',[0.929411768913269 0.694117665290833 0.125490203499794]);
+ plot(T_dg(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
+     'Color',[0.929411768913269 0.694117665290833 0.125490203499794]);
 % 
 % % Create plot
 % plot(T_cm(Q.Zret<=5000),Q.Zret(Q.Zret<=5000)./1000,'DisplayName','TraditionalCombined','LineWidth',1,...
@@ -311,7 +316,7 @@ xlabel('Temperature (K)');
 
 % Create ylabel
 ylabel('Altitude(km)');
-legend ('T a priori','T OEM','T sonde')
+legend ('T a priori','T OEM','T sonde','Traditional Analog','Traditional Digital')
 
   set(gca,'fontsize',16)
 
@@ -380,8 +385,8 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
     set(gca,'fontsize',16)
     ylim([0 12])
     subplot(1,2,2)
-    semilogx(exp(Q.alpha_aero),Q.Zret./1000,'g',exp(X.x(2*m+9:end)),Q.Zret./1000,'r')
-%     semilogx((Q.alpha_aero),Q.Zret./1000,'g',(X.x(2*m+9:end)),Q.Zret./1000,'r')
+%     semilogx(exp(Q.alpha_aero),Q.Zret./1000,'g',exp(X.x(2*m+9:end)),Q.Zret./1000,'r')
+ semilogx((Q.alpha_aero),Q.Zret./1000,'g',(X.x(2*m+9:end)),Q.Zret./1000,'r')
     grid on;
     xlabel('Extinction')
     ylabel('Altitude ( km )')
@@ -411,7 +416,7 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     hold on
                     plot(-(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r',(sqrt(yJH)./X.yf(1:n1)).*100,Q.Zmes2./1000,'r');
                     %plot(-(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJH)).*100,Q.Zmes2./1000,'r');
-                   ylim([4 30])
+                   ylim([2 30])
                    grid off
                     hold off
                     xlabel('JH digital counts residual(%)')
@@ -427,7 +432,7 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
                     hold on;
                     plot(-(sqrt(yJL)./X.yf(n1+1:n1+n2)).*100,Q.Zmes2./1000,'r',(sqrt(yJL)./X.yf(n1+1:n1+n2)).*100,Q.Zmes2./1000,'r');
                     %plot(-(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r',(1./sqrt(yJL)).*100,Q.Zmes2./1000,'r');
-                    ylim([4 30])
+                    ylim([2 30])
                     grid off;
                     hold off
                     xlabel('JL digital counts residual(%)')

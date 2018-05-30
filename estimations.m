@@ -6,17 +6,10 @@ Zi = Q.Zmes;
 Za = Q.Zmes1;%analog
 Zd = Q.Zmes2;%digital
 
-cutoffOV = Q.cutoffOV;
+ %cutoffOV = Q.cutoffOV;
 
-if cutoffOV < 5000
+    ind2 = Za>=1500 & Za<3000;% 1800 was changed
     
-    ind1 = Zd>=3000 & Zd< 4000;% 6-8km
-    ind2 = Za>=3000 & Za< 4000;% 1800 was changed
-else
-    ind1 = Zd>=4000 & Zd< 5000;% 6-8km
-    ind2 = Za>=4000 & Za< 5000;% 1800 was changed
-    
-end
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -40,10 +33,10 @@ SJLa = Q.JLnewa - Q.BaJLa;
 
 [JL,JH,JLa,JHa]=forwardmodelTraman(Q,x);
   
-yJL= SJL(ind1);
-xJL=JL(ind1);
-yJH= SJH(ind1);
-xJH =JH(ind1);
+yJL= SJL(Q.ind1);
+xJL=JL(Q.ind1);
+yJH= SJH(Q.ind1);
+xJH =JH(Q.ind1);
 
 fL = fittype({'x'});
 [fitJL,C.GJL] = fit(xJL',yJL,fL,'Robust','on');

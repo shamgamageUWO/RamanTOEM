@@ -11,7 +11,8 @@ function [Y] = makeYNEWer(Q)
  yr = num2str(year);
 
  % open S0 matfile according to the given date
-datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
+ datadirS3='/Volumes/Sham_RALMO/RALMO_DATA/RALMO_Data/RALMO';
+% datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
 % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
 file = 'S0';
 
@@ -81,29 +82,29 @@ Eb_an = S0.Channel(9).Signal(:,starttime:endtime);%20120717(:,1347:1377);%(:,961
 JL_an = JL_an';
 JH_an = JH_an';
 
-figure;subplot(2,2,1)
-grid on;
-semilogx(JL_an,alt_an./1000)
-xlabel('JL_an')
-grid off;
-
-subplot(2,2,2)
-grid on;
-semilogx(JH_an,alt_an./1000)
-xlabel('JH_an')
-grid off;
-
-subplot(2,2,3)
-grid on;
-semilogx(JL,alt./1000)
-xlabel('JL_dg')
-grid off;
-
-subplot(2,2,4)
-grid on;
-semilogx(JH,alt./1000)
-xlabel('JH_dg')
-grid off;
+% figure;subplot(2,2,1)
+% grid on;
+% semilogx(JL_an,alt_an./1000)
+% xlabel('JL_an')
+% grid off;
+% 
+% subplot(2,2,2)
+% grid on;
+% semilogx(JH_an,alt_an./1000)
+% xlabel('JH_an')
+% grid off;
+% 
+% subplot(2,2,3)
+% grid on;
+% semilogx(JL,alt./1000)
+% xlabel('JL_dg')
+% grid off;
+% 
+% subplot(2,2,4)
+% grid on;
+% semilogx(JH,alt./1000)
+% xlabel('JH_dg')
+% grid off;
 
 
 % MHZ to Counts conversion constant 
@@ -210,16 +211,18 @@ bkg_ind2 = Alt>50e3;
   figure;
   subplot(1,2,1)
   semilogx(JLnwn,alt./1000,'b',JHnwn,alt./1000,'r')
+  legend('JL','JH')
   xlabel('Digital Signal (MHz)')
   ylabel('Altitude (km)')
-title( Dateofthefolder);
-  set(gca,'fontsize',16)
+% title( Dateofthefolder);
+  set(gca,'fontsize',20)
   subplot(1,2,2)
   semilogx(JL_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'b',JH_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'r') 
-  xlabel('Analog Signal (mV)')
+  legend('JLa','JHa')
+  xlabel('Analog Signal (MHz)')
   ylabel('Altitude (km)')
-title( Dateofthefolder);
-  set(gca,'fontsize',16)
+% title( Dateofthefolder);
+  set(gca,'fontsize',20)
   
 %   figure;
 %   semilogx(Eb,Ebzc./1000,'g')
