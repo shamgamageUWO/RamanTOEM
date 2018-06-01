@@ -48,8 +48,8 @@ Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.Shots = 1800; 
 Q.deltatime = 30;%30;3
-Q.min1 = 00;
-Q.min2 = 30;
+Q.min1 = 29;
+Q.min2 = 59;
 disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -71,7 +71,7 @@ c4 = 2.*c3;
 %  Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
 Q.AerosolFreeheight = 20000;%2011080223 17000
-Q.ASRcutoffheight = 20000; % 20110909 1400 20110802 day 11km
+Q.ASRcutoffheight = 20000; % 20110909 2000 20110802 day 11km
 % Q.asrsmoothing = 10; % 100 for 20110802 day, 
 % Q.OVCOV_6above = 1e-3; % 1e-4 for clear 1e-2/3 for cloud relax this 
 

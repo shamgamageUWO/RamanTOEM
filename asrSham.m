@@ -89,7 +89,7 @@ end
 % asrDATAs(fneg1) = 1;
 
 % 
- [fneg,I] = min(asrDATAs(zN<5000));
+ [fneg,I] = min(asrDATAs(zN<6000));
  if fneg<0
   'diffrence is less than 0 shift towards 1'
     diff = 1-fneg;
