@@ -15,7 +15,7 @@ iter = 1;
 %%
 % %xa
                    %%% x_a = [Q.Ta (Q.BaJH) (Q.BaJL) log(Q.CL) Q.OVa]; % now im retrieving log of CJL
-x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL Q.alpha_aero]; % now im retrieving log of CJL
+x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL Q.LR]; % now im retrieving log of CJL
 
 % x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CHa Q.CLa]; %  CJHa
 m = length(Q.Ta);
@@ -23,7 +23,7 @@ m = length(Q.Ta);
 
 [S_aT]=TestTempCov(Q.Zret,Q.Ta);
 
-[S_aero]=AeroCov(Q.Zret,Q.alpha_aero,Q.cutoffOV);
+[S_aero]=AeroCov(Q.Zret,Q.LR,Q.cutoffOV);
 
 %%
 %%

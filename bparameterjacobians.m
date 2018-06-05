@@ -23,7 +23,7 @@ BJLa = x(2*m+5);
 CJLa = x(2*m+6);
 DT_JH = x(2*m+7);
 DT_JL = x(2*m+8); % deadtimes
-alpha_aero = x(2*m+9 :end);
+LR = x(2*m+9 :end);
 
 
 % interpolation
@@ -41,14 +41,12 @@ OV_Zia = OV_Zi(1:length(Q.JHnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
 %%
 % Constants
 kb = 1.38064852*10^-23;
-% area = pi * (0.3^2);
+
 % Transmission
-alpha_aero1 = interp1(Q.Zret,alpha_aero,Q.Zmes,'linear');
-% alpha_aero1 = exp(alpha_aero1); % retrieving log of aerosol
-
-sigma_tot = Q.alpha_mol + alpha_aero1;
+% Total calculation Transmission
+LR1 = interp1(Q.Zret,LR,Q.Zmes,'linear');
+sigma_tot = Q.alpha_mol + LR1 .* Q.asr;
 R_tr_i  = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
-
 
 R_tr_id = R_tr_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
 R_tr_ia = R_tr_i(1:length(Q.JHnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
@@ -115,7 +113,7 @@ yJH = Q.JHnew;
 yJL = Q.JLnew;
 yJHA = Q.JHnewa;
 yJLA = Q.JLnewa;
- deltaZ = Q.Zmes1(2) - Q.Zmes1(1);
+deltaZ = Q.Zmes1(2) - Q.Zmes1(1);
 % oem retrievals
 n = length(X.x);
 N = length(X.yf);
@@ -229,15 +227,29 @@ R.Jnair  = diag(Jnair);
 
 
 %%% aerosol scattering jacobian
-
+%%
 % dSJHdnaero = (-2.*(JH)) .* DTDJH;
 % dSJLdnaero = (-2.*(JL)) .* DTDJL;
 % dSJHdnaeroA = (-2.*(JHa));
 % dSJLdnaeroA = (-2.* (JLa));
 
+dSJHdnaero = (-2.*(LR1(end-n1+1:end).*JH)) .* DTDJH;
+dSJLdnaero = (-2.*(LR1(end-n1+1:end).*JL)) .* DTDJL;
+dSJHdnaeroA = (-2.*(LR1(1:n2).*JHa));
+dSJLdnaeroA = (-2.*(LR1(1:n2).*JLa));
 
-% Jaero = [dSJHdnaero' ;dSJLdnaero';dSJHdnaeroA';dSJLdnaeroA'];
-% R.Jaero  = diag(Jaero);
+Jaero = [dSJHdnaero' ;dSJLdnaero';dSJHdnaeroA';dSJLdnaeroA'];
+R.Jaero  = diag(Jaero);
+
+% dSJHdnbetamol = (-2.*(JH)) .* DTDJH;
+% dSJLdnbetamol = (-2.*(JL)) .* DTDJL;
+% dSJHdnbetamolA = (-2.*(JHa));
+% dSJLdnbetamolA = (-2.* (JLa));
+% 
+% 
+%  Jbeta = [dSJHdnbetamol' ;dSJLdnbetamol';dSJHdnbetamolA';dSJLdnbetamolA'];
+%  R.Jbeta  = diag(Jbeta);
+
 
 %     figure;
 %     subplot(2,2,1)

@@ -12,7 +12,7 @@ BJLa = x(2*m+5);
 CJLa = x(2*m+6);
 DT_JH = x(2*m+7);
 DT_JL = x(2*m+8); % deadtimes
-alpha_aero = x(2*m+9 :end);
+LR = x(2*m+9 :end);
 
 
 % interpolation
@@ -32,9 +32,9 @@ OV_Zia = OV_Zi(1:length(Q.JHnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
 kb = 1.38064852*10^-23;
 
 % Total calculation Transmission
-alpha_aero1 = interp1(Q.Zret,alpha_aero,Q.Zmes,'linear');
+ LR1 = interp1(Q.Zret,LR,Q.Zmes,'linear');
 % alpha_aero1 = exp(alpha_aero1);% now retrieving log of aerosol extinction
-sigma_tot = Q.alpha_mol + alpha_aero1;
+sigma_tot = Q.alpha_mol + LR1 .* (Q.asr);
 R_tr_i  = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
 
 

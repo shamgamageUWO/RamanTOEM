@@ -48,8 +48,8 @@ Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.Shots = 1800; 
 Q.deltatime = 30;%30;3
-Q.min1 = 29;
-Q.min2 = 59;
+Q.min1 = 00;
+Q.min2 = 30;
 disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -176,7 +176,7 @@ Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
 Ta = temp; % for now im adding 2K to test
 % Q.Ta=Ta;
- Q.Ta = (Ta./Ta(1)).* Q.Tsonde2(1);
+Q.Ta = (Ta./Ta(1)).* Q.Tsonde2(1);
 Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
 
 disp('a priori temperature profile is loaded ')
@@ -184,14 +184,39 @@ disp('a priori temperature profile is loaded ')
 
 
 % % Calculate the aerosol attenuation
-[alpha_aero,odaer,cutoffOV] = asrSham(Q);
- Q.alpha_aero = (alpha_aero');
-%  Q.alpha_aero = log(alpha_aero');%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
+[asr,cutoffOV,beta_mol] = asrSham(Q);
+LR = 20.*ones(1,length(Q.Zret));
+LR(Q.Zret<=2000) = 80;
+% LR(Q.Zret>2000 & Q.Zret<cutoffOV) = 50;
+Q.LR = LR;
+% LR(Q.Zmes>2000) = 20; 
+% LR(Q.Zmes>2000 & Q.Zmes<cutoffOV) = 20;
+% if isempty(s1)
+%     s3 = find(zN >=2000);
+%     LR(s3) = 50;
+%     cutoffOV = 6000;
+% else
+%     
+%     if  zN(s1(1))>=6000
+%         LR(s1(1):end) = 25;
+%     elseif zN(s1(1))<=6000
+%         LR(s1(1):end) = 20;
+%     else
+%         LR(s1(1):end)= 50;
+%     end
+%     
+%     if zN(s1(1))<6000
+%         cutoffOV = zN(s1(1));
+%     else
+%         cutoffOV = 6000;
+%     end
+% end
+
+
+Q.asr = interp1(Q.Zret,asr,Q.Zmes,'spline');
+% Q.LR = interp1(Q.Zmes,LR,Q.Zret,'spline');
+% Q.beta_mol = interp1(Q.Zret,beta_mol,Q.Zmes,'spline');
 Q.cutoffOV = cutoffOV;
-% Q.odaer = odaer;
-% 
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
@@ -329,12 +354,12 @@ end
 
 
 
-% Q.YYa = 0.01.*ones(1,length(Q.JLnewa)); 
-% Q.YYYa = 0.01.*ones(1,length(Q.JHnewa));
-                Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYa =Q.YYa';
-                Q.YYYa =Q.YYYa';
+Q.YYa = 0.004.*ones(1,length(Q.JLnewa)); 
+Q.YYYa = 0.004.*ones(1,length(Q.JHnewa));
+%                 Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+%                 Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+%                 Q.YYa =Q.YYa';
+%                 Q.YYYa =Q.YYYa';
                 
 
 Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];

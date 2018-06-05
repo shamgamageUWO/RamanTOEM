@@ -1,5 +1,5 @@
 % this is first get S3 file with asr content
-function [alphaAer,odaer,cutoffOV] = asrSham(Q)
+function [asr,cutoffOV,beta_mol] = asrSham(Q)
 % first load S3.mat 
  date = Q.date_in;
 [year,month,day] = getYMDFromDate(date);
@@ -56,7 +56,7 @@ lambda_em = 354.7;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% These lines are from BOB - WV - makeQ.m
 
-asrDATA = interp1(asr.z,asr.profile,zN,'spline');
+asrDATA = interp1(asr.z,asr.profile',zN,'spline');
 % plot(asrDATA,zN./1000,'black');
 
 flow = find(zN < asr.z(1));
@@ -118,25 +118,25 @@ title( Q.Dateofthefolder);
 
 hold off;
 
-LR = 20.*ones(size(asrDATAs));
-s2 = find(zN <2000);
-LR(s2) = 80;
+% % LR = 20.*ones(size(asrDATAs));
+% s2 = find(zN <2000);
+% LR(s2) = 80;
 s1 = find(asrDATAnew > 2); % find indices asr greater than 2
 
 %%
 if isempty(s1)
-    s3 = find(zN >=2000);
-    LR(s3) = 50;
+%     s3 = find(zN >=2000);
+%     LR(s3) = 50;
     cutoffOV = 6000;
 else
     
-    if  zN(s1(1))>6000
-        LR(s1(1):end) = 25;
-    elseif zN(s1(1))<6000
-        LR(s1(1):end) = 20;
-    else
-        LR(s1(1):end)= 50;
-    end
+%     if  zN(s1(1))>=6000
+%         LR(s1(1):end) = 25;
+%     elseif zN(s1(1))<=6000
+%         LR(s1(1):end) = 20;
+%     else
+%         LR(s1(1):end)= 50;
+%     end
     
     if zN(s1(1))<6000
         cutoffOV = zN(s1(1));
@@ -148,19 +148,20 @@ end
 
 %%
 
-alphaAer = LR .* (beta_mol .* (asrDATAnew-1));
-znoAer = find(zN > Q.AerosolFreeheight); % was 3000 for 20130122
-alphaAer(znoAer) = 1e-12;
-% 'asr set to 0 > Q.AerosolFreeheight'
-    fl0 = find(alphaAer <= 0);
-    alphaAer(fl0) = 1e-12;
+% alphaAer = LR .* (beta_mol .* (asrDATAnew-1));
+% znoAer = find(zN > Q.AerosolFreeheight); % was 3000 for 20130122
+% alphaAer(znoAer) = 1e-12;
+% % 'asr set to 0 > Q.AerosolFreeheight'
+%     fl0 = find(alphaAer <= 0);
+%     alphaAer(fl0) = 1e-12;
     
     
     
-     alphaCorErr = 0;
-     z0 = 0:.1:zN(1);
-     alpha0=alphaAer(1).*ones(size(z0));
-     odnorm = trapz(z0,alpha0);
-    odaer = cumtrapz(zN,alphaAer) +odnorm;
-
+%      alphaCorErr = 0;
+%      z0 = 0:.1:zN(1);
+%      alpha0=alphaAer(1).*ones(size(z0));
+%      odnorm = trapz(z0,alpha0);
+%     odaer = cumtrapz(zN,alphaAer) +odnorm;
+    
+asr = (asrDATAnew-1).*beta_mol;
 

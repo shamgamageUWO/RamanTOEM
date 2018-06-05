@@ -47,7 +47,7 @@ BJLa = X.x(2*m+5);
 CJLa = X.x(2*m+6);
 DT_JH = X.x(2*m+7);
 DT_JL = X.x(2*m+8); % deadtimes
-alpha_aero = X.x(2*m+9:end);
+LR = X.x(2*m+9:end);
 
 
 'X.cost'
@@ -176,7 +176,7 @@ DT_JL
                     plot(response,Q.Zret./1000,'r')
                     % plot(X.A(1:m,1:m).*unit,Q.Zret./1000)
                     hold off;
-                    xlabel('Temperature - Averaging Kernels')
+                    xlabel('Temperature Averaging Kernel')
                     ylabel('Altitude ( km )')
                     title( Q.Dateofthefolder);
                     set(gca,'fontsize',16)
@@ -184,7 +184,7 @@ DT_JL
                     subplot(1,3,2)
                     plot(X.A(m+4:5:2*m+3,m+4:5:2*m+3),Q.Zret(1:5:m)./1000)
                     
-                    xlabel('Overlap - Averaging Kernels')
+                    xlabel('Overlap Averaging Kernel')
                     ylabel('Altitude ( km )')
                     title( Q.Dateofthefolder);
                     set(gca,'fontsize',16)
@@ -192,7 +192,7 @@ DT_JL
                     subplot(1,3,3)
                     plot(X.A(2*m+9:5:end,2*m+9:5:end),Q.Zret(1:5:m)./1000)
                     
-                    xlabel('Aerosol Extinction - Averaging Kernels')
+                    xlabel('LR Averaging Kernel')
                     ylabel('Altitude ( km )')
                     title( Q.Dateofthefolder);
                     set(gca,'fontsize',16)
@@ -207,9 +207,9 @@ S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end))%DegF for Aerosol
                     
 %                     OVresponse = (X.A(m+4:end-5,m+4:end-5))*unit';
                 figure;
-                plot(width(2:end-2)./1000,Q.Zret(2:end-2)./1000)
+                plot(width(2:end-2),Q.Zret(2:end-2)./1000)
                 grid on;
-                xlabel('Vertical Resolution ( km )')
+                xlabel('Vertical Resolution ( m )')
                 ylabel('Altitude ( km )')
                 set(gca,'fontsize',16)
 %                     %
@@ -275,7 +275,7 @@ xlim([150 320])
 xlabel('Temperature (K)');
 
 % Create ylabel
-ylabel('Altitude(km)');
+ylabel('Altitude (km)');
 
 % box(axes1,'on');
 % grid(axes1,'on');
@@ -315,7 +315,7 @@ xlim([250 310])% Create xlabel
 xlabel('Temperature (K)');
 
 % Create ylabel
-ylabel('Altitude(km)');
+ylabel('Altitude (km)');
 legend ('T a priori','T OEM','T sonde','Traditional Analog','Traditional Digital')
 
   set(gca,'fontsize',16)
@@ -364,7 +364,7 @@ plot(( T_an(in2)' - Toem(in2)),Q.Zret(in2)./1000,'y',(T_an(in2)-Q.Tsonde2(in2)),
 grid on;
 hold off
 xlabel('Temperature residuals (K)')
-ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+ylabel('Altitude (km)')%  ylabel('Altitude(km)')
 legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OEM - Traditional analog','Traditional analog-Sonde')
   set(gca,'fontsize',16)
 
@@ -386,11 +386,11 @@ legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OE
     ylim([0 12])
     subplot(1,2,2)
 %     semilogx(exp(Q.alpha_aero),Q.Zret./1000,'g',exp(X.x(2*m+9:end)),Q.Zret./1000,'r')
- semilogx((Q.alpha_aero),Q.Zret./1000,'g',(X.x(2*m+9:end)),Q.Zret./1000,'r')
+ plot((Q.LR),Q.Zret./1000,'g',(X.x(2*m+9:end)),Q.Zret./1000,'r')
     grid on;
-    xlabel('Extinction')
+    xlabel('LR (sr)')
     ylabel('Altitude ( km )')
-    legend('Aerosol Extinction a priori (m^-^1)','OEM aerosol extinction (m^-^1)')
+    legend('LR a priori','OEM LR')
     title( Q.Dateofthefolder);
     set(gca,'fontsize',16)
     ylim([0 20])

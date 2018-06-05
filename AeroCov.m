@@ -8,22 +8,23 @@ function [S_Aero]=AeroCov(Zj,aero,cutoffOV)
  m = length(aero);
  n = m;
 S_Aero =zeros(n,n);
- lengthcT = 100; % =3000; % only need m of these
+ lengthcT = 3; % =3000; % only need m of these
  lc = lengthcT.*ones(1,m);
- l = size(aero);
+%  l = size(aero);
  
-  Tfac = .5;
-  Tmodvar = (Tfac.*ones(l)).^2;
+  Tfac = .01;
+%      Tmodvar = (Tfac.*aero).^2;
 % %  
 %  ll = size(OV);
 %  Tfac2 =0.01;
-%  Tmodvar2 = (Tfac2.*ones(1,ll(2)-l(2))).^2;
+        Tmodvar = (Tfac.*ones(size(aero))).^2;
 % 
 %  vars2 = [Tmodvar Tmodvar2];
  vars2 = Tmodvar ;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+%  vars2(Zj<cutoffOV) = 1e-4;
+%  S_Aero = diag( vars2);
 
 for i = 1:m
     for j = 1:m
@@ -42,8 +43,9 @@ for i = 1:m
             %         if i==j
             %          Sa_T(i,j) = Ta(i);
             %         end
+
          else
-             S_Aero(i,i) = 1e-12; % cloud at 6km use 1e-2
+             S_Aero(i,i) = 1e-4; % cloud at 6km use 1e-2
          end
     end
 end
