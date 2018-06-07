@@ -10,45 +10,45 @@ function [S_Aero]=AeroCov(Zj,aero,cutoffOV)
 S_Aero =zeros(n,n);
  lengthcT = 3; % =3000; % only need m of these
  lc = lengthcT.*ones(1,m);
-%  l = size(aero);
+ l = size(aero);
  
-  Tfac = .01;
-%      Tmodvar = (Tfac.*aero).^2;
+  Tfac = .1;
+     Tmodvar = (Tfac.*aero).^2;
 % %  
 %  ll = size(OV);
 %  Tfac2 =0.01;
-        Tmodvar = (Tfac.*ones(size(aero))).^2;
+%        Tmodvar = (Tfac.*ones(size(aero))).^2;
 % 
 %  vars2 = [Tmodvar Tmodvar2];
  vars2 = Tmodvar ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%  vars2(Zj<cutoffOV) = 1e-4;
-%  S_Aero = diag( vars2);
+ vars2(Zj<cutoffOV) = 1e-4;
+ S_Aero = diag( vars2);
 
-for i = 1:m
-    for j = 1:m
-         if Zj(i)>cutoffOV % this is to force the ov to go to 1.
-%             disp('ok')
-            sigprod = sqrt(vars2(i).*vars2(j));
-            diffz = Zj(i) - Zj(j);
-            sumlc = lc(i) + lc(j);
-            shape(3) = (1-(1-exp(-1)).*2.*abs(diffz)./sumlc);
-            
-            if shape(3) < 0
-                shape(3) = 0;
-            end
-            
-           S_Aero(i,j) = sigprod.*shape(3);
-            %         if i==j
-            %          Sa_T(i,j) = Ta(i);
-            %         end
-
-         else
-             S_Aero(i,i) = 1e-4; % cloud at 6km use 1e-2
-         end
-    end
-end
+% for i = 1:m
+%     for j = 1:m
+%          if Zj(i)>cutoffOV % this is to force the ov to go to 1.
+% %             disp('ok')
+%             sigprod = sqrt(vars2(i).*vars2(j));
+%             diffz = Zj(i) - Zj(j);
+%             sumlc = lc(i) + lc(j);
+%             shape(3) = (1-(1-exp(-1)).*2.*abs(diffz)./sumlc);
+%             
+%             if shape(3) < 0
+%                 shape(3) = 0;
+%             end
+%             
+%            S_Aero(i,j) = sigprod.*shape(3);
+%             %         if i==j
+%             %          Sa_T(i,j) = Ta(i);
+%             %         end
+% 
+%          else
+%              S_Aero(i,i) = 1e-4; % cloud at 6km use 1e-2
+%          end
+%     end
+% end
 
 
 % t = Zj./norm(Zj);
