@@ -204,14 +204,16 @@ bkg_ind2 = Alt>50e3;
      % 1. Make the Co added counts to avg counts
         JHn = JH./(Q.deltatime.*Q.coaddalt);
         JLn = JL./(Q.deltatime.*Q.coaddalt);
+        Ebn = Eb./(Q.deltatime.*Q.coaddalt);
         
         % 2. Convert counts to MHz
         JHnwn = (JHn./F);
         JLnwn = (JLn./F);
+        Ebnwn = Ebn./F;
   figure;
   subplot(1,2,1)
-  semilogx(JLnwn,alt./1000,'b',JHnwn,alt./1000,'r')
-  legend('JL','JH')
+  semilogx(JLnwn,alt./1000,'b',JHnwn,alt./1000,'r',Ebnwn,alt./1000,'g')
+  legend('JL','JH','Eb')
   xlabel('Digital Signal (MHz)')
   ylabel('Altitude (km)')
 % title( Dateofthefolder);

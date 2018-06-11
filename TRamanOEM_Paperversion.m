@@ -209,11 +209,11 @@ ylim([0 12])
 
 
 subplot(1,2,2)
-plot((Q.alpha_aero),Q.Zret./1000,'g',(X.x(2*m+9:end)),Q.Zret./1000,'r')
+semilogx((Q.alpha_aero).*1000,Q.Zret./1000,'g',(X.x(2*m+9:end)).*1000,Q.Zret./1000,'r')
 grid on;
-xlabel('Aerosol Extinction')
+xlabel('Extinction (km^-^1)')
 ylabel('Altitude ( km )')
-legend('Aerosol Extinction a priori (m^-^1)','OEM aerosol extinction (m^-^1)')
+legend('a priori (m^-^1)','OEM (m^-^1)')
 title( Q.Dateofthefolder);
 set(gca,'fontsize',20)
 ylim([0 20])

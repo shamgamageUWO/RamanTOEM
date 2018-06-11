@@ -1,4 +1,4 @@
-function [R,Ra,R_fit,Ra_fit,dfacR,dfacRa,ind1,ind2] = Restimationnew(Q)
+function [R,Ra,R_fit,Ra_fit,dfacR,dfacRa,ind1] = Restimationnew(Q)
 % JHnew = Q.JHnew-Q.BaJH;
 % JLnew = Q.JLnew-Q.BaJL;
 % JHnewa = Q.JHnewa-Q.BaJHa;
@@ -7,15 +7,15 @@ cutoffOV = Q.cutoffOV;
 Zd = Q.Zmes2;
 Za = Q.Zmes1;
 
-% if cutoffOV < 6000
+if cutoffOV < 6000
     
     ind1 = Zd>=6000 & Zd< 8000;% If the cloud height is below full overlap
     ind2 = Za>=800 & Za< 1800;% 1800 was changed
-% else
-%     ind1 = Zd>=4000 & Zd< cutoffOV;% 6-8km
-%     ind2 = Za>=800 & Za< 1800;% 1800 was changed
-%     
-% end
+else
+    ind1 = Zd>=4000 & Zd < 5000;%cutoffOV;% 6-8km
+    ind2 = Za>=800 & Za< 1800;% 1800 was changed
+    
+end
 
 
 N1 = length(Q.JHnewa);

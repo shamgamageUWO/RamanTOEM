@@ -48,8 +48,8 @@ Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.Shots = 1800; 
 Q.deltatime = 30;%30;3
-Q.min1 = 29;
-Q.min2 = 59;
+Q.min1 = 00;
+Q.min2 = 30;
 disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -195,13 +195,13 @@ Q.cutoffOV = cutoffOV;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-    [R,Ra,R_fit,Ra_fit,dfacR,dfacRa,ind1,ind2] = Restimationnew(Q);
+    [R,Ra,R_fit,Ra_fit,dfacR,dfacRa,ind1] = Restimationnew(Q);
     Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
     Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
     Q.GR = dfacR ; % ISSI recommend
     Q.GRa = dfacRa;
     Q.ind1 = ind1;
-    Q.ind2 = ind2;
+%     Q.ind2 = ind2;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
