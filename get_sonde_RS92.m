@@ -37,7 +37,8 @@ Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day) sprintf('%02.f
 
 
 
-datadir = '/Users/sham/Documents/MATLAB/RALMO_Data/Sonde/RS92';
+% datadir = '/Users/sham/Documents/MATLAB/RALMO_Data/Sonde/RS92';
+datadir = '/Volumes/Sham_RALMO/RALMO_DATA/RALMO_Data/Sonde/RS92';
 
 folder = [datadir filesep Dateofthefolder];
 files = dirFiles(folder);
@@ -46,7 +47,7 @@ FLEDTfile = strfind(files,'FLEDT.tsv');
 FLEDTfile = find(~cellfun(@isempty,FLEDTfile));
 
 if length(FLEDTfile)>1
-    FLEDTfile = FLEDTfile(1);
+    FLEDTfile = FLEDTfile(2);
 end
   file = [folder filesep files{FLEDTfile}]
 if exist(file, 'file')
@@ -86,9 +87,17 @@ end
 
 index1 = find(Psonde>0);
 index2 = find(Tsonde>0);
+index3 = find(RH>0);
 Psonde = Psonde(index1);
 Tsonde = Tsonde(index2);
 Zsonde = Zsonde(index1);
+RH = RH(index3);
+
+I = find(Zsonde == max(Zsonde));
+Zsonde = Zsonde(1:I);
+Psonde = Psonde(1:I);
+Tsonde = Tsonde(1:I);
+RH = RH(1:I);
  
 %     if exist(file, 'file')
 %         disp('ok')

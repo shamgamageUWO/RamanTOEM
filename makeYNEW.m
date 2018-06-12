@@ -11,8 +11,8 @@ function [Y] = makeYNEW(Q)
  yr = num2str(year);
 
  % open S0 matfile according to the given date
-datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
-% datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
+% datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28/Volumes/Sham_RALMO/RALMO_DATA/RALMO_Data
+ datadirS3='/Volumes/Sham_RALMO/RALMO_DATA/RALMO_Data/RALMO';
 file = 'S0';
 
 %  
@@ -223,18 +223,21 @@ bkg_ind2 = Alt>50e3;
         semilogx(JLnwn,alt./1000,'b',JHnwn,alt./1000,'r')
         xlabel('Photon Counts (MHz)')
         ylabel('Altitude (km)')
+        legend('JL','JH')
         title( Dateofthefolder);
         set(gca,'fontsize',16)
         subplot(2,2,2)
         plot(JL_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'b',JH_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'r')
         xlabel('Analog Signal (mV)')
         ylabel('Altitude (km)')
+        legend('JL','JH')
         %   legend('JL - Digital','JH - Digital','Eb - Digital','JL - Analog','JH - Analog')
         title( Dateofthefolder);
         set(gca,'fontsize',16)
         
         subplot(2,2,3)
         semilogx(N2nwn,alt./1000,'b',WVnwn,alt./1000,'r')
+        legend('N2','WV')
         xlabel('Photon Counts (MHz)')
         ylabel('Altitude (km)')
         title( Dateofthefolder);
@@ -243,7 +246,7 @@ bkg_ind2 = Alt>50e3;
         plot(N2_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'b',WV_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'r')
         xlabel('Analog Signal (mV)')
         ylabel('Altitude (km)')
-        %   legend('JL - Digital','JH - Digital','Eb - Digital','JL - Analog','JH - Analog')
+           legend('N2','WV')
         title( Dateofthefolder);
         set(gca,'fontsize',16)
   

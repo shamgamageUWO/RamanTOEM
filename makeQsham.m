@@ -42,8 +42,12 @@ sigma_Rcm2 = A / Lambda^(exponent);
 Q.sigmaNicolet = sigma_Rcm2*1e-4;%m2
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.7e-9; % 4ns
+Q.deadtimeN2 = 3.8e-9; % 4ns
+Q.deadtimeWV = 3.8e-9; % 4ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
+Q.CovDTWV = (.1.*Q.deadtimeWV).^2;
+Q.CovDTN2 = (.1.*Q.deadtimeN2).^2;
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.deltatime = 30;
@@ -75,7 +79,7 @@ Q.ASRcutoffheight = 12000; % 20110909 1400
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Load raw measurements
 %    [Y] = makeY(Q);
-  [Y] = makeYNEW(Q);
+[Y] = makeYNEW(Q);
 % [Y]=makeYFFT(Q);
 Q.Dateofthefolder = Y.Dateofthefolder;
 
@@ -135,7 +139,7 @@ Q.ANalt = ANalt(ANalt>=alt_a0);
 Q.Zmes1 = ANalt(ANalt>=alt_a0 & ANalt <= alt_af);
 Q.Zmes1 = Q.Zmes1';
 
- Q.Zmes = [Q.Zmes1 Q.Zmes2]; %% Fix this here ..one range should fix the asr
+Q.Zmes = [Q.Zmes1 Q.Zmes2]; %% Fix this here ..one range should fix the asr
 
 % Backgrounds
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -174,13 +178,13 @@ disp('Defined grids ')
 
 [Tsonde,Zsonde,Psonde,RH] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
-Tsonde = Tsonde(Zsonde<=35000);
-Psonde = Psonde(Zsonde<=35000);
-Zsonde = Zsonde(Zsonde<=35000);
-RHsonde = RH(Zsonde<=35000);
+Tsonde = Tsonde(Zsonde<=32000);
+Psonde = Psonde(Zsonde<=32000);
+Zsonde = Zsonde(Zsonde<=32000);
+RHsonde = RH(Zsonde<=32000);
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
-Q.RHsonde = interp1(Zsonde,RHsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
+Q.RHsonde = interp1(Zsonde,RHsonde,Q.Zmes,'linear'); 
 
 Psonde = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr
 Q.Psonde = exp(Psonde);
@@ -198,12 +202,10 @@ Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 % US temperature model
 [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
 Ta = temp; % for now im adding 2K to test
-% Q.Ta=Ta;
 Q.Ta = (Ta./Ta(1)).* Q.Tsonde2(1);
 Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-
-%a priori RH
-
+RHa = smooth(Q.RHsonde2,200);%a priori RH
+Q.RHa = RHa';
 disp('a priori temperature profile is loaded ')
 
 
@@ -213,49 +215,65 @@ disp('a priori temperature profile is loaded ')
 Q.alpha_aero = alphaAer;
 Q.odaer = odaer;
 % total transmission air + aerosol 
-Q.Tr = Total_Transmission(Q);
+[Tr_PRR,Tr_N2,Tr_WV] = Total_Transmission(Q);
+Q.Tr = Tr_PRR;
+Q.Tr_N2 = Tr_N2;
+Q.Tr_WV = Tr_WV;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-[R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
-Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
-Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
-Q.GR = dfacR ; % ISSI recommend
-Q.GRa = dfacRa;
-disp('R is calibrated ')
+% [R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
+Q.R = 0.808780013344381;%R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
+Q.Ra = 0.8639;%Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
+Q.GR = 0.001;%dfacR ; % ISSI recommend
+Q.GRa = 0.001;%dfacRa;
+% disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Estimating background and lidar constant wrt a priori 
 
 C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
 Q.CL = C.CJL;
 Q.CLa =C.CJLa;
+Q.CN2 = C.Cn2;
+Q.CWV = C.Cwv;
+Q.CN2a = C.Cn2a;
+Q.CWVa =C.Cwva;
+
 Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CovWV = (1 .* (Q.CWV)).^2;%sqrt(Q.CL);
+Q.CovWVa = (1 .* (Q.CWVa)).^2;%sqrt(Q.CL);
+Q.CovN2 = (1 .* (Q.CN2)).^2;%sqrt(Q.CL);
+Q.CovN2a = (1 .* (Q.CN2a)).^2;%sqrt(Q.CL);
 
-
-
-
-
-
-
-                           Q.CovBJLa = ((Y.bg_JL_stda)).^2; % day time
-                           Q.CovBJHa = ((Y.bg_JH_stda)).^2;
-
+Q.CovBJLa = ((Y.bg_JL_stda)).^2; % day time
+Q.CovBJHa = ((Y.bg_JH_stda)).^2;
+Q.CovBN2a = ((Y.bg_N2_stda)).^2; % day time
+Q.CovBWVa = ((Y.bg_WV_stda)).^2;
+ 
 
                                         if flag ==1
-                                        Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
-                                        Q.CovBJH = ((Y.bg_JH_std)).^2;
+                                            Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
+                                            Q.CovBJH = ((Y.bg_JH_std)).^2;
+                                            Q.CovBWV = ((Y.bg_WV_std)).^2; % day time
+                                            Q.CovBN2 = ((Y.bg_N2_std)).^2;
+                                            
                                         load('OVDay.mat')
                                         OVnw = interp1(OVDay.Z,OVDay.OV,Q.Zret,'linear');
                                         OVnw(isnan(OVnw))=1;
-                                        Q.OVa = OVnw;
-                                        %  Q.OVa = ones(1,length(Q.Ta));
+                                        Q.OVa = OVnw;                                    
                                         Q.OVlength = length(Q.OVa);
                                         Q.COVa = OVCov(Q.Zret,Q.OVa);
+                                        
                                         disp('Daytime retrieval')
+                                        
+                                        
                                         else 
-                                        Q.CovBJL = ((Y.bg_JL_std/sqrt(Y.bg_length2))).^2;
-                                        Q.CovBJH = ((Y.bg_JH_std/sqrt(Y.bg_length1))).^2;
-%                                         
+                                            Q.CovBJL = ((Y.bg_JL_std/sqrt(Y.bg_length2))).^2;
+                                            Q.CovBJH = ((Y.bg_JH_std/sqrt(Y.bg_length1))).^2;
+                                            Q.CovBWV = ((Y.bg_WV_std/sqrt(Y.bg_length4))).^2;
+                                            Q.CovBN2 = ((Y.bg_N2_std/sqrt(Y.bg_length3))).^2;
+                                            
                                         load('OVDay.mat')
                                         OVnw = interp1(OVDay.Z,OVDay.OV,Q.Zret,'linear');
                                         OVnw(isnan(OVnw))=1;
@@ -274,13 +292,21 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                         Q.JHnewa(Q.JHnewa<=0)= round(rand(1)*10);
                         Q.JLnew(Q.JLnew<=0)= round(rand(1)*10);
                         Q.JLnewa(Q.JLnewa<=0)= round(rand(1)*10);
+                                          
+                        Q.N2new(Q.N2new<=0)= round(rand(1)*10);
+                        Q.N2newa(Q.N2newa<=0)= round(rand(1)*10);
+                        Q.WVnew(Q.WVnew<=0)= round(rand(1)*10);
+                        Q.WVnewa(Q.WVnewa<=0)= round(rand(1)*10);
 
 JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLnewa';
+N2real = Q.N2new'; WVreal = Q.WVnew';  N2realan = Q.N2newa';    WVrealan = Q.WVnewa';
 
 
  Q.JHnew =JHreal;  Q.JLnew=JLreal ;  Q.JHnewa =JHrealan ;   Q.JLnewa= JLrealan;
+  Q.N2new =N2real;  Q.WVnew=WVreal ;  Q.N2newa =N2realan ;   Q.WVnewa= WVrealan;
 
-                        Q.y = [Q.JHnew Q.JLnew Q.JHnewa Q.JLnewa]';
+
+                        Q.y = [Q.JHnew Q.JLnew Q.JHnewa Q.JLnewa Q.WVnew Q.N2new Q.WVnewa Q.N2newa]';
 
 
 
@@ -294,80 +320,44 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
              Q.JHv = [r1 JHv r2];
              Q.JLv = [r3 JLv r4];
 
-
-%  [JHav,go1] =bobpoissontest(JHrealan,Q.Zmes1,b2);
-%  [JLav,go2] =bobpoissontest(JLrealan,Q.Zmes1,b2);
-% 
-%             ar1 = ones(1,go1-1).* JHav(1);
-%             ar2 = ones(1,go1-1).* JHav(end);
-%             ar3 = ones(1,go2-1).* JLav(1);
-%             ar4 = ones(1,go2-1).* JLav(end);
-%             Q.JHav = [ar1 JHav ar2];
-%             Q.JLav = [ar3 JLav ar4];
-            
-
-%             
-%                                 for i = 1: length(Q.JLav)
-%                                     if Q.Zmes1(i) <= 6000
-%                                         Q.YYa(i) = Q.JLav(i);
-%                                     else
-%                                         Q.YYa(i) = .1.*Q.JLav(i);
-%                                     end
-%                                 end
-%                                 
-%                                 for i = 1: length(Q.JHav)
-%                                     if  Q.Zmes1(i) <= 6000
-%                                         Q.YYYa(i) = Q.JHav(i);
-%                                     else
-%                                         Q.YYYa(i) = .1.*Q.JHav(i);
-%                                     end
-%                                 end
+             [n2v,g1] =bobpoissontest(N2real,Q.Zmes2,b1);
+             [wvv,g11] =bobpoissontest(WVreal,Q.Zmes2,b1);
+          
+             r11 = ones(1,g1-1).* n2v(1);
+             r21 = ones(1,g1-1).* n2v(end);
+             r31 = ones(1,g11-1).* wvv(1);
+             r41 = ones(1,g11-1).* wvv(end);
+             Q.n2v = [r11 n2v r21];
+             Q.wvv = [r31 wvv r41];
 
             
             
         for i = 1: length(Q.JLv)
             if Q.Zmes2(i) <= 8000
                 Q.YY(i) = Q.JLv(i);
+                Q.YYY(i) = Q.JHv(i);
+                Q.YYn2(i) = Q.n2v(i);
+                Q.YYwv(i) = Q.wvv(i);
             else
                 Q.YY(i) = JLreal(i);
-            end
-        end
-
-        for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 8000
-                Q.YYY(i) = Q.JHv(i);
-            else
                 Q.YYY(i) = JHreal(i);
+                Q.YYn2(i) = N2real(i);
+                Q.YYwv(i) = WVreal(i);
             end
         end
-        
-%         for i = 1:length( Q.JHnew )
-%             
-%             if  Q.JHnew (i) <= 15
-%                 Q.YYY(i) =  15;
-%             end
-%             if  Q.JLnew (i) <= 10
-%                 Q.YY(i) =  10 ;
-%             end
-%             
-%         end
-%         for i = 1:length( Q.JLnew )
-%             if  Q.JLnew (i) <= 10
-%                 Q.YY(i) =  10 ;
-%             end
-%         end
-%          Q.Yvar =[Q.YYY Q.YY Q.JHav Q.JLav];
-%         Q.Yvar =[JHreal JLreal];
 
 
-
- 
                 Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
                 Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
                 Q.YYa =Q.YYa';
                 Q.YYYa =Q.YYYa';
 
-Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
+                Q.YYwva = Y.YYWVa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYYn2a = Y.YYYN2a(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYwva =Q.YYwva';
+                Q.YYYn2a =Q.YYYn2a';
+
+Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa Q.YYwv Q.YYn2 Q.YYwva Q.YYYn2a];
 Q.yvar = diag(Q.Yvar);
                 
                 

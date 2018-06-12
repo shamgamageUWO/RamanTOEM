@@ -6,8 +6,9 @@ function [alphaAer,odaer] = asrSham(Q)
  yr = num2str(year);
 
  % open S0 matfile according to the given date
-datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
+% datadirS3='/Users/sham/Documents/MATLAB/RALMO_Data/RALMO';%/2011.09.28
 % datadirS3='/Volumes/Sham_RALMO/2011/2011.09.09';
+datadirS3 = '/Volumes/Sham_RALMO/RALMO_DATA/RALMO_Data/RALMO';
 file = 'S3';
 %  Dateofthefolder =[yr  sprintf('%02.f',month) sprintf('%02.f',day)];
  Dateofthefolder = Q.Dateofthefolder;
