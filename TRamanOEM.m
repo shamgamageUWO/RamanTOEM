@@ -5,11 +5,16 @@ xa = xa';
 S_ainv=[];
 Seinv=[];
 m = length(Q.Zret);
-n = Q.n1+Q.n2+Q.n3+Q.n4;
+% n = Q.n1+Q.n2+Q.n3+Q.n4;
 n1 = Q.n1;
 n2 = Q.n2;
 n3 = Q.n3;
 n4= Q.n4;
+n5 = Q.n5;
+n6 = Q.n6;
+n7= Q.n7;
+n8= Q.n8;
+
 y = Q.y;
 % 
 yJH = smooth(y(1:n1),100);
@@ -50,33 +55,8 @@ DT_JL = X.x(end); % deadtimes
 'X.cost'
 X.cost(end)
 
-'OEM-BG-JH'
-BJH
-
-'real-BG-JH'
-Q.BaJH
-
-'OEM-BG-JL'
-BJL
-
-'real-BG-JL'
-Q.BaJL
-
 'OEM-CL'
 CJL
-
-
-'OEM-BG-JHa'
-BJHa
-
-'real-BG-JHa'
-Q.BaJHa
-
-'OEM-BG-JLa'
-BJLa
-
-'real-BG-JLa'
-Q.BaJLa
 
 'OEM-CLa'
 CJLa
@@ -90,63 +70,26 @@ DT_JH
 'DT-JL'
 DT_JL
 
-%CJL = exp(logCJL)
 
-% 'OEM-CH'
-% X.x(end)
+'OEM-CWV'
+CWV
 
-% R =makeParameterJacobians(Q,X.x);
+'OEM-CWVa'
+CWVa
+
+'OEM-N2'
+CN2
+
+'OEM-CN2a'
+CN2a
+
+'DT-WV'
+DT_WV
+
+'DT-N2'
+DT_N2
 
 
-
-% nmol = interp1(Q.Zmes,Q.Nmol,Q.Zret,'linear');
-% 
-% %                     %% plot counts
-%                     figure;
-%                     subplot(1,2,1)
-%                     semilogx(Q.y(1:n1),Q.Zmes2./1000);
-%                     hold on;
-%                     semilogx(Q.y(n1+1:n1+n2),Q.Zmes2./1000);
-%                     xlabel('Raw Counts Log scale')
-%                     ylabel('Altitude( km)')
-%                     legend('JH digital','JL digital')
-%                     hold off;
-% 
-% 
-%                     figure;
-%                     subplot(1,2,1)
-%                     semilogx(Q.y(n1+n2+1:n1+n2+n3),Q.Zmes1./1000);
-%                     hold on;
-%                     semilogx(Q.y(n1+n2+n3+1:end),Q.Zmes1./1000);
-%                     xlabel('Raw Counts Log scale')
-%                     ylabel('Altitude (km)')
-%                     legend('JH analog','JL analog')
-%                     hold off;
-% % 
-% % 
-% %                     %% Plot Temperature Jacobians
-% %                     figure;
-% %                     subplot(2,1,1)
-% %                     plot(X.J(1:n1,1:m),Q.Zmes./1000)
-% %                     xlabel('Jacobian - JH')
-% %                     ylabel('Altitude (km)')
-% % 
-% %                     subplot(2,1,2)
-% %                     plot(X.J(n1+1:n1+n2,1:m),Q.Zmes./1000)
-% %                     xlabel('Jacobian - JL')
-%                     ylabel('Altitude (km)')
-% 
-%                     subplot(2,2,1)
-%                     plot(X.J(n1+n2+1:n1+n2+n3,1:m),Q.Zmes./1000)
-%                     xlabel('Jacobian - JHa')
-%                     ylabel('Altitude (km)')
-% 
-%                     subplot(2,2,2)
-%                     plot(X.J(n1+n2+n3+1:n,1:m),Q.Zmes./1000)
-%                     xlabel('Jacobian - JLa')
-%                     ylabel('Altitude (km)')
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                     %% Plot Avg Kenerl
 %                     response = sum(X.A(1:m,1:m));
                     unit = ones(size(Q.Zret));

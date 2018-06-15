@@ -1,6 +1,6 @@
 % This code is to create synthetic data using the US standard data
 
-function [JL,JH,JLa,JHa,N2,WV,N2a,WVa]=forwardmodelTraman(Q,x)
+function [JL,JH,JLa,JHa,WV,N2,WVa,N2a]=forwardmodelTraman(Q,x)
 m = length(Q.Zret);
 x_a = x(1:m);%T
 BJH = x(m+1);
@@ -13,7 +13,7 @@ CJLa = x(2*m+6);
 DT_JH = x(2*m+7);
 DT_JL = x(2*m+8); % deadtimes
 
-rh_a = x(2*m+9:3*m+8);%T
+rh_a = x(2*m+9:3*m+8);%
 Bwv = x(3*m+9);
 Bn2 = x(3*m+10);
 Cwv = x(3*m+11);
@@ -29,23 +29,27 @@ DT_N2 = x(end); % deadtimes
 %% PRR FM
             % interpolation
             Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear');
-            Td= Ti(end-length(Q.JHnew)+1:end);
+            Td = Ti(1:length(Q.JHnew));
+%             Td= Ti(end-length(Q.JHnew)+1:end);
             Ta= Ti(1:length(Q.JHnewa));
             OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
-            OV_Zid = OV_Zi(end-length(Q.JHnew)+1:end);%interp1(Q.Zret,OV,Q.Zmes2,'linear');
+            OV_Zid = OV_Zi(1:length(Q.JHnew));
+%             OV_Zid = OV_Zi(end-length(Q.JHnew)+1:end);%interp1(Q.Zret,OV,Q.Zmes2,'linear');
             OV_Zia = OV_Zi(1:length(Q.JHnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
 
             kb = 1.38064852*10^-23;
 
             R_tr_i = (Q.Tr);
-            R_tr_id = R_tr_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
+            R_tr_id= R_tr_i(1:length(Q.JHnew));
+%             R_tr_id = R_tr_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
             R_tr_ia = R_tr_i(1:length(Q.JHnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
-            Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
+            Pd= Q.Pressi(1:length(Q.JHnew));
+%             Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
             Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
-            A_Zi_an = ( OV_Zia .*R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2);
-            B_Zi_an = (R_tr_ia .*Pa)./(kb * Q.Zmes1 .^2); % No overlap
-            A_Zi_d = (OV_Zid .*R_tr_id .*Pd)./(kb * Q.Zmes2 .^2);
-            B_Zi_d = (R_tr_id .*Pd)./(kb * Q.Zmes2 .^2); % No overlap
+            A_Zi_an = ( OV_Zia' .*R_tr_ia .*Pa')./(kb * Q.Zmes1 .^2);
+            B_Zi_an = (R_tr_ia .*Pa')./(kb * Q.Zmes1 .^2); % No overlap
+            A_Zi_d = (OV_Zid' .*R_tr_id .*Pd')./(kb * Q.Zmes2 .^2);
+            B_Zi_d = (R_tr_id .*Pd')./(kb * Q.Zmes2 .^2); % No overlap
 
             %% loading cross sections
             load('DiffCrossSections.mat');
@@ -61,11 +65,11 @@ DT_N2 = x(end); % deadtimes
             CJH = (Q.R).* CJL;
             CJHa = (Q.Ra).* CJLa;
 
-            JL = (CJL.* A_Zi_d .* dJLd)./(Td);
-            JH = (CJH.* A_Zi_d .* dJHd)./(Td);
+            JL = (CJL.* A_Zi_d' .* dJLd)./(Td);
+            JH = (CJH.* A_Zi_d' .* dJHd)./(Td);
 
-            JLa = (CJLa.* A_Zi_an .* dJLa )./(Ta );
-            JHa = (CJHa.* A_Zi_an .* dJHa )./(Ta );
+            JLa = (CJLa.* A_Zi_an' .* dJLa )./(Ta );
+            JHa = (CJHa.* A_Zi_an' .* dJHa )./(Ta );
 
             %  % Add true background to the digital counts
             JL = JL  + BJL;
@@ -101,20 +105,24 @@ DT_N2 = x(end); % deadtimes
 % es = 6.107 * exp ((M_A .*(T-273))./(M_B + (T-273))); Saturated vapor pressure
 % Q = (0.6222 .*RH)./(P - RH.*es); Mixing ratio
 RHi = interp1(Q.Zret,rh_a,Q.Zmes,'linear');
-RHd=   RHi(end-length(Q.JHnew)+1:end);
+RHd = RHi(1:length(Q.JHnew));
+% RHd=   RHi(end-length(Q.JHnew)+1:end);
 RHa=   RHi(1:length(Q.JHnewa));
 
 OV_wvi = interp1(Q.Zret,OVwv,Q.Zmes,'linear');
-OV_wvd = OV_wvi(end-length(Q.JHnew)+1:end);%interp1(Q.Zret,OV,Q.Zmes2,'linear');
+OV_wvd = OV_wvi(1:length(Q.JHnew));
+% OV_wvd = OV_wvi(end-length(Q.JHnew)+1:end);%interp1(Q.Zret,OV,Q.Zmes2,'linear');
 OV_wva = OV_wvi(1:length(Q.JHnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
 
 
             R_tr_wv = (Q.Tr_WV);
-            R_tr_wvd = R_tr_wv(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
+            R_tr_wvd = R_tr_wv(1:length(Q.JHnew));
+%             R_tr_wvd = R_tr_wv(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
             R_tr_wva = R_tr_wv(1:length(Q.JHnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
             
             R_tr_n2 = (Q.Tr_N2);
-            R_tr_n2d = R_tr_n2(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
+            R_tr_n2d = R_tr_n2(1:length(Q.JHnew));
+%             R_tr_n2d = R_tr_n2(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
             R_tr_n2a = R_tr_n2(1:length(Q.JHnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
             
 % For analog channels
@@ -128,7 +136,7 @@ for i = 1:length(Ta)
     end
     
     es_a(i) = 6.107 * exp ((M_A .*(Ta(i)-273))./(M_B + (Ta(i)-273)));
-    Q_a(i) = (0.6222 .*RHa(i))./(Pa(i) - RHa(i).*es_a(i));
+    Q_a(i) = (0.6222 .* RHa(i))./(Pa(i) - RHa(i).*es_a(i));
 end
 
 
@@ -146,20 +154,20 @@ for i = 1:length(Td)
 end
 
 
-N2 = (OV_wvd.*R_tr_n2d.*Cn2.*Pd.*Q_d)./(kb.*Td.*Q.Zmes2.^2);
-La = (OV_wva.*R_tr_n2a.*Cn2a.*Pa.*Q_a)./(kb.*Ta.*Q.Zmes1.^2);
+N2  = (0.7809.*OV_wvd'.*R_tr_n2d.*Cn2.*Pd')./(kb.*Td'.*Q.Zmes2.^2);
+n2a = (0.7809.*OV_wva'.*R_tr_n2a.*Cn2a.*Pa')./(kb.*Ta'.*Q.Zmes1.^2);
 
-WV = (OV_wvd.*R_tr_wvd.*Cwv.*Pd.*Q_d)./(kb.*Td.*Q.Zmes2.^2);
-Ga = (OV_wva.*R_tr_wva.*Cwva.*Pa.*Q_a)./(kb.*Ta.*Q.Zmes1.^2);
+WV  = (OV_wvd'.*R_tr_wvd.*Cwv.*Pd'.*Q_d)./(kb.*Td'.*Q.Zmes2.^2);
+wva = (OV_wva'.*R_tr_wva.*Cwva.*Pa'.*Q_a)./(kb.*Ta'.*Q.Zmes1.^2);
 
 
-WVa = Ga+Bwva;
-N2a = La+Bn2a;
+WVa = (wva+Bwva)';
+N2a = (n2a+Bn2a)';
 
 
 %  % Add true background to the digital counts
-N2 = N2  + Bn2;
-WV = WV  + Bwv;
+N2 = (N2  + Bn2)';
+WV = (WV  + Bwv)';
 
 %
 % Saturation correction is applied for the averaged count profile This is just for digital channel
@@ -168,18 +176,20 @@ N2 = N2./(Q.deltatime.*Q.coaddalt);
 WV = WV./(Q.deltatime.*Q.coaddalt);
 
 % 2. Convert counts to Hz
-N2nw = ( N2.*Q.f);
+N2nw = (N2.*Q.f);
 WVnw = (WV.*Q.f);
 
 % 3. Apply DT
-N2_dtc =  N2nw ./ (1 +  N2nw.*(DT_N2)); % non-paralyzable
+N2_dtc =  N2nw ./ (1 + N2nw.*(DT_N2)); % non-paralyzable
 WV_dtc = WVnw ./ (1 + WVnw.*(DT_WV));
+
 % 4. Convert to counts
 N2 =  N2_dtc.*(1./Q.f);
 WV = WV_dtc.*(1./Q.f);
+
 % 5. Scale bacl to coadded signal
-N2 =  N2.*(Q.deltatime.*Q.coaddalt);
-WV = WV.*(Q.deltatime.*Q.coaddalt);
+N2 = N2.*(Q.deltatime .*Q.coaddalt);
+WV = WV.*(Q.deltatime .*Q.coaddalt);
 
 return
 

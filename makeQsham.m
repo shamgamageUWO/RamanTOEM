@@ -56,8 +56,8 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
-alt_df = 30000; % Digital Channel ending altitude
+alt_d0 = 50; % Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_df = 22000; % Digital Channel ending altitude
 alt_a0 = 50;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
@@ -139,7 +139,7 @@ Q.ANalt = ANalt(ANalt>=alt_a0);
 Q.Zmes1 = ANalt(ANalt>=alt_a0 & ANalt <= alt_af);
 Q.Zmes1 = Q.Zmes1';
 
-Q.Zmes = [Q.Zmes1 Q.Zmes2]; %% Fix this here ..one range should fix the asr
+Q.Zmes =  alt(alt>=alt_a0 & alt <= alt_df);%% Fix this here ..one range should fix the asr
 
 % Backgrounds
 Q.BaJL = Y.bgJL;%0.297350746852139; % change later
@@ -159,17 +159,16 @@ Q.n1=length(Q.JHnew);
 Q.n2=length(Q.JLnew);
 Q.n3=length(Q.JHnewa);
 Q.n4=length(Q.JLnewa);
-Q.n5=length(Q.N2new);
-Q.n6=length(Q.WVnew);
-Q.n7=length(Q.N2newa);
-Q.n8=length(Q.WVnewa);
-
+Q.n5=length(Q.WVnew);
+Q.n6=length(Q.N2new);
+Q.n7=length(Q.WVnewa);
+Q.n8=length(Q.N2newa);
 %% Define grid sizes
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:6000;
 Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
 Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
-Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:40000;
+Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:25000;
 Q.Zret =[Z1 Z2 Z3 Z4];
 disp('Defined grids ')
 
@@ -241,10 +240,10 @@ Q.CWVa =C.Cwva;
 
 Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
-Q.CovWV = (1 .* (Q.CWV)).^2;%sqrt(Q.CL);
-Q.CovWVa = (1 .* (Q.CWVa)).^2;%sqrt(Q.CL);
-Q.CovN2 = (1 .* (Q.CN2)).^2;%sqrt(Q.CL);
-Q.CovN2a = (1 .* (Q.CN2a)).^2;%sqrt(Q.CL);
+Q.CovWV = (.1 .* (Q.CWV)).^2;%sqrt(Q.CL);
+Q.CovWVa = (.1 .* (Q.CWVa)).^2;%sqrt(Q.CL);
+Q.CovN2 = (.1 .* (Q.CN2)).^2;%sqrt(Q.CL);
+Q.CovN2a = (.1 .* (Q.CN2a)).^2;%sqrt(Q.CL);
 
 Q.CovBJLa = ((Y.bg_JL_stda)).^2; % day time
 Q.CovBJHa = ((Y.bg_JH_stda)).^2;
@@ -265,6 +264,12 @@ Q.CovBWVa = ((Y.bg_WV_stda)).^2;
                                         Q.OVlength = length(Q.OVa);
                                         Q.COVa = OVCov(Q.Zret,Q.OVa);
                                         
+                                         load('OV_N2.mat')
+                                        OVnwv = interp1(OVN2.z,OVN2.OV,Q.Zret,'linear');
+                                        OVnwv(isnan(OVnwv))=1;
+                                        Q.OVwva = OVnwv;                                    
+                                        Q.OVwvlength = length(Q.OVwva);
+                                        Q.COVwva = OVCov(Q.Zret,Q.OVwva);
                                         disp('Daytime retrieval')
                                         
                                         
@@ -281,6 +286,13 @@ Q.CovBWVa = ((Y.bg_WV_stda)).^2;
                                         Q.OVlength = length(Q.OVa);
                                         Q.COVa = OVCov(Q.Zret,Q.OVa);
 
+                                        load('OV_N2.mat')
+                                        OVnwv = interp1(OVN2.z,OVN2.OV,Q.Zret,'linear');
+                                        OVnwv(isnan(OVnwv))=1;
+                                        Q.OVwva = OVnwv;
+                                        Q.OVwvlength = length(Q.OVwva);
+                                        Q.COVwva = OVCov(Q.Zret,Q.OVwva);
+                                        
                                         disp('Nighttime retrieval')
                                         end 
 
