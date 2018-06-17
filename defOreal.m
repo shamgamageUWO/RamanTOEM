@@ -15,7 +15,7 @@ O.jfast = false;
 O.linear = false;
 %
 if ~O.linear 
-  O.itermethod = 'GN'; % ?GN? Gauss-Newton ?ML? or ?LM? for Marquardt-Levenberg
+  O.itermethod = 'ML'; % ?GN? Gauss-Newton ?ML? or ?LM? for Marquardt-Levenberg
   O.stop_dx = .5; %.5; %.1; %1; %2; %.5, 1,50;
   O.maxiter = 15; %15; %12
   O.ga_factor_not_ok = 10;
