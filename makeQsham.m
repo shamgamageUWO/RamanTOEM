@@ -44,10 +44,10 @@ Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.7e-9; % 4ns
 Q.deadtimeN2 = 3.8e-9; % 4ns
 Q.deadtimeWV = 3.8e-9; % 4ns
-Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
-Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
-Q.CovDTWV = (.1.*Q.deadtimeWV).^2;
-Q.CovDTN2 = (.1.*Q.deadtimeN2).^2;
+Q.CovDTJL = (.01.*Q.deadtimeJL).^2;
+Q.CovDTJH = (.01.*Q.deadtimeJH).^2;
+Q.CovDTWV = (.01.*Q.deadtimeWV).^2;
+Q.CovDTN2 = (.01.*Q.deadtimeN2).^2;
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.deltatime = 30;
@@ -56,12 +56,13 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-alt_d0 = 50; % Digital Channel starting altitude 20110705 2000 2011080223 3000
-alt_df = 22000; % Digital Channel ending altitude
-alt_a0 = 50;% Analog Channel starting altitude 20110705 150
-alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
+alt_d0 = 4000; % PRR Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_d01 = 4000; % WV/N2 Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_df = 20000; % Digital Channel ending altitude
+alt_a0 = 200;% Analog Channel starting altitude 20110705 150
+alt_af = 8000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
-Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
+Q.b2 = 8; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 3; % retrieval bin size
 c2 = 2.*c1;
 c3 = 2.*c2;
@@ -70,10 +71,10 @@ c4 = 2.*c3;
 % For asr
 Q.LRfree = 25; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
 Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 4000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
-Q.AerosolFreeheight = 12000;%2011080223 17000
-Q.ASRcutoffheight = 12000; % 20110909 1400
+Q.AerosolFreeheight = 15000;%2011080223 17000
+Q.ASRcutoffheight = 15000; % 20110909 1400
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -106,15 +107,16 @@ Q.JLnew= JLnew(alt>=alt_d0 & alt <= alt_df);
 Q.JH_DS =JH_DS(alt>=alt_d0 & alt <= alt_df);
 Q.JL_DS =JL_DS(alt>=alt_d0 & alt <= alt_df);
 
-Q.N2new= N2new(alt>=alt_d0 & alt <= alt_df);
-Q.WVnew= WVnew(alt>=alt_d0 & alt <= alt_df);
-Q.N2_DS =N2_DS(alt>=alt_d0 & alt <= alt_df);
-Q.WV_DS =WV_DS(alt>=alt_d0 & alt <= alt_df);
+Q.N2new= N2new(alt>=alt_d01 & alt <= alt_af);
+Q.WVnew= WVnew(alt>=alt_d01 & alt <= alt_af);
+Q.N2_DS =N2_DS(alt>=alt_d01 & alt <= alt_af);
+Q.WV_DS =WV_DS(alt>=alt_d01 & alt <= alt_af);
 
 Q.alt = alt(alt>=alt_d0 & alt <= alt_df);
 Q.Zmes2 = Q.alt';
 
-
+Q.alt1 = alt(alt>=alt_d01 & alt <= alt_af);
+Q.Zmes3 = Q.alt1';
 
 Q.f = 1e6./(Y.F);
 
@@ -168,7 +170,7 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:6000;
 Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
 Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
-Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:25000;
+Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:21000;
 Q.Zret =[Z1 Z2 Z3 Z4];
 disp('Defined grids ')
 
@@ -201,9 +203,11 @@ Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 % US temperature model
 [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
 Ta = temp; % for now im adding 2K to test
-Q.Ta = (Ta./Ta(1)).* Q.Tsonde2(1);
+ Q.Ta = (Ta./Ta(1)).* Q.Tsonde2(1);
+% Q.Ta = smooth(Q.Tsonde2,100);%a priori RH
+% Q.Ta = Q.Ta';
 Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-RHa = smooth(Q.RHsonde2,200);%a priori RH
+RHa = smooth(log(Q.RHsonde2./100),10);%a priori RH
 Q.RHa = RHa';
 disp('a priori temperature profile is loaded ')
 
@@ -221,14 +225,27 @@ Q.Tr_WV = Tr_WV;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-% [R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
-Q.R = 0.808780013344381;%R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
-Q.Ra = 0.8639;%Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
-Q.GR = 0.001;%dfacR ; % ISSI recommend
-Q.GRa = 0.001;%dfacRa;
+ [R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
+Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
+Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
+Q.GR = dfacR ; % ISSI recommend
+Q.GRa = dfacRa;
 % disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Estimating background and lidar constant wrt a priori 
+                                        load('OVDay.mat')
+                                        OVnw = interp1(OVDay.Z,OVDay.OV,Q.Zret,'linear');
+                                        OVnw(isnan(OVnw))=1;
+                                        Q.OVa = OVnw;                                    
+                                        Q.OVlength = length(Q.OVa);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
+                                        
+                                         load('OV_N2.mat')
+                                        OVnwv = interp1(OVN2.z,OVN2.OV,Q.Zret,'linear');
+                                        OVnwv(isnan(OVnwv))=1;
+                                        Q.OVwva = OVnwv;                                    
+                                        Q.OVwvlength = length(Q.OVwva);
+                                        Q.COVwva = OVCov(Q.Zret,Q.OVwva);
+                                        disp('Daytime retrieval')% Estimating background and lidar constant wrt a priori 
 
 C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
 Q.CL = C.CJL;
@@ -238,8 +255,8 @@ Q.CWV = C.Cwv;
 Q.CN2a = C.Cn2a;
 Q.CWVa =C.Cwva;
 
-Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
-Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 Q.CovWV = (.1 .* (Q.CWV)).^2;%sqrt(Q.CL);
 Q.CovWVa = (.1 .* (Q.CWVa)).^2;%sqrt(Q.CL);
 Q.CovN2 = (.1 .* (Q.CN2)).^2;%sqrt(Q.CL);
@@ -257,20 +274,20 @@ Q.CovBWVa = ((Y.bg_WV_stda)).^2;
                                             Q.CovBWV = ((Y.bg_WV_std)).^2; % day time
                                             Q.CovBN2 = ((Y.bg_N2_std)).^2;
                                             
-                                        load('OVDay.mat')
-                                        OVnw = interp1(OVDay.Z,OVDay.OV,Q.Zret,'linear');
-                                        OVnw(isnan(OVnw))=1;
-                                        Q.OVa = OVnw;                                    
-                                        Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
-                                        
-                                         load('OV_N2.mat')
-                                        OVnwv = interp1(OVN2.z,OVN2.OV,Q.Zret,'linear');
-                                        OVnwv(isnan(OVnwv))=1;
-                                        Q.OVwva = OVnwv;                                    
-                                        Q.OVwvlength = length(Q.OVwva);
-                                        Q.COVwva = OVCov(Q.Zret,Q.OVwva);
-                                        disp('Daytime retrieval')
+%                                         load('OVDay.mat')
+%                                         OVnw = interp1(OVDay.Z,OVDay.OV,Q.Zret,'linear');
+%                                         OVnw(isnan(OVnw))=1;
+%                                         Q.OVa = OVnw;                                    
+%                                         Q.OVlength = length(Q.OVa);
+%                                         Q.COVa = OVCov(Q.Zret,Q.OVa);
+%                                         
+%                                          load('OV_N2.mat')
+%                                         OVnwv = interp1(OVN2.z,OVN2.OV,Q.Zret,'linear');
+%                                         OVnwv(isnan(OVnwv))=1;
+%                                         Q.OVwva = OVnwv;                                    
+%                                         Q.OVwvlength = length(Q.OVwva);
+%                                         Q.COVwva = OVCov(Q.Zret,Q.OVwva);
+%                                         disp('Daytime retrieval')
                                         
                                         
                                         else 
@@ -279,19 +296,19 @@ Q.CovBWVa = ((Y.bg_WV_stda)).^2;
                                             Q.CovBWV = ((Y.bg_WV_std/sqrt(Y.bg_length4))).^2;
                                             Q.CovBN2 = ((Y.bg_N2_std/sqrt(Y.bg_length3))).^2;
                                             
-                                        load('OVDay.mat')
-                                        OVnw = interp1(OVDay.Z,OVDay.OV,Q.Zret,'linear');
-                                        OVnw(isnan(OVnw))=1;
-                                        Q.OVa = OVnw;
-                                        Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
-
-                                        load('OV_N2.mat')
-                                        OVnwv = interp1(OVN2.z,OVN2.OV,Q.Zret,'linear');
-                                        OVnwv(isnan(OVnwv))=1;
-                                        Q.OVwva = OVnwv;
-                                        Q.OVwvlength = length(Q.OVwva);
-                                        Q.COVwva = OVCov(Q.Zret,Q.OVwva);
+%                                         load('OVDay.mat')
+%                                         OVnw = interp1(OVDay.Z,OVDay.OV,Q.Zret,'linear');
+%                                         OVnw(isnan(OVnw))=1;
+%                                         Q.OVa = OVnw;
+%                                         Q.OVlength = length(Q.OVa);
+%                                         Q.COVa = OVCov(Q.Zret,Q.OVa);
+% 
+%                                         load('OV_N2.mat')
+%                                         OVnwv = interp1(OVN2.z,OVN2.OV,Q.Zret,'linear');
+%                                         OVnwv(isnan(OVnwv))=1;
+%                                         Q.OVwva = OVnwv;
+%                                         Q.OVwvlength = length(Q.OVwva);
+%                                         Q.COVwva = OVCov(Q.Zret,Q.OVwva);
                                         
                                         disp('Nighttime retrieval')
                                         end 
@@ -332,8 +349,8 @@ N2real = Q.N2new'; WVreal = Q.WVnew';  N2realan = Q.N2newa';    WVrealan = Q.WVn
              Q.JHv = [r1 JHv r2];
              Q.JLv = [r3 JLv r4];
 
-             [n2v,g1] =bobpoissontest(N2real,Q.Zmes2,b1);
-             [wvv,g11] =bobpoissontest(WVreal,Q.Zmes2,b1);
+             [n2v,g1] =bobpoissontest(N2real,Q.Zmes3,b1);
+             [wvv,g11] =bobpoissontest(WVreal,Q.Zmes3,b1);
           
              r11 = ones(1,g1-1).* n2v(1);
              r21 = ones(1,g1-1).* n2v(end);
@@ -345,29 +362,53 @@ N2real = Q.N2new'; WVreal = Q.WVnew';  N2realan = Q.N2newa';    WVrealan = Q.WVn
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 8000
+            if Q.Zmes2(i) <= 4000
                 Q.YY(i) = Q.JLv(i);
                 Q.YYY(i) = Q.JHv(i);
-                Q.YYn2(i) = Q.n2v(i);
-                Q.YYwv(i) = Q.wvv(i);
+%                 Q.YYn2(i) = Q.n2v(i);
+%                 Q.YYwv(i) = Q.wvv(i);
             else
                 Q.YY(i) = JLreal(i);
                 Q.YYY(i) = JHreal(i);
+%                 Q.YYn2(i) = N2real(i);
+%                 Q.YYwv(i) = WVreal(i);
+            end
+        end
+
+        for i = 1: length(Q.wvv)
+            if Q.Zmes3(i) <= 4000
+%                 Q.YY(i) = Q.JLv(i);
+%                 Q.YYY(i) = Q.JHv(i);
+                Q.YYn2(i) = Q.n2v(i);
+                Q.YYwv(i) = Q.wvv(i);
+            else
+%                 Q.YY(i) = JLreal(i);
+%                 Q.YYY(i) = JHreal(i);
                 Q.YYn2(i) = N2real(i);
                 Q.YYwv(i) = WVreal(i);
             end
         end
 
+        
+%                 Q.YYa = Y.YYa(1:length(Q.JLnewa));%ANalt>=alt_a0 & ANalt <=alt_af);
+%                 Q.YYYa = Y.YYYa(1:length(Q.JHnewa));%ANalt>=alt_a0 & ANalt <=alt_af);
+%                 Q.YYa =Q.YYa';
+%                 Q.YYYa =Q.YYYa';
+% 
+%                 Q.YYwva = Y.YYWVa(1:length(Q.WVnewa));%ANalt>=alt_a0 & ANalt <=alt_af);
+%                 Q.YYYn2a = Y.YYYN2a(1:length(Q.N2newa));%ANalt>=alt_a0 & ANalt <=alt_af);
+%                 Q.YYwva =Q.YYwva';
+%                 Q.YYYn2a =Q.YYYn2a';
+                Q.YYa = 0.01.*ones(1,length(Q.JLnewa));
+                Q.YYYa = 0.01.*ones(1,length(Q.JHnewa));
+%                 Q.YYa =Q.YYa';
+%                 Q.YYYa =Q.YYYa';
 
-                Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYa =Q.YYa';
-                Q.YYYa =Q.YYYa';
+                Q.YYwva = 0.01.*ones(1,length(Q.WVnewa));
+                Q.YYYn2a =0.01.*ones(1,length(Q.N2newa));
+%                 Q.YYwva =Q.YYwva;
+%                 Q.YYYn2a =Q.YYYn2a;
 
-                Q.YYwva = Y.YYWVa(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYYn2a = Y.YYYN2a(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYwva =Q.YYwva';
-                Q.YYYn2a =Q.YYYn2a';
 
 Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa Q.YYwv Q.YYn2 Q.YYwva Q.YYYn2a];
 Q.yvar = diag(Q.Yvar);

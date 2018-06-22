@@ -32,7 +32,7 @@ g = hour(S0.GlobalParameters.Start);%S0.GlobalParameters.Start.FastCom );
 Minute = minute(S0.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom  );
 tin =Q.time_in;
 % from 2300 to 2330
-starttime=find(g==tin & Minute==00);
+starttime=find(g==tin & Minute==23);
 endtime=find(g==tin & Minute==30);
 
 % pick the measurements from 11-11.30

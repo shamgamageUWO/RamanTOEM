@@ -21,7 +21,7 @@ exponent = 4+B+C*Lambda+D/Lambda;
 sigma_Rcm2 = A / Lambda^(exponent);
 sigmaNicolet = sigma_Rcm2*1e-4;%m2
 Nmol = (NA/M).* Q.rho ; % mol m-3
-alpha_aero = Q.alpha_aero';
+alpha_aero = Q.alpha_aero;
 odaer = Q.odaer';
 sigma_tot = Nmol*sigmaNicolet+ alpha_aero;
 Tr_PRR = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
@@ -44,5 +44,7 @@ sigma_totN2 = Nmol*sigmaNicoletN2 + alpha_aero + sigma_tot;
 Tr_N2 = exp(-cumtrapz(Q.Zmes,sigma_totN2)); % Molecular transmission
 Tr_WV = exp(-cumtrapz(Q.Zmes,sigma_totWV)); % Molecular transmission
 
-
+tr_N2 = exp(-cumtrapz(Q.Zmes,Nmol*sigmaNicoletN2)); % only n2
+tr_WV = exp(-cumtrapz(Q.Zmes,Nmol*sigmaNicoletWV )); % only wv
+%figure;plot(tr_N2./tr_WV,Q.Zmes./1000,'r',Tr_N2./Tr_WV,Q.Zmes./1000,'b')
 % figure;plot(Tr_PRR,Q.Zmes./1000,'r',Tr_N2,Q.Zmes./1000,'b',Tr_WV,Q.Zmes./1000,'g')

@@ -13,7 +13,7 @@ CJLa = x(2*m+6);
 DT_JH = x(2*m+7);
 DT_JL = x(2*m+8); % deadtimes
 
-rh_a = x(2*m+9:3*m+8);%
+rh_a = exp(x(2*m+9:3*m+8));%
 Bwv = x(3*m+9);
 Bn2 = x(3*m+10);
 Cwv = x(3*m+11);
@@ -29,22 +29,31 @@ DT_N2 = x(end); % deadtimes
 %% PRR FM
             % interpolation
             Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear');
-            Td = Ti(1:length(Q.JHnew));
-%             Td= Ti(end-length(Q.JHnew)+1:end);
+%             Td = Ti(1:length(Q.JHnew));
+             Td= Ti(end-length(Q.JHnew)+1:end);
             Ta= Ti(1:length(Q.JHnewa));
+            Td_WV = Ti(end-length(Q.WVnew)+1:end);
+            
+            rho =Q.rho;% Q.Zmes
+            rho_WVa= rho(1:length(Q.WVnewa));
+            rho_WV = rho(end-length(Q.WVnew)+1:end);
+            
+            
+            
             OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
-            OV_Zid = OV_Zi(1:length(Q.JHnew));
-%             OV_Zid = OV_Zi(end-length(Q.JHnew)+1:end);%interp1(Q.Zret,OV,Q.Zmes2,'linear');
+%             OV_Zid = OV_Zi(1:length(Q.JHnew));
+             OV_Zid = OV_Zi(end-length(Q.JHnew)+1:end);%interp1(Q.Zret,OV,Q.Zmes2,'linear');
             OV_Zia = OV_Zi(1:length(Q.JHnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
 
             kb = 1.38064852*10^-23;
 
-            R_tr_i = (Q.Tr);
-            R_tr_id= R_tr_i(1:length(Q.JHnew));
-%             R_tr_id = R_tr_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
+            R_tr_i = (Q.Tr');
+%             R_tr_id= R_tr_i(1:length(Q.JHnew));
+             R_tr_id = R_tr_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
             R_tr_ia = R_tr_i(1:length(Q.JHnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
-            Pd= Q.Pressi(1:length(Q.JHnew));
-%             Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
+%             Pd= Q.Pressi(1:length(Q.JHnew));
+             Pd = Q.Pressi(end-length(Q.JHnew)+1:end);%exp(Pdigid);
+                   Pd_WV = Q.Pressi(end-length(Q.WVnew)+1:end);%exp(Pdigid);
             Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
             A_Zi_an = ( OV_Zia' .*R_tr_ia .*Pa')./(kb * Q.Zmes1 .^2);
             B_Zi_an = (R_tr_ia .*Pa')./(kb * Q.Zmes1 .^2); % No overlap
@@ -104,26 +113,26 @@ DT_N2 = x(end); % deadtimes
 %% WV/N2 FM
 % es = 6.107 * exp ((M_A .*(T-273))./(M_B + (T-273))); Saturated vapor pressure
 % Q = (0.6222 .*RH)./(P - RH.*es); Mixing ratio
-RHi = interp1(Q.Zret,rh_a,Q.Zmes,'linear');
-RHd = RHi(1:length(Q.JHnew));
-% RHd=   RHi(end-length(Q.JHnew)+1:end);
-RHa=   RHi(1:length(Q.JHnewa));
+RHi = interp1(Q.Zret,100.*rh_a,Q.Zmes,'linear');
+% RHd = RHi(1:length(Q.JHnew));
+ RHd=   RHi(end-length(Q.WVnew)+1:end);
+RHa=   RHi(1:length(Q.WVnewa));
 
 OV_wvi = interp1(Q.Zret,OVwv,Q.Zmes,'linear');
-OV_wvd = OV_wvi(1:length(Q.JHnew));
-% OV_wvd = OV_wvi(end-length(Q.JHnew)+1:end);%interp1(Q.Zret,OV,Q.Zmes2,'linear');
-OV_wva = OV_wvi(1:length(Q.JHnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
+% OV_wvd = OV_wvi(1:length(Q.JHnew));
+ OV_wvd = OV_wvi(end-length(Q.WVnew)+1:end);%interp1(Q.Zret,OV,Q.Zmes2,'linear');
+OV_wva = OV_wvi(1:length(Q.WVnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
 
 
-            R_tr_wv = (Q.Tr_WV);
-            R_tr_wvd = R_tr_wv(1:length(Q.JHnew));
-%             R_tr_wvd = R_tr_wv(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
-            R_tr_wva = R_tr_wv(1:length(Q.JHnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
+            R_tr_wv = (Q.Tr_WV');
+%             R_tr_wvd = R_tr_wv(1:length(Q.JHnew));
+             R_tr_wvd = R_tr_wv(end-length(Q.WVnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
+            R_tr_wva = R_tr_wv(1:length(Q.WVnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
             
-            R_tr_n2 = (Q.Tr_N2);
-            R_tr_n2d = R_tr_n2(1:length(Q.JHnew));
-%             R_tr_n2d = R_tr_n2(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
-            R_tr_n2a = R_tr_n2(1:length(Q.JHnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
+            R_tr_n2 = (Q.Tr_N2');
+%             R_tr_n2d = R_tr_n2(1:length(Q.JHnew));
+             R_tr_n2d = R_tr_n2(end-length(Q.N2new)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
+            R_tr_n2a = R_tr_n2(1:length(Q.WVnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
             
 % For analog channels
 for i = 1:length(Ta)
@@ -140,8 +149,8 @@ for i = 1:length(Ta)
 end
 
 
-for i = 1:length(Td)
-    if Td(i) <= 273 
+for i = 1:length(Td_WV)
+    if Td_WV(i) <= 273 
         M_Aa = 17.84;
         M_Ba = 245.4;
     else 
@@ -149,18 +158,25 @@ for i = 1:length(Td)
         M_Ba = 234.2;
     end
     
-    es_d(i) = 6.107 * exp ((M_Aa .*(Td(i)-273))./(M_Ba + (Td(i)-273)));
-    Q_d(i) = (0.6222 .*RHd(i))./(Pd(i) - RHd(i).*es_d(i));
+    es_d(i) = 6.107 * exp ((M_Aa .*(Td_WV(i)-273))./(M_Ba + (Td_WV(i)-273)));
+    Q_d(i) = (0.6222 .*RHd(i))./(Pd_WV(i) - RHd(i).*es_d(i));
 end
 
 
-N2  = (0.7809.*OV_wvd'.*R_tr_n2d.*Cn2.*Pd')./(kb.*Td'.*Q.Zmes2.^2);
-n2a = (0.7809.*OV_wva'.*R_tr_n2a.*Cn2a.*Pa')./(kb.*Ta'.*Q.Zmes1.^2);
+ N2  = (0.7809.*OV_wvd'.*R_tr_n2d.*Cn2.*Pd_WV')./(kb.*Td_WV'.*Q.Zmes3.^2);
+ n2a = (0.7809.*OV_wva'.*R_tr_n2a.*Cn2a.*Pa')./(kb.*Ta'.*Q.Zmes1.^2);
+% % N2  = (0.7809.*OV_wvd'.*R_tr_n2d.*Cn2.*rho_WV')./(Q.Zmes3.^2);
+% % n2a = (0.7809.*OV_wva'.*R_tr_n2a.*Cn2a.*rho_WVa')./(Q.Zmes1.^2);
 
-WV  = (OV_wvd'.*R_tr_wvd.*Cwv.*Pd'.*Q_d)./(kb.*Td'.*Q.Zmes2.^2);
-wva = (OV_wva'.*R_tr_wva.*Cwva.*Pa'.*Q_a)./(kb.*Ta'.*Q.Zmes1.^2);
 
+M_N2 = 14.0067;
+M_WV = 18.01;
+mass_ratio = M_N2/M_WV;
+ WV  = (mass_ratio.*OV_wvd'.*R_tr_wvd.*Cwv.*Pd_WV'.*Q_d)./(kb.*Td_WV'.*Q.Zmes3.^2);
+ wva = (mass_ratio.*OV_wva'.*R_tr_wva.*Cwva.*Pa'.*Q_a)./(kb.*Ta'.*Q.Zmes1.^2);
 
+% WV  = (mass_ratio.*OV_wvd'.*R_tr_wvd.*Cwv.*rho_WV'.*Q_d)./(Q.Zmes3.^2);
+% wva = (mass_ratio.*OV_wva'.*R_tr_wva.*Cwva.*rho_WVa'.*Q_a)./(Q.Zmes1.^2);
 WVa = (wva+Bwva)';
 N2a = (n2a+Bn2a)';
 

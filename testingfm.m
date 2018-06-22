@@ -2,13 +2,13 @@ x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadti
 [JL,JH,JLa,JHa,WV,N2,WVa,N2a]=forwardmodelTraman(Q,x_a);
 figure;
 subplot(1,2,1)
-semilogx(Q.WVnew,Q.Zmes2,'y',WV,Q.Zmes2,'g')
+semilogx(Q.WVnew,Q.Zmes3,'y',WV,Q.Zmes3,'g')
 hold on;
 semilogx(Q.WVnewa,Q.Zmes1,'r',WVa,Q.Zmes1,'b')
 hold off
 
 subplot(1,2,2)
-semilogx(Q.N2new,Q.Zmes2,'y',N2,Q.Zmes2,'g')
+semilogx(Q.N2new,Q.Zmes3,'y',N2,Q.Zmes3,'g')
 hold on;
 semilogx(Q.N2newa,Q.Zmes1,'r',N2a,Q.Zmes1,'b')
 hold off

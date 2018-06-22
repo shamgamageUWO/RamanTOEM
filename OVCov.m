@@ -68,7 +68,7 @@ function [S_OV]=OVCov(Zj,OV)
 
 for i = 1:m
     for j = 1:m
-         if Zj(i)< 6000 % this is to force the ov to go to 1.
+         if Zj(i)< 7000 % this is to force the ov to go to 1.
 %             disp('ok')
             sigprod = sqrt(vars2(i).*vars2(j));
             diffz = Zj(i) - Zj(j);
@@ -84,7 +84,7 @@ for i = 1:m
             %          Sa_T(i,j) = Ta(i);
             %         end
          else
-             S_OV(i,i) = 1e-3;
+             S_OV(i,i) = 1e-6;
          end
     end
 end

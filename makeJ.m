@@ -36,10 +36,10 @@ for j = 1:m
    Jc(n1+n2+1:n1+n2+n3,j) = dJHa;
    Jc(n1+n2+n3+1:n1+n2+n3+n4,j) = dJLa;
   
-   Jc(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = dwv;
-   Jc(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = dn2;
-   Jc(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = dwva;
-   Jc(n1+n2+n3+n4+n5+n6+n7+1:n,j) = dn2a;
+   Jc(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = 0;
+   Jc(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = 0;
+   Jc(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = 0;
+   Jc(n1+n2+n3+n4+n5+n6+n7+1:n,j) = 0;
 % j
 % disp('ok')
 end
@@ -110,9 +110,9 @@ for j = 1:m
    JRH(n1+n2+n3+1:n1+n2+n3+n4,j) = 0;
    
    JRH(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = dRHWV;
-   JRH(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = dRHN2;
+   JRH(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = 0;
    JRH(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = dRHWVa;
-   JRH(n1+n2+n3+n4+n5+n6+n7+1:n,j) = dRHN2a;
+   JRH(n1+n2+n3+n4+n5+n6+n7+1:n,j) = 0;
 end
 
 

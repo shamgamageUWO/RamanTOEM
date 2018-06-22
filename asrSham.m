@@ -130,7 +130,7 @@ hold off;
 % xlabel('asr profile after fixing the diff')
 % ylabel('Alt(km)')
 
-alphaAer = LR' .* (beta_mol .* (asrDATAnew-1));
+alphaAer = LR .* (beta_mol .* (asrDATAnew-1));
 znoAer = find(zN > Q.AerosolFreeheight); % was 3000 for 20130122
 alphaAer(znoAer) = 1e-12;
 % 'asr set to 0 > Q.AerosolFreeheight'
