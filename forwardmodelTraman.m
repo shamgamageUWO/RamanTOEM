@@ -25,7 +25,7 @@ Cwva = x(4*m+15);
 Cn2a = x(4*m+16);
 DT_WV = x(4*m+17);
 DT_N2 = x(4*m+18); % deadtimes
-alpha_aero = exp(x(4*m+19:end));
+% alpha_aero = exp(x(4*m+19:end));
 
 %% PRR FM
             % interpolation
@@ -58,7 +58,7 @@ alpha_aero = exp(x(4*m+19:end));
             Pa = Q.Pressi(1:length(Q.JHnewa));%exp(Pdigia);
             
             
-            alpha_aero1 = interp1(Q.Zret,alpha_aero,Q.Zmes,'linear');
+            alpha_aero1 = interp1(Q.Zret,Q.alpha_aero,Q.Zmes,'linear');
             sigma_tot = Q.alpha_mol + alpha_aero1;
             R_tr_i  = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
             R_tr_id = R_tr_i(end-length(Q.JHnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');

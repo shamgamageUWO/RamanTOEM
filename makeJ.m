@@ -43,23 +43,23 @@ for j = 1:m
 % j
 % disp('ok')
 end
-
-Jaer = zeros(n,m);
-for j = 1:m 
-    [dJHaer,dJLaer,dJHaaer,dJLaaer,dwvaer,dn2aer,dwvaaer,dn2aaer] = deriCountsAero(j,Q,x,@forwardmodelTraman);
-    
-   Jaer(1:n1,j) = dJHaer;
-   Jaer(n1+1:n1+n2,j) = dJLaer;
-   Jaer(n1+n2+1:n1+n2+n3,j) = dJHaaer;
-   Jaer(n1+n2+n3+1:n1+n2+n3+n4,j) = dJLaaer;
-   
-   Jaer(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = dwvaer;
-   Jaer(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = dn2aer;
-   Jaer(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = dwvaaer;
-   Jaer(n1+n2+n3+n4+n5+n6+n7+1:n,j) = dn2aaer;
-% j
-% disp('ok')
-end
+% 
+% Jaer = zeros(n,m);
+% for j = 1:m 
+%     [dJHaer,dJLaer,dJHaaer,dJLaaer,dwvaer,dn2aer,dwvaaer,dn2aaer] = deriCountsAero(j,Q,x,@forwardmodelTraman);
+%     
+%    Jaer(1:n1,j) = dJHaer;
+%    Jaer(n1+1:n1+n2,j) = dJLaer;
+%    Jaer(n1+n2+1:n1+n2+n3,j) = dJHaaer;
+%    Jaer(n1+n2+n3+1:n1+n2+n3+n4,j) = dJLaaer;
+%    
+%    Jaer(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = dwvaer;
+%    Jaer(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = dn2aer;
+%    Jaer(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = dwvaaer;
+%    Jaer(n1+n2+n3+n4+n5+n6+n7+1:n,j) = dn2aaer;
+% % j
+% % disp('ok')
+% end
 
 %% OV for PRR
 JOV = zeros(n,m);
@@ -184,6 +184,6 @@ J_N2a = [zeros(n1+n2+n3+n4+n5+n6+n7,1); Kb_N2a];
 
 
 
-J = [J_counts J_JH J_JL KCL' JOV J_JHa J_JLa KCLa' Jdt1 Jdt2 JRH J_WV J_N2 KC1' KC2' JOVwv J_WVa J_N2a KC3' KC4' Jdt3 Jdt4 Jaer];
+J = [J_counts J_JH J_JL KCL' JOV J_JHa J_JLa KCLa' Jdt1 Jdt2 JRH J_WV J_N2 KC1' KC2' JOVwv J_WVa J_N2a KC3' KC4' Jdt3 Jdt4];
 
 

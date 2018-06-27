@@ -16,10 +16,10 @@ if ~O.linear
 end
 
 m = length(Q.Zret);
-figure;plot(X.x(1:m),Q.Zret./1000)
-hold on
-plot(Q.Tsonde2,Q.Zret./1000)
-hold off
+% figure;plot(X.x(1:m),Q.Zret./1000)
+% hold on
+% plot(Q.Tsonde2,Q.Zret./1000)
+% hold off
 
 figure;
 subplot(2,2,1)
@@ -42,10 +42,14 @@ plot(Q.OVwva,Q.Zret./1000)
 hold off
 
 subplot (2,2,4)
-plot(X.x(4*m+19:end),Q.Zret./1000)
-hold on;
-plot(Q.alpha_aero,Q.Zret./1000)
+plot(X.x(1:m),Q.Zret./1000)
+hold on
+plot(Q.Tsonde2,Q.Zret./1000)
 hold off
+% plot(X.x(4*m+19:end),Q.Zret./1000)
+% hold on;
+% plot(Q.alpha_aero,Q.Zret./1000)
+% hold off
 
 
 figure;
