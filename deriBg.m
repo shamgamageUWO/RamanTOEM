@@ -7,8 +7,8 @@ BJHa = x(2*m+4);
 BJLa = x(2*m+5);
 BWV = x(3*m+9);
 BN2 = x(3*m+10);
-BWVa = x(end-5);
-BN2a = x(end-4);
+BWVa = x(4*m+13);
+BN2a = x(4*m+14);
 
 
     [y_JL,y_JH,y_JLa,y_JHa,y_WV,y_N2,y_WVa,y_N2a]=forwardmodelTraman(Q,x);
@@ -36,8 +36,8 @@ dn8 = BN2a.*1e-4;
     xpert(2*m+5) =  BJLa + dn4;
     xpert(3*m+9) = BWV + dn5;
     xpert(3*m+10) =  BN2 + dn6;
-    xpert(end-5) = BWVa + dn7;
-    xpert(end-4) =  BN2a + dn8;
+    xpert(4*m+13) = BWVa + dn7;
+    xpert(4*m+14) =  BN2a + dn8;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];
 
     [y_JL_dT,y_JH_dT,y_JLa_dT,y_JHa_dT,y_WV_dT,y_N2_dT,y_WVa_dT,y_N2a_dT]=forwardmodelTraman(Q,xpert);

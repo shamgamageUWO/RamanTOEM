@@ -36,30 +36,30 @@ for j = 1:m
    Jc(n1+n2+1:n1+n2+n3,j) = dJHa;
    Jc(n1+n2+n3+1:n1+n2+n3+n4,j) = dJLa;
   
-   Jc(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = 0;
-   Jc(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = 0;
-   Jc(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = 0;
-   Jc(n1+n2+n3+n4+n5+n6+n7+1:n,j) = 0;
+   Jc(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = dwv;
+   Jc(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = dn2;
+   Jc(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = dwva;
+   Jc(n1+n2+n3+n4+n5+n6+n7+1:n,j) = dn2a;
 % j
 % disp('ok')
 end
 
-
-% for j = 1:m 
-%     [dJH,dJL,dJHa,dJLa] = deriCountsOEMNORH(j,Q,x,@forwardmodelTraman);
-%     
-%    Jc(1:n1,j) = dJH;
-%    Jc(n1+1:n1+n2,j) = dJL;
-%    Jc(n1+n2+1:n1+n2+n3,j) = dJHa;
-%    Jc(n1+n2+n3+1:n1+n2+n3+n4,j) = dJLa;
-%    
-%    Jc(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = 0;
-%    Jc(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = 0;
-%    Jc(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = 0;
-%    Jc(n1+n2+n3+n4+n5+n6+n7+1:n,j) = 0;
-% % j
-% % disp('ok')
-% end
+Jaer = zeros(n,m);
+for j = 1:m 
+    [dJHaer,dJLaer,dJHaaer,dJLaaer,dwvaer,dn2aer,dwvaaer,dn2aaer] = deriCountsAero(j,Q,x,@forwardmodelTraman);
+    
+   Jaer(1:n1,j) = dJHaer;
+   Jaer(n1+1:n1+n2,j) = dJLaer;
+   Jaer(n1+n2+1:n1+n2+n3,j) = dJHaaer;
+   Jaer(n1+n2+n3+1:n1+n2+n3+n4,j) = dJLaaer;
+   
+   Jaer(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = dwvaer;
+   Jaer(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = dn2aer;
+   Jaer(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = dwvaaer;
+   Jaer(n1+n2+n3+n4+n5+n6+n7+1:n,j) = dn2aaer;
+% j
+% disp('ok')
+end
 
 %% OV for PRR
 JOV = zeros(n,m);
@@ -83,7 +83,7 @@ end
 JOVwv = zeros(n,m);
 
 for jj = 1:m 
-   
+
    [dOVwv,dOVn2,dOVwva,dOVn2a] = deriCountsOVwv(jj,Q,x,@forwardmodelTraman);
    JOVwv(1:n1,jj) = 0;
    JOVwv(n1+1:n1+n2,jj) = 0;
@@ -110,9 +110,9 @@ for j = 1:m
    JRH(n1+n2+n3+1:n1+n2+n3+n4,j) = 0;
    
    JRH(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = dRHWV;
-   JRH(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = 0;
+   JRH(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = dRHN2;
    JRH(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = dRHWVa;
-   JRH(n1+n2+n3+n4+n5+n6+n7+1:n,j) = 0;
+   JRH(n1+n2+n3+n4+n5+n6+n7+1:n,j) = dRHN2a;
 end
 
 
@@ -184,6 +184,6 @@ J_N2a = [zeros(n1+n2+n3+n4+n5+n6+n7,1); Kb_N2a];
 
 
 
-J = [J_counts J_JH J_JL KCL' JOV J_JHa J_JLa KCLa' Jdt1 Jdt2 JRH J_WV J_N2 KC1' KC2' JOVwv J_WVa J_N2a KC3' KC4' Jdt3 Jdt4];
+J = [J_counts J_JH J_JL KCL' JOV J_JHa J_JLa KCLa' Jdt1 Jdt2 JRH J_WV J_N2 KC1' KC2' JOVwv J_WVa J_N2a KC3' KC4' Jdt3 Jdt4 Jaer];
 
 

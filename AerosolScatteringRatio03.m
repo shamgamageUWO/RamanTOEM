@@ -1,4 +1,4 @@
-function ASRatio = AerosolScatteringRatio03(data, config,tin)
+function ASRatio = AerosolScatteringRatio03(Q,data, config,tin)
 
 % filter width in m
 filter_width = config.ini.dASR.filter_width;
@@ -26,8 +26,8 @@ Minute = minute(data.GlobalParameters.Start);%(S0.GlobalParameters.Start.FastCom
 
 % from 2300 to 2330
 % tin =Q.time_in;
-starttime=find(g==tin & Minute==00);
-endtime=find(g==tin & Minute==30);
+starttime=find(g==tin & Minute==Q.min1);
+endtime=find(g==tin & Minute==Q.min2);
 
 JL = nanmean(data.JL.(what).Signal(:,starttime:endtime)');
 JH = nanmean(data.JH.(what).Signal(:,starttime:endtime)');
@@ -42,7 +42,7 @@ JH=JH';
 % JH = data.JH.(what).SignalMean;
 
 % Background correction
-bkg_ind = z > 45e3 & z<50e3;
+bkg_ind = z > 40e3 & z<50e3;
 JL = CorrBkg(JL,sum(bkg_ind),0,1);
 JH = CorrBkg(JH,sum(bkg_ind),0,1);
 
@@ -97,7 +97,7 @@ sigma   = Ebsig./(JLsig + JHsig) .* sqrt( (Ebsum./(Ebsig.^2)) + ((JLsum+JHsum)./
 %% filtering
 
 % standard altitude grid
-z_ref = [60:30:12000]'; % Sham changed this from 60 to 20. 
+z_ref = [60:30:20000]'; % Sham changed this from 60 to 20. 
 [Rf sigma_f dz] = deal(nan(size(z_ref)));
 
 % plot(Rf,z_ref./1000,'b')

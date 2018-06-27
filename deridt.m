@@ -2,8 +2,8 @@ function [dJHdt,dJLdt,dWVdt,dN2dt] = deridt(Q,x,forwardmodelTraman)
 m = length(Q.Zret);
 DT_JH = x(2*m+7);
 DT_JL = x(2*m+8); % deadtimes
-DT_WV = x(end-1);
-DT_N2 = x(end); % deadtimes
+DT_WV = x(4*m+17);
+DT_N2 = x(4*m+18); % deadtimes
 % N = 2*m+6 ;
 
 
@@ -15,17 +15,17 @@ DT_N2 = x(end); % deadtimes
     end
 %     m=length(Q.Zret);
 %     xa=x(1:m);
-dn = DT_JH.*1e3;
-dn2 = DT_JL.*1e3;
-dn3 = DT_WV.*1e3;
-dn4 = DT_N2.*1e3;
+dn = DT_JH.*1e-4;
+dn2 = DT_JL.*1e-4;
+dn3 = DT_WV.*1e-4;
+dn4 = DT_N2.*1e-4;
     % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
 
     xpert(2*m+7) = DT_JH + dn;
     xpert(2*m+8) =  DT_JL + dn2;
-    xpert(end-1) = DT_WV + dn3;
-    xpert(end) =  DT_N2 + dn4;
+    xpert(4*m+17) = DT_WV + dn3;
+    xpert(4*m+18) =  DT_N2 + dn4;
 %     Xpert= [xpert x(end-2) x(end-1) x(end)];
 
     [y_JL_dT,y_JH_dT,y_JLa_dT,y_JHa_dT,y_WV_dT,y_N2_dT,y_WVa_dT,y_N2a_dT]=forwardmodelTraman(Q,xpert);

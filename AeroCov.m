@@ -2,15 +2,15 @@
 
 % % % % % Input : US Temperatures
 % % % % % Output : Temperature covariance
-function [S_OV]=OVCov(Zj,OV,cutoffOV)
+function [S_Aero]=AeroCov(Zj,aero,cutoffOV)
  Zj = Zj';
 % ind = Zj<15000;
- m = length(OV);
+ m = length(aero);
  n = m;
- S_OV =zeros(n,n);
+S_Aero =zeros(n,n);
  lengthcT = 100; % =3000; % only need m of these
  lc = lengthcT.*ones(1,m);
- l = size(OV);
+ l = size(aero);
  
   Tfac = .1;
   Tmodvar = (Tfac.*ones(l)).^2;
@@ -23,52 +23,11 @@ function [S_OV]=OVCov(Zj,OV,cutoffOV)
  vars2 = Tmodvar ;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
- 
-%  
-% deltaZ = 2000;
-% ind = Zj<=15000;
-% ind2 = Zj>15000 & Zj<17000;
-% ind3 = Zj>=17000;
-% % 
-% l1=length(Zj(ind));
-% l2=length(Zj(ind2));
-% l3 = length(Zj(ind3));
-% % % 
-% % % L = Zj(ind);
-% % % L2 = Zj(ind2);
-% % % L3 = Zj(ind3);
-% OVstdl = 0.012;
-% OVstd2 = 0.00001;
-% 
-% h1 = OVstdl.* ones(1,l1);
-% h3 = OVstd2.* ones(1,l3);
-% 
-% % 
-% a = (OVstdl + OVstd2 )/deltaZ;
-% pl(1) = a* 250; % change these to general form
-% for i = 1:6  % change these to general form
-% pl(i+1)= pl(1)*(i+1);
-% end
-% ppl=fliplr(pl);
-% OV_dia  =[h1 ppl h3];
-% 
-% 
-% Tmodvar = (OV_dia.*ones(l)).^2;
-% % LL = 1:deltaZ;
-% % pl = a.*LL;
-% 
-% plot(Zj,OV_dia,'b')
-% % hold off
-
- 
- 
- 
- 
 
 
 for i = 1:m
     for j = 1:m
-%          if Zj(i)< cutoffOV % this is to force the ov to go to 1.
+%          if Zj(i)>cutoffOV % this is to force the ov to go to 1.
 %             disp('ok')
             sigprod = sqrt(vars2(i).*vars2(j));
             diffz = Zj(i) - Zj(j);
@@ -79,16 +38,22 @@ for i = 1:m
                 shape(3) = 0;
             end
             
-            S_OV(i,j) = sigprod.*shape(3);
+           S_Aero(i,j) = sigprod.*shape(3);
             %         if i==j
             %          Sa_T(i,j) = Ta(i);
             %         end
 %          else
-%              S_OV(i,i) = 1e-6;
+%              S_Aero(i,i) = 1e-12; % cloud at 6km use 1e-2
 %          end
     end
 end
 
+
+% t = Zj./norm(Zj);
+% unitstep = Zj>=6000;
+% quad = t.^2.*unitstep;
+%  
+%   S_Aero = quad.* S_Aero;
 
 %  S_OV(n,n) = vars2(n);
  

@@ -25,7 +25,7 @@ Q.time_in = time_in;%23; % 11
 Q.Csum =  2.8077e+18;
 Q.CLfac = 10^-2;
 Q.CHfac = 10^-2;
-Q.coaddalt = 4;
+Q.coaddalt = 8;
 Q.Rgas = 8.3145;%Hz
 Q.t_bin = 60;%s
 Q.altbinsize = 3.75;%m
@@ -44,23 +44,25 @@ Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.7e-9; % 4ns
 Q.deadtimeN2 = 3.8e-9; % 4ns
 Q.deadtimeWV = 3.8e-9; % 4ns
-Q.CovDTJL = (.01.*Q.deadtimeJL).^2;
-Q.CovDTJH = (.01.*Q.deadtimeJH).^2;
-Q.CovDTWV = (.01.*Q.deadtimeWV).^2;
-Q.CovDTN2 = (.01.*Q.deadtimeN2).^2;
+Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
+Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
+Q.CovDTWV = (.1.*Q.deadtimeWV).^2;
+Q.CovDTN2 = (.1.*Q.deadtimeN2).^2;
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.deltatime = 30;
 Q.Shots = 1800; 
+Q.min1 = 00;
+Q.min2 = 30;
 disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-alt_d0 = 4000; % PRR Digital Channel starting altitude 20110705 2000 2011080223 3000
-alt_d01 = 4000; % WV/N2 Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_d0 = 2000; % PRR Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_d01 = 200; % WV/N2 Digital Channel starting altitude 20110705 2000 2011080223 3000
 alt_df = 20000; % Digital Channel ending altitude
 alt_a0 = 200;% Analog Channel starting altitude 20110705 150
-alt_af = 8000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
+alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
 Q.b2 = 8; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 3; % retrieval bin size
@@ -69,12 +71,12 @@ c3 = 2.*c2;
 c4 = 2.*c3;
 
 % For asr
-Q.LRfree = 25; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
-Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+% Q.LRfree = 25; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
+% Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
+% Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
-Q.AerosolFreeheight = 15000;%2011080223 17000
-Q.ASRcutoffheight = 15000; % 20110909 1400
+Q.AerosolFreeheight = 20000;%2011080223 17000
+Q.ASRcutoffheight = 20000; % 20110909 1400
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -107,15 +109,15 @@ Q.JLnew= JLnew(alt>=alt_d0 & alt <= alt_df);
 Q.JH_DS =JH_DS(alt>=alt_d0 & alt <= alt_df);
 Q.JL_DS =JL_DS(alt>=alt_d0 & alt <= alt_df);
 
-Q.N2new= N2new(alt>=alt_d01 & alt <= alt_af);
-Q.WVnew= WVnew(alt>=alt_d01 & alt <= alt_af);
-Q.N2_DS =N2_DS(alt>=alt_d01 & alt <= alt_af);
-Q.WV_DS =WV_DS(alt>=alt_d01 & alt <= alt_af);
+Q.N2new= N2new(alt>=alt_d01 & alt <= alt_df);
+Q.WVnew= WVnew(alt>=alt_d01 & alt <= alt_df);
+Q.N2_DS =N2_DS(alt>=alt_d01 & alt <= alt_df);
+Q.WV_DS =WV_DS(alt>=alt_d01 & alt <= alt_df);
 
 Q.alt = alt(alt>=alt_d0 & alt <= alt_df);
 Q.Zmes2 = Q.alt';
 
-Q.alt1 = alt(alt>=alt_d01 & alt <= alt_af);
+Q.alt1 = alt(alt>=alt_d01 & alt <= alt_df);
 Q.Zmes3 = Q.alt1';
 
 Q.f = 1e6./(Y.F);
@@ -170,7 +172,7 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:6000;
 Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
 Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
-Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:21000;
+Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:22000;
 Q.Zret =[Z1 Z2 Z3 Z4];
 disp('Defined grids ')
 
@@ -179,22 +181,24 @@ disp('Defined grids ')
 
 [Tsonde,Zsonde,Psonde,RH] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
-Tsonde = Tsonde(Zsonde<=32000);
-Psonde = Psonde(Zsonde<=32000);
-Zsonde = Zsonde(Zsonde<=32000);
-RHsonde = RH(Zsonde<=32000);
+Tsonde = Tsonde(Zsonde<=30000);
+Psonde = Psonde(Zsonde<=30000);
+Zsonde = Zsonde(Zsonde<=30000);
+RHsonde = RH(Zsonde<=30000);
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
 Q.RHsonde = interp1(Zsonde,RHsonde,Q.Zmes,'linear'); 
+Psonde1 = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr
+Q.Psonde = exp(Psonde1);
 
-Psonde = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr
-Q.Psonde = exp(Psonde);
 Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
 Q.RHsonde2 = interp1(Zsonde,RHsonde,Q.Zret,'linear'); % this goes to CJL estimation
 
-
+Psonde2 = interp1(Zsonde,log(Psonde),Q.Zret,'linear'); % this goes asr
+Q.Psonde2= exp(Psonde2);
 Q.Pressi = Q.Psonde;
 Ti = Q.Tsonde;
+
 Q.rho = Q.Pressi./(Rsp.*Ti);
 Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 %%
@@ -207,29 +211,37 @@ Ta = temp; % for now im adding 2K to test
 % Q.Ta = smooth(Q.Tsonde2,100);%a priori RH
 % Q.Ta = Q.Ta';
 Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-RHa = smooth(log(Q.RHsonde2./100),10);%a priori RH
+RHa = smooth((Q.RHsonde2),20);%a priori RH
 Q.RHa = RHa';
 disp('a priori temperature profile is loaded ')
 
 
 
 % Calculate the aerosol attenuation
-[alphaAer,odaer] = asrSham(Q);
-Q.alpha_aero = alphaAer;
-Q.odaer = odaer;
+% [alphaAer,odaer] = asrSham(Q);
+% Q.alpha_aero = alphaAer;
+% Q.odaer = odaer;
+[alpha_aero,odaer,cutoffOV] = asrSham(Q);
+ Q.alpha_aero = (log(alpha_aero)');
+%  Q.alpha_aero = log(alpha_aero');%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
+Q.cutoffOV = cutoffOV;
 % total transmission air + aerosol 
-[Tr_PRR,Tr_N2,Tr_WV] = Total_Transmission(Q);
-Q.Tr = Tr_PRR;
-Q.Tr_N2 = Tr_N2;
-Q.Tr_WV = Tr_WV;
-
+% [Tr_PRR,Tr_N2,Tr_WV] = Total_Transmission(Q);
+% Q.Tr = Tr_PRR;
+% Q.Tr_N2 = Tr_N2;
+% Q.Tr_WV = Tr_WV;
+[alpha_mol,alpha_wv,alpha_n2] = Transmission(Q);
+Q.alpha_mol = alpha_mol;
+Q.alpha_wv = alpha_wv;
+Q.alpha_n2 = alpha_n2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
- [R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
+ [R_fit,Ra_fit,dfacR,dfacRa,ind1] = Restimationnew(Q);
 Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
 Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
 Q.GR = dfacR ; % ISSI recommend
 Q.GRa = dfacRa;
+Q.ind1=ind1;
 % disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                                         load('OVDay.mat')
@@ -237,14 +249,14 @@ Q.GRa = dfacRa;
                                         OVnw(isnan(OVnw))=1;
                                         Q.OVa = OVnw;                                    
                                         Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.cutoffOV);
                                         
                                          load('OV_N2.mat')
                                         OVnwv = interp1(OVN2.z,OVN2.OV,Q.Zret,'linear');
                                         OVnwv(isnan(OVnwv))=1;
                                         Q.OVwva = OVnwv;                                    
                                         Q.OVwvlength = length(Q.OVwva);
-                                        Q.COVwva = OVCov(Q.Zret,Q.OVwva);
+                                        Q.COVwva = OVCovwv(Q.Zret,Q.OVwva,Q.cutoffOV);
                                         disp('Daytime retrieval')% Estimating background and lidar constant wrt a priori 
 
 C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
@@ -255,12 +267,12 @@ Q.CWV = C.Cwv;
 Q.CN2a = C.Cn2a;
 Q.CWVa =C.Cwva;
 
-Q.CovCL = (.1 .* (Q.CL)).^2;%sqrt(Q.CL);
-Q.CovCLa = (.1 .* (Q.CLa)).^2;%sqrt(Q.CL);
-Q.CovWV = (.1 .* (Q.CWV)).^2;%sqrt(Q.CL);
-Q.CovWVa = (.1 .* (Q.CWVa)).^2;%sqrt(Q.CL);
-Q.CovN2 = (.1 .* (Q.CN2)).^2;%sqrt(Q.CL);
-Q.CovN2a = (.1 .* (Q.CN2a)).^2;%sqrt(Q.CL);
+Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
+Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
+Q.CovWV = (1 .* (Q.CWV)).^2;%sqrt(Q.CL);
+Q.CovWVa = (1 .* (Q.CWVa)).^2;%sqrt(Q.CL);
+Q.CovN2 = (1 .* (Q.CN2)).^2;%sqrt(Q.CL);
+Q.CovN2a = (1 .* (Q.CN2a)).^2;%sqrt(Q.CL);
 
 Q.CovBJLa = ((Y.bg_JL_stda)).^2; % day time
 Q.CovBJHa = ((Y.bg_JH_stda)).^2;
@@ -399,6 +411,8 @@ N2real = Q.N2new'; WVreal = Q.WVnew';  N2realan = Q.N2newa';    WVrealan = Q.WVn
 %                 Q.YYYn2a = Y.YYYN2a(1:length(Q.N2newa));%ANalt>=alt_a0 & ANalt <=alt_af);
 %                 Q.YYwva =Q.YYwva';
 %                 Q.YYYn2a =Q.YYYn2a';
+
+
                 Q.YYa = 0.01.*ones(1,length(Q.JLnewa));
                 Q.YYYa = 0.01.*ones(1,length(Q.JHnewa));
 %                 Q.YYa =Q.YYa';

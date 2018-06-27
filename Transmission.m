@@ -1,7 +1,6 @@
 
-function [Tr_PRR,Tr_N2,Tr_WV] = Total_Transmission(Q)
-kb = 1.38064852*10^-23;
-area = pi * (0.3^2);
+function [alpha_mol,alpha_wv,alpha_n2] = Transmission(Q)
+
 
 % For PRR
 Lambda = 354.7* (10^-3);
@@ -11,10 +10,7 @@ A = 4.02*10^(-28);
 B = -0.3228;
 C = 0.389;
 D = 0.09426;
-J_low = [3,4,5,6,7,8,9];
-J_high = [10,11,12,13,14,15];
-J_lowO2 = [5,7,9,11,13];
-J_highO2 = [15,17,19,21];
+
 
 % Transmission 
 exponent = 4+B+C*Lambda+D/Lambda;
@@ -23,8 +19,8 @@ sigmaNicolet = sigma_Rcm2*1e-4;%m2
 Nmol = (NA/M).* Q.rho ; % mol m-3
 % alpha_aero = Q.alpha_aero;
 % odaer = Q.odaer';
-sigma_tot = Nmol*sigmaNicolet+ alpha_aero;
-Tr_PRR = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
+alpha_mol = Nmol*sigmaNicolet;
+% Tr_PRR = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
 
 % For N2 and WV
 % Molecular profile number density
@@ -38,13 +34,13 @@ sigmaNicoletN2 = sigma_Rcm2N2*1e-4; %m2
 exponentWV = 4+B+C*LambdaWV+D/LambdaWV;
 sigma_Rcm2WV = A / LambdaWV^(exponentWV);
 sigmaNicoletWV = sigma_Rcm2WV*1e-4;%m2
-sigma_totWV = Nmol*sigmaNicoletWV + alpha_aero + sigma_tot;
-sigma_totN2 = Nmol*sigmaNicoletN2 + alpha_aero + sigma_tot;
+alpha_wv = Nmol*sigmaNicoletWV;
+alpha_n2 = Nmol*sigmaNicoletN2;
 
-Tr_N2 = exp(-cumtrapz(Q.Zmes,sigma_totN2)); % Molecular transmission
-Tr_WV = exp(-cumtrapz(Q.Zmes,sigma_totWV)); % Molecular transmission
-
-tr_N2 = exp(-cumtrapz(Q.Zmes,Nmol*sigmaNicoletN2)); % only n2
-tr_WV = exp(-cumtrapz(Q.Zmes,Nmol*sigmaNicoletWV )); % only wv
+% Tr_N2 = exp(-cumtrapz(Q.Zmes,sigma_totN2)); % Molecular transmission
+% Tr_WV = exp(-cumtrapz(Q.Zmes,sigma_totWV)); % Molecular transmission
+% 
+% tr_N2 = exp(-cumtrapz(Q.Zmes,Nmol*sigmaNicoletN2)); % only n2
+% tr_WV = exp(-cumtrapz(Q.Zmes,Nmol*sigmaNicoletWV )); % only wv
 %figure;plot(tr_N2./tr_WV,Q.Zmes./1000,'r',Tr_N2./Tr_WV,Q.Zmes./1000,'b')
 % figure;plot(Tr_PRR,Q.Zmes./1000,'r',Tr_N2,Q.Zmes./1000,'b',Tr_WV,Q.Zmes./1000,'g')

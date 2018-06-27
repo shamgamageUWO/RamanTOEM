@@ -4,8 +4,8 @@ CJL = x(m+3);
 CJLa = x(end-2);
 CWV = x(3*m+11);
 CN2 = x(3*m+12);
-CWVa = x(end-3);
-CN2a = x(end-2);
+CWVa = x(4*m+15);
+CN2a = x(4*m+16);
 
 
     [y_JL,y_JH,y_JLa,y_JHa,y_WV,y_N2,y_WVa,y_N2a]=forwardmodelTraman(Q,x);
@@ -30,8 +30,8 @@ dn6 = CN2a.*1e-4;
     xpert(end-2) = CJLa + dn2;
     xpert(3*m+11) = CWV + dn3;
     xpert(3*m+12) = CN2 + dn4;
-    xpert(end-3) = CWVa + dn5;
-    xpert(end-2) = CN2a + dn6;
+    xpert(4*m+15) = CWVa + dn5;
+    xpert(4*m+16) = CN2a + dn6;
     
 
 

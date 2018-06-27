@@ -15,7 +15,7 @@ function [dOVJH,dOVJL,dOVJHa,dOVJLa] = deriCountsOV(j,Q,x,forwardmodelTraman)
 %     xa=x(1:m);
     dn = x(m+3+j).*1e-12; % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
-    if x(j) == 0 % trap for tau's where tau(1) = 0
+    if x(m+3+j) == 0 % trap for tau's where tau(1) = 0
         dn = 1.e-12 .* x(m+3+j+1);
     end
     xpert(m+3+j) = x(m+3+j) + dn;

@@ -11,7 +11,7 @@ function [S_rh]=RHCov(Zj,Ta)
  lengthcT = 100; % =3000; % only need m of these
 %  Tfac = 1;
 %   Tmodvar = (Tfac.*ones(size(Ta))).^2;
-   Tmodvar = (.3.*Ta).^2;
+   Tmodvar = (.2.*Ta).^2;
  vars2 = Tmodvar;
  lc = lengthcT.*ones(1,m);
  S_rh =zeros(n,n);

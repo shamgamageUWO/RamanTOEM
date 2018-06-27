@@ -1,4 +1,4 @@
-x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL Q.RHa Q.BaWV Q.BaN2 Q.CWV Q.CN2 Q.OVwva Q.BaWVa Q.BaN2a Q.CWVa Q.CN2a Q.deadtimeWV Q.deadtimeN2];
+x_a = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.BaJHa Q.BaJLa Q.CLa Q.deadtimeJH Q.deadtimeJL Q.RHa Q.BaWV Q.BaN2 Q.CWV Q.CN2 Q.OVwva Q.BaWVa Q.BaN2a Q.CWVa Q.CN2a Q.deadtimeWV Q.deadtimeN2 Q.alpha_aero];
 [JL,JH,JLa,JHa,WV,N2,WVa,N2a]=forwardmodelTraman(Q,x_a);
 figure;
 subplot(1,2,1)

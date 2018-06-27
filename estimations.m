@@ -9,7 +9,7 @@ Zdd= Q.Zmes3;
 
 ind1 = Zd>6000 & Zd< 8000;
 ind4 = Zdd>=4000 & Zdd< 6000; % WV digital
-ind2 = Za>=1000 & Za< 2000;% 1800 was changed
+ind2 = Za>=1500 & Za< 3000;% 1800 was changed
 ind3 = Za>=800 & Za < 1000;
 ind5 = Za>= 800 & Za < 1000;
 % ind3 = Zi
@@ -28,7 +28,7 @@ SWVa = Q.WVnewa - Q.BaWVa;
     OVa = ones(1,length(Q.Ta));
     Q.OVlength = length(OVa);
 
-x = [Q.Tsonde2 0 0 1 Q.OVa 0 0 1 0 0 Q.RHa 0 0 1 1 Q.OVwva 0 0 1 1 0 0]; % coupled analog channels
+x = [Q.Tsonde2 0 0 1 Q.OVa 0 0 1 0 0 Q.RHa 0 0 1 1 Q.OVwva 0 0 1 1 0 0 Q.alpha_aero]; % coupled analog channels
 
 
 [JL,JH,JLa,JHa,WV,N2,WVa,N2a]=forwardmodelTraman(Q,x);
