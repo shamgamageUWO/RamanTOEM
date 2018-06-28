@@ -58,11 +58,11 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-alt_d0 = 2000; % PRR Digital Channel starting altitude 20110705 2000 2011080223 3000
-alt_d01 = 200; % WV/N2 Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_d0 = 4000; % PRR Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_d01 = 100; % WV/N2 Digital Channel starting altitude 20110705 2000 2011080223 3000
 alt_df = 20000; % Digital Channel ending altitude
-alt_a0 = 200;% Analog Channel starting altitude 20110705 150
-alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
+alt_a0 = 100;% Analog Channel starting altitude 20110705 150
+alt_af = 8000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
 Q.b2 = 8; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 3; % retrieval bin size
@@ -207,9 +207,9 @@ Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 % US temperature model
 [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
 Ta = temp; % for now im adding 2K to test
- Q.Ta = (Ta./Ta(1)).* Q.Tsonde2(1);
-% Q.Ta = smooth(Q.Tsonde2,100);%a priori RH
-% Q.Ta = Q.Ta';
+%  Q.Ta = (Ta./Ta(1)).* Q.Tsonde2(1);
+ Q.Ta = smooth(Q.Tsonde2,20);%a priori RH
+ Q.Ta = Q.Ta';
 Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
 RHa = smooth((Q.RHsonde2),20);%a priori RH
 Q.RHa = RHa';
@@ -222,7 +222,8 @@ disp('a priori temperature profile is loaded ')
 % Q.alpha_aero = alphaAer;
 % Q.odaer = odaer;
 [alpha_aero,odaer,cutoffOV] = asrSham(Q);
- Q.alpha_aero = (log(alpha_aero)');
+Q.alpha_aero = smooth( alpha_aero,20);%a priori RH
+Q.alpha_aero = (log(Q.alpha_aero)');
 %  Q.alpha_aero = log(alpha_aero');%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
 Q.cutoffOV = cutoffOV;
 % total transmission air + aerosol 
@@ -236,12 +237,14 @@ Q.alpha_wv = alpha_wv;
 Q.alpha_n2 = alpha_n2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
- [R_fit,Ra_fit,dfacR,dfacRa,ind1] = Restimationnew(Q);
+ [R_fit,Ra_fit,dfacR,dfacRa,ind1,R_fitn2,R_fitn2a] = Restimationnew(Q);
 Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
 Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
 Q.GR = dfacR ; % ISSI recommend
 Q.GRa = dfacRa;
 Q.ind1=ind1;
+Q.RN2=R_fitn2;
+Q.RN2a=R_fitn2a;
 % disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                                         load('OVDay.mat')
@@ -374,7 +377,7 @@ N2real = Q.N2new'; WVreal = Q.WVnew';  N2realan = Q.N2newa';    WVrealan = Q.WVn
             
             
         for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 4000
+            if Q.Zmes2(i) <= 6000
                 Q.YY(i) = Q.JLv(i);
                 Q.YYY(i) = Q.JHv(i);
 %                 Q.YYn2(i) = Q.n2v(i);
@@ -388,7 +391,7 @@ N2real = Q.N2new'; WVreal = Q.WVnew';  N2realan = Q.N2newa';    WVrealan = Q.WVn
         end
 
         for i = 1: length(Q.wvv)
-            if Q.Zmes3(i) <= 4000
+            if Q.Zmes3(i) <= 2000
 %                 Q.YY(i) = Q.JLv(i);
 %                 Q.YYY(i) = Q.JHv(i);
                 Q.YYn2(i) = Q.n2v(i);
@@ -413,13 +416,13 @@ N2real = Q.N2new'; WVreal = Q.WVnew';  N2realan = Q.N2newa';    WVrealan = Q.WVn
 %                 Q.YYYn2a =Q.YYYn2a';
 
 
-                Q.YYa = 0.01.*ones(1,length(Q.JLnewa));
-                Q.YYYa = 0.01.*ones(1,length(Q.JHnewa));
+                Q.YYa = 0.005.*ones(1,length(Q.JLnewa));
+                Q.YYYa = 0.005.*ones(1,length(Q.JHnewa));
 %                 Q.YYa =Q.YYa';
 %                 Q.YYYa =Q.YYYa';
 
-                Q.YYwva = 0.01.*ones(1,length(Q.WVnewa));
-                Q.YYYn2a =0.01.*ones(1,length(Q.N2newa));
+                Q.YYwva = 0.005.*ones(1,length(Q.WVnewa));
+                Q.YYYn2a =0.005.*ones(1,length(Q.N2newa));
 %                 Q.YYwva =Q.YYwva;
 %                 Q.YYYn2a =Q.YYYn2a;
 

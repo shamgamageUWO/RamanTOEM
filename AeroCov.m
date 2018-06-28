@@ -12,7 +12,7 @@ S_Aero =zeros(n,n);
  lc = lengthcT.*ones(1,m);
  l = size(aero);
  
-  Tfac = .1;
+  Tfac = .5;
   Tmodvar = (Tfac.*ones(l)).^2;
 % %  
 %  ll = size(OV);

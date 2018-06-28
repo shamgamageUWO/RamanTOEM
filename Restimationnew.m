@@ -1,4 +1,4 @@
-function [R_fit,Ra_fit,dfacR,dfacRa,ind1] = Restimationnew(Q)
+function [R_fit,Ra_fit,dfacR,dfacRa,ind1,R_fitn2,R_fitn2a] = Restimationnew(Q)
 JHnew = Q.JH_DS-Q.BaJH;
 JLnew = Q.JL_DS-Q.BaJL;
 JHnewa = Q.JHnewa-Q.BaJHa;
@@ -51,7 +51,7 @@ dfacR = GR.rmse;
 % 
 
 % %% analog
-% Alt2 = Q.Zmes1;
+ Alt2 = Q.Zmes1;
 % ind2 = Alt2 >= 1000 & Alt2 <= 1200;
  xa = 1./Ratio_diff_a(ind2);
  ya = Analog_ratio(ind2);
@@ -68,22 +68,24 @@ dfacRa = GRa.rmse;
 
 % %%
 % 
-% WVnew = Q.WV_DS-Q.BaWV;
-% N2new = Q.N2_DS-Q.BaN2;
-% WVnewa = Q.WVnewa-Q.BaWVa;
-% N2newa = Q.N2newa-Q.BaN2a;
-% 
-% R_tr_n2 = (Q.Tr_N2');
-% R_tr_wv = (Q.Tr_WV');
-% 
-% Diff_transmission = R_tr_n2./R_tr_wv;
-% 
-% R_tr_d = Diff_transmission(end-length(Q.WVnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
-% R_tr_a = Diff_transmission(1:length(Q.WVnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
-% 
-% Count_Ratio_d = WVnew./N2new;
-% Count_Ratio_a = WVnewa./N2newa;
+WVnew = Q.WV_DS-Q.BaWV;
+N2new = Q.N2_DS-Q.BaN2;
+WVnewa = Q.WVnewa-Q.BaWVa;
+N2newa = Q.N2newa-Q.BaN2a;
 
+R_tr_n2 = exp(cumtrapz(Q.Zmes3,Q.alpha_n2));
+R_tr_wv =  exp(cumtrapz(Q.Zmes3,Q.alpha_wv));
+        
+
+
+Diff_transmission = R_tr_n2./R_tr_wv;
+
+R_tr_d = Diff_transmission(end-length(Q.WVnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
+R_tr_a = Diff_transmission(1:length(Q.WVnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
+
+Count_Ratio_d = WVnew./N2new;
+Count_Ratio_a = WVnewa./N2newa;
+% 
 % for i = 1:length(Q.Tsonde)
 %     if Q.Tsonde(i) <= 273 
 %         M_Aa = 17.84;
@@ -96,37 +98,37 @@ dfacRa = GRa.rmse;
 %     es(i) = 6.107 * exp ((M_Aa .*(Q.Tsonde(i)-273))./(M_Ba + (Q.Tsonde(i)-273)));
 %     U(i) = (0.6222 .* Q.RHsonde(i))./(Q.Psonde(i) - Q.RHsonde(i).*es(i));    
 % end
-%% For N2 digital
+% % For N2 digital
 % Q_d = U(end-length(Q.WVnew)+1:end);
 % Q_a = U(1:length(Q.WVnewa));
 
-% 
-% d = Count_Ratio_d'.*R_tr_d;
-% a = Count_Ratio_a.*R_tr_a;
-% 
-% 
-% X_n2 = 1./Count_Ratio_d';
-% Y_n2 = R_tr_d;
-% 
-% aalt = Q.Zmes3;
-% ind4 = aalt >= 4000 & aalt< 6000;
-% xc = X_n2(ind4);
-% yc = Y_n2(ind4);
-% fc = fittype({'x'});
-% [fitr,GRr] = fit(xc',yc',fc,'Robust','on');
-% R_fitn2 = fitr(1);
-% dfacRn2 = GRr.rmse;
-% 
-% 
-% X_n2a = 1./Count_Ratio_a';
-% Y_n2a = R_tr_a;
-% ind5 = Alt2 >= 4500 & Alt2< 6000;
-% xca = X_n2a(ind5);
-% yca = Y_n2a(ind5);
-% fca = fittype({'x'});
-% [fitra,GRra] = fit(xca',yca',fca,'Robust','on');
-% R_fitn2a = fitra(1);
-% dfacRn2a = GRra.rmse;
+
+d = Count_Ratio_d.*R_tr_d;
+a = Count_Ratio_a.*R_tr_a;
+
+
+X_n2 = 1./Count_Ratio_d';
+Y_n2 = R_tr_d;
+
+aalt = Q.Zmes3;
+ind4 = aalt >= 4000 & aalt< 5500;
+xc = X_n2(ind4);
+yc = Y_n2(ind4);
+fc = fittype({'x'});
+[fitr,GRr] = fit(xc',yc,fc,'Robust','on');
+R_fitn2 = fitr(1);
+dfacRn2 = GRr.rmse;
+
+
+X_n2a = 1./Count_Ratio_a';
+Y_n2a = R_tr_a;
+ind5 = Alt2 >= 4000 & Alt2< 5500;
+xca = X_n2a(ind5);
+yca = Y_n2a(ind5);
+fca = fittype({'x'});
+[fitra,GRra] = fit(xca',yca,fca,'Robust','on');
+R_fitn2a = fitra(1);
+dfacRn2a = GRra.rmse;
 % figure;plot(d,Q.Zmes3./1000)
 % figure;plot(a,Q.Zmes1./1000)
 

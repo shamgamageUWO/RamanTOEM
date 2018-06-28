@@ -250,9 +250,9 @@ bkg_ind2 = Alt>50e3;
         title( Dateofthefolder);
         set(gca,'fontsize',16)
   
-  figure;plot(Eb,Ebzc./1000,'g')
-  xlabel('Eb Photon Counts (MHz)') 
-  ylabel('Altitude (km)')
+%   figure;plot(Eb,Ebzc./1000,'g')
+%   xlabel('Eb Photon Counts (MHz)') 
+%   ylabel('Altitude (km)')
         
         % 3. Apply DT correction
         JL_dtc = JLn ./ (1 - JLnwn.*(Q.deadtimeJL.*1e6)); % non-paralyzable

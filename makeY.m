@@ -274,7 +274,7 @@ bkg_ind2 = Alt>50e3;
 title( Dateofthefolder);
   set(gca,'fontsize',20)
   
-  figure;plot(Eb,Ebzc./1000,'g')
+%   figure;plot(Eb,Ebzc./1000,'g')
         % 3. Apply DT correction
         JL_dtc = JLn ./ (1 - JLnwn.*(Q.deadtimeJL.*1e6)); % non-paralyzable
         JH_dtc = JHn ./ (1 - JHnwn.*(Q.deadtimeJH).*1e6);

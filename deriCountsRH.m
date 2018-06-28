@@ -13,10 +13,10 @@ function [dRHWV,dRHN2,dRHWVa,dRHN2a] = deriCountsRH(j,Q,x,forwardmodelTraman)
     end
 %     m=length(Q.Zret);
 %     xa=x(1:m);
-    dn = x(2*m+8+j).*1e-3; % this can go anything smaller than 0.1 even for higher temperatures works ok
+    dn = x(2*m+8+j).*1e-4; % this can go anything smaller than 0.1 even for higher temperatures works ok
     xpert = x;
     if x(2*m+8+j) == 0 % trap for tau's where tau(1) = 0
-        dn = 1.e-3 .* x(2*m+8+j+1);
+        dn = 1.e-4 .* x(2*m+8+j+1);
     end
     
     xpert(2*m+8+j) = x(2*m+8+j) + dn;

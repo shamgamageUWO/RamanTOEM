@@ -1,4 +1,4 @@
-[O,Q,R,S_a,Se,x_a] = InputsForOEM( 20110910,11,1);
+[O,Q,R,S_a,Se,x_a] = InputsForOEM( 20110909,23,2);
 xa = x_a';
 S_ainv=[];
 Seinv=[];
@@ -23,7 +23,7 @@ hold off
 
 figure;
 subplot(2,2,1)
-plot((X.x(2*m+9:3*m+7)),Q.Zret(2:end)./1000)
+plot((X.x(2*m+8:3*m+7)),Q.Zret./1000)
 hold on;
 plot((Q.RHa),Q.Zret./1000)
 plot(Q.RHsonde2,Q.Zret./1000)
