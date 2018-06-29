@@ -169,11 +169,11 @@ Q.n7=length(Q.WVnewa);
 Q.n8=length(Q.N2newa);
 %% Define grid sizes
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:6000;
-Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
-Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
-Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:22000;
-Q.Zret =[Z1 Z2 Z3 Z4];
+Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:22000;
+% Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
+% Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
+% Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:22000;
+% Q.Zret =[Z1 Z2 Z3 Z4];
 disp('Defined grids ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
