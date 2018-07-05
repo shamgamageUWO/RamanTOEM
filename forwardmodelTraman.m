@@ -13,7 +13,7 @@ CJLa = x(2*m+6);
 DT_JH = x(2*m+7);
 DT_JL = x(2*m+8); % deadtimes
 
-rh_a = (x(2*m+9:3*m+8));%
+rh_a = exp(x(2*m+9:3*m+8));%
 Bwv = x(3*m+9);
 Bn2 = x(3*m+10);
 Cwv = x(3*m+11);
@@ -138,11 +138,14 @@ OV_wva = OV_wvi(1:length(Q.WVnewa));%interp1(Q.Zret,OV,Q.Zmes1,'linear');
 
 
             sigma_totwv = Q.alpha_mol + 2.*alpha_aero1 +Q.alpha_wv;
+%               sigma_totwv  = 1 + ((Q.Q.Lambdawv./Q.Lambda).^(-angstrom)) + ((Q.alpha_wv + Q.alpha_mol)./alpha_aero1);
+            
             R_tr_wv  = exp(-cumtrapz(Q.Zmes,sigma_totwv)); % Molecular transmission
             R_tr_wvd = R_tr_wv(end-length(Q.WVnew)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
             R_tr_wva = R_tr_wv(1:length(Q.WVnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');
             
             sigma_totn2 = Q.alpha_mol + 2.*alpha_aero1 +Q.alpha_n2;
+%            sigma_totn2  = 1 + ((Q.Q.Lambdan2./Q.Lambda).^(-angstrom)) + ((Q.alpha_n2 + Q.alpha_mol)./alpha_aero1);
             R_tr_n2  = exp(-cumtrapz(Q.Zmes,sigma_totn2));
             R_tr_n2d = R_tr_n2(end-length(Q.N2new)+1:end);%interp1(Q.Zmes,R_tr_i,Q.Zmes2,'linear');
             R_tr_n2a = R_tr_n2(1:length(Q.WVnewa));%interp1(Q.Zmes,R_tr_i,Q.Zmes1,'linear');

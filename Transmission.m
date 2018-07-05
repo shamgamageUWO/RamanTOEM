@@ -26,11 +26,12 @@ alpha_mol = Nmol*sigmaNicolet;
 % Molecular profile number density
 ScaleHeight = 8.771;%e+3; % Approximative up to 10km
 % Nmol = 2.56e25 .* exp(-z/ScaleHeight); % Molecular profile
-LambdaN2 = 386.7* (10^-1); %micrometere
-LambdaWV = 407.6* (10^-1);
+LambdaN2 = 386.7* (10^-3); %
+LambdaWV = 407.6* (10^-3);
 exponentN2 = 4+B+(C*LambdaN2)+(D/LambdaN2);
 sigma_Rcm2N2 = A / LambdaN2^(exponentN2);
 sigmaNicoletN2 = sigma_Rcm2N2*1e-4; %m2
+
 exponentWV = 4+B+C*LambdaWV+D/LambdaWV;
 sigma_Rcm2WV = A / LambdaWV^(exponentWV);
 sigmaNicoletWV = sigma_Rcm2WV*1e-4;%m2

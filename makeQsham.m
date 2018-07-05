@@ -32,13 +32,13 @@ Q.altbinsize = 3.75;%m
 Q.Clight = 299792458; %ISSI value
 Q.ScaleFactor = 150/3.75;
 Q.shots = 1800;
-Lambda = 354.7* (10^-3);
+Q.Lambda = 354.7* (10^-3);
 A = 4.02*10^(-28);
 B = -0.3228;
 C = 0.389;
 D = 0.09426;
-exponent = 4+B+C*Lambda+D/Lambda;
-sigma_Rcm2 = A / Lambda^(exponent);
+exponent = 4+B+C*Q.Lambda+D/Q.Lambda;
+sigma_Rcm2 = A / Q.Lambda^(exponent);
 Q.sigmaNicolet = sigma_Rcm2*1e-4;%m2
 Q.deadtimeJL = 3.8e-9; % 4ns
 Q.deadtimeJH = 3.7e-9; % 4ns
@@ -59,13 +59,13 @@ disp('All the constants are ready')
 
 % Inputs
 alt_d0 = 4000; % PRR Digital Channel starting altitude 20110705 2000 2011080223 3000
-alt_d01 = 100; % WV/N2 Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_d01 = 1000; % WV/N2 Digital Channel starting altitude 20110705 2000 2011080223 3000
 alt_df = 20000; % Digital Channel ending altitude
 alt_a0 = 100;% Analog Channel starting altitude 20110705 150
-alt_af = 8000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
+alt_af = 20000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
 Q.b2 = 8; % Bin size for piecewise cov for analog 20110705  2011080223 24
-c1 = 3; % retrieval bin size
+c1 = 4; % retrieval bin size
 c2 = 2.*c1;
 c3 = 2.*c2;
 c4 = 2.*c3;
@@ -208,10 +208,10 @@ Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
 Ta = temp; % for now im adding 2K to test
 %  Q.Ta = (Ta./Ta(1)).* Q.Tsonde2(1);
- Q.Ta = smooth(Q.Tsonde2,20);%a priori RH
+ Q.Ta = smooth(Q.Tsonde2,50);%a priori RH
  Q.Ta = Q.Ta';
 Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
-RHa = smooth((Q.RHsonde2),20);%a priori RH
+RHa = smooth(log(Q.RHsonde2),50);%a priori RH
 Q.RHa = RHa';
 disp('a priori temperature profile is loaded ')
 
@@ -231,7 +231,7 @@ Q.cutoffOV = cutoffOV;
 % Q.Tr = Tr_PRR;
 % Q.Tr_N2 = Tr_N2;
 % Q.Tr_WV = Tr_WV;
-[alpha_mol,alpha_wv,alpha_n2] = Transmission(Q);
+[alpha_mol,alpha_n2,alpha_wv] = Transmission(Q);
 Q.alpha_mol = alpha_mol;
 Q.alpha_wv = alpha_wv;
 Q.alpha_n2 = alpha_n2;
@@ -260,7 +260,7 @@ Q.RN2a=R_fitn2a;
                                         Q.OVwva = OVnwv;                                    
                                         Q.OVwvlength = length(Q.OVwva);
                                         Q.COVwva = OVCovwv(Q.Zret,Q.OVwva,Q.cutoffOV);
-                                        disp('Daytime retrieval')% Estimating background and lidar constant wrt a priori 
+%                                         disp('Daytime retrieval')% Estimating background and lidar constant wrt a priori 
 
 C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
 Q.CL = C.CJL;
@@ -302,7 +302,7 @@ Q.CovBWVa = ((Y.bg_WV_stda)).^2;
 %                                         Q.OVwva = OVnwv;                                    
 %                                         Q.OVwvlength = length(Q.OVwva);
 %                                         Q.COVwva = OVCov(Q.Zret,Q.OVwva);
-%                                         disp('Daytime retrieval')
+                                         disp('Daytime retrieval')
                                         
                                         
                                         else 
@@ -391,7 +391,7 @@ N2real = Q.N2new'; WVreal = Q.WVnew';  N2realan = Q.N2newa';    WVrealan = Q.WVn
         end
 
         for i = 1: length(Q.wvv)
-            if Q.Zmes3(i) <= 2000
+            if Q.Zmes3(i) <= 4000
 %                 Q.YY(i) = Q.JLv(i);
 %                 Q.YYY(i) = Q.JHv(i);
                 Q.YYn2(i) = Q.n2v(i);
@@ -422,7 +422,7 @@ N2real = Q.N2new'; WVreal = Q.WVnew';  N2realan = Q.N2newa';    WVrealan = Q.WVn
 %                 Q.YYYa =Q.YYYa';
 
                 Q.YYwva = 0.005.*ones(1,length(Q.WVnewa));
-                Q.YYYn2a =0.005.*ones(1,length(Q.N2newa));
+                Q.YYYn2a =0.003.*ones(1,length(Q.N2newa));
 %                 Q.YYwva =Q.YYwva;
 %                 Q.YYYn2a =Q.YYYn2a;
 

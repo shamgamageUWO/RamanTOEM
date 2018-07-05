@@ -23,9 +23,9 @@ hold off
 
 figure;
 subplot(2,2,1)
-plot((X.x(2*m+9:3*m+7)),Q.Zret(2:end)./1000)
+plot(exp(X.x(2*m+9:3*m+7)),Q.Zret(2:end)./1000)
 hold on;
-plot((Q.RHa),Q.Zret./1000)
+plot(exp(Q.RHa),Q.Zret./1000)
 plot(Q.RHsonde2,Q.Zret./1000)
 hold off
 

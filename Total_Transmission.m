@@ -11,10 +11,10 @@ A = 4.02*10^(-28);
 B = -0.3228;
 C = 0.389;
 D = 0.09426;
-J_low = [3,4,5,6,7,8,9];
-J_high = [10,11,12,13,14,15];
-J_lowO2 = [5,7,9,11,13];
-J_highO2 = [15,17,19,21];
+% J_low = [3,4,5,6,7,8,9];
+% J_high = [10,11,12,13,14,15];
+% J_lowO2 = [5,7,9,11,13];
+% J_highO2 = [15,17,19,21];
 
 % Transmission 
 exponent = 4+B+C*Lambda+D/Lambda;
@@ -30,8 +30,8 @@ Tr_PRR = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
 % Molecular profile number density
 ScaleHeight = 8.771;%e+3; % Approximative up to 10km
 % Nmol = 2.56e25 .* exp(-z/ScaleHeight); % Molecular profile
-LambdaN2 = 386.7* (10^-1); %micrometere
-LambdaWV = 407.6* (10^-1);
+LambdaN2 = 386.7* (10^-3); %micrometere
+LambdaWV = 407.6* (10^-3);
 exponentN2 = 4+B+(C*LambdaN2)+(D/LambdaN2);
 sigma_Rcm2N2 = A / LambdaN2^(exponentN2);
 sigmaNicoletN2 = sigma_Rcm2N2*1e-4; %m2

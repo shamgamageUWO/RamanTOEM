@@ -110,9 +110,9 @@ for j = 1:m
    JRH(n1+n2+n3+1:n1+n2+n3+n4,j) = 0;
    
    JRH(n1+n2+n3+n4+1:n1+n2+n3+n4+n5,j) = dRHWV;
-   JRH(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = dRHN2;
+   JRH(n1+n2+n3+n4+n5+1:n1+n2+n3+n4+n5+n6,j) = 0;
    JRH(n1+n2+n3+n4+n5+n6+1:n1+n2+n3+n4+n5+n6+n7,j) = dRHWVa;
-   JRH(n1+n2+n3+n4+n5+n6+n7+1:n,j) = dRHN2a;
+   JRH(n1+n2+n3+n4+n5+n6+n7+1:n,j) = 0;
 end
 
 

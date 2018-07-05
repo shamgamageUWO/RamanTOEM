@@ -7,18 +7,19 @@ function [S_aT]=TestTempCov(Zj,Ta)
  
  m = length(Ta);
  n = m;
- 
- lengthcT = 100; % =3000; % only need m of these
+  lengthcT1 = 3000;
+ lengthcT = 1000; % =3000; % only need m of these
 %   Tfac = 35;
 %   Tmodvar = (Tfac.*ones(size(Ta))).^2;
-  Tmodvar = (0.2.*Ta).^2;
+  Tmodvar = (0.3.*Ta).^2;
  vars2 = Tmodvar;
  lc = lengthcT.*ones(1,m);
+  lc1 = lengthcT1.*ones(1,m);
  S_aT =zeros(n,n);
 
 for i = 1:m
     for j = 1:m
-        
+       if Zj(j) <15000 
         sigprod = sqrt(vars2(i).*vars2(j));
         diffz = Zj(i) - Zj(j);
         sumlc = lc(i) + lc(j);
@@ -32,6 +33,19 @@ for i = 1:m
 %         if i==j
 %          Sa_T(i,j) = Ta(i);
 %         end
+
+       else 
+             sigprod = sqrt(vars2(i).*vars2(j));
+        diffz1 = Zj(i) - Zj(j);
+        sumlc1 = lc1(i) + lc1(j);
+        shape1(3) = (1-(1-exp(-1)).*2.*abs(diffz1)./sumlc1);
+        
+        if shape1(3) < 0
+            shape1(3) = 0;
+        end
+        
+        S_aT(i,j) = sigprod.*shape1(3);  
+       end   
     end
 end
  

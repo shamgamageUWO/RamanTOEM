@@ -1,5 +1,5 @@
 % this is first get S3 file with asr content
-function [alphaAer,odaer,cutoffOV] = asrSham(Q)
+function [alphaAer,odaer,cutoffOV] = angstram(Q)
 % first load S3.mat 
  date = Q.date_in;
 [year,month,day] = getYMDFromDate(date);
@@ -26,13 +26,13 @@ P = Q.Psonde2;
 T = Q.Tsonde2;
 lambda_rec= 354.7; % nm
 lambda_em = 354.7;
-lambda_emwv = 354.7;
-lambda_emn2 = 354.7;
+lambda_emwv = 407.6;
+lambda_emn2 = 386.7;
 
 
 [alpha_mol,beta_mol,lidar_signal,beta_att,density]=get_rayleigh_v3(zN,P,T,lambda_rec,lambda_em);
-% [alpha_molwv,beta_molwv,lidar_signalwv,beta_attwv,densitywv]=get_rayleigh_v3(zN,P,T,lambda_rec,lambda_emwv);
-% [alpha_moln2,beta_moln2,lidar_signaln2,beta_attn2,densityn2]=get_rayleigh_v3(zN,P,T,lambda_rec,lambda_emn2);
+[alpha_molwv,beta_molwv,lidar_signalwv,beta_attwv,densitywv]=get_rayleigh_v3(zN,P,T,lambda_emwv,lambda_em);
+[alpha_moln2,beta_moln2,lidar_signaln2,beta_attn2,densityn2]=get_rayleigh_v3(zN,P,T,lambda_emn2,lambda_em);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,18 +108,24 @@ alphaAer(znoAer) = 1e-12;
 fl0 = find(alphaAer <= 0);
 alphaAer(fl0) = 1e-12;
 
-% 
-% alphaAerwv = LR .* (beta_molwv .* (asrDATAnew-1));
-% znoAerwv = find(zN > Q.AerosolFreeheight); % was 3000 for 20130122
-% alphaAerwv(znoAerwv) = 1e-12;
-% fl0wv = find(alphaAerwv <= 0);
-% alphaAerwv(fl0wv) = 1e-12;
-% 
-% alphaAern2 = LR .* (beta_moln2 .* (asrDATAnew-1));
-% znoAern2 = find(zN > Q.AerosolFreeheight); % was 3000 for 20130122
-% alphaAern2(znoAern2) = 1e-12;
-% fl0n2 = find(alphaAern2 <= 0);
-% alphaAern2(fl0n2) = 1e-12;
+
+alphaAerwv = LR .* (beta_molwv .* (asrDATAnew-1));
+znoAerwv = find(zN > Q.AerosolFreeheight); % was 3000 for 20130122
+alphaAerwv(znoAerwv) = 1e-12;
+fl0wv = find(alphaAerwv <= 0);
+alphaAerwv(fl0wv) = 1e-12;
+
+alphaAern2 = LR .* (beta_moln2 .* (asrDATAnew-1));
+znoAern2 = find(zN > Q.AerosolFreeheight); % was 3000 for 20130122
+alphaAern2(znoAern2) = 1e-12;
+fl0n2 = find(alphaAern2 <= 0);
+alphaAern2(fl0n2) = 1e-12;
+
+
+angswv = (log(beta_mol./beta_molwv)) ./ (log(lambda_emwv./lambda_em));
+angsn2 = (log(beta_mol./beta_moln2)) ./ (log(lambda_emn2./lambda_em));
+
+figure;plot(angswv,angsn2)
 
 alphaCorErr = 0;
 z0 = 0:.1:zN(1);
