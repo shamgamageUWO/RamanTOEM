@@ -40,23 +40,23 @@ D = 0.09426;
 exponent = 4+B+C*Lambda+D/Lambda;
 sigma_Rcm2 = A / Lambda^(exponent);
 Q.sigmaNicolet = sigma_Rcm2*1e-4;%m2
-Q.deadtimeJL = 3.8e-9; % 4ns
-Q.deadtimeJH = 3.7e-9; % 4ns
+Q.deadtimeJL = 3.8e-9; % 3.84ns
+Q.deadtimeJH = 3.8e-9; % 3.74ns
 Q.CovDTJL = (.1.*Q.deadtimeJL).^2;
 Q.CovDTJH = (.1.*Q.deadtimeJH).^2;
 Q.g0a=90*10^-3;%m % this is to create a priori overlap
 Q.g0real=100*10^-3;%m % this is to create real overlap
 Q.Shots = 1800; 
-Q.deltatime = 05;%30;3
-Q.min1 = 04;
-Q.min2 = 08;
+Q.deltatime = 30;%30;3
+Q.min1 = 00;
+Q.min2 = 30;
 disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
 alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
-alt_df = 30000; % Digital Channel ending altitude
-alt_a0 = 50;% Analog Channel starting altitude 20110705 150
+alt_df = 25000; % Digital Channel ending altitude
+alt_a0 = 150;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
 % Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
@@ -66,12 +66,12 @@ c3 = 2.*c2;
 c4 = 2.*c3;
 
 % For asr
-% Q.LRfree = 20; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
-% Q.LRpbl = 20; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
-% Q.LRtranHeight = 3000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
+%  Q.LRfree = 50; % was 20 on 20120228/20110901/20110705/2011080223, 0308 50, 200905-6 50 Cirrus cloud???
+%  Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
+%  Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
-Q.AerosolFreeheight = 12000;%2011080223 17000
-Q.ASRcutoffheight = 12000; % 20110909 1400 20110802 day 11km
+Q.AerosolFreeheight = 20000;%2011080223 17000
+Q.ASRcutoffheight = 20000; % 20110909 2000 20110802 day 11km
 % Q.asrsmoothing = 10; % 100 for 20110802 day, 
 % Q.OVCOV_6above = 1e-3; % 1e-4 for clear 1e-2/3 for cloud relax this 
 
@@ -141,11 +141,12 @@ Q.n4=length(Q.JLnewa);
 
 %% Define grid sizes
 Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
-Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:6000;
-Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
-Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
-Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:32000;
-Q.Zret =[Z1 Z2 Z3 Z4];
+% Z1 = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:6000;
+% Z2 = 6000:(Q.Zmes(2)-Q.Zmes(1))*c2:10000;
+% Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
+% Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:28000;
+% Q.Zret =[Z1 Z2 Z3 Z4];
+  Q.Zret= Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:28000;
 disp('Defined grids ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -153,9 +154,9 @@ disp('Defined grids ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
-Tsonde = Tsonde(Zsonde<=32000);
-Psonde = Psonde(Zsonde<=32000);
-Zsonde = Zsonde(Zsonde<=32000);
+Tsonde = Tsonde(Zsonde<=30000);
+Psonde = Psonde(Zsonde<=30000);
+Zsonde = Zsonde(Zsonde<=30000);
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
 Psonde1 = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr
@@ -184,9 +185,10 @@ disp('a priori temperature profile is loaded ')
 
 
 % % Calculate the aerosol attenuation
-[alpha_aero,odaer] = asrSham(Q);
- Q.alpha_aero = alpha_aero';%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
-
+[alpha_aero,odaer,cutoffOV] = asrSham(Q);
+ Q.alpha_aero = (alpha_aero');
+%  Q.alpha_aero = log(alpha_aero');%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
+Q.cutoffOV = cutoffOV;
 % Q.odaer = odaer;
 % 
 
@@ -194,11 +196,13 @@ disp('a priori temperature profile is loaded ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % R is calibrated wrt sonde profiles
-    [R,Ra,R_fit,Ra_fit,dfacR,dfacRa] = Restimationnew(Q);
+    [R,Ra,R_fit,Ra_fit,dfacR,dfacRa,ind1] = Restimationnew(Q);
     Q.R = R_fit;%0.7913;%R;%0.808780013344381;%R;%R;%0.17;
     Q.Ra = Ra_fit;%0.8639;%Ra;%1.042367710538608;%Ra; %%I'm hardcoding this for now. for some reason FM doesnt provide measurements close to real unless divide by 2                     Ttradi = real(Q.bb./(Q.aa-lnQ));
     Q.GR = dfacR ; % ISSI recommend
     Q.GRa = dfacRa;
+    Q.ind1 = ind1;
+%     Q.ind2 = ind2;
 disp('R is calibrated ')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -215,7 +219,6 @@ Q.alpha_mol = alpha_mol;
 % % Q.CLa= 4.6099e+15;
 Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
-
 % load('OverlapSham.mat')
 % OVnw = interp1(OverlapSham.z,OverlapSham.OVsmooth,Q.Zret,'linear');
 % 
@@ -244,7 +247,7 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                                         Q.OVa = OVnw;
                                         %  Q.OVa = ones(1,length(Q.Ta));
                                         Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.cutoffOV);
                                         disp('Daytime retrieval')
                                         else 
                                         Q.CovBJL = ((Y.bg_JL_std/sqrt(Y.bg_length2))).^2;
@@ -258,7 +261,7 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
                                         OVnw(isnan(OVnw))=1;
                                         Q.OVa = OVnw;
                                         Q.OVlength = length(Q.OVa);
-                                        Q.COVa = OVCov(Q.Zret,Q.OVa);
+                                        Q.COVa = OVCov(Q.Zret,Q.OVa,Q.cutoffOV);
 
                                         disp('Nighttime retrieval')
                                         end 
@@ -315,24 +318,24 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 for i =1:length(Q.JLnew)
     if Q.JLnew(i) <15
          Q.YY(i) = 15;
-        Q.JLnew(i) = Q.JLnew(i) + rand*sqrt(Q.YY(i));
+        Q.JLnew(i) = Q.JLnew(i) + rand*sqrt(15);
     end
 end
 for i =1:length(Q.JHnew)
     if Q.JHnew(i) <15
          Q.YYY(i) = 15;
-        Q.JHnew(i) = Q.JHnew(i) + rand*sqrt(Q.YYY(i));
+        Q.JHnew(i) = Q.JHnew(i) + rand*sqrt(15);
     end
 end
 
 
 
-Q.YYa = 0.0025.*ones(1,length(Q.JLnewa)); 
-Q.YYYa = 0.0005.*ones(1,length(Q.JHnewa));
-%                 Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
-%                 Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
-%                 Q.YYa =Q.YYa';
-%                 Q.YYYa =Q.YYYa';
+% Q.YYa = 0.01.*ones(1,length(Q.JLnewa)); 
+% Q.YYYa = 0.01.*ones(1,length(Q.JHnewa));
+                Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYa =Q.YYa';
+                Q.YYYa =Q.YYYa';
                 
 
 Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];

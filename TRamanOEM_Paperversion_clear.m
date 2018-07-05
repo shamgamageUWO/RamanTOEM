@@ -255,10 +255,13 @@ S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end))%DegF for Aerosol
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                    
 
 
-H = traditionalTraman(Q);
-T_an = interp1(Q.Zmes1,H.T_an,Q.Zret);
-T_dg = interp1(Q.Zmes2,H.T_dg,Q.Zret);
-
+% H = traditionalTraman(Q);
+% T_an = interp1(Q.Zmes1,H.T_an,Q.Zret);
+% T_dg = interp1(Q.Zmes2,H.T_dg,Q.Zret);
+% load('201109092330.mat');
+% load('201109101130.mat');
+load('201107052359.mat');
+T_tr = interp1(Temp.z,Temp.profile,Q.Zret);
 
 Toem= X.x(1:m);
 
@@ -277,12 +280,12 @@ plot(Toem(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'DisplayName','T OEM','Colo
 plot(Q.Tsonde2(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'DisplayName','T sonde','Color',[0 0 1]);
 
 % Create plot
-plot(T_an(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','Traditionalanalog','LineWidth',1,'Color',[0 0 0]);
+plot(T_tr(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'DisplayName','T Traditional','LineWidth',1,'Color',[0 0 0]);
 
-% Create plot
-plot(T_dg(Q.Zret<=25000),Q.Zret(Q.Zret<=25000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
-    'Color',[0.929411768913269 0.694117665290833 0.125490203499794]);
-jbfilly(Q.Zret(Q.Zret<=28000)./1000,upper(Q.Zret<=28000)',lower(Q.Zret<=28000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
+% % Create plot
+% plot(T_dg(Q.Zret<=25000),Q.Zret(Q.Zret<=25000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
+%     'Color',[0.929411768913269 0.694117665290833 0.125490203499794]);
+ jbfilly(Q.Zret(Q.Zret<=28000)./1000,upper(Q.Zret<=28000)',lower(Q.Zret<=28000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
 
 xlim([150 320])
 % Create xlabel
@@ -295,86 +298,69 @@ ylabel('Altitude (km)');
 % grid(axes1,'on');
 % Create legend
 % legend(axes1,'show');
-legend ('T a priori','T OEM','T sonde','Traditionalanalog','TraditionalDigital')
+legend ('T a priori','T OEM','T sonde','Traditional')
 set(gca,'fontsize',20)
 
 hold off;
+Tdiff = Toem-Q.Tsonde2';
+Toem_e=X.eo(1:m);
 
 subplot(1,2,2)
-plot(Q.Ta(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','T a priori','LineWidth',1,...
-    'Color',[0 0.498039215803146 0]);
-hold on;
-plot(Toem(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','T OEM','Color',[1 0 0]);
+plot(Tdiff(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'b');
+hold on
+plot(Toem_e(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'r',-Toem_e(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'r')
 
-
-% Create plot
-plot(Q.Tsonde2(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','T sonde','Color',[0 0 1]);
-
-% % Create plot
- plot(T_an(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','Traditionalanalog','LineWidth',1,'Color',[0 0 0]);
-% 
-% % Create plot
- plot(T_dg(Q.Zret<=6000),Q.Zret(Q.Zret<=6000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
-     'Color',[0.929411768913269 0.694117665290833 0.125490203499794]);
-
-
-% [fillhandle,msg]=jbfilly(Q.Zret./1000,upper',lower',rand(1,3),rand(1,3),0,0.5);
-jbfilly(Q.Zret(Q.Zret<=6000)./1000,upper(Q.Zret<=6000)',lower(Q.Zret<=6000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
-xlim([250 310])% Create xlabel
-xlabel('Temperature (K)');
-
-% Create ylabel
+xlabel('Temperature Difference (K)');
+% Create ylabe
 ylabel('Altitude (km)');
 % legend ('T a priori','T OEM','T sonde','Traditional Analog','Traditional Digital')
-
-  set(gca,'fontsize',20)
-
-hold off;
+set(gca,'fontsize',20)
+ hold off;
 
 
-in= Q.Zret<=25000;
-Toem_e=X.eo(1:m);
-in2 = Q.Zret<=6000;
-in3= Q.Zret>=4000 & Q.Zret<=25000;
+% in= Q.Zret<=25000;
+% Toem_e=X.eo(1:m);
+% in2 = Q.Zret<=6000;
+% in3= Q.Zret>=4000 & Q.Zret<=25000;
 
-figure;
-subplot(1,3,1)
-plot(Toem(in) - (Q.Tsonde2(in)'),Q.Zret(in)./1000)
-hold on;
-plot(Toem_e(in),Q.Zret(in)./1000,'r',-Toem_e(in),Q.Zret(in)./1000,'r')
-hold off;
-grid on;
-xlabel('(T OEM - T sonde) (K)')
-ylabel('Altitude(km)')%  ylabel('Altitude(km)')
-   set(gca,'fontsize',20)
-
-
-
-%                      T = X.x(1:m);
-
-subplot(1,3,2)
-plot(Toem(in3) - T_dg(in3)',Q.Zret(in3)./1000,'b')
-hold on;
-plot(Toem(in2) - T_an(in2)',Q.Zret(in2)./1000,'black')
-plot(Toem_e(in3),Q.Zret(in3)./1000,'r',-Toem_e(in3),Q.Zret(in3)./1000,'r')
-plot(Toem_e(in2),Q.Zret(in2)./1000,'r',-Toem_e(in2),Q.Zret(in2)./1000,'r')
-hold off;
-grid on;
-xlabel('(T OEM - T digital traditional) (K)')
-ylabel('Altitude(km)')%  ylabel('Altitude(km)')
-  set(gca,'fontsize',20)
-
-
-subplot(1,3,3)
-plot((T_dg(in3)-Q.Tsonde2(in3)),Q.Zret(in3)./1000,'r',( T_dg(in3)' - Toem(in3)),Q.Zret(in3)./1000,'b',(Toem(in) - Q.Tsonde2(in)'),Q.Zret(in)./1000,'g')
-hold on
-plot(( T_an(in2)' - Toem(in2)),Q.Zret(in2)./1000,'y',(T_an(in2)-Q.Tsonde2(in2)),Q.Zret(in2)./1000,'black');
-grid on;
-hold off
-xlabel('Temperature residuals (K)')
-ylabel('Altitude (km)')%  ylabel('Altitude(km)')
-legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OEM - Traditional analog','Traditional analog-Sonde')
-  set(gca,'fontsize',20)
+% figure;
+% subplot(1,3,1)
+% plot(Toem(in) - (Q.Tsonde2(in)'),Q.Zret(in)./1000)
+% hold on;
+% plot(Toem_e(in),Q.Zret(in)./1000,'r',-Toem_e(in),Q.Zret(in)./1000,'r')
+% hold off;
+% grid on;
+% xlabel('(T OEM - T sonde) (K)')
+% ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+%    set(gca,'fontsize',20)
+% 
+% 
+% 
+% %                      T = X.x(1:m);
+% 
+% subplot(1,3,2)
+% plot(Toem(in3) - T_dg(in3)',Q.Zret(in3)./1000,'b')
+% hold on;
+% plot(Toem(in2) - T_an(in2)',Q.Zret(in2)./1000,'black')
+% plot(Toem_e(in3),Q.Zret(in3)./1000,'r',-Toem_e(in3),Q.Zret(in3)./1000,'r')
+% plot(Toem_e(in2),Q.Zret(in2)./1000,'r',-Toem_e(in2),Q.Zret(in2)./1000,'r')
+% hold off;
+% grid on;
+% xlabel('(T OEM - T digital traditional) (K)')
+% ylabel('Altitude(km)')%  ylabel('Altitude(km)')
+%   set(gca,'fontsize',20)
+% 
+% 
+% subplot(1,3,3)
+% plot((T_dg(in3)-Q.Tsonde2(in3)),Q.Zret(in3)./1000,'r',( T_dg(in3)' - Toem(in3)),Q.Zret(in3)./1000,'b',(Toem(in) - Q.Tsonde2(in)'),Q.Zret(in)./1000,'g')
+% hold on
+% plot(( T_an(in2)' - Toem(in2)),Q.Zret(in2)./1000,'y',(T_an(in2)-Q.Tsonde2(in2)),Q.Zret(in2)./1000,'black');
+% grid on;
+% hold off
+% xlabel('Temperature residuals (K)')
+% ylabel('Altitude (km)')%  ylabel('Altitude(km)')
+% legend('Traditional digital-Sonde','OEM - Traditional digital','OEM - Sonde','OEM - Traditional analog','Traditional analog-Sonde')
+%   set(gca,'fontsize',20)
 
 
 
