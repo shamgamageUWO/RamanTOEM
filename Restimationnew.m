@@ -9,7 +9,7 @@ Za = Q.Zmes1;
 
 if cutoffOV < 6000
     
-    ind1 = Zd>=6000 & Zd< 8000;% If the cloud height is below full overlap
+    ind1 = Zd>=2000 & Zd< 3000;% If the cloud height is below full overlap % for 20110621 1-2km
     ind2 = Za>=800 & Za< 1800;% 1800 was changed
 else
     ind1 = Zd>=4000 & Zd < 5000;%cutoffOV;% 6-8km

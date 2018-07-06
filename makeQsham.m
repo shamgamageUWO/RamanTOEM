@@ -54,7 +54,7 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
+alt_d0 = 1000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
 alt_df = 25000; % Digital Channel ending altitude
 alt_a0 = 150;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
