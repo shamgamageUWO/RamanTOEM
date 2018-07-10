@@ -210,6 +210,19 @@ bkg_ind2 = Alt>50e3;
         JHnwn = (JHn./F);
         JLnwn = (JLn./F);
         Ebnwn = Ebn./F;
+        
+        JL_an_MHZ = JL_an./(Q.deltatime.*Q.coaddalt);
+        JH_an_MHZ =JH_an./(Q.deltatime.*Q.coaddalt);
+        
+        JL_an_MHZ_12km = JL_an(alt_an<=12000)./(Q.deltatime.*Q.coaddalt);
+        JH_an_MHZ_12km = JH_an(alt_an<=12000)./(Q.deltatime.*Q.coaddalt);
+        
+        Y.JH_Alt_20MHZ = find(JHnwn>=20);
+        Y.JL_Alt_20MHZ = find(JLnwn>=20);
+        
+        Y.JH_an_Alt_20MHZ = find(JH_an_MHZ_12km<=20);
+        Y.JL_an_Alt_20MHZ = find(JL_an_MHZ_12km<=20);
+  
   figure;
   subplot(1,2,1)
   semilogx(JLnwn,alt./1000,'b',JHnwn,alt./1000,'r',Ebnwn,alt./1000,'g')
@@ -219,7 +232,7 @@ bkg_ind2 = Alt>50e3;
 % title( Dateofthefolder);
   set(gca,'fontsize',20)
   subplot(1,2,2)
-  semilogx(JL_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'b',JH_an./(Q.deltatime.*Q.coaddalt),Alt./1000,'r') 
+  semilogx(JL_an_MHZ,Alt./1000,'b',JH_an_MHZ,Alt./1000,'r') 
   legend('JLa','JHa')
   xlabel('Analog Signal (MHz)')
   ylabel('Altitude (km)')
@@ -313,5 +326,6 @@ Y.F = F;
 % Y.YYa = JL_P.*JL_an;
 % Y.YYYa = JH_P.*JH_an;
 Y.Dateofthefolder  = Dateofthefolder ;
+
 
 % save('data.mat','-struct','Y');

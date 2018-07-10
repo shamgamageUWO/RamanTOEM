@@ -8,11 +8,11 @@ function [S_Aero]=AeroCov(Zj,aero,cutoffOV)
  m = length(aero);
  n = m;
 S_Aero =zeros(n,n);
- lengthcT = 100; % =3000; % only need m of these
+ lengthcT = 10; % =3000; % only need m of these
  lc = lengthcT.*ones(1,m);
  l = size(aero);
  
-  Tfac = .5;
+  Tfac = .3;
   Tmodvar = (Tfac.*ones(l)).^2;
 % %  
 %  ll = size(OV);

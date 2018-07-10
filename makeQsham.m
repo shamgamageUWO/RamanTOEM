@@ -60,7 +60,7 @@ alt_a0 = 150;% Analog Channel starting altitude 20110705 150
 alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
 % Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
-c1 = 3; % retrieval bin size
+c1 = 4; % retrieval bin size
 c2 = 2.*c1;
 c3 = 2.*c2;
 c4 = 2.*c3;
@@ -92,6 +92,13 @@ alt = Y.alt;
 Eb = Y.Eb;
 Q.binzise = Y.binsize;
 
+
+JH_alt_20MHz = Y.JH_Alt_20MHZ;
+JL_alt_20MHz= Y.JL_Alt_20MHZ;
+
+JH_an_alt_20MHz= Y.JH_an_Alt_20MHZ;
+JL_an_alt_20MHz=Y.JL_an_Alt_20MHZ;
+        
 Q.Eb = Eb(alt>=alt_d0 & alt <= alt_df );
 Q.Eb(Q.Eb <=0)= rand();
 Q.JHnew= JHnew(alt>=alt_d0 & alt <= alt_df);
@@ -186,6 +193,7 @@ disp('a priori temperature profile is loaded ')
 
 % % Calculate the aerosol attenuation
 [alpha_aero,odaer,cutoffOV] = asrSham(Q);
+alpha_aero = smooth(alpha_aero,5);
  Q.alpha_aero = (alpha_aero');
 %  Q.alpha_aero = log(alpha_aero');%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
 Q.cutoffOV = cutoffOV;
@@ -219,16 +227,7 @@ Q.alpha_mol = alpha_mol;
 % % Q.CLa= 4.6099e+15;
 Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
-% load('OverlapSham.mat')
-% OVnw = interp1(OverlapSham.z,OverlapSham.OVsmooth,Q.Zret,'linear');
-% 
-% load('ralmoFixedOverlap.mat')
-% OVnw = interp1(ralmoO.zoverlap,ralmoO.overlap,Q.Zret,'linear');
-% OVnw(isnan(OVnw))=1;
-% Q.OVa = OVnw;
-% %  Q.OVa = ones(1,length(Q.Ta));
-% Q.OVlength = length(Q.OVa);
-% Q.COVa = OVCov(Q.Zret,Q.OVa);
+
 
 
 
@@ -268,8 +267,7 @@ Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
 %%
                         % this need to be done if there is any zeros in the real measurements
-                        % smooth the signal over 1
-% figure;plot(Q.Zret./1000,Q.OVa)                    
+                   
                         Q.JHnew(Q.JHnew<=0)= round(rand(1)*10);
                         Q.JHnewa(Q.JHnewa<=0)= round(rand(1)*10);
                         Q.JLnew(Q.JLnew<=0)= round(rand(1)*10);
@@ -296,24 +294,28 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
 
+Q.YY = JLreal;
+Q.YY(JL_alt_20MHz) = Q.JLv(JL_alt_20MHz).*10;
 
+Q.YYY = JHreal;
+Q.YYY(JH_alt_20MHz) = Q.JHv(JH_alt_20MHz).*10;
             
             
-        for i = 1: length(Q.JLv)
-            if Q.Zmes2(i) <= 6000
-                Q.YY(i) = Q.JLv(i);
-            else
-                Q.YY(i) = JLreal(i);
-            end
-        end
-
-        for i = 1: length(Q.JHv)
-            if  Q.Zmes2(i) <= 6000
-                Q.YYY(i) = Q.JHv(i);
-            else
-                Q.YYY(i) = JHreal(i);
-            end
-        end
+%         for i = 1: length(Q.JLv)
+%             if Q.Zmes2(i) <= 4000
+%                 Q.YY(i) = Q.JLv(i);
+%             else
+%                 Q.YY(i) = JLreal(i);
+%             end
+%         end
+% 
+%         for i = 1: length(Q.JHv)
+%             if  Q.Zmes2(i) <= 4000
+%                 Q.YYY(i) = Q.JHv(i);
+%             else
+%                 Q.YYY(i) = JHreal(i);
+%             end
+%         end
 
 for i =1:length(Q.JLnew)
     if Q.JLnew(i) <15
@@ -332,11 +334,15 @@ end
 
 % Q.YYa = 0.01.*ones(1,length(Q.JLnewa)); 
 % Q.YYYa = 0.01.*ones(1,length(Q.JHnewa));
-                Q.YYa = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYYa = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYa =Q.YYa';
-                Q.YYYa =Q.YYYa';
-                
+                YYa(JL_an_alt_20MHz) = Y.YYa(JL_an_alt_20MHz);
+                YYYa(JH_an_alt_20MHz) = Y.YYYa(JH_an_alt_20MHz);
+
+                Q.YYa = YYa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYYa = YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+%  
+%                 Q.YYa =Q.YYa';
+%                 Q.YYYa =Q.YYYa';
+
 
 Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 Q.yvar = diag(Q.Yvar);

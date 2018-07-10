@@ -247,9 +247,9 @@ S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end))%DegF for Aerosol
 %                     OVresponse = (X.A(m+4:end-5,m+4:end-5))*unit';
 
 %                     %
-                    err = X.e(1:m);
-                    upper = real(err+ X.x(1:m));
-                    lower =  real(X.x(1:m)-err);
+                    err = X.e(2:m);
+                    upper = real(err+ X.x(2:m));
+                    lower =  real(X.x(2:m)-err);
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%                    
@@ -258,34 +258,37 @@ S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end))%DegF for Aerosol
 % H = traditionalTraman(Q);
 % T_an = interp1(Q.Zmes1,H.T_an,Q.Zret);
 % T_dg = interp1(Q.Zmes2,H.T_dg,Q.Zret);
-% load('201109092330.mat');
+ load('201109092330.mat');
 % load('201109101130.mat');
-load('201107052359.mat');
-T_tr = interp1(Temp.z,Temp.profile,Q.Zret);
-
-Toem= X.x(1:m);
+% load('201107052359.mat');
+T_tr = interp1((Temp.z-491),Temp.profile,Q.Zret);
+T_tr = T_tr(2:m);
+Toem= X.x(2:m);
+Zret=Q.Zret(2:m);
+Ta = Q.Ta(2:m);
+Tsonde2=Q.Tsonde2(2:m);
 
 figure;
 subplot(1,2,1)
 % Create plot
-plot(Q.Ta(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'DisplayName','T a priori','LineWidth',1,...
+plot(Ta(Zret<=28000),Zret(Zret<=28000)./1000,'DisplayName','T a priori','LineWidth',1,...
     'Color',[0 0.498039215803146 0]);
 
 hold on;
 
 % Create plot
-plot(Toem(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'DisplayName','T OEM','Color',[1 0 0]);
+plot(Toem(Zret<=28000),Zret(Zret<=28000)./1000,'DisplayName','T OEM','Color',[1 0 0]);
 
 % Create plot
-plot(Q.Tsonde2(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'DisplayName','T sonde','Color',[0 0 1]);
+plot(Tsonde2(Zret<=28000),Zret(Zret<=28000)./1000,'DisplayName','T sonde','Color',[0 0 1]);
 
 % Create plot
-plot(T_tr(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'DisplayName','T Traditional','LineWidth',1,'Color',[0 0 0]);
+plot(T_tr(Zret<=28000),Zret(Zret<=28000)./1000,'DisplayName','T Traditional','LineWidth',1,'Color',[0 0 0]);
 
 % % Create plot
 % plot(T_dg(Q.Zret<=25000),Q.Zret(Q.Zret<=25000)./1000,'DisplayName','TraditionalDigital','LineWidth',1,...
 %     'Color',[0.929411768913269 0.694117665290833 0.125490203499794]);
- jbfilly(Q.Zret(Q.Zret<=28000)./1000,upper(Q.Zret<=28000)',lower(Q.Zret<=28000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
+ jbfilly(Zret(Zret<=28000)./1000,upper(Zret<=28000)',lower(Zret<=28000)',[0.9 1 1],[0.94 0.87 0.87],0,0.5);
 
 xlim([150 320])
 % Create xlabel
@@ -302,13 +305,13 @@ legend ('T a priori','T OEM','T sonde','Traditional')
 set(gca,'fontsize',20)
 
 hold off;
-Tdiff = Toem-Q.Tsonde2';
-Toem_e=X.eo(1:m);
+Tdiff = Toem-Tsonde2';
+Toem_e=X.e(2:m);
 
 subplot(1,2,2)
-plot(Tdiff(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'b');
+plot(Tdiff(Zret<=28000),Zret(Zret<=28000)./1000,'b');
 hold on
-plot(Toem_e(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'r',-Toem_e(Q.Zret<=28000),Q.Zret(Q.Zret<=28000)./1000,'r')
+plot(Toem_e(Zret<=28000),Zret(Zret<=28000)./1000,'r',-Toem_e(Zret<=28000),Zret(Zret<=28000)./1000,'r')
 
 xlabel('Temperature Difference (K)');
 % Create ylabe

@@ -6,10 +6,12 @@ Zi = Q.Zmes;
 Za = Q.Zmes1;%analog
 Zd = Q.Zmes2;%digital
 
- %cutoffOV = Q.cutoffOV;
-
+%  cutoffOV = Q.cutoffOV;
+% if cutoffOV <= 3000 
+%     ind2 = Za>= 1000 & Za<1100;
+% else
     ind2 = Za>=1500 & Za<3000;% 1800 was changed
-    
+% end   
 % ind3 = Zi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
