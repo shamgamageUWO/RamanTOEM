@@ -42,17 +42,21 @@ bkg_ind = z > 40e3 & z<50e3;
 JL = CorrBkg(JL,sum(bkg_ind),0,1);
 JH = CorrBkg(JH,sum(bkg_ind),0,1);
 
-JH =JH(z>=Q.alt_d0 & z <= Q.alt_df);
-JL =JL(z>=Q.alt_d0 & z <= Q.alt_df);
+JH =JH(z>=Q.alt_a0 & z <= Q.alt_df);
+JL =JL(z>=Q.alt_a0 & z <= Q.alt_df);
 Q_Digi = JL./JH;
 
 
 Tprofiledg = 1./log(Q_Digi);
 
-T_digi = Q.Tsonde;%interp1(Q.Zmes,Q.Tsonde,Q.Zmes2,'linear');
+ T_digi = Q.Tsonde;%interp1(Q.Zmes,Q.Tsonde,Q.Zmes2,'linear');
 
+if  Q.flag ==1
+ind2 = Q.Zmes>2000 & Q.Zmes < 3000;
+else 
+  ind2 = Q.Zmes>6000 & Q.Zmes < 8000;
+end
 
-ind2 = Q.Zmes>6000 & Q.Zmes < 8000;
 
 y_d = (T_digi);
 y_d = y_d( ind2);
@@ -69,7 +73,7 @@ a_dg = f_dg.a;
 b_dg = f_dg.b;
 
 H.T_dg = real(a_dg./(1./Tprofiledg +b_dg));
-
+figure;plot(Q.Tsonde,Q.Zmes./1000,'r',H.T_dg,Q.Zmes./1000,'b')
  %figure;plot(Q.Tsonde,Q.Zmes./1000,'r',H.T_an(Q.Zmes1<=10000),Q.Zmes1(Q.Zmes1<=10000)./1000,'b',H.T_dg(Q.Zmes2<=30000),Q.Zmes2(Q.Zmes2<=30000)./1000,'g')
 % xlabel('Temperature (K)')
 % ylabel('Altitude (km)')

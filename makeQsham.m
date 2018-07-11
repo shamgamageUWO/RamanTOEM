@@ -347,7 +347,7 @@ end
 Q.Yvar =[Q.YYY Q.YY Q.YYYa Q.YYa];
 Q.yvar = diag(Q.Yvar);
                 
-                
+  Q.flag = flag;              
 
 
 
