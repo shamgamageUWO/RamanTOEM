@@ -54,10 +54,10 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-alt_d0 = 1000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
-alt_df = 25000; % Digital Channel ending altitude
-alt_a0 = 150;% Analog Channel starting altitude 20110705 150
-alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
+Q.alt_d0 = 1000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
+Q.alt_df = 25000; % Digital Channel ending altitude
+Q.alt_a0 = 150;% Analog Channel starting altitude 20110705 150
+Q.alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
 % Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 4; % retrieval bin size
@@ -99,13 +99,13 @@ JL_alt_20MHz= Y.JL_Alt_20MHZ;
 JH_an_alt_20MHz= Y.JH_an_Alt_20MHZ;
 JL_an_alt_20MHz=Y.JL_an_Alt_20MHZ;
         
-Q.Eb = Eb(alt>=alt_d0 & alt <= alt_df );
+Q.Eb = Eb(alt>=Q.alt_d0 & alt <= Q.alt_df );
 Q.Eb(Q.Eb <=0)= rand();
-Q.JHnew= JHnew(alt>=alt_d0 & alt <= alt_df);
-Q.JLnew= JLnew(alt>=alt_d0 & alt <= alt_df);
-Q.JH_DS =JH_DS(alt>=alt_d0 & alt <= alt_df);
-Q.JL_DS =JL_DS(alt>=alt_d0 & alt <= alt_df);
-Q.alt = alt(alt>=alt_d0 & alt <= alt_df);
+Q.JHnew= JHnew(alt>=Q.alt_d0 & alt <= Q.alt_df);
+Q.JLnew= JLnew(alt>=Q.alt_d0 & alt <= Q.alt_df);
+Q.JH_DS =JH_DS(alt>=Q.alt_d0 & alt <= Q.alt_df);
+Q.JL_DS =JL_DS(alt>=Q.alt_d0 & alt <= Q.alt_df);
+Q.alt = alt(alt>=Q.alt_d0 & alt <= Q.alt_df);
 Q.Zmes2 = Q.alt';
 
 % Zmes = alt(alt>=alt_a0 & alt <= alt_df);
@@ -118,17 +118,17 @@ JHnewa = Y.JHa;
 JLnewa = Y.JLa;
 Eba = Y.Eba;
 ANalt = Y.alt_an;
-Q.Eba = Eba(ANalt>=alt_a0 & ANalt <= alt_af);
+Q.Eba = Eba(ANalt>=Q.alt_a0 & ANalt <= Q.alt_af);
 Q.Eba(Q.Eba <=0)= rand();
-Q.JHnewa= JHnewa(ANalt>=alt_a0 & ANalt <=alt_af);
-Q.JLnewa= JLnewa(ANalt>=alt_a0 & ANalt <=alt_af);
+Q.JHnewa= JHnewa(ANalt>=Q.alt_a0 & ANalt <=Q.alt_af);
+Q.JLnewa= JLnewa(ANalt>=Q.alt_a0 & ANalt <=Q.alt_af);
 % Q.JLanalogstd = Y.YYa(ANalt>=alt_a0 & ANalt <=alt_af);
 % Q.JHanalogstd = Y.YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
-Q.ANalt = ANalt(ANalt>=alt_a0);
-Q.Zmes1 = ANalt(ANalt>=alt_a0 & ANalt <= alt_af);
+Q.ANalt = ANalt(ANalt>=Q.alt_a0);
+Q.Zmes1 = ANalt(ANalt>=Q.alt_a0 & ANalt <= Q.alt_af);
 Q.Zmes1 = Q.Zmes1';
 
- Zmes = ANalt(ANalt>=alt_a0 & ANalt <= alt_df);
+ Zmes = ANalt(ANalt>=Q.alt_a0 & ANalt <= Q.alt_df);
  Q.Zmes = Zmes';
 %  Q.Zmes = [Q.Zmes1 Q.Zmes2]; %% Fix this here ..one range should fix the asr
 
@@ -295,10 +295,10 @@ JHreal = Q.JHnew'; JLreal = Q.JLnew';  JHrealan = Q.JHnewa';    JLrealan = Q.JLn
 
 
 Q.YY = JLreal;
-Q.YY(JL_alt_20MHz) = Q.JLv(JL_alt_20MHz).*10;
+Q.YY(JL_alt_20MHz) = Q.JLv(JL_alt_20MHz);
 
 Q.YYY = JHreal;
-Q.YYY(JH_alt_20MHz) = Q.JHv(JH_alt_20MHz).*10;
+Q.YYY(JH_alt_20MHz) = Q.JHv(JH_alt_20MHz);
             
             
 %         for i = 1: length(Q.JLv)
@@ -337,8 +337,8 @@ end
                 YYa(JL_an_alt_20MHz) = Y.YYa(JL_an_alt_20MHz);
                 YYYa(JH_an_alt_20MHz) = Y.YYYa(JH_an_alt_20MHz);
 
-                Q.YYa = YYa(ANalt>=alt_a0 & ANalt <=alt_af);
-                Q.YYYa = YYYa(ANalt>=alt_a0 & ANalt <=alt_af);
+                Q.YYa = YYa(ANalt>=Q.alt_a0 & ANalt <=Q.alt_af);
+                Q.YYYa = YYYa(ANalt>=Q.alt_a0 & ANalt <=Q.alt_af);
 %  
 %                 Q.YYa =Q.YYa';
 %                 Q.YYYa =Q.YYYa';
