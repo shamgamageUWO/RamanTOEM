@@ -52,7 +52,7 @@ Tprofiledg = 1./log(Q_Digi);
  T_digi = Q.Tsonde;%interp1(Q.Zmes,Q.Tsonde,Q.Zmes2,'linear');
 
 if  Q.flag ==1
-ind2 = Q.Zmes>2000 & Q.Zmes < 3000;
+ind2 = Q.Zmes>2000 & Q.Zmes < 4000;
 else 
   ind2 = Q.Zmes>6000 & Q.Zmes < 8000;
 end
