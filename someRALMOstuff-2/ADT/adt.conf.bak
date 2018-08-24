@@ -1,0 +1,221 @@
+
+% folders
+% config.TreatedDataFolder='C:\Users\haa\RALMO\data\combined';
+config.TreatedDataFolder='E:\RALMO\TreatedData';
+% config.TreatedDataFolder='\\paynas201.meteoswiss.ch\data\data\pay\REM\ACQ\LIDAR\repro\test';
+% config.BulletinFolder='C:\Users\haa\RALMO\data\bulletin';
+% config.BulletinFolder='\\paynas201.meteoswiss.ch\data\data\pay\REM\ACQ\LIDAR\repro\test\bulletin';
+% config.BulletinFolder='F:\RALMO\data';
+% config.BulletinFolder='C:\Users\haa\RALMO\data';
+config.BulletinFolder='E:\ralmo\bulletin';
+config.RawDataFolder='E:\ralmo';
+% config.RawDataFolder='G:\RALMO\level0\2012';
+config.MWRFolder='E:\ralmo\MWR';
+
+% DWH
+config.dwh.prod_name = 'VSSA42';
+config.dwh.header = 'VSSA42 LSSW';
+
+% time zone
+config.localtimezone=0;
+
+% integration time
+config.t=datenum(2012,8,25,6,0,0):1/48:datenum(2012,8,27,5,30,0);
+config.t0=datenum(2012,6,18,10,0,0);
+config.T=30;
+config.tint=1;
+
+% iniDT
+config.iniDT.BinShift=10;
+config.iniDT.BinStart=8;
+config.iniDT.BinStop=15000;
+config.iniDT.ChannelNames={'Es';'Es';'JH';'JH';'N2';'N2';'WV';'WV';'Eb';'Eb';'JL';'JL'};
+% config.iniDT.ChannelNames={'Es';'Es';'O2';'O2';'N2';'N2';'WV';'WV';'Eb';'Eb';'JL';'JL'}; % before 2009-10-09
+
+% Cloud detection
+config.CloudBaseThreshold = 4000;
+
+% WV
+config.ini.dWV.minalt=30;
+config.ini.dWV.fvstep=30;
+config.ini.dWV.maxalt=12000;
+config.ini.dWV.averagetime=30;
+config.ini.dWV.constant=[];
+config.ini.dWV.calibFile='WaterVaporCalibration.txt';
+config.ini.dWV.precision=0.1000;
+config.ini.dWV.vertres=[30 600];
+config.ini.dWV.Average=-1;
+config.ini.dWV.dT=0;
+config.ini.dWV.SmoothIt=1;
+config.ini.dWV.SmoothPoints=3;
+
+% ABS
+config.ini.dABS.minalt= 30;
+config.ini.dABS.fvstep= 30;
+config.ini.dABS.maxalt= 12000;
+config.ini.dABS.averagetime= 30;
+config.ini.dABS.constant= [];
+config.ini.dABS.precision= 0.1000;
+config.ini.dABS.vertres= 12;
+
+% ASR
+config.ini.dASR.minalt= 45;
+config.ini.dASR.fvstep= 30;
+config.ini.dASR.maxalt= 14985;
+config.ini.dASR.averagetime= 30;
+config.ini.dASR.constant= [];
+config.ini.dASR.calibFile='ASRCalibration.txt';
+config.ini.dASR.precision= 0.0550;
+config.ini.dASR.vertres= 8;
+config.ini.dASR.filter_width = 100;
+config.ini.dASR.K = 2;
+
+
+% Backscatter
+config.ini.dBCKS.minalt= 45;
+config.ini.dBCKS.fvstep= 30;
+config.ini.dBCKS.maxalt= 14985;
+config.ini.dBCKS.averagetime= 30;
+config.ini.dBCKS.constant= [];
+config.ini.dBCKS.calibFile=[];
+config.ini.dBCKS.precision= 0.0550;
+config.ini.dBCKS.vertres= 8;
+
+% Extinction
+config.ini.dEX.minalt= 30;
+config.ini.dEX.fvstep= 30;
+config.ini.dEX.maxalt= 12000;
+config.ini.dEX.averagetime= 30;
+config.ini.dEX.constant= [];
+config.ini.dEX.precision= 0.1000;
+config.ini.dEX.vertres= [30 600];
+
+% Temperature
+config.ini.dTE.minalt= 60;
+config.ini.dTE.fvstep= 60;
+config.ini.dTE.maxalt= 12000;
+config.ini.dTE.averagetime= 30;
+config.ini.dTE.constant= [];
+config.ini.dTE.calibFile='TemperatureCalibration.txt';
+config.ini.dTE.MWRCalibrationDo = 1;
+config.ini.dTE.MWRCalibInterval=[1000 2000];
+config.ini.dTE.MWRBulletinBasename='VSSA02.';
+config.ini.dTE.precision= 5;
+config.ini.dTE.vertres= 16;
+config.ini.dTE.filter_width = 500;
+config.ini.dTE.K = 1;
+config.ini.dTE.minCloudBase = 5000;
+
+
+
+% gluecoef
+
+config.GlueCoef_filename = 'iniGlue.mat';
+
+config.gluecoef.Es.coeffs.f=250;
+config.gluecoef.Es.coeffs.a=88.1000;
+config.gluecoef.Es.coeffs.asmoothed=88.1000;
+config.gluecoef.Es.coeffs.as=88.1000*ones(12,1);
+config.gluecoef.Es.coeffs.astep=12;
+config.gluecoef.Es.coeffs.offset=1.7850;
+config.gluecoef.Es.coeffs.offsetsmoothed=1.7850;
+config.gluecoef.Es.coeffs.offsets=1.7850*ones(12,1);
+config.gluecoef.Es.coeffs.offsetstep=12;
+config.gluecoef.Es.coeffs.ADmin1=0.1000;
+config.gluecoef.Es.coeffs.PCmax1=65;
+config.gluecoef.Es.coeffs.ADmin2=0.1000;
+config.gluecoef.Es.coeffs.PCmax2=35;
+config.gluecoef.Es.coeffs.paralyse=0;
+config.gluecoef.Es.coeffs.scaleToEb=0.8788;
+         
+
+config.gluecoef.Eb.coeffs.f=280;
+config.gluecoef.Eb.coeffs.a=90.4000;
+config.gluecoef.Eb.coeffs.asmoothed=90.4000;
+config.gluecoef.Eb.coeffs.as=90.4000*ones(12,1);
+config.gluecoef.Eb.coeffs.astep=12;
+config.gluecoef.Eb.coeffs.offset=2.0312;
+config.gluecoef.Eb.coeffs.offsetsmoothed=2.0312;
+config.gluecoef.Eb.coeffs.offsets=2.0312*ones(12,1);
+config.gluecoef.Eb.coeffs.offsetstep=12;
+config.gluecoef.Eb.coeffs.ADmin1=0.0500;
+config.gluecoef.Eb.coeffs.PCmax1=20;
+config.gluecoef.Eb.coeffs.ADmin2=0.0500;
+config.gluecoef.Eb.coeffs.PCmax2=10;
+config.gluecoef.Eb.coeffs.paralyse=0;
+          
+
+% config.gluecoef.JL.coeffs.f=680;
+config.gluecoef.JL.coeffs.f=280;
+config.gluecoef.JL.coeffs.a=64.7144;
+config.gluecoef.JL.coeffs.asmoothed=64.1477;
+config.gluecoef.JL.coeffs.as=[64.1759;64.1759;64.1759;64.1759;64.1759;64.1759;64.1759;64.1759;64.1759;64.1759;64.2017;63.8115];
+config.gluecoef.JL.coeffs.astep=12;
+config.gluecoef.JL.coeffs.offset=1.9962;
+config.gluecoef.JL.coeffs.offsetsmoothed=1.9883;
+config.gluecoef.JL.coeffs.offsets=[1.9882;1.9882;1.9882;1.9882;1.9882;1.9882;1.9882;1.9882;1.9882;1.9882;1.9884;1.9883];
+config.gluecoef.JL.coeffs.offsetstep=12;
+% config.gluecoef.JL.coeffs.ADmin1=0.0200;
+config.gluecoef.JL.coeffs.ADmin1=0.10;
+% config.gluecoef.JL.coeffs.PCmax1=10;
+config.gluecoef.JL.coeffs.PCmax1=60;
+config.gluecoef.JL.coeffs.ADmin2=0.0200;
+% config.gluecoef.JL.coeffs.PCmax2=7;
+% config.gluecoef.JL.coeffs.PCmax2=10;
+config.gluecoef.JL.coeffs.PCmax2=50;
+config.gluecoef.JL.coeffs.paralyse=0;
+config.gluecoef.JL.coeffs.scaleToEb=0.9804;
+         
+
+% config.gluecoef.JH.coeffs.f=450;
+config.gluecoef.JH.coeffs.f=280;
+config.gluecoef.JH.coeffs.a=62.1212;
+config.gluecoef.JH.coeffs.asmoothed=58.5312;
+config.gluecoef.JH.coeffs.as=[58.5282;58.5282;58.5282;58.5282;58.5282;58.5282;58.5282;58.5282;58.5282;58.5282;58.5440;58.5485];
+config.gluecoef.JH.coeffs.astep=12;
+config.gluecoef.JH.coeffs.offset=1.0206;
+config.gluecoef.JH.coeffs.offsetsmoothed=1.0480;
+config.gluecoef.JH.coeffs.offsets=[1.0480;1.0480;1.0480;1.0480;1.0480;1.0480;1.0480;1.0480;1.0480;1.0480;1.0477;1.0477];
+config.gluecoef.JH.coeffs.offsetstep=12;
+config.gluecoef.JH.coeffs.ADmin1=0.0200;
+config.gluecoef.JH.coeffs.PCmax1=30;
+config.gluecoef.JH.coeffs.ADmin2=0.0200;
+% config.gluecoef.JH.coeffs.PCmax2=4;
+config.gluecoef.JH.coeffs.PCmax2=20;
+config.gluecoef.JH.coeffs.paralyse=0;
+config.gluecoef.JH.coeffs.scaleToEb=0.5174;
+    
+
+config.gluecoef.WV.coeffs.f=180;
+config.gluecoef.WV.coeffs.a=39.8000;
+config.gluecoef.WV.coeffs.asmoothed=39.8000;
+config.gluecoef.WV.coeffs.as=39.8000*ones(12,1);
+config.gluecoef.WV.coeffs.astep=12;
+config.gluecoef.WV.coeffs.offset=1.4858;
+config.gluecoef.WV.coeffs.offsetsmoothed=1.4858;
+config.gluecoef.WV.coeffs.offsets=1.4858*ones(12,1);
+config.gluecoef.WV.coeffs.offsetstep=12;
+config.gluecoef.WV.coeffs.ADmin1=0.0200;
+config.gluecoef.WV.coeffs.PCmax1=10;
+config.gluecoef.WV.coeffs.ADmin2=0.0200;
+config.gluecoef.WV.coeffs.PCmax2=6;
+config.gluecoef.WV.coeffs.paralyse=0;
+config.gluecoef.WV.coeffs.scaleToEb=0.7303;
+         
+
+config.gluecoef.N2.coeffs.f= 235;
+config.gluecoef.N2.coeffs.a= 95.5000;
+config.gluecoef.N2.coeffs.asmoothed= 95.5000;
+config.gluecoef.N2.coeffs.as= 95.5000*ones(12,1);
+config.gluecoef.N2.coeffs.astep= 12;
+config.gluecoef.N2.coeffs.offset= 1.6351;
+config.gluecoef.N2.coeffs.offsetsmoothed= 1.6351;
+config.gluecoef.N2.coeffs.offsets= 1.6351*ones(12,1);
+config.gluecoef.N2.coeffs.offsetstep= 12;
+config.gluecoef.N2.coeffs.ADmin1= 0.0200;
+config.gluecoef.N2.coeffs.PCmax1= 35;
+config.gluecoef.N2.coeffs.ADmin2= 0.0200;
+config.gluecoef.N2.coeffs.PCmax2= 25;
+config.gluecoef.N2.coeffs.paralyse= 0;
+config.gluecoef.N2.coeffs.scaleToEb= 0.8117;
+ 

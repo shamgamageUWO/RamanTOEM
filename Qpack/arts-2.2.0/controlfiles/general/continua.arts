@@ -1,0 +1,161 @@
+Arts2 {
+
+#
+# initialize the continua tag structures
+#
+abs_cont_descriptionInit
+
+#
+# define the continua tags with the appropriate input
+#
+
+#
+# H2O continuum
+#
+# Rosenkranz-type H2O-H2O continuum:
+abs_cont_descriptionAppend( tagname="H2O-SelfContStandardType",
+                            model="Rosenkranz" )
+
+# Rosenkranz-type H2O-dry air continuum
+abs_cont_descriptionAppend( tagname="H2O-ForeignContStandardType",
+                            model="Rosenkranz" )
+
+# Rosenkranz H2O full absorption model
+abs_cont_descriptionAppend( tagname="H2O-PWR98",
+                            model="Rosenkranz" )
+
+# Liebe 1993 H2O full absorption model
+abs_cont_descriptionAppend( tagname="H2O-MPM93",
+                            model="MPM93" )
+
+# Ma Tipping Continuum model
+abs_cont_descriptionAppend( tagname="H2O-ForeignContMaTippingType",
+                            model="MaTipping" )
+
+# MPM93-type H2O-air continuum
+abs_cont_descriptionAppend( tagname="H2O-ContMPM93",
+                            model="MPM93" )
+
+# CKD2.4 original parameters
+abs_cont_descriptionAppend( tagname="H2O-SelfContCKD24",
+                            model="CKD24" )
+
+# CKD2.4 original parameters
+abs_cont_descriptionAppend( tagname="H2O-ForeignContCKD24",
+                            model="CKD24" )
+
+#
+# CKD MT 1.00 self continuum original parameters:
+abs_cont_descriptionAppend( tagname="H2O-SelfContCKDMT100",
+                            model="CKDMT100" )
+#
+# CKD MT 1.00 H2O foreign continuum original parameters:
+abs_cont_descriptionAppend( tagname="H2O-ForeignContCKDMT100",
+                            model="CKDMT100" )
+#
+#  Cruz-Pol et al. 98 Continuum:
+abs_cont_descriptionAppend( tagname="H2O-CP98",
+                            model="CruzPol" )
+
+
+#
+# O2 continuum 
+#
+# Standard O2-air continuum
+abs_cont_descriptionAppend( tagname="O2-SelfContStandardType",
+                            model="Rosenkranz" )
+
+# Rosenkranz 1998 full oxygen continuum
+abs_cont_descriptionAppend( tagname="O2-PWR98",
+                            model="Rosenkranz" )
+
+# Rosenkranz 1993 full oxygen continuum
+abs_cont_descriptionAppend( tagname="O2-PWR93",
+                            model="Rosenkranz" )
+
+# Liebe 1993 O2 full absorption model
+abs_cont_descriptionAppend( tagname="O2-MPM93",
+                            model="MPM93" )
+
+# Liebe 1989 O2 full absorption model
+abs_cont_descriptionAppend( tagname="O2-MPM89",
+                            model="MPM89" )
+
+# Tretyakov etal. 2005 modernization of Liebe 1993 O2 full absorption model
+abs_cont_descriptionAppend( tagname="O2-TRE05",
+                            model="TRE05" )
+
+
+#
+# Thibault et  al. from CKD F77 program:
+abs_cont_descriptionAppend( tagname="O2-CIAfunCKDMT100",
+                            model="CKDMT100" )
+#
+
+#
+# N2 continuum
+#
+# Rosenkranz N2-N2 continuum (only N2-N2 broadening)
+abs_cont_descriptionAppend( tagname="N2-SelfContStandardType",
+                            model="Rosenkranz" )
+
+# MPM93 N2-N2 continuum (only N2-N2 broadening)
+abs_cont_descriptionAppend( tagname="N2-SelfContMPM93",
+                            model="MPM93" )
+
+# Borysow-Frommhold original parameters
+abs_cont_descriptionAppend( tagname="N2-SelfContBorysow",
+                            model="BF86" )
+
+# Borysow-Frommhold from CKD F77 program:
+abs_cont_descriptionAppend( tagname="N2-CIArotCKDMT100",
+                            model="CKDMT100" )
+#
+#
+# Lafferty et  al. from CKD F77 program:
+abs_cont_descriptionAppend( tagname="N2-CIAfunCKDMT100",
+                            model="CKDMT100" )
+
+#
+
+#
+# CO2 continuum 
+#
+# Rosenkranz CO2-CO2 continuum:
+abs_cont_descriptionAppend( tagname="CO2-SelfContPWR93",
+                            model="Rosenkranz" )
+
+# Rosenkranz CO2-N2 continuum:
+abs_cont_descriptionAppend( tagname="CO2-ForeignContPWR93",
+                            model="Rosenkranz" )
+
+# Ho et al 1966 CO2-CO2 continuum:
+abs_cont_descriptionAppend( tagname="CO2-SelfContHo66",
+                            model="Ho66" )
+
+# Ho et al 1966 CO2-N2 continuum:
+abs_cont_descriptionAppend( tagname="CO2-ForeignContHo66",
+                            model="Ho66" )
+
+# far line wing continuum from CKD F77 program:
+abs_cont_descriptionAppend( tagname="CO2-CKDMT100",
+                            model="CKDMT100" )
+
+
+#
+# Hydrometeors
+#
+
+# Rosenkranz liquid cloud
+abs_cont_descriptionAppend( tagname="liquidcloud-MPM93",
+                            model="MPM93" )
+
+# Rosenkranz ice cloud
+abs_cont_descriptionAppend( tagname="icecloud-MPM93",
+                            model="MPM93" )
+
+# Rosenkranz rain
+abs_cont_descriptionAppend( tagname="rain-MPM93",
+                            model="MPM93" )
+
+}

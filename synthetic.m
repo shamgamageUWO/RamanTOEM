@@ -1,170 +1,289 @@
-% This code is to create synthetic data using the US standard data
+function [Q] = Synthetic( date_in,time_in,flag)
+% makeQ(in)
 
-function [Diff_JH_i,Diff_JL_i,A_Zi,B_Zi]=synthetic(temp,press,alt,g0)
+% -Usage-
+%	[Q,y,yvar] = makeQ(in)
+%
+% -Inputs-
+%	in - data structure of parameters passed from oem
+% flag == 1 day time measurement
+%
+% -Outputs-
+%	Q - retrieval input structure
+%   y - n channels of data
+%   yvar - the data's variance
+%  t= cputime
 
-
-% %  R = 0.1723.*4.5=0.77;
-% % CL = H = 2.065152155995913e+18;
-%Bg_JH_real =2.9989
-%Bg_JL_real =3.4144
-
-
-% Constants
+%% All the constants
 kb = 1.38064852*10^-23;
-area = pi * (0.3^2);
-Lambda = 354.7* (10^-3);
-Rsp = 287; %J K-1 mol-1
+Rsp = 287;
 NA = 6.02214129 *(10^23) ;% Avergadro Number mol?1
-M = 28.9645 * (10^-3); % molar mass - Mair	28.9645 g.mol-1 Molecular mass of dry air kg/mol
-A = 4.02*10^(-28);
-B = -0.3228;
-C = 0.389;
-D = 0.09426;
-J_low = [3,4,5,6,7,8,9];
-J_high = [10,11,12,13,14,15];
-J_lowO2 = [5,7,9,11,13];
-J_highO2 = [15,17,19,21];
-%  R = 0.76;%0.17; % Im chaning this here inorder to change the forward model
+M = 28.9645 * (10^-3); 
+Q.date_in = date_in;%20110616; % daytime 20110816
+Q.time_in = time_in;%23; % 11
+% Q.Csum =  2.8077e+18;
+% Q.CLfac = 10^-2;
+% Q.CHfac = 10^-2;
+Q.coaddalt =20;
+Q.Rgas = 8.3145;
+% Q.Rate = 30;%Hz
+Q.t_bin = 60;%s
+% Q.altbinsize = 3.75;%m
+Q.Clight = 299792458; %ISSI value
+% Q.ScaleFactor = 150/3.75;
+Q.shots = 1800;
+% Q.f = Q.Clight ./ (2.*(Q.Rate).*Q.altbinsize);
 
+Q.deadtimeJH = 3; % 4ns
+Q.deadtimeJL = 3; % 4ns
+Q.CovDTJL = (.01.*Q.deadtimeJL).^2;
+Q.CovDTJH = (.01.*Q.deadtimeJH).^2;
 
+% Q.deltaT = 5; %2 K
+Q.g0a=90*10^-3;%m % this is to create a priori overlap
+Q.g0real=100*10^-3;%m % this is to create real overlap
+% Q.deltatime = 30;
+Q.Shots = 1800; 
+% Q.f = Q.Clight ./ (2.*(Q.Shots).*Q.altbinsize); 
+disp('All the constants are ready')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Load raw measurements
+[Y] = makeY(Q);
 
+Q.deltatime = Y.deltatime;
+% Digital measurements 2km above
+JHnew = Y.JH;
+JLnew = Y.JL;
+JL_DS = Y.JL_DS;
+JH_DS = Y.JH_DS;
+Eb = Y.Eb;
+Ebalt = Y.Ebalt;
 
-% Measurement grid
-Zi = alt;
-Pressi = press;
-Ti = temp;
-rho = Pressi./(Rsp*Ti);
+alt = Y.alt;
+Q.binzise = Y.binsize;
+% Q.JHnew= JHnew(alt>=50  & alt <=45000);
+% Q.JLnew= JLnew(alt>=50 & alt <=45000);
+Q.JH_DS =JH_DS(alt>=500  & alt <=45000);
+Q.JL_DS =JL_DS(alt>=500  & alt <=45000);
+Q.alt = alt(alt>=500  & alt <=45000);
+Q.Eb = Eb(Ebalt>=500  & Ebalt <=45000);
+Q.Ebalt = Ebalt(Ebalt>=500  & Ebalt <=45000);
+Q.Zmes2 = Q.alt';
+Q.Zmes = Q.Zmes2;
+Q.f = 1e6./(Y.F);
+Q.BaJL = 1.3614;%Y.bgJL;%0.297350746852139; % change later
+Q.BaJH = 0.5783;%Y.bgJH;%4.998109499057194e-04;
+% Q.n1=length(Q.JHnew);
+% Q.n2=length(Q.JLnew);
+disp('Loaded RALMO measurements ')
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Functions needed in measurement grid
+%% Define grid sizes
+% k = find(Q.Zmes<=6000);
+% h = k(end);
+%  deltaZ = (Q.Zmes(2)-Q.Zmes(1));
+% Z1 = Q.Zmes(1):deltaZ:Q.Zmes(h);
+% Z2= Q.Zmes(h):deltaZ*10:55000;   
+%   Q.Zret = [Z1 Z2];
+    Q.Zret = Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*20:50000;% Retrieval grid
+disp(' Grids Defined')
 
-% Transmission 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  a priori temperatures
 
-exponent = 4+B+C*Lambda+D/Lambda;
-sigma_Rcm2 = A / Lambda^(exponent);
-sigmaNicolet = sigma_Rcm2*1e-4;%m2
-Nmol = (NA/M).* rho ; % mol m-3
-Tr = exp(-cumtrapz(Zi,Nmol*sigmaNicolet));
+%msis data for temperature
+% [Tmsis, pmsis,zmsis]= msisRALMO;
+% % Tmsis = Tmsis;
+%  Q.Ta = interp1(zmsis,Tmsis,Q.Zret,'linear');
+%  Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
+%  Q.Pressi = interp1(zmsis,pmsis,Q.Zmes,'linear');
+%  Q.rho = Q.Pressi./(Rsp.*Q.Ti);
+% [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in,Q.time_in);
+% Q.Ta = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this should be in x vector
+% Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
+% Q.Pressi =interp1(Zsonde,Psonde,Q.Zmes,'linear');
+% Q.rho = Q.Pressi./(Rsp.*Q.Ti);
 
-R_tr_i = Tr.^2;
+% US temperature model
+% load('USdata.mat');
+% Q.Ta = Ta; Q.Ti = Ti; Q.Pressi = Pressi; Q.Nmol = Nmol; Q.rho = rho;
+            [temp, press, dens, alt] = US1976(Q.date_in, Q.time_in, Q.Zret);
+            Q.Ta = temp; % for now im adding 2K to test
+            Q.Ti = interp1(Q.Zret,Q.Ta,Q.Zmes,'linear');
+            lnpress = log(press);
+            Pressi =interp1(Q.Zret,lnpress,Q.Zmes,'linear');
+            Q.Pressi = exp(Pressi);
+            Q.rho = Q.Pressi./(Rsp.*Q.Ti);
+            Q.Nmol = (NA/M).* Q.rho ; % mol m-3
 
-%  figure;plot(Pressi,Zi./1000)
-%  figure;plot(Ti,Zi./1000)
-% Overlap
+obj2 = Gravity(Q.Zmes, 46.82);
+Q.grav = obj2.accel;
+Q.MoR = (M./Q.Rgas).*ones(size(Q.Ti));
+Q.z0 = 30000;            
+[Q.Pdigi,p0A] = find_pHSEQ(Q.z0,Q.Zmes,Q.Ti,Q.Pressi,0,Q.grav',Q.MoR);           
+disp('a priori temperature profile is loaded ')
 
-[epsi,z] = Overlap(Zi,g0);
-% figure;plot(z,epsi)
-dis = length(Zi)-length(z);
-NN = ones(1,dis);
-KK = (epsi);
-NK= [KK NN];
-OV_Zi = NK;
+[Tsonde,Zsonde,Psonde] = get_Sonde_C50(Q.date_in, Q.time_in);
+ Zsonde = Zsonde - 491; % altitude correction isn't required for C50
+%  ind =  Zsonde>=0 & Zsonde < 33000;
+%  Zsonde = Zsonde(ind);
+%  Tsonde = Tsonde(ind);
+%  Psonde = Psonde(ind);
 
-% OV_Zi = 1;
-% Define the first part of the equation 
+%  [Zsonde, sortIndex] = sort(Zsonde);
+% Tsonde = Tsonde(sortIndex);
+% Psonde = Psonde(sortIndex); 
+nn=find(isnan(Tsonde)); %% There is always a nan at the end of the temperature 
+Tsonde = Tsonde(1:nn-1);
+Psonde = Psonde(1:nn-1);
+Zsonde = Zsonde(1:nn-1);
 
-A_Zi = (area .* OV_Zi .*R_tr_i .*Pressi)./(kb * Zi.^2);
-B_Zi = (area .*R_tr_i .*Pressi)./(kb * Zi.^2); % No overlap function
+[Zsonde, index] = unique(Zsonde); 
+Tsonde = Tsonde(index);
+Psonde = Psonde(index);
 
+Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
+Psonde = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % 
+Q.Psonde = exp(Psonde);
+Q.Tsonde2 = interp1(Zsonde,Tsonde,Q.Zret,'linear'); % this goes to CJL estimation
+%%%%%
 
-[diff_O2Ls,diff_O2Las,deri_diff_O2Ls,deri_diff_O2Las] = RR_differentialO2_JL(J_lowO2,Ti); % JL Oxygen 
-[diff_O2Hs,diff_O2Has,deri_diff_O2Hs,deri_diff_O2Has] = RR_differentialO2_JH(J_highO2,Ti);% JH Oxygen
-[diff_N2Ls,diff_N2Las,deri_diff_N2Ls,deri_diff_N2Las] = RR_differentialN2_JL(J_low,Ti);% JL Nitrogen
-[diff_N2Hs,diff_N2Has,deri_diff_N2Hs,deri_diff_N2Has] = RR_differentialN2_JH(J_high,Ti);% JH Nitrogen
-Diff_JLN2 = nansum(diff_N2Ls') + nansum(diff_N2Las') ; % new unit is in m^2
-Diff_JLO2 = nansum(diff_O2Ls') + nansum(diff_O2Las') ; % new unit is in m^2
-Diff_JL_i =  Diff_JLO2 + Diff_JLN2;
-Diff_JHN2 = nansum(diff_N2Hs') + nansum(diff_N2Has') ; % new unit is in m^2
-Diff_JHO2 = nansum(diff_O2Hs') + nansum(diff_O2Has') ; % new unit is in m^2
-Diff_JH_i =  Diff_JHO2 + Diff_JHN2; 
+% Calculate the aerosol attenuation NoT USINH+G THIS FOR NOW
+%                         [alphaAer, odaer] = asrShamFastCom(Q);
+%                          Q.alpha_aero = alphaAer;
+%                          Q.odaer = odaer;
+%                         % total transmission air 
+%                         Q.Tr = Total_Transmission(Q);
 
-% %  figure;plot(Diff_JH_i,Zi./1000)
-% %  figure;plot(Diff_JL_i,Zi./1000)
-% CL = 1.3250e+20;%1.449192680052850e+18;
-% CH = R.*CL;
+[Tr1,Tr2] = TransmissionFastCom(Q);
+Q.Tr = Tr1;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % R is calibrated wrt sonde profiles
+% [R,R_fit] = Restimationnew(Q);
+% Q.R = R_fit;
+ Q.R = 0.8359;
+disp('R is calibrated ')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Estimating background and lidar constant wrt a priori 
 
-    %%Using Csum
-    % Csum =  2.8077e+18;%6.8122e+20; % cALCULATED USING THE FINDCSUMANDR CODE
-    % CL = (Csum.*(Diff_JL_i+Diff_JH_i))./(Diff_JL_i+ R.*Diff_JH_i);
-    % y=CL(Zi>=4000&Zi<=7500);
-    % CL = nanmean(y);
-    % CH = R.*CL;
-    % %%Using Cjl and R
-%     CL = 1.2e+22;
-%     CH = R.*CL;
-% figure;
-% subplot(1,2,1)
-% plot(CL,Zi./1000,'r',CH,Zi./1000,'b'); 
+[CJL,OV] = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+%  load('ovmodeldata.mat');
+% OVnw = interp1(z,epsi,Q.Zret,'linear');
+% OVnw(isnan(OVnw))=1;
+% Q.OVa = OVnw;
+%     Q.OVa = ones(1,length(Q.Ta));
+    Q.OVa = OV;
+Q.OVlength = length(Q.OVa);
+Q.COVa = OVCov(Q.Zret,Q.OVa);
 
-% hold on;
+Q.CL = CJL;
+Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 
-% xmean1 = mean(CL);
-% xmean2 = mean(CH);
-% xstd1 = std(CL);
-% xstd2 = std(CH);
-% meanValue1 = [xmean1 xmean1];
-% meanValue2 = [xmean2 xmean2];
-% plot(meanValue1,'g');
-% plot(meanValue2,Zi./1000,'y');
-% legend('CL','CH')
-% xlabel('Constant')
-% ylabel('Alt (km)')
+if flag ==1
+    Q.CovBJL = ((Y.bg_JL_std)).^2; % day time
+    Q.CovBJH = ((Y.bg_JH_std)).^2;
+    %                                         Q.CovBJLa = ((Y.bg_JL_stda)).^2; % day time
+    %                                         Q.CovBJHa = ((Y.bg_JH_stda)).^2;
+    disp('Daytime retrieval')
+else
+    Q.CovBJL = ((Y.bg_JL_std/sqrt(Y.bg_length2))).^2;
+    Q.CovBJH = ((Y.bg_JH_std/sqrt(Y.bg_length1))).^2;
+    %                                          Q.CovBJLa = ((Y.bg_JL_stda/sqrt(Y.bg_length2a))).^2;
+    %                                         Q.CovBJHa = ((Y.bg_JH_stda/sqrt(Y.bg_length1a))).^2;
+    disp('Nighttime retrieval')
+end
 
-% Syntheic data for JL using US standard data
+xx = [Q.Ta Q.BaJH Q.BaJL Q.CL Q.OVa Q.deadtimeJH Q.deadtimeJL]; % now im retrieving log of CJL
 
-% JLL = (CL.*A_Zi .* Diff_JL_i)./(Ti) ;%+5.9895e+03; % Here I have to add background 
-% JHH = (CH.*B_Zi .* Diff_JH_i)./(Ti);%+5.9895e+03; % Here I have to add background 
+[JLreal,JHreal]=forwardmodelTraman(Q,xx);
+JLreal = NoiseP(JLreal);
+JHreal = NoiseP(JHreal);
+% JLareal = awgn(JLareal,100,'measured');
+% JHareal = awgn(JHareal,100,'measured');
+    Q.JHnew =JHreal;  Q.JLnew=JLreal ;  
+%     Q.JHnewa =JHareal ;   Q.JLnewa= JLareal;                     
+                        Q.JHnew(Q.JHnew<=0)= round(rand(1)*10);
+%                         Q.JHnewa(Q.JHnewa<=0)= round(rand(1)*10);
+                        Q.JLnew(Q.JLnew<=0)= round(rand(1)*10);
 
-% Bg_JL_real= Q.Bg_JL_real;
-% Bg_JH_real= Q.Bg_JH_real;
-
-
-
+                   
+                        Q.y = [Q.JHnew Q.JLnew]';
 % 
-%         % Saturation Correction
-%         ScaleFactor = 150/3.75;
-%         shots = 1800;
-%         % 1. Convert counts to Hz
-%         JHnw = (JHH.*ScaleFactor)./shots;
-%         JLnw = (JLL.*ScaleFactor)./shots;
+             [JHv,go1] =bobpoissontest(Q.JHnew,Q.Zmes2,8);
+             [JLv,go] =bobpoissontest(Q.JLnew,Q.Zmes2,8);
 % 
-%         % 2. Apply the correction
-%  JL = JLL ./ (1 + JLnw.*(4e-9)); % non-paralyzable
-% % JL = JL .* exp(-JLnw.*(4e-9)); % paralyzable %units is counts
-%  JH = JHH ./ (1 + JHnw.*(4e-9));
-%         JH = JHH .* exp(-JHnw.*(4e-9)); % paralyzable %units is counts
-%         % newY1 = JH ./ (1 + JHnw.*(4e-9)); % non-paralyzable
-%         JL = JLL .* exp(-JLnw.*(4e-9)); % paralyzable %units is counts
-% subplot(1,2,2)
-% semilogx(JLL,Zi./1000,'r',JHH,Zi./1000,'b')
-% legend('JL','JH')
-% xlabel('Log Counts')
-% ylabel('Alt (km)')
-% % Add background 
+% 
+%             
+             r1 = ones(1,go1-1).* JHv(1);
+             r2 = ones(1,go1-1).* JHv(end);
+             r3 = ones(1,go-1).* JLv(1);
+             r4 = ones(1,go-1).* JLv(end);
+             Q.JHv = [r1 JHv r2];
+             Q.JLv = [r3 JLv r4];
 
-% JL = JL+ Bg_JL_real;
-% JH = JH+ Bg_JH_real;
+
+
+            
+             for i = 1: length(Q.JLv)
+                 if Q.Zmes2(i) <= 2000
+                     Q.YY(i) = Q.JLv(i);
+                 else
+                     Q.YY(i) =  Q.JLnew(i);
+                 end
+             end
+             
+             for i = 1: length(Q.JHv)
+                 if  Q.Zmes2(i) <= 2000
+                     Q.YYY(i) = Q.JHv(i);
+                 else
+                     Q.YYY(i) =  Q.JHnew(i);
+                 end
+             end
+             
+             
+              Q.Yvar =[Q.YYY Q.YY];
+             Q.yvar = diag(Q.Yvar);
+                
+                
+Q.n1=length(Q.JHnew);
+Q.n2=length(Q.JLnew);
+
+
+disp('Estimations for CJL, backgrounds and overlap done ')
+disp('makeQ complete ')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% load('Temperature20110909.mat');
+JHt = Q.JH_DS-Q.BaJH;
+JLt = Q.JL_DS-Q.BaJL;
+
+Q_Digi = JLt./JHt;
+Tprofiledg = 1./log(Q_Digi);
+
+%             y_d = (Q.Tsonde);
+%             y_d = y_d( Q.Zmes>=1000 & Q.Zmes<=10000);
+%             x_d = 1./Tprofiledg( Q.Zmes>=1000 & Q.Zmes<=10000);
 % 
-%  JLreal = NoiseP((JL));
-%  JHreal = NoiseP((JH));
-% %  JLreal = JLreal./100;
-% %  JHreal = JHreal./100;
-% % JL = awgn(JL,1);
-% % JH = awgn(JH,2);
-% % JLreal(JLreal<=0) = 1;
-% % JHreal(JHreal<=0) = 1;
-% 
-% %  figure;
-% % subplot(1,2,1)
-% %  plot(JLreal,Zi./1000,'r',JL,Zi./1000,'b',JHreal,Zi./1000,'r',JH,Zi./1000,'b')
-% % subplot(1,2,2)
-% %  plot((JLreal-JL),Zi./1000,'r',(JHreal-JH),Zi./1000,'b')
-% 
-% nijl=(JLreal-JL);
-% nijh=(JHreal-JH);
+%             ftdg=fittype('a/(x+b)','dependent',{'y'},'independent',{'x'},'coefficients',{'a','b'});
+%             fodg = fitoptions('method','NonlinearLeastSquares','Robust','On');
+%             set(fodg, 'StartPoint',[350, 0.3]);
 % 
 % 
-% % Now here I want to remove the JH counts from altitudes above 3 km
-% ind = alt_in>=100;
-% JHreal = JHreal(ind);
-% T_US = Ti;
+%             [f_dg,gofdg] = fit(x_d,y_d',ftdg,fodg);
+%             Q.a_dg = f_dg.a;
+%             Q.b_dg = f_dg.b;
+
+Q.a_dg = 399.8616;
+Q.b_dg = 0.5247;
+
+Tradi= real(Q.a_dg./(1./Tprofiledg +Q.b_dg));
+Q.Ttradi = interp1(Q.Zmes,Tradi,Q.Zret,'linear');
+
+
+end
+
+
+
+
+

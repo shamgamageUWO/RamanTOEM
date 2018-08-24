@@ -1,0 +1,110 @@
+--- Welcome to the Atmlab package of Matlab functions ---
+
+   Copyright (C) 2002-2012
+   Patrick Eriksson      <patrick.eriksson@chalmers.se>
+   Oliver Lemke          <olemke@ltu.se>
+   Christian Maetzler    <christian.matzler@iap.unibe.ch>
+   Stefan Buehler        <sbuehler@ltu.se>
+   Bengt Rydberg         <benryd@chalmers.se>
+   and many others
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2, or (at your option) any
+   later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+   USA. 
+
+
+For further information
+-----------------------
+
+AUTHORS: The people who has contributed to Atmlab.
+
+CONFIGURE: How to set-up Atmlab for your personal use.
+
+INSTRUCTIONS: Instructions for Atmlab developers.
+
+When Atmlab is added to the Matlab search path (as described in CONFIGURE)
+you get a small introduction by:
+
+>> atmlab_demo 
+
+
+Guidelines for atmlab functions
+-------------------------------
+
+There are no totally strict principles for atmlab functions, but the
+ambition is to follow the guidelines below. Exceptions exist, for
+example, imported function sets are not revised to match the
+guidelines (importing updates would then be quite demanding).
+
+The functions shall not require access to special toolboxes.
+
+The functions shall have a clear header. Mandatory and optional
+variables shall be cleared identified in the header, with allowed
+choices for the input also clearly described. If nothing else is
+stated, setting an optional input argument to [] signifies to use the
+default value.
+
+A distinction is made between numerical and logical 0 and 1. To obtain
+a logical variables, use logical expressions or the functions false,
+true or logical. The terms "flag" or "boolean" (used in atmlab
+function headers) signify a single logical value. The function
+*isboolean* identifies if a varaible matches this definition.
+
+Matlab is classifying also non-numeric data as scalars and vectors.
+In addition, all data are considered to have a dimension of at least
+two and there is no clear definition of a vector in Matlab. In Atmlab,
+the terms scalar, vector, matrix and tensor are used only for numeric
+data. A scalar treated to have dimension zero. One dimensional data
+shall be given (and returned) as column vectors (exceptions can be
+accepted where the size does not matter). The function *dimens* can be
+used to determine the effective dimension of data according to
+atmlab's definition of scalars and vectors. Two dimensional data are
+denoted as a matrix. A tensor is a data container of any
+dimension. For example, vectors are one dimensional tensors.
+
+This means that the Matlab functions *isscalar* and *isvector* should
+not be used inside Atmlab. Other Matlab is-functions are used and
+followed. For example, cell array of strings (see *cellstr* for a
+definition) are used frequently and correct type is here checked by
+*iscellstr*. To avoid confusion with e.g. *isvector*, Atmlab uses here
+the notation of tensors throughout in function names (that can be
+reflected in some error messages and function headers). Accordingly,
+Atmlab includes functions such as *istensor0* and *istensor1*.
+
+The general rule is that numeric data shall either be scalars or all
+have the same size. This to allow that expressions can use .* and ./
+without any modification of the input. Accordingly, the data are
+scalar fields (and not grids). A scalar corresponds to a constant
+field. For example, to calculate the total number density for all
+combinations of some vectors with pressures and temperatures
+   vmr2nd(1,repmat(p,1,length(t)),repmat(t',length(p),1))
+The above gives a matrix while
+   vmr2nd(1,p,t)
+gives a vector. 
+For cases where this general rule can be applied, the sizes are not
+commented in the function header and the sizes are not checked
+specifically by the function. If the data sizes do not match, there
+will be a general error of the type "Matrix dimensions must
+agree.". However, there are many cases where all the input does not go
+into a single equation and the function header shall then comment on
+size requirements of the data and there should be clear error messages.
+
+The comment %&% marks lines that can be removed for 'operational
+applications'. That is, calculations where the code has been carefully
+tested and data checks are skipped to obtain a higher calculation
+speed. The code is stripped from lines including %&% and pure comment
+lines by the script ???? (to be implemented). 
+
+It is recommended to join the atmlab-dev mailing-list, see
+https://www.sat.ltu.se/mailman/listinfo/atmlab-dev

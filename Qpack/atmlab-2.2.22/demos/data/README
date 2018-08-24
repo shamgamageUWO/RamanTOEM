@@ -1,0 +1,5 @@
+
+This purpose of this folder is to contain data needed to run examples.
+
+Try to keep the data files as small as possible, not to make updates
+and checkouts over modem difficult.

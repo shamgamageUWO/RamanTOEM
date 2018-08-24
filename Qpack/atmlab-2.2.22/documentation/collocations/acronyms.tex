@@ -1,0 +1,142 @@
+% For use with \usepackage[acronym]{glossaries}.
+%
+% \input this file after you have defined your own acronyms (but why not
+% add your own acronyms here?). It will define any acronyms that you have
+% yet defined yourself (acronyms will not be over-written). The acronym
+% key will be equal to the actual acronym, e.g. \gls{ARTS}.
+%
+% You don't need to include an actual glossary to use those acronyms; the
+% package takes care of the first usage \gls{ABC} being expanded. See
+% 'texdoc glossaries' for more info.
+%
+% If you do include a glossary (table of acronyms), only those acronyms
+% that are actually used will be included.
+%
+% $Id: acronyms.tex 7678 2012-04-04 16:30:11Z gerrit $
+
+\newcommand{\makeacroif}[2]{%
+\ifglsentryexists{#1}{}{%
+ \newacronym{#1}{#1}{#2}}}
+
+\newcommand{\makepluralacroif}[3]{%
+\ifglsentryexists{#1}{}{%
+ \newacronym[plural=#2]{#1}{#1}{#3}}}
+
+\makeacroif{IPCC}{Intergovernmental Panel on Climate Change}
+\makeacroif{AR4}{4th Assessment Report}
+\makeacroif{NOAA}{National Oceanic and Atmospheric Administration}
+\makeacroif{TRMM}{Tropical Rainfall Measuring Mission}
+\makeacroif{CALIPSO}{Cloud-Aerosol Lidar and Infrared Pathfinder Satellite Observation}
+\makeacroif{PARASOL}{Polarization and Anisotropy of Reflectances
+                              for Atmospheric Sciences Coupled with
+                              Observations from a Lidar}
+\makeacroif{OCO}{Orbital Carbon Observatory}
+\makeacroif{ESMR}{Electrically Scanning Microwave Radiometer}
+\makeacroif{DMSP}{Defense Meteorological Satellite Program}
+\makeacroif{SSM/T}{Special Sensor Microwave/Temperature}
+\makeacroif{SEVIRI}{Spinning Enhanced Visible Infra-Red Imager}
+\makeacroif{VHRR}{Very High Resolution Radiometer}
+\makeacroif{UV}{Ultra-Violet}
+\makeacroif{IR}{Infra-Red}
+\makeacroif{MW}{microwave}
+\makeacroif{FRAC}{Full Resolution Area Coverage}
+\makeacroif{GAC}{Global Area Coverage}
+\makeacroif{IWSSM}{International Workshop on Space-based Snowfall Measurement}
+\makeacroif{DDA}{Discrete Dipole Approximation}
+\makeacroif{PND}{particle number density}
+\makeacroif{FDTD}{Finite Difference Time Domain}
+\makeacroif{DOIT}{Discrete Ordinate ITerative}
+\makeacroif{PR}{Precipitation Radar}
+%
+\makeacroif{HIRS}{High-resolution Infrared Radiation Sounder}
+\makeacroif{AVHRR}{Advanced Very High Resolution Radiometer}
+\makeacroif{MC}{Monte Carlo}
+\makeacroif{NOAA}{National Oceanic and Atmospheric Administration}
+\makeacroif{ARTS}{Atmospheric Radiative Transfer Simulator}
+\makepluralacroif{mpbs}{MPBS}{monochromatic pencil-beam simulation}
+\makeacroif{RMSE}{root mean square error}
+\makeacroif{GCM}{general circulation model}
+\makeacroif{CPR}{Cloud Profiling Radar}
+\makeacroif{IWP}{Ice Water Path}
+\makeacroif{AMSU}{Advanced Microwave Sounding Unit}
+\makeacroif{MHS}{Microwave Humidity Sounder}
+\makeacroif{ANN}{Artificial Neural Network}
+\makeacroif{radar}{RAdio Detection and Ranging}
+\makeacroif{IR}{infrared}
+\makeacroif{MW}{microwave}
+\makeacroif{MODIS}{MODerate resolution Imaging Spectroradiometer}
+\makeacroif{FRAC}{Full-Resolution Area Coverage}
+\makeacroif{GAC}{Global Area Coverage}
+\makeacroif{TIROS}{Television InfraRed Operational Sounder}
+\makeacroif{SRF}{spectral response function}
+\makeacroif{DOIT}{Discrete Ordinate ITerative}
+\makeacroif{DOM}{Discrete Ordinate Method}
+\makeacroif{ECMWF}{European Centre for Medium-range Weather Forecasting}
+\makeacroif{FASCOD}{Fast Atmospheric Signature CODe}
+\makeacroif{MSU}{Microwave Sounding Unit}
+\makeacroif{SSM/I}{Special Sensor Microwave/Imager}
+\makeacroif{TIROS}{Television Infra-Red Operational Sounder}
+\makeacroif{GCM}{General Circulation Model}
+\makeacroif{ERA}{\protect\gls{ECMWF} Re-Analysis}
+\makeacroif{NESDIS}{National Environment Satellite, Data and Information Service}
+\makeacroif{MSPPS}{Microwave Surface and Precipitation Products System}
+\makeacroif{UTH}{Upper Tropospheric Humidity}
+\makeacroif{PWV}{Precipitable Water Vapour}
+\makeacroif{TOA}{Top Of Atmosphere}
+\makeacroif{IWC}{Ice Water Content}
+\makeacroif{NPP}{National Partnership Program}
+\makeacroif{EOS}{Earth Observing System}
+\makeacroif{ATMS}{Advanced Technology Microwave Sounder}
+\makeacroif{CrIS}{Cross-track Infrared Sounder}
+\makeacroif{AIRS}{Atmospheric Infrared Sounder}
+\makeacroif{FOV}{Field Of View}
+\makeacroif{FOR}{Field Of Regard}
+\makeacroif{VIIRS}{Visible Infrared Imager Radiometer Suite}
+\makeacroif{FY}{Feng-Yun}
+\makeacroif{MWHS}{Micro-Wave Humidity Sounder}
+\makeacroif{MWS}{Micro-Wave Sounder}
+\makeacroif{SG}{Second Generation}
+\makeacroif{STAR}{Center for Satellite Applications and Research}
+\makeacroif{MIRS}{Microwave Integrated Retrieval System}
+\makeacroif{TIROS}{Television InfraRed Operational Satellite}
+\makeacroif{TOVS}{\protect\gls{TIROS} Operational Vertical Sounder}
+\makeacroif{ATOVS}{Advanced \protect\gls{TIROS} Operational Vertical Sounder}
+\makeacroif{AAPP}{Advanced \protect\gls{ATOVS} Processing Package}
+\makeacroif{POES}{Polar Orbiting Environmental Satellites}
+\makeacroif{NASA}{National Aeronautics and Space Administration}
+\makeacroif{HIRLAM}{High Resolution Local Area Modelling}
+\makeacroif{NWP}{Numerical Weather Prediction}
+\makeacroif{HARMONIE}{\protect\gls{HIRLAM} Aladin Regional/Mesoscale Operational \protect\gls{NWP} In Europe}
+\makeacroif{RTSP}{Radiative Transfer and Surface Properties}
+\makeacroif{WG}{Working Group}
+\makeacroif{ITWG}{International \protect\gls{TOVS} Working Group}
+\makeacroif{RDR}{Raw Data Record}
+\makeacroif{SDR}{Sensor Data Record}
+\makeacroif{CDR}{Climate Data Record}
+\makeacroif{VTPR}{Vertical Temperature Profile Radiometer}
+\makeacroif{DWD}{Deutsche Wetter-Dienst}
+\makeacroif{JPL}{Jet Propulsion Library}
+\makeacroif{SSU}{Stratospheric Sounding Unit}
+\makeacroif{C3VP}{Canadian CloudSat/CALIPSO Validation Project}
+\makeacroif{SNO}{Simultaneous Nadir Observation}
+\makeacroif{NRL}{Naval Research Laboratory}
+\makeacroif{DARDAR}{raDAR/liDAR}
+\makeacroif{CALIOP}{Cloud-Aerosol Lidar with Orthogonal Polarization}
+\makeacroif{VLIDORT}{Vectorized Linearized Discrete Ordinate Radiative Transfer}
+\makeacroif{DISORT}{Discrite Ordinate Radiative Transfer}
+\makeacroif{LMD}{Laboratoire de M\'{e}t\'{e}orologie Dynamique}
+\makeacroif{CLEX}{Cloud Layer EXperiment}
+\makeacroif{CSU}{Colorado State University}
+\makeacroif{IIR}{Imaging Infrared Radiometer}
+\makeacroif{EUMETSAT}{European Organisation for the Exploitation of Meteorological Satellites}
+\makeacroif{CM}{Climate Monitoring}
+\makeacroif{SAF}{Satellite Application Facility}
+\makeacroif{TWP}{Total Water Path}
+\makeacroif{LERMA}{Laboratoire d'Etude du Rayonnement et de la Mati\`ere en Astrophysique}
+\makeacroif{ITSC}{International \protect\gls{TOVS} Study Conference}
+\makeacroif{PSD}{Particle Size Distribution}
+\makeacroif{FASTEM}{Fast Emissivity (FIXME CHECK ACRONYM!)}
+\makeacroif{TELSEM}{A Tool to Estimate Land Surface Emissivities at Microwave}
+\makeacroif{RTTOV}{Radiative Transfer for \protect\gls{TOVS}}
+\makeacroif{ASG}{Atmospheric Scene Generator}
+\makeacroif{NICAM}{Nonhydrostatic ICosahedral Atmospheric Model}

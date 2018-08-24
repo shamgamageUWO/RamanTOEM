@@ -1,0 +1,220 @@
+%% LyX 2.1.2 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{scrreprt}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\setcounter{secnumdepth}{-2}
+\setcounter{tocdepth}{3}
+\usepackage{textcomp}
+\usepackage{url}
+\usepackage{amsmath}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter} 
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\title{ISMAR Retrieval Database}
+
+
+\author{Manfred Brath}
+
+\maketitle
+
+\section{Database description}
+
+The database consists of radiative transfer simulations of $1\text{D}$-atmospheric
+profiles made with ARTS 2.2%
+\footnote{ARTS 2.3 is still under strong development with a lot of changes,therefore
+the database will be defined according to ARTS 2.2%
+}. As the database should be the foundation of a retrieval, the database
+has to be consistent and self-standing, meaning each state of the
+database should be comparable with each other. So, following assumptions
+are made:
+\begin{itemize}
+\item All the different states of the database should be on common grids
+of pressure coordinates and looking direction.
+\item All states should have the same types of hydrometeors, hydrometeor
+sizes and shapes.
+\item All states should have the same spectral composition.
+\end{itemize}
+Therefore, the database has a static part with the grids, instrument
+and scatterer definitions and a variable part with the state variables
+changing for each case. So, the database consists of $6$ grids, $2$
+instrument description, $5$ descriptions for the scatterers and $13$
+state variables, which all will be described in the folowing parts.
+
+
+\subsection{Static part}
+
+
+\subsubsection*{Grids }
+\begin{itemize}
+\item $case\_index$, an index that names a specific case with a number.
+\item $pressure$, the vertical grid. It is as first try defined from $1000\,\textrm{hPa}$
+to $30\,\textrm{hPa}$ with $75$ logarithmic distributed steps. 
+\item $channel\_no$, the index of the channel, see table \ref{tab:Channel-definition}
+for the description.
+\item $looking\_direction$, the angular grid. It is as first try defined
+from $0\text{\textdegree}$ to $180\text{\textdegree}$ in steps of
+$5\text{\textdegree}$ ($37$ steps).
+\item $scattering\_element\_index$, an index that names a specific scattering\_element
+with a number.
+\item $polarization$, a four element grid stating the polarization state.
+The first component is the $I$-component, the second is the $Q$-component,
+the second is the $U$-component and the second is the $V$-component
+of the Stokes vector. 
+\end{itemize}
+
+\subsubsection*{Instrument description}
+\begin{itemize}
+\item $channel\_def\left(channel\_no\right)$, the channel description,
+it consists of the center frequencies, the offsets of the sidebands
+and the bandwidths, see table \ref{tab:Channel-definition}.
+\begin{table}
+\begin{centering}
+\begin{tabular}{c|r@{\extracolsep{0pt}.}l|r@{\extracolsep{0pt}.}l|r@{\extracolsep{0pt}.}l|c}
+ & \multicolumn{2}{c|}{Center fre- } & \multicolumn{2}{c|}{Side} & \multicolumn{2}{c|}{Band-} & \tabularnewline
+$channel\_no$ & \multicolumn{2}{c|}{quency {[}$\text{GHz}${]}} & \multicolumn{2}{c|}{bands {[}$\text{GHz}${]}} & \multicolumn{2}{c|}{widths {[}$\text{GHz}${]}} & Instrument\tabularnewline
+\hline 
+1 & 23&8 & $\ \pm$0&07 & $\negmedspace$0&127 & Deimos\tabularnewline
+\hline 
+2 & 50&1 & $\pm$0&08 & 0&082 & Deimos\tabularnewline
+\hline 
+3 & 89&0 & $\pm$1&1 & 0&65 & MARSS\tabularnewline
+\hline 
+4 & 118&75 & $\pm$1&1 & 0&4 & ISMAR\tabularnewline
+\hline 
+5 & $\ $118&75 & $\pm$1&5 & 0&4 & ISMAR\tabularnewline
+\hline 
+6 & 118&75 & $\pm$2&1 & 0&8 & ISMAR\tabularnewline
+\hline 
+7 & 118&75 & $\pm$3&0 & 1&0 & ISMAR\tabularnewline
+\hline 
+8 & 118&75 & $\pm$5&0 & 2&0 & ISMAR\tabularnewline
+\hline 
+9 & 157&05 & $\pm$2&6 & 2&6 & MARSS\tabularnewline
+\hline 
+10 & 183&31 & $\pm$1&0 & 0&45 & MARSS\tabularnewline
+\hline 
+11 & 183&31 & $\pm$3&0 & 1&0 & MARSS\tabularnewline
+\hline 
+12 & 183&31 & $\pm$7&0 & 2&0 & MARSS\tabularnewline
+\hline 
+13 & 243&20 & $\pm$2&5 & 3&0 & ISMAR\tabularnewline
+\hline 
+14 & 325&15 & $\pm$1&5 & 1&6 & ISMAR\tabularnewline
+\hline 
+15 & 325&15 & $\pm$3&5 & 2&4 & ISMAR\tabularnewline
+\hline 
+16 & 325&15 & $\pm$9&5 & 3&0 & ISMAR\tabularnewline
+\hline 
+17 & 424&70 & $\pm$1&0 & 0&4 & ISMAR\tabularnewline
+\hline 
+18 & 424&70 & $\pm$1&5 & 0&6 & ISMAR\tabularnewline
+\hline 
+19 & 424&70 & $\pm$4&0 & 1&0 & ISMAR\tabularnewline
+\hline 
+20 & 448&0 & $\pm$1&4 & 1&2 & ISMAR\tabularnewline
+\hline 
+21 & 448&0 & $\pm$3&0 & 2&0 & ISMAR\tabularnewline
+\hline 
+22 & 448&0 & $\pm$7&2 & 3&0 & ISMAR\tabularnewline
+\hline 
+23 & 664&0 & $\pm$4&2 & 3&0 & ISMAR\tabularnewline
+\hline 
+24 & 874&4 & $\pm$6&0 & 3&0 & ISMAR\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\protect\caption{\label{tab:Channel-definition}Channel description, taken from: \protect\url{http://www.sat.ltu.se/workshops/ismar/material/20140611_11_rule_ismar_overview.pdf}}
+\end{table}
+
+\item $calibration$, the used calibration, it is a string with either ``PlanckBT''
+or ``RayleighJeansBT'' indicating if the brightness temperature
+is calibrated using the Planck equation or using the Rayleigh-Jeans
+approximation. 
+\end{itemize}
+
+\subsubsection*{Scatterer descriptions}
+\begin{itemize}
+\item the properties of the scattering elements: 
+
+\begin{itemize}
+\item mass $\left[\text{kg}\right]$: $mass(scattering\_element\_index)$ 
+\item maximum dimension $\left[\text{m}\right]$:$dmax(scattering\_element\_index)$
+\item volume $\left[\text{m}^{3}\right]$:$volume(scattering\_element\_index)$ 
+\item type of scattering elemenent\\
+$scattering\_element\_type(scattering\_element\_index)$, an cell
+array with a tag for each $scattering\_element\_index$ according
+to the arts 2.2 method \textquotedbl{}ParticleSpeciesSet\textquotedbl{}
+\item shape of the scattering element\\
+$scattering\_element\_shape(scattering\_element\_index)$, an cell
+array with a stringe for each $scattering\_element\_index$ describing
+the shape.
+\end{itemize}
+\end{itemize}
+
+\subsection*{Variable part}
+
+
+\subsubsection*{State variables}
+\begin{itemize}
+\item the atmospheric data:
+
+\begin{itemize}
+\item temperature$\left[\text{K}\right]$: $temperature(case\_index,\, pressure)$ 
+\item altitude $\left[\text{m}\right]$:$atltitude(case\_index,\, pressure)$ 
+\item particle number density $\left[\text{m}^{-3}\right]$:\\
+ $pnd\_field(case\_index,\, pressure,\, scattering\_element\_index)$ 
+\item water vapor as volume mixing ratio $x\left(case\_index,\, pressure\right)$
+\item brightness temperature $\left[\text{K}\right]$:\\
+ $t\_b(case\_index,\, pressure,\, channel\_no,\, looking\_direction,\, polarization)$.
+It is calculated by using the Planck equation or using the Rayleigh-Jeans
+approximation, which is shown by the variable $calibration$. If the
+Rayleigh-Jeans approximation is used, the conversion from specific
+intensity to brightness temperature will be done seperately for each
+component and for each simulated frequency before the mapping to the
+channels will be done. If planck is used only the $I$ component will
+be converted to brightness temperature. The other components will
+be set to zero, because they are not defined for Planck brightness
+temperature. The mapping is done by taking the average brightness
+temperature of the frequencies belonging to the specific channel.
+\end{itemize}
+\item the surface properties 
+
+\begin{itemize}
+\item surface altitude~$\left[\text{m}\right]$: $surface\_altitude(case\_index)$
+\item surface temperature $\left[\text{K}\right]$: $surface\_temperature(case\_index)$ 
+\item surface type $surface\_type(case\_index)$, a cell array with a string
+defining the surface type of each $case\_index$. 
+\item surface reflectivity
+\[
+\begin{gathered}surface\_reflectivities(case\_index,\, channel\_no,\\
+\, looking\_direction,\, polarization,\, polarization)
+\end{gathered}
+\]
+the two last dimensions are the $4\times4$ reflection matrices for
+a four dimensional stokes vector with the above mentioned components
+\end{itemize}
+\item the simulated position in space and time 
+
+\begin{itemize}
+\item latittude $\left[\text{\textdegree}\right]$: $lat(case\_index)$ 
+\item longitude $\left[\text{\textdegree}\right]$: $lon(case\_index)$
+\item time $time(case\_index)$\end{itemize}
+\end{itemize}
+
+\end{document}

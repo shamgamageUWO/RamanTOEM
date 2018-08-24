@@ -1,0 +1,32 @@
+function data = satur(data, coeff)
+
+channels={'JH','JL'};
+
+
+for i=1:length(channels)
+    
+    nrmax=coeff.(channels{i}).coeffs.f*1e6;
+    disc=.5;
+    order=1;
+    
+    for j=1:length(data.(channels{i}).Photon.Time)
+        
+        S=data.(channels{i}).Photon.Signal(:,j);
+        shots=data.(channels{i}).Photon.Shots(j);
+        pulseT=data.(channels{i}).Photon.BinSize / 150; % in microseconds
+        
+        y = S / shots / pulseT;
+        x=nan(size(y));
+        
+        for k=1:length(y)
+            
+            x(k) = rootxexp(y(k),nrmax,disc,order);
+            
+        end
+        
+        data.(channels{i}).Photon.SignalDesaturated(:,j)=x;
+        
+    end
+    
+end
+

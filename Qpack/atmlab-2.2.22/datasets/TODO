@@ -1,0 +1,3 @@
+- Make a function find_dataset_range
+- Add epoch fields to all reader functions.
+- Add sensible defaults for sat depending on sensor

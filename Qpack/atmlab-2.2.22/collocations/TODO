@@ -1,0 +1,117 @@
+********************************
+* New style since January 2012 *
+********************************
+
+- In FieldCopier and FieldMultiInstrumentCopier, provide a way to store
+  index, pos, start, etc. for the new one. Maybe with some 'magic' in
+  read_granule or the actual readers?
+- Get new-fields when reading long period? Or force to store first?
+- For FieldCopier, be smart in long_name if possible
+- single 'CPR' super-dataset that knows in what actual datasets fields are
+  and reads the fields accordingly. Maybe in the same way can implement
+  different associated datasets as super-dataset?
+- Add some kind of checksum to check that read collocs are consistent with
+  collocs from the object as it was stored, a hash of some kind?
+- in CollocatedDataset.read, more advanced info-passing for associated-datasets where
+  fields to read are from, e.g. full structure with info per
+  field rather than cell array limiting associated-datasets to
+  check in the first place
+- For a Collapser, access to the AssociatedDatasets could be useful even
+  for global limitators?
+- the CachedData objects should also check if the ASsociatedDatasets are
+  the same
+
+- Port to new NetCDF interface
+
+- Unify strrep_variables and pos2re, also make more flexible, redesign?
+
+Memory issue: sometimes too many collocations with too many fields, all in
+double, needs solution.
+
+Fundamental solution: split over several files per day
+Postponing the problem: more memory-efficient
+    -> don't always double
+    -> don't duplicate/copy data
+
+- More portable way of collocating collocated datasets: get the output
+  from CollocatedDataset.read(...) for one day, put this in a structure as
+  expected by .reader(...), then make this a dynamic dataset
+
+- when finished, in old-style add small functions using new-style
+
+- handle properly when sibling is missing but core exists
+- write proper error message if duration is missing
+- write proper error message if input fieldcopier is bollocks
+- default granule duration?
+
+Fix:
+    - mhs/amsub
+    - bugs
+    
+BUGS:
+    - if the FieldCopier no prim. fields are asked, but prim. sibling
+      are, failing to read primary therefore data1.lat empty
+    - Why is cmoiwp starting time sometimes a minute later than the
+      corresponding MHS starting time?
+
+*********************************
+* Old style before January 2012 *
+*********************************
+
+DOCUMENTATION:
+
+- It appears the distinction between C_I/C_START is not entirely clear.
+  Document more clearly 1) how to get to the right datafile 2) how to get
+  to the right profile within this datafile
+
+BUGS
+
+- Sometimes, MSPPS starts the minute after the corresponding
+  MHS/AMSUB-granule. In the current implementation, near the end of
+  colloc_process_data_cpr_mhs, this is not accounted for. When this happens,
+  the MSPPS data is missed.
+- Bug-checking: sometimes H_INT and B_INT are both within 900 seconds, but
+  H_TIME-B_TIME is ~one day; error in hirs time calculation? Or artefact of
+  something from a long time ago? Can't reproduce.
+- HIRSCS, use scanline numbers for double-checking, rather than unique(...,
+  rows), that may be incomplete. At least check whether the latter is or isn't
+  incomplete.
+- In the collocations, I often add one second to the starting time so that it
+  doesn't get truncated to the wrong minute. This is stupid, I should have
+  rounded in the first place, and this should be corrected *in the
+  collocations*.
+
+WARTS
+- Currently, when processing CloudSat/MHS-collocations, I read the files for
+  AMSUA and HIRS twice: once when getting collocation info, once when getting
+  collocation data. This is not good.
+- In both collocate_date and collocate_granule, I predefine 'overlap', 'data'
+  and 'meandata' as empty matrices (0x0). This should actually be 0xwidth, so
+  that data as stored in the collocation files can always be vertically
+  concatenated, and I can get rid of the 'isempty'-test in collocation_read.
+- Optimise reading: collocate_date simply loops through every granule and does
+  collocate_granule, that means if two granules from sensor A collocate with
+  the same granule from sensor B (which they usually do), this one is read
+  twice. Bad, particularly for AVHRR where reading takes a long time.
+- When collocation poes/mhs or poes/amsub, mhs are amsub are really aliases.
+  This is now accomodated by a special case if-statement in collocate_granule.
+  This is ugly and needs to go.
+- In colloc_read_collocation_cpr_poes.m actually the meandata is read, just
+  because that's what I want when collocating with AVHRR; such a special case
+  is ugly and needs to go.
+- In colloc_process_data_cpr_mhs, move MSPPS reading to a specialised reading
+  function (add to colloc_config and all that) and use read_granule to read.
+
+WISHES
+- Add aliases for abbreviated satellite pairs, so that noaa15/N15 are the same
+  (particularly useful for hirscs).
+- Don't let CPR collocate with more than one MHS; only the closest one?
+- Don't let AVHRR collocate with more than one MHS; only the closest one?
+- Add many, many sat/sensor pairs to the firstline-database and to
+  read_granule.
+- Generalise the firstline-database. Add to atmlab-data?
+- (From Salomon, Ajil) When searching for collocations, permit the ability to
+  pass on fields to return on-the-fly.
+- Add an extensive testing suite.
+
+

@@ -1,0 +1,53 @@
+--- Atmlab people ---
+
+Some of the persons who have worked on Atmlab are listed below. 
+Otherwise, look in header of each individual file.
+This list is not exhaustive.
+
+Patrick Eriksson <patrick.eriksson@chalmers.se>
+---
+Initiated Atmlab. Made the little design there is.
+Contributed with functions of various kind.
+
+
+Oliver Lemke <olemke@ltu.se>
+---
+ARTS XML and NetCDF interface.
+Maintaining SVN repository and the mailing list.
+
+
+Salomon Eliasson <s.eliasson@ltu.se>
+---
+GMT plotting interface, 
+some other small functions
+
+
+Gerrit Holl <gerrit.holl@ltu.se>
+---
+Collocations, datasets, some small functions.
+
+
+Function sets have been imported made by these persons:
+
+Christian Mätzler <christian.matzler@iap.unibe.ch>
+---
+Mie scattering functions (ATMLAB/mie).
+
+
+Peter J. Acklam (pjacklam@online.no)
+---
+Time and date utilities (main part of (ATMLAB/time). 
+
+
+Philipp Berens (berens@tuebingen.mpg.de )
+---
+Circular statistics toolbox (main part of ATMLAB/circular).
+http://www.kyb.tuebingen.mpg.de/~berens/circStat.html
+Reference:
+P. Berens, CircStat: A Matlab Toolbox for Circular Statistics, Journal of
+Statistical Software, Volume 31, Issue 10, 2009
+http://www.jstatsoft.org/v31/i10
+
+Please cite this paper when the provided code is used. See licensing terms for
+details.
+

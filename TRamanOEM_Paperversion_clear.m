@@ -259,8 +259,8 @@ S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end))%DegF for Aerosol
 % % H = traditionalTraman_combined(Q);
 % T_an = interp1(Q.Zmes1,H.T_an,Q.Zret);
 % %  T_tr = interp1(Q.Zmes,H.T_dg,Q.Zret);
-   load('201109092330.mat');
-%   load('201109101130.mat');
+%    load('201109092330.mat');
+   load('201109101130.mat');
 % load('201107052359.mat');
  T_tr = interp1((Temp.z-2*491),Temp.profile,Q.Zret);
  T_reerror=interp1((Temp.z-2*491),Temp.relerr,Q.Zret);

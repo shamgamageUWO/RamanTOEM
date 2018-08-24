@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<arts format="ascii" version="1">
+<ArrayOfLineRecord version="ARTSCAT-3" nelem="1">
+@ O2-66 1.187503430e+11 0 2.941034e-19 300 0.00000e+00 14779.86 14479.76 0.71 0.71 296 0 1.000e+04 -1 20.0 20.0 -1 -1 -1 "    " " 1 1        " " 1 0        " "JPL" "JPL" "HITRAN" "HITRAN" "-"
+</ArrayOfLineRecord>
+</arts>

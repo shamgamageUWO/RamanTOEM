@@ -1,0 +1,9 @@
+For documentation on how to use this sub-system, see
+atmlab/documentation/collocations.pdf.
+
+The files in satreaders/ have the task to read a particular granule from a
+particular dataset and arrange it in a structure that contains at least lat,
+lon and time, where the number of rows in each three should be the same, and
+the number of columns in lat and lon should be equal, and the number of
+columns in time should be 1. This convention was initially designed for the
+portable use of collocation codes.

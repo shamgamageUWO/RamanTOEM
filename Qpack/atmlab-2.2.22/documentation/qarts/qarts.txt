@@ -1,0 +1,103 @@
+=========================== Qarts ===========================
+
+This is a stub to a (possible) future qarts user guide. The ambition so far is
+to document some basic features of qarts. Anyhow, qarts is mainly documented
+through the qinfo system, as described below, and by providing a number of
+"demos" found in the atmlab/demo folder.
+
+Qarts is primarily an interface to the ARTS forward model allowing to set-up
+arts calculations and exucute those calculations without leaving matlab. All
+settings to control the arts run go into a structure denoted as Q. Most fields
+of Q match directly an ARTS workspace variable (WSV) or agenda, beside that
+qarts fields are all written using uppercase letters. For example, Q.F_GRID
+matches the ARTS WSV f_grid. The qarts system contains a number of functions to
+help you setting the fields of Q. Remaining functions in qarts allow you to run
+arts in different ways. 
+
+The most basic intoduction to using qarts to make arts runs are provided by the
+qarts_demo and qarts_demo2 scripts, but see also all other demos named as
+qarts_xy...z_demo.
+
+Not all fields of Q are used directly in an arts run. The Q structure is
+designed to also hold information needed to perform an inversion of OEM type.
+To make full use of this option, you need to work directly with the function
+oem and this requires a rather special set up including calling arts_oem_init. 
+This type of calculations are demonstrated in arts_oem_demo. OEM retrievals of
+1D type are most simply performed by using the qpack2 system. Qpack2 is
+described seperately. 
+
+
+To list all fields of Q, type:
+>> qarts
+
+That is, to initialise a Q structure you do:
+>> Q = qarts;
+
+To get a short description of all fields:
+>> qinfo( @qarts )
+
+To get the description of a particular field, add the field name as second
+input argument, e.g.:
+>> qinfo( @qarts, 'F_GRID' )
+
+The symbol * is recognised as a wildcard in the field argument, e.g.:
+>> qinfo( @qarts, 'SENSOR*' )
+
+
+A few Q fields are structures with a number of fields:
+Q.BATCH
+Q.CLOUDBOX
+Q.SENSOR_RESPONSE
+These structures can be initialised by qartsBatch, qartsCloudbox and
+qartsSensor, respectively. These sub-structures are documented as the main Q,
+i.e. using qinfo. For example:
+>> qinfo( @qartsSensor )
+
+The options to set the Q fields vary between the fields. More basic variables
+must be assigned a value inside matlab, e.g.:
+>> Q.STOKES_DIM  = 2;
+>> Q.CLOUDBOX_DO = true;
+
+You can of course make of some function to set such (all other fields), e.g.:
+>> Q.STOKES_DIM = max( 1, 4*any(pnd_field>0) );
+
+
+For vectors and more complex variables, you have several options. As above,
+eg.:
+>> Q.Z_SURFACE = 100*rand(25,25);
+
+Or by giving the name of a file holding relevant data, e.g.:
+>> Q.Z_SURFACE = '/home/myname/dataexamples/z_surface.xml';
+
+You can also define control file text, that in the ARTS language should work as
+an include file. That is, a set of workspace method calls, embraced of 'Arts2{'
+and '}'. The text is given as an array of strings. One common application of
+this option: 
+>> Q.Z_SURFACE = { 'Arts2{', ...
+                   'Extract( z_surface, z_field, 0 )' , ...
+                   '}' };
+
+There exists a small help function that avoids specifying the start and end
+string:
+>> Q.Z_SURFACE = text2cfile( 'Extract( z_surface, z_field, 0 )' );
+
+
+For agenda variables, the only option is to give an array of strings. The
+content of the strings are inserted in the control file created without any
+formatting. You should not include the AgendaSet part. An example:
+>> Q.IY_SPACE_AGENDA = { 'Ignore(rtp_pos)', 'Ignore(rtp_los)', ...
+                         'MatrixCBR(iy,stokes_dim,f_grid)' };
+
+Please, note that for agendas there should be no 'Arts2{'.
+
+The pre-defined agenda templates can be used by just giving the name of the
+template to copy, on the condition that the name of the template includes '__'.
+For example:
+>> Q.PPATH_AGENDA = { 'ppath_agenda__FollowSensorLosPath' };
+
+The field descriptions obtained qinfo should make clear which setting
+option pattern that is used for each field.
+
+
+For further information on the general usage and examples on making using how
+the qarts functions, see the demonstration scripts mentioned above.

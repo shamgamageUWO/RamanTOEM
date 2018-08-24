@@ -1,0 +1,697 @@
+%
+% To start the document, use
+%  \chapter{...}
+% For lover level, sections use
+%  \section{...}
+%  \subsection{...}
+%
+\chapter{The art of developing ARTS}
+ \label{sec:development}
+
+%
+% Document history, format:
+%  \starthistory
+%    date1 & text .... \\
+%    date2 & text .... \\
+%    ....
+%  \stophistory
+%
+\starthistory
+  020425 & Stefan Buehler: Put this part back in the AUG. Updated.\\
+  000728 & Stefan Buehler: Added stuff about build system and howto cut a release. \\
+  000615 & Created by Stefan Buehler.\\
+\stophistory
+
+%
+% Symbol table, format:
+%  \startsymbols
+%    ... & \shortcode{...} & text ... \\
+%    ... & \shortcode{...} & text ... \\
+%    ....
+%  \stopsymbols
+%
+%
+
+%
+% Introduction
+%
+The aim of this section is to describe how the program is organized
+and to give detailed instructions how to make extensions. That means,
+it is addressed to the ARTS developers, not the users. If you only
+want to use ARTS, you should not need to read it. \textbf{But if you
+  want to make changes or additions, you should definitely read this
+  carefully, since it can safe you a lot of work to understand how
+  things are organized.}
+
+\section{Organization}
+%====================
+\label{sec:development:org}
+ 
+ARTS is written in C++ and uses the cross-platform, open-source build system
+CMake (\url{http://www.cmake.org/}). It is organized in a similar
+manner as most GNU packages. The top-level ARTS directory is either called
+\shortcode{arts} or \shortcode{arts-x.y}, where x.y is the release number. It
+contains various sub-directories, notably \shortcode{doc} for documentation,
+\shortcode{src} for the C++ source code, and \shortcode{aii} for the IDL
+interface. The document that you are reading right now, the ARTS Developer
+Guide, is located in \shortcode{doc/uguide}.
+
+There are two different versions of the ARTS package: The development
+version and the end-user version. Both contain the complete source
+code, the only difference is that the developers version also includes
+the SVN housekeeping data. If you want to join in the ARTS development
+(which we of course encourage you to do), you should write an email to
+the ARTS Development mailing list.
+Furthermore, for serious development work you need a computer running
+Unix, CMake, LaTeX, and the Doxygen program.  All
+this is freely and easily available on the Internet, and, what is
+more, all these tools are included in the standard Linux
+distributions like \href{http://www.ubuntu.com/}{\nolinkurl{Ubuntu}} or \href{http://www.opensuse.org/}{\nolinkurl{openSUSE}}.
+
+The end-user version contains everything that you need in order to
+compile and install ARTS in a fairly automatic manner. The only thing
+you should need is an ANSI-C++ compiler, and the CMake utility. Please
+see files \fileindex{arts/README} and \fileindex{arts/INSTALL} for
+installation instructions. We are developing with the GNU C++ compiler,
+no other compilers have been tried so far.
+
+\section{The ARTS build system}
+%============================
+
+As mentioned above, CMake is used to construct the ARTS
+build system. A good introduction to the CMake system can be found in:
+\begin{quote}
+  \url{http://www.cmake.org/cmake/project/about.html}
+\end{quote}
+Using this tool makes a lot of things very easy, but also some
+things slightly more complicated.
+
+%The most important thing to keep in mind is that an ARTS release
+%is not just a copy of the ARTS development tree. Instead there is a
+%special make target `dist' that you can use to cut a release. How this
+%is done in detail is described in Section \ref{sec:release}. Mostly,
+%the GNU tools are smart enough to figure out automatically what should
+%go into the release. However, this can be controlled by editing the
+%\fileindex{Makefile.am} files which can be found in almost all directories.
+
+The support for documentation other than info and man pages is not
+very good in the GNU system, so we had to use some tricks to make sure
+that the Doxygen automatic documentation and the User Guide work as they
+should. 
+
+\subsection{Configure options}
+%========================================
+
+Here are some interesting options for CMake:
+
+\begin{description}
+\item[\shortcode{-DCMAKE\_BUILD\_TYPE=Release}:] Removes '-g' from
+the compiler flags and includes \shortcode{\#define NDEBUG 1} in
+\fileindex{config.h}. The central switch to turn off all debugging
+features (index range checking for vectors, the trace facility,
+assertions,...). The default configuration \shortcode{RelWithDebInfo}
+turns on some optimizations and provides debugging information.
+
+\item[\shortcode{-DCMAKE\_BUILD\_TYPE=Debug}:] This switch turns off all
+optimizations. This should only be used if the default configuration
+makes debugging a certain problem difficult.
+
+\item[\shortcode{-DNO\_OPENMP=1}:] 
+Disables the generation of multi-threaded code. CMake tries to detect if the compiler supports OpenMP and enables it by default.
+
+\end{description}
+
+
+%\subsection{Adding directories or files}
+%%==================================
+%
+%If you add directories or just files, you have to make sure that they
+%also go into the distribution. In some cases (e.g., program source
+%code files) this is done automatically. But if you add any other kind
+%of file, for example a data or a documentation file, you have to edit
+%the \fileindex{Makefile.am} file in that directory to make sure that your
+%stuff goes into the distribution. It is a good idea to always check
+%the release in order to see if the things you added are really there.
+
+\section{Conventions}
+%===================
+\label{sec:development:conv}
+
+Here are some general rules for ARTS programming:
+
+\subsection{Numeric types} Never use \shortcode{float} or
+\shortcode{double} explicitly, use the type \typeindex{Numeric} instead.
+This is set by CMake (to \shortcode{double} by default).
+In the same way, use \typeindex{Index} for all integers. It can take on
+positive or negative values and defaults to \shortcode{long}.
+To change the default types, run \shortcode{cmake} with the options
+\shortcode{-DINDEX=long} or \shortcode{-DNUMERIC=double}:
+
+\begin{code}
+cmake -DINDEX=int --DNUMERIC=float ..
+\end{code}
+
+Note that changing the numeric type to a lower precision type than
+double might have unforseen impacts on the numerical precision and could
+lead to wrong results. In a similar way, reducing the index type can
+make it impossible to handle larger Vectors, Matrices or Tensors. The
+maximum range of the index type determines the maximum number of
+elements the container types can handle.
+
+\subsection{Container types} Use \builtindoc{Vector} and
+\builtindoc{Matrix} for mathematical vectors and matrices (with elements
+of type \builtindoc{Numeric}). Use \shortcode{Array<something>} to
+create an array of \shortcode{something}s.
+Commonly used Arrays have been predefined, they have names like
+\builtindoc{ArrayOfString}, \builtindoc{ArrayOfMatrix}, and so forth.
+
+\subsection{Terminology}
+Calculations are carried out in the so called workspace (WS), on
+workspace variables (WSVs). A WSV is for example the variable
+containing the absorption coefficients. The WSVs are manipulated by 
+workspace methods (WSMs). The WSMs to use are specified in the
+controlfile in the same order in which they will be
+executed. 
+
+\subsection{Global variables}
+   Are not visible by default. To use them you have to declare them
+   like this:
+   \begin{quote}
+   \shortcode{extern const Numeric PI;}
+   \end{quote}
+   which will make the global constant PI=3.14... available. Other important globals are:
+
+   \begin{quote}
+   \begin{tabular}{ll}
+   \shortcode{full\_name}&         Full name of the program, including version.\\
+   \shortcode{parameters}&        All command line parameters.\\
+   \shortcode{basename}&          Used to construct output file names.\\
+   \shortcode{out\_path}&          Output path.\\
+   \shortcode{messages}&          Controls the verbosity level.\\
+   \shortcode{wsv\_data}&          WSV lookup data.\\
+   \shortcode{wsv\_group\_names}&   Lookup table for the names of \emph{types} of WSVs.\\
+   \shortcode{WsvMap}&            The map associated with \shortcode{wsv\_data}. \\
+   \shortcode{md\_data}&           WSM lookup data.\\
+   \shortcode{MdMap}&             The map associated with \shortcode{md\_data}. \\
+   \shortcode{workspace}&         The workspace itself.\\
+   \shortcode{species\_data}&      Lookup information for spectroscopic species.\\
+   \shortcode{SpeciesMap}&        The map associated with \shortcode{species\_data}.
+   \end{tabular}
+   \end{quote}
+   The only exception from this rule are the output streams \shortcode{out0} to
+   \shortcode{out3}, which are visible by default.
+
+\subsection{Files}
+Always use the \shortcode{open\_output\_file} and \shortcode{open\_input\_file}
+functions to open files. This switches on exceptions, so that any
+error occurring later on with this file will result in an
+exception. (Currently not really implemented in the GNU compiler,
+but please use it anyway.)
+
+\subsection{Version numbers} 
+The package version number is set in the \fileindex{ChangeLog} file in the
+top level ARTS directory. Always increase this when you do a SVN
+commit, even for small changes. In such cases increase the last digit
+by one. If you make a new distribution, increase the middle digit by
+one and omit the last digit. If you make a bug-fix distribution, you
+can add the last digit to indicate this. 
+
+\subsection{Header files} 
+The global header file \fileindex{arts.h} \emph{must} be included by every
+file. Apart from that you have to see yourself what header files you
+need. If you use functions from the C or C++ standard library, you
+have to also include the appropriate header file.
+
+\subsection{Documentation}
+Doxygen is used to generate automatic source code documentation. See
+\begin{quote}
+  \url{http://www.stack.nl/\~dimitri/doxygen/}
+\end{quote}
+for information. There is a complete User manual there. At the moment
+we only generate the output as HTML, although latex, man-page, and rtf
+format is also possible. The HTML version is particularly useful for
+source code browsing, since it includes the complete source code! You
+should add Doxygen headers to the following:
+
+\begin{enumerate}
+\item Files
+\item Classes (Including all private and public members)
+\item Functions
+\item Global Variables
+\end{enumerate}
+
+The documentation headers are comment blocks that look like the
+examples below. They should be put above the \emph{definition} of a
+function, i.e., in the \shortcode{.cc} file.  Some functions are defined in
+the \shortcode{.h} file (e.g., inline member functions). In that case the
+comment can be put in the \shortcode{.h} file.
+
+There is an Emacs package (Doxymacs) that makes the insertion of
+documentation headers particularly easy. You can find documentation of
+this on the Doxymacs webpage: \url{http://doxymacs.sourceforge.net/}.
+To use it for ARTS (provided you have it), put the following in your
+Emacs initialization file:
+
+\begin{code}
+(require 'doxymacs)
+
+(setq doxymacs-doxygen-style "Qt")
+
+(defun my-doxymacs-font-lock-hook ()
+  (if (or (eq major-mode 'c-mode) (eq major-mode 'c++-mode))
+      (progn
+        (doxymacs-font-lock)
+        (doxymacs-mode))))
+
+(add-hook 'font-lock-mode-hook 'my-doxymacs-font-lock-hook)
+
+(setq doxymacs-doxygen-root "../doc/doxygen/html/")
+(setq doxymacs-doxygen-tags "../doc/doxygen/arts.tag")
+\end{code}
+
+The only really important lines are the first two, where the second
+line is the one selecting the style of documentation. The next block
+just turns on syntax highlighting for the Doxygen headers, which looks
+nice. The last two lines are needed if you want to use the tag lookup
+features (see Doxymacs documentation if you want to find out what this
+is).  The package allows you to automatically insert headers. The
+standard key-bindings are:
+\begin{quote}
+\begin{tabularx}{.8\hsize}{@{}lX}
+\texttt{C-c d ?} & look up documentation for the symbol under the point.\\
+\texttt{C-c d r} & rescan your Doxygen tags file.\\
+\texttt{C-c d f} & insert a Doxygen comment for the next function.\\
+\texttt{C-c d i} & insert a Doxygen comment for the current file.\\
+\texttt{C-c d ;} & insert a Doxygen comment for a member variable on the current line (like M-;).\\
+\texttt{C-c d m} & insert a blank multi-line Doxygen comment.\\
+\texttt{C-c d s} & insert a blank single-line Doxygen comment.\\
+\texttt{C-c d @} & insert grouping comments around the current region.\\
+\end{tabularx}
+\end{quote}
+You can call the macros also by name, e.g., \shortcode{doxymacs-insert-file-comment}.
+
+\subsubsection{File comment}
+
+Generated by \shortcode{doxymacs-insert-file-comment}.
+
+\begin{code}
+/*!
+\file   dummy.cc
+\author John Doe <john.doe (at) example.com>
+\date   2011-03-02
+
+\brief  A dummy file.
+
+ This file has no purpose at all,
+ it just servers as an example... 
+*/
+\end{code}
+
+\subsubsection{Function comment}
+
+Generated by \shortcode{doxymacs-insert-function-comment}. If
+arguments are modified by the function you should add `[out]' after
+the \shortcode{\char`\\ param} command, just like for the parameter
+\shortcode{a} in the example below. If a parameter is both input and
+output, you should say `[in,out]'. Parameters that are passed by
+value or not modified inside the function should carry an `[in]'. The
+documentation for each parameter should start with a capital letter and
+end with a period, like in the example below.
+
+Author and date tags are not inserted by default, since they would be
+overkill if you have many small functions. However, you should include
+them for important functions. 
+
+\begin{code}
+//! A dummy function.
+/*! 
+ This function has no purpose at all,
+ it just serves as an example... 
+
+\param[out]     a This parameter is initialized by the
+                  function.
+\param[in,out]  b This parameter is modified by the function.
+\param[in]      c This parameter used but not changed by the function.
+
+\return   Dummy value computed from a and b.         
+*/
+int dummy(int& a, int& b, int c);
+\end{code}
+
+\subsubsection{Generic multi-line comment}
+
+Generated by \shortcode{doxymacs-insert-blank-multiline-comment}.
+
+\begin{code}
+//! A dummy comment.
+/*! 
+ Some more elaborate description about this variable, 
+ class, or whatever. 
+*/
+\end{code}
+
+\subsubsection{Generic single-line comment}
+
+Generated by \shortcode{doxymacs-insert-blank-singleline-comment}.
+
+\begin{code}
+//! Short comment here.
+\end{code}
+
+
+\section{Extending ARTS}
+%======================
+ \label{sec:development:extending}
+
+\subsection{How to add a workspace variable}
+%---------------------------------------
+
+You should read Section \ref{sec:agendas:wsvs} to understand what workspace
+variables are. Here is just the practical description how a new
+variable can be added.
+
+\begin{enumerate}
+\item Create a record entry in file \fileindex{workspace.cc}. (Just add
+  another one of the \shortcode{wsv\_data.push\_back} blocks.) Take the
+  already existing entries as templates. The ARTS concept works best
+  if WSVs are only of a rather limited number of different types, so
+  that generic WSMs can be used extensively, for example for IO.
+      
+  The name must be \emph{exactly} like you use it in the source code,
+  because this is used to generate interface functions.
+  
+  Make sure that the documentation string you give explains the
+  variable and its purpose well. \textbf{In particular, state the
+    dimensions (in the case of matrices) and the units!} This string
+  is used for the online documentation. Please take some time to write
+  it carefully. Use the template at the beginning of function
+  \shortcode{define\_wsv\_data()} in file \shortcode{workspace.cc} as a
+  guideline. 
+
+\item That's it!
+\end{enumerate}
+
+
+\subsection{How to add a workspace variable group}
+%--------------------------------------------
+
+You should read Section \ref{sec:agendas:wsvs} to understand what workspace
+variable groups are. Here is just the practical description how a new
+group can be added.
+
+\begin{enumerate}
+\item Add a \shortcode{wsv\_group\_names.push\_back("your\_type")} function to
+  the function \shortcode{define\_wsv\_group\_names()} in \fileindex{groups.cc}.
+  The name must be \emph{exactly} like you use it in the source code,
+  because this is used to generate interface functions.
+\item XML reading/writing routines are mandatory for each workspace variable
+  group. Two steps are necessary to add xml support for the new group:
+  \begin{enumerate}
+  \item Implement an \shortcode{xml\_read\_from\_stream}
+    and \shortcode{xml\_write\_to\_stream} function. Depending
+    on the type of the group the implementation goes into one
+    of the three files \fileindex{xml\_io\_basic\_types.cc},
+    \fileindex{xml\_io\_compound\_types.cc}, or
+    \fileindex{xml\_io\_array\_types.cc}. Basic types are for example Index
+    or Numeric. Compound types are structures and classes. And array types are
+    arrays of basic or compound types. Also add the function declaration in the
+    corresponding \shortcode{.h} file.
+  \item Add an explicit instantiation for
+    \shortcode{xml\_read\_from\_file<GROUP>} and
+    \shortcode{xml\_write\_to\_file<GROUP>} to \fileindex{xml\_io\_instantiation.h}.
+  \end{enumerate}
+\item If your new group does not implement the output operator
+  (\shortcode{operator<<}), you have to add an explicit implementation
+  of the \builtindoc{Print} function in \fileindex{m\_general.h} and
+  \fileindex{m\_general.cc}.
+\item That's it! (But as stated above, use this feature wisely)
+\end{enumerate}
+
+
+
+\subsection{How to add a workspace method}
+%-------------------------------------
+
+You should read Section \ref{sec:agendas:wsms} to understand what workspace
+methods are. Here is just the practical description how a new
+method can be added.
+
+\begin{enumerate}
+\item Create an entry in the function \funcindex{define\_md\_data} in file
+  \fileindex{methods.cc}.  (Make a copy of an existing entry (one of the
+  \shortcode{md\_data.push\_back(...)} blocks) and edit it to fit your new
+  method.) Don't forget the documentation string! Please refer to the
+  example at the beginning of the file to see how to format it.
+\item Run:
+  \shortcode{make}.
+\item Look in \fileindex{auto\_md.h}. There is a new function prototype
+  \begin{quote}
+    \shortcode{void <YourNewMethod>(...)}
+  \end{quote}
+\item Add your function to one of the \shortcode{.cc} files which contain method
+  functions. Such files must have names starting with \shortcode{m\_}. (See
+  separate HowTo if you want to create a new source file.) The header
+  of your function must be compatible with the prototype in \shortcode{auto\_md.h}.
+\item Check that everything looks nice by running 
+  \begin{quote}
+    \shortcode{arts -d YourNewMethod}
+  \end{quote}
+  If necessary, change the documentation string.
+
+\item Thats it!
+\end{enumerate}
+
+
+\subsection{How to add a source code file}
+%---------------------------------------
+\begin{enumerate}
+\item Create your file. Names of files containing workspace methods should
+  start with \shortcode{m\_}.
+\item You have to register your file in the file
+  \fileindex{src/CMakeLists.txt}. This file states which source files
+  are needed for arts. In the usual case, you just have to add your
+  \shortcode{.cc} file to the list of source files of the artscore
+  library. Header files are not added to this list.
+\item Go to \shortcode{src} and run: \shortcode{svn add <my\_file>} to
+  make your file known to SVN.
+\end{enumerate}
+
+
+\subsection{How to add a test case}
+%---------------------------------------
+\begin{enumerate}
+\item Tests are located in subdirectories in the \fileindex{controlfiles}
+  folder. Instrument specific test cases are in the
+  \fileindex{controlfiles/instruments} folder, all other cases are
+  located in the \fileindex{controlfiles/artscomponents} folder. Create
+  a new subdirectory in the appropriate folder. If your test is closely
+  related to another test case you can skip this step and instead add it
+  to one of the existing subdirectories.
+\item Create your own test controlfile. The filename should start
+  with \fileindex{Test} followed by the name
+  of the subdirectory it is located in, e.g.
+  \fileindex{controlfiles/artscomponents/doit/TestDOIT.arts}.
+
+  If the subdirectory contains more than one test controlfile,
+  append a short descriptive text to the end of the filename like
+  \fileindex{controlfiles/artscomponents/ montecarlo/TestMonteCarloGaussian.arts}.
+\item Copy all required input files into the subdirectory. Input data that is
+  shared among several test cases should be placed in
+  \fileindex{controlfiles/testdata}.
+\item Add an entry for your test case in
+  \fileindex{controlfiles/CMakeLists.txt}.
+\end{enumerate}
+
+
+\section{SVN issues}
+%======================
+ \label{sec:development:cvs}
+
+The arts project is controlled by Subversion. This section describes some
+basic SVN commands. For more information see the extensive SVN
+documentation:
+\begin{quote}
+  \url{http://svnbook.red-bean.com/}
+\end{quote}
+
+
+
+
+\subsection{How to check out arts}
+%-----------------------------
+\begin{enumerate}
+\item Go to a temporary directory.
+\item Run: \shortcode{svn co https://www.sat.ltu.se/svn/rt/arts/trunk arts}
+\end{enumerate}
+
+
+\subsection{How to update (if you already have a copy)}
+%--------------------------------------------------
+\begin{enumerate}
+\item Go to the top ARTS directory (called simply \shortcode{arts}).
+\item Run: \shortcode{svn update}
+   
+  \textbf{IMPORTANT!} Always update, before you start to make changes
+  to the program, especially after a longer pause. If you edit an
+  outdated copy, it will be a lot more work to bring your changes into
+  the current copy of the program.
+\end{enumerate}
+
+
+\subsection{How to commit your changes}
+%---------------------------------------
+\begin{enumerate}
+\item You should make sure that the program compiles and runs without
+  obvious errors before you commit.
+\item If you have created a new source file, make it known to SVN by
+  running the command \shortcode{svn add <my\_file>} in the directory where
+  the file resides.
+  
+  In general, when you run \shortcode{svn update}, it will warn you about
+  any files it doesn't know by marking them with a \shortcode{?}. Files
+  that are created during the compilation process, but should not be
+  part of the package are ignored by SVN. You can view the list of ignored
+  files for the current directory with \shortcode{svn propget svn:ignore .}.
+  The list can be edited with \shortcode{svn propedit svn:ignore .}.
+\item Have you added the documentation for your new features?
+\item Open the file \fileindex{ChangeLog} in the top level ARTS directory
+  with your favorite editor.
+  
+  With Emacs, you can very easily add an entry by typing either
+  \begin{quote}
+    \shortcode{M-x add-change-log-entry}
+  \end{quote}
+  or \shortcode{C-x 4 a}.
+  
+  Specify the new version number and describe your changes.
+
+  \textbf{These keystrokes work also while you are editing some other
+    file in Emacs. Thus it is best to write your ChangeLog entry
+    already while you work on a file}. Whenever you make a change to a
+  file, there should be a ChangeLog Entry!
+\item Make sure that you have saved all your files. Go to the top
+  level ARTS directory and run: \shortcode{svn commit}.
+\item This will pop up an editor. Use the mouse to cut and paste the
+  ChangeLog message also to this editor window. Safe the file and exit
+  the editor. If you made changes in different directories, another
+  editor will pop up, already containing your message. Save again and
+  exit. Do this until no more editors come up. (Note: This works well
+  if you set
+  \begin{quote}
+    \shortcode{export EDITOR=xedit}
+  \end{quote}
+  in your shell startup file.
+ 
+  With smart editors there can be problems, because they might
+  refuse to safe your file if you haven't made changes to it. With
+  xedit you just have to push the save button twice to override.
+\item Tell the other developers about it. The best way to do this is
+  to send an email to \shortcode{arts-dev@www.sat.ltu.se}.
+\end{enumerate}
+
+
+% FIXME OLE
+%\subsection{How to cut a release}
+%%----------------------------
+%\label{sec:release}
+%\begin{enumerate}
+%\item Change the release number in the file \fileindex{configure.in} in the
+%  top-level ARTS directory. (The line that you have to change is the
+%  one with \shortcode{AM\_INIT\_AUTOMAKE}.) Omit the subversion number (last digit).
+%\item Commit your changes (see other howto). 
+%\item In the top-level ARTS directory, run \shortcode{autogen.sh}.
+%\item In the top-level ARTS directory, run \shortcode{make distcheck}. This
+%  will not only cut the release, but also immediately try to build
+%  it, to see if it works. Unless you are on a very fast machine, this
+%  may take a while. Maybe you should go and have a cup of coffee.
+%\item If all goes well, you can find the release inside the top-level
+%  ARTS directory as a file \fileindex{arts-x.y.tar.gz}, where x.y is the
+%  release number.
+%\item Check the release carefully by trying to build and install the
+%  program. 
+%\end{enumerate}
+
+
+\subsection{How to move your arts working directory}
+%----------------------------------------------
+
+In general it is no problem to move your working directory. Only when you are
+using a build directory that is located outside the ARTS source tree, you
+have rerun \shortcode{cmake PATHTOARTS} in that directory.
+
+\section{Debugging (use of assert)}
+%================================
+\label{sec:development:assert}
+ 
+The idea behind assert is simple. Suppose that at a certain point in
+your code, you expect two variables to be equal.  If this expectation
+is a precondition that must be satisfied in order for the subsequent
+code to execute correctly, you must assert it with a statement like
+this:
+\begin{quote}
+\shortcode{assert(var1 == var2);}
+\end{quote}
+
+In general assert takes as argument a boolean expression. If the
+boolean expression is true, execution continues. Otherwise the
+\shortcode{abort} system call is invoked and the program execution is
+stopped. If a bug prevents the precondition from being true, then you
+can trace the bug at the point where the precondition breaks down
+instead of further down in execution or not at all.  The \shortcode{assert} call
+is implemented as a C preprocessor macro, so it can be enabled or
+disabled at will. 
+
+In ARTS, you don't have to do this manually, as long as your source file
+includes \shortcode{arts.h} either directly or indirectly. Instead, assertions
+are turned on and off with the global NDEBUG preprocessor macro, which is
+set or unset automatically by the \shortcode{cmake} build configuration.
+Assertions are enabled in the default \shortcode{cmake} build configuration
+(\shortcode{-DCMAKE\_BUILD\_TYPE=RelWithDebInfo}). They are turned off in the
+release configuration (\shortcode{-DCMAKE\_BUILD\_TYPE=Release}).
+
+If your program is stopped by an assertion failure, then the first
+thing you should do is to find out where the error happens. To do
+this, run the program under the GDB debugger. First invoke
+the debugger:
+\begin{quote}
+\shortcode{gdb arts}
+\end{quote}
+You have to give the full path to the ARTS executable.  Then set a
+breakpoint at the assertion failure:
+\begin{quote}
+  \shortcode{(gdb) break \_\_assert\_fail}
+\end{quote}
+(Note the two leading underscores!) Now run the program: 
+\begin{quote}
+  \shortcode{(gdb) run}
+\end{quote}
+
+Instead of just exiting, under the debugger the program will be paused
+when the assertion fails, and you will get back the debugger prompt.
+Now type:
+\begin{quote}
+  \shortcode{(gdb) where} 
+\end{quote}  
+to see where the assertion failure happened. You can use the
+\shortcode{print} command to look at the contents of variables and you
+can use the \shortcode{up} and \shortcode{down} commands to navigate
+the stack.  For more information, see the GDB documentation or type
+\shortcode{help} at the prompt of GDB.
+
+For ARTS, the assertion failures mostly happen inside the Tensor /
+Matrix / Vector package (usually because you triggered a range check
+error, i.e., you tried to read or write beyond array bounds). In this
+case the \shortcode{up} command of GDB is particularly useful. If you
+give this a couple of times you will finally end up in the part of
+your code that caused the error.
+
+Recommendation: In Emacs there is a special GDB mode. With this you
+can very conveniently step through your code.
+
+
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "uguide"
+%%% End: 

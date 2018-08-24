@@ -1,0 +1,33 @@
+INSTRUCTIONS FOR ATMLAB AUTHORS
+
+The top directory (where you find this file) shall only contain
+general information. The provided functions shall be placed in
+suitable sub-folder. If you think that your function really not fit
+into the topic of any existing sub-folder you are free to add a new
+sub-folder, but please select a name/topic of the new folder with
+care. Don't select a too broad subject as then it is not clear what
+functions you can expect to find in the folder. If you select a too
+narrow subject there is a chance that your function will be alone in
+the folder. An exception is of course if you make a complete set of
+functions for a particular purpose, when it makes sense to create a
+particular folder for your functions. You need to edit 
+atmlab/atmlab_init to include the new folder in the search path.
+
+Each function shall have a clear description, a header. You are
+recommended to use either the style used by MathWorks or the style
+described in examples/example_heading.m (you find an empty header in
+empty_header.m). The file example_heading.m contains also some hints
+regarding optional variables and how to set default variables. The two
+main options should be Matlab's *inputParser* and Atmlab's
+*funcinput*. 
+
+Follow the guidelines for atmlab functions, described in README, as
+far as possible.
+
+The changes done for each SVN commit shall be explained satisfactorily
+in ChangeLog. 
+
+Please join the atmlab-dev mailing list at
+https://www.sat.ltu.se/mailman/listinfo/atmlab-dev
+
+Patrick Eriksson, 2002-12-09   <patrick.eriksson@chalmers.se>

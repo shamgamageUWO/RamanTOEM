@@ -1,0 +1,98 @@
+
+
+t=datenum(2011,4,1):.5:datenum(2011,4,30,12,0,0);
+
+
+for i=1:length(t)
+    
+    try
+        ph=load(fullfile('C:','haa\RALMO\data\Temperature\photon',sprintf('Temp%s.mat',datestr(t(i),'yyyymmddHHMM'))));
+    catch
+        disp('photon failed')
+        ph=[];
+    end
+    
+    try
+        an=load(fullfile('C:','haa\RALMO\data\Temperature\analog',sprintf('Temp%s.mat',datestr(t(i),'yyyymmddHHMM'))));
+    catch
+        disp('an failed')
+        an=[];
+    end
+    
+    try
+        snd=get_sounding_from_files(datestr(t(i),'yyyymmddHHMMSS'),datestr(t(i),'yyyymmddHHMMSS'));
+    catch
+        disp('snd failed')
+        snd=[];
+    end
+    
+    try
+        S0=load(fullfile('C:','haa\RALMO\data\Temperature\photon',sprintf('S0%s.mat',datestr(t(i),'yyyymmddHHMM'))));
+    catch
+        disp('S0 failed')
+        S0=[];
+    end
+    
+    
+    clf
+    subplot(1,3,1)
+    hold on
+    
+    if isempty(snd.t)==0
+        plot(snd.T,snd.gph-491,'k')
+    else
+        plot(0,0,'k')
+    end
+    
+    if isempty(ph)==0
+        plot(ph.Temperature.profile,ph.Temperature.z,'b');
+    else
+        plot(0,0,'b')
+    end
+    
+    if isempty(an)==0
+        plot(an.Temperature.profile,an.Temperature.z,'r');
+    else
+        plot(0,0,'r')
+    end
+    
+%     ind=logical(mwr.tempro.t==t(i));
+%     plot(mwr.tempro.x(:,ind),mwr.tempro.z-491,'m')
+    
+    title(datestr(t(i),'yyyy-mm-dd HH:MM'));
+    ylim([0 10000])
+    xlim([220 320])
+    
+    subplot(1,3,2)
+    hold on
+    grid on
+    if isempty(S0)==0
+        plot(S0.S0.Channel(3).Range,S0.S0.Channel(3).Signal,'r')
+        plot(S0.S0.Channel(11).Range,S0.S0.Channel(11).Signal,'b')
+%         plot([1 10000],[14 14],'k--')
+    else
+        plot(0,0)
+    end
+    xlim([200 10000])
+    
+    subplot(1,3,3)
+    hold on
+    grid on
+    if isempty(S0)==0
+        plot(S0.S0.Channel(4).Range,S0.S0.Channel(4).Signal,'r')
+        plot(S0.S0.Channel(12).Range,S0.S0.Channel(12).Signal,'b')
+        plot([1 10000],[15 15],'k--')
+    else
+        plot(0,0)
+    end
+    xlim([200 10000])
+    
+    
+    input('ok?')
+    
+end
+
+
+
+
+

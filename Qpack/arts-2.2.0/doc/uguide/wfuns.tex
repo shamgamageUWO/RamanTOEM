@@ -1,0 +1,982 @@
+\chapter{Clear-sky Jacobians}
+ \label{sec:wfuns}
+
+ \starthistory
+ 110826 & First complete version by Patrick Eriksson.\\
+ \stophistory
+
+\graphicspath{{Figs/wfuns/}}
+
+
+Inversions of both OEM and Tikhonov type require that the Jacobian can be
+provided by the forward model \citep[see e.g.][]{eriksson:analy:00}. A
+retrieval characterisation following \citet{rodgers:90,rodgers:00} raises the
+same demand. A column of the Jacobian, \aWfnMtr{\SttVct}, is defined as
+\begin{equation}
+  \frac{\partial\MsrVct}{\partial\aSttElm{p}},
+  \label{eq:wfuns:ki}
+\end{equation}
+where \MsrVct\ is the vector of measurement data and \aSttElm{p}\ is one forward
+model (scalar) variable. See further Section~\ref{T-sec:formalism:wfuns} of
+\theory. The nomenclature of that section is also used here.
+
+The quantity in Eq.~\ref{eq:wfuns:ki} is in the atmospheric sounding
+community frequently denoted as a ``weighting function'', and accordingly
+\aWfnMtr{\SttVct} is called the weighting function matrix. In the documentation
+of ARTS both terms (Jacobian and weighting functions) are used. These names
+refer normally to \aWfnMtr{\SttVct}, the partial derivatives with respect to
+the variables to be retrieved, forming the state vector \SttVct. However, in
+the context of retrieval characterisation, the same matrix for the remaining
+model parameters is of equally high interest, denoted as \aWfnMtr{\FrwMdlVct}.
+In the same manner, the terms inversion and retrieval are used interchangeably.
+
+The main task of the user is to select which quantities that shall be
+retrieved, and to define the associated retrieval grids. These aspects must be
+considered for successful inversions, but are out of scope for this document.
+Beside for the most simple retrievals, it is further important to understand
+how the Jacobian is calculated. A practical point is the calculation speed,
+primarily determined if perturbations or analytical expressions are used
+(Sec.~\ref{sec:wfuns:intro}). The derivation of the different Jacobians
+involves some approximations due to theoretical and practical considerations.
+Such approximations can be accepted, if of low or moderate size, but will
+result in a slower convergence (the inversion will require more iterations).
+Due to these later aspects, and to meet the needs of more experienced users,
+this section is relatively detailed and contains a (high?) number of equations.
+
+This section is restricted to Jacobians for clear-sky conditions, i.e.\ to be
+applied outside the cloudbox. So far none of the scattering methods provide
+Jacobians. Sections \ref{sec:wfuns:intro}\,-\,\ref{sec:wfuns:basis} contain
+information of general character, while the available quantities are discussed
+in the remaining sections (Section~\ref{sec:wfuns:absspecies} and forward).
+
+
+
+\section{Introduction}
+%==============================================================================
+\label{sec:wfuns:intro}
+%
+There are two main approaches for calculating Jacobians, by analytical
+expressions and by perturbations. We start with the conceptually simplest one,
+but also the more inefficient approach.
+
+
+
+\subsection{Perturbations}
+%==============================================================================
+\label{sec:wfuns:pert}
+%
+The most straightforward method to determine the Jacobian is by perturbing the
+model parameter of concern. For example, the Jacobian corresponding to state
+variable $p$ can always be calculated as
+\begin{equation}
+  \aWfnMtr{\SttVct}^p = \frac{\FrwMdl(\SttVct+\Delta\SttElm\VctStl{e}^p,
+                      \FrwMdlVct)-\FrwMdl(\SttVct,\FrwMdlVct)} {\Delta\SttElm}
+ \label{eq:wfuns:perturb}
+\end{equation}
+where $(\SttVct,\FrwMdlVct)$ is the linearization state, $\VctStl{e}^p$ is a
+vector of zeros except for the $p$:th component that is unity, and
+$\Delta\SttElm$ is a small disturbance (but sufficiently large to avoid
+numerical instabilities).
+
+However, it is normally not needed to make a recalculation using the total
+forward model as the variables are either part of the atmospheric or the sensor
+state, but not both. In addition, in many cases it is possibly to find
+short-cuts. For example, the perturbed state can be approximated by an
+interpolation of existing data (such as for a perturbed zenith angle). Such
+short-cuts are discussed separately for each retrieval quantity.
+
+
+\subsection{Analytical expressions}
+%==============================================================================
+\label{sec:wfuns:anal}
+%
+For most atmospheric variables, such as species abundance, it is possible to
+derive an analytical expression for the Jacobians. This is advantageous because
+they result in faster and more accurate calculations. Such expressions are
+derived below. Some of the terms involved are calculated as a perturbation.
+This is partly a consequence of the flexibility of ARTS. The high-level
+radiative transfer methods (e.g.\ \builtindoc{iyEmissionStandard}) do not know
+how the low-level methods are defining all quantities, and a fixed analytical
+expression can not be used (see e.g.\ Sec.~\ref{sec:wfuns:atmtemp}). So, in
+practise, the calculations are ``semi-analytical''. 
+The analytical calculations are introduced in Sec.~\ref{sec:wfuns:atmvars}. 
+
+
+\subsection{Workspace variables and methods}
+%==============================================================================
+\label{sec:wfuns:wsm}
+%
+As a workspace variable, the complete Jacobian is denoted as
+\wsvindex{jacobian}. Auxiliary information is provided by
+\wsvindex{jacobian\_quantities} and \wsvindex{jacobian\_indices}. The actual
+calculations are made as part of \builtindoc{yCalc}.
+
+The retrieval quantities are defined separately, before calling
+\builtindoc{yCalc}. This process is started by calling \wsmindex{jacobianInit}.
+The retrieval quantities are then introduced through workspace methods named as
+jacobianAdd{\it Something}. For example, for atmospheric temperature the method
+is \builtindoc{jacobianAddTemperature}. It does not matter in which order these
+``add methods'' are called.
+
+The definition of retrieval quantities is finalised by calling
+\wsmindex{jacobianClose}. To disable the calculation of the Jacobian, skip all
+above, and just use \wsmindex{jacobianOff}. The methods named jacobianCalc{\it
+  Something} shall never be used directly. Neither needs the user to consider
+\wsaindex{jacobian\_agenda}.
+
+The input to the ``add methods'' differs. In some cases you can select between
+the analytical and perturbation options. For all perturbation calculations you
+must specify the size of the perturbation. For atmospheric gases you can use
+different units. For atmospheric fields, and some other quantities, you must
+define the retrieval grid(s) to use.
+
+
+
+ 
+\section{Basis functions}
+%==============================================================================
+\label{sec:wfuns:basis}
+
+A forward model must use a discrete representation: it describes each quantity
+with one or several variables. This is unproblematic for quantities that are of
+discrete nature (including scalar variables). However, for atmospheric fields
+and other continuous model quantities, the discrete representation inside the
+forward model requires consideration. To avoid inconsistencies between model
+input and output it is important that the mapping from the discrete variables
+to the ``continuous view'' of the quantity is well defined, and applied
+consistently through the forward model . This mapping is given by the basis
+functions\index{basis function}. Similar arguments and nomenclature are found
+in \citet{read:thecl:06}.
+
+The basis functions are discussed explicitly in few places in this user guide,
+but it shall be noted that all interpolations imply an underlying set of basis
+functions. On the other hand, an understanding of both the derivation and the
+obtained Jacobians require direct consideration of the basis functions. ARTS
+operates with two types of basis functions.
+
+
+
+
+\subsection{Basis functions for piece-wise linear quantities}
+\label{sec:wfuns:basis1}
+%
+To treat an one-dimensional quantity to be piece-wise linear, or to say that a
+linear interpolation shall be applied, are identical definitions. The basis
+functions matching this definition have triangular shape, sometimes denoted as
+``tenth functions''. Such functions are exemplified in
+Fig.~\ref{fig:wfuns:zbasis}, see also \citet{buehler:artst:05}.
+
+\begin{figure}[t]
+ \begin{center}
+  \includegraphics*[width=0.7\hsize]{fig_absbasis_z}
+  \caption{Examples on 1d basis functions for a vertical grid with a 1 km
+           spacing: \lsolid~30~km, \ldashed~31~km and \ldashdot~32~km.}
+  \label{fig:wfuns:zbasis}  
+ \end{center}
+\end{figure}
+
+In most cases, the quantity is considered to be undefined outside the end
+points of the grid. Hence, the basis function for a grid end point is then just
+``half a tenth''. The exception to this rule is retrieval grids of piece-wise
+linear variables. To avoid that retrieval grids must cover the complete
+atmosphere, end point values are assumed to be valid to the end of the
+atmosphere (or data range of concern). That is, the basis functions for end
+points of retrieval grids follow the tenth shape inside the grid range, and
+have a constant value of 1 outside. In terms of interpolation, this matches to
+allow extrapolation, the applying a ``nearest'' interpolation for positions
+outside the covered range (the end values are valid all the way to
+$\pm$infinity).
+The basis functions are defined likewise for higher dimensions, but the
+tenth functions are then 2D or 3D ``tenths''.
+
+
+
+
+\subsection{Polynomial basis functions}
+\label{sec:wfuns:basis2}
+%
+Some retrieval quantities are expressed using a polynomial basis. Sensor zenith
+angle pointing off-set is one such quantity. The off-set is then treated to
+have a polynomial variation as a function of time. If the offset is assumed to
+be constant in time, a zero order polynomial shall be selected. If there is
+also a linear drift with time, use a first order polynomial, etc.
+
+For these basis functions, the explanatory variable (time in the example above)
+is normalised to cover the range [-1,1], here denoted as $z$, and the
+continuous representation ($f$) of the variable of concern can be written as
+\begin{equation}
+  f(z) = \aSttElm{0} + \aSttElm{1}(z-b_1) + \aSttElm{2}(z^2-b_2) + 
+                     \aSttElm{3}(z^3-b_3) + \aSttElm{4}(z^3-b_4) + \dots  
+\end{equation}
+where $\aSttElm{0}, \aSttElm{1}, \dots$ are the coefficients to be retrieved
+(elements of \SttVct). The interpretation of a retrieval is simplified if the
+average of $f$ equals \aSttElm{p0}, and the scalars $b_1, b_2, \dots$ are
+selected, schematically, as
+\begin{equation}
+  0 = \int_{-1}^1 \!\left(z^n-b_n\right) \, \DiffD z, \quad n>0.
+\end{equation}
+According to this expression, $b_n$ is zero for odd $n$. However, $z$ is in
+practise a discrete variable ($z_i$, not necessarily symmetric around 0), and
+$b_n$ is taken as the average of $z_i^n$: all $b_n$ can be non-zero. The
+normalisation of $z$ is not only made for interpretation reasons, it can be
+required for pure numerical reasons, such as when $z$ represent frequency (in
+Hz).
+
+In practise, the basis functions are vectors, denoted below as $\VctStl{z}_i$.
+Element $j$ of $\VctStl{z}_i$ is
+\begin{equation}
+  \VctStl{z}_i(j) = z(j)^i - b_i.
+\end{equation}
+
+
+
+
+\section{Atmospheric variables, common expressions}
+%==============================================================================
+\label{sec:wfuns:atmvars}
+%
+The analytically-oriented calculation procedure to obtain the Jacobian for
+atmospheric quantities is here outlined. The expressions are based on the
+chain rule, and can be applied for absorption constituents, atmospheric
+temperatures and winds. It is important to notice that only local effects are
+considered, and the expressions have limitations, as discussed below in
+Sec.~\ref{sec:wfuns:atmvars:limit}.
+
+
+\subsection{Matrix derivatives}
+\label{sec:wfuns:atmvars:matder}
+%
+Some of the expressions of this section treat derivatives involving vectors
+and matrices. Such derivatives must be handled with some care, the standard
+calculation rules do not always apply. The basic relationships used here
+are\footnote{See e.g.\ \url{en.wikipedia.org/wiki/Matrix_calculus}.}
+\begin{eqnarray}
+  \frac{\PartD\VctStl{a}}{\PartD\VctStl{a}} &=& 
+    \IdnMtr, \\
+  \frac{\PartD(\MtrStl{A}\VctStl{b})}{\PartD\VctStl{a}} &=& 
+    \MtrStl{A}\frac{\PartD\VctStl{b}}{\PartD\VctStl{a}}, \quad\quad
+    \mathrm{when}\ \MtrStl{A}\ \mathrm{independent\ of}\ \VctStl{a},\\
+  \frac{\PartD(\VctStl{b}+\VctStl{c})}{\PartD\VctStl{a}} &=& 
+    \frac{\PartD\VctStl{b}}{\PartD\VctStl{a}}+
+    \frac{\PartD\VctStl{c}}{\PartD\VctStl{a}},
+\end{eqnarray}
+where \VctStl{a}, \VctStl{b}\ and \VctStl{c}\ are vectors, and \MtrStl{A}\ is a
+matrix.
+
+Matrix exponential derivatives can not be expressed analytically in a general
+manner, but some cases can be handled. If two matrices \MtrStl{A}\ and
+\MtrStl{B}\ are commutative, i.e. $\MtrStl{A}\MtrStl{B}=\MtrStl{B}\MtrStl{A}$,
+then the following is valid \citep{Dattorro2011}\footnote{Available at
+  \url{https://ccrma.stanford.edu/~dattorro/mybook.html}.}
+\begin{equation}
+  \label{eq:expmder}
+  \frac{\PartD}{\PartD t} e^{t\MtrStl{A}+\MtrStl{B}} = 
+       \MtrStl{A}e^{t\MtrStl{A}+\MtrStl{B}},
+\end{equation}
+where $t$ is a scalar variable.
+The cases where \MtrStl{A}\ and \MtrStl{B}\ are commutative includes the
+situation where one of them is a scalar matrix (can be written as $a\IdnMtr$,
+i.e.\ diagonal with all non-zero elements equal).
+
+
+
+
+\subsection{Separation of terms}
+\label{sec:wfuns:atmvars:sepe}
+%
+The overall task is to calculate (Eq.~\ref{eq:wfuns:ki} with subscript $p$ left
+out)
+\begin{displaymath}
+  \frac{\PartD\MsrVct}{\PartD\SttElm}  
+\end{displaymath}
+where \SttElm\ is the element of $\SttVct$ for which we want to obtain the
+weighting function. This is a column of the complete weighting function matrix.
+
+A first step is to identify how sensor characteristics can be incorporated? To
+make the nomenclature simpler, we assume here that the simulations cover only a
+single measurement block and we have (cf.\ Eq.~\ref{eq:fm_defs:measseq})
+\begin{equation}
+  \MsrVct = \SnsMtr\aMpiVct{b}.
+  \label{eq:wfuns:Hi}
+\end{equation}
+We can then apply the chain-rule for a first time to obtain 
+\begin{equation}
+  \frac{\PartD\MsrVct}{\PartD\SttElm} = 
+  \frac{\PartD\MsrVct}{\PartD\aMpiVct{b}} 
+  \frac{\PartD\aMpiVct{b}}{\PartD\SttElm} = 
+  \SnsMtr \frac{\PartD\aMpiVct{b}}{\PartD\SttElm} = \SnsMtr\VctStl{k}_\MpiVct.
+  \label{eq:wfuns:Hk}
+\end{equation}
+Hence, sensor characteristics can be handled by calculating the weighting
+function column matching all monochromatic pencil beam calculation of the
+measurement block ($\VctStl{k}_\MpiVct$) and perform a multiplication with
+\SnsMtr, a parallel procedure compared to how \aMpiVct{b}\ is compiled to obtain
+\MsrVct. The calculation procedure expands to allow that the complete
+weighting function matrix (for quantities covered by the analytical calculation
+procedure) is calculated as
+\begin{equation}
+  \frac{\PartD\MsrVct}{\PartD\SttVct} = \SnsMtr\aWfnMtr{\MpiVct},
+  \label{eq:wfuns:HK}
+\end{equation}
+where $\aWfnMtr{\MpiVct} = \PartD\aMpiVct{b}/\PartD\SttVct$. One column of this
+matrix is $\VctStl{k}_\MpiVct$.
+
+The vector \aMpiVct{b}\ consists of a number of Stokes vectors appended,
+$\aMpiVct{b}=[\aStoVec{1}^T, \aStoVec{2}^T,\dots,\aStoVec{n}^T]^T$, and the
+calculation of $\VctStl{k}_\MpiVct$ can schematically be written as
+\begin{equation}
+  \VctStl{k}_\MpiVct = \sum_{j=1}^n \frac{\PartD\aMpiVct{b}}{\PartD\aStoVec{j}}
+    \frac{\PartD\aStoVec{j}}{\PartD\SttElm}
+  \label{eq:wfuns:kisum}
+\end{equation}
+The terms $\PartD\MpiVct/\PartD\aStoVec{j}$ are formally matrices. However,
+these matrices are not calculated explicitly as they only contain information
+on where \aStoVec{i}\ is stored inside \MpiVct. That is, these matrices are of
+bookkeeping character, consisting only of zeros and ones. In practice, results
+matching $\PartD\aStoVec{j}/\PartD\SttElm$ are simply inserted in correct place
+of $\VctStl{k}_\MpiVct$, mimicking how is \aStoVec{i}\ put into \MpiVct.
+
+Accordingly, the core task is to calculate $\PartD\aStoVec{j}/\PartD\SttElm$,
+where for simplicity the subscript $j$ is dropped below. This calculation is
+expanded as
+\begin{equation}
+  \frac{\PartD\StoVec}{\PartD\SttElm} = \sum_{i=1}^n
+    \frac{\PartD\StoVec}{\PartD\aSttElm{i}}
+    \frac{\PartD\aSttElm{i}}{\PartD\SttElm},
+\end{equation}
+where \aSttElm{i}\ is the value of the quantity of concern, at each point of
+the propagation path. That is, $i$ indexes the path points. The actual
+radiative transfer enters by the terms $\PartD\StoVec/\PartD\aSttElm{i}$, and
+they are discussed separately below.
+
+The term $\PartD\aSttElm{i}/\PartD\SttElm$ appears due to the fact that
+\aSttElm{i}\ and \SttElm\ are placed at different positions, and the
+representation of the atmospheric fields must be considered here. In practise,
+the term is calculated as the value of the basis function for \SttElm\ at the
+location of \aSttElm{i}\ (further discussed in \citet{buehler:artst:05}). This
+is a slight approximation with respect to the goal of fully incorporating the
+piece-wise linear representation in the weighting functions
+\citep{buehler:artst:05}. A low value of $\Delta\aPpathLng{i}$ decreases the
+degree of approximation.
+
+It can be noted that $\PartD\aSttElm{i} / \PartD\SttElm$ is normally non-zero
+for more than one element of \SttVct. The exception is if the positions of
+\aSttElm{i}\ and \SttElm\ are identical. Reversely, the weighting function for
+element \SttElm\ can have contributions from several propagation path points
+(\aSttElm{i}), as well as from several radiance spectra. Accordingly, the
+practical calculations are done by first determine all
+$\PartD\StoVec/\PartD\aSttElm{i}$, of the given propagation path. These data
+are then used to determine $\PartD\StoVec/\PartD\SttVct$, for the retrieval
+quantity of concern. That is, each $\PartD\StoVec/\PartD\aSttElm{i}$ is
+combined with $\PartD\aSttElm{i}/\PartD\SttElm$ for all elements of \SttVct.
+Most of these combinations yield a zero result. The terms
+$\PartD\aSttElm{i}/\PartD\SttElm$ are determined with help of ARTS' internal
+interpolation grid position routines.
+
+
+
+\subsection{$\PartD\StoVec/\PartD\aSttElm{i}$, general 
+case}
+\label{sec:wfuns:atmvars:gene}
+%
+The term $\PartD\StoVec/\PartD\aSttElm{i}$ is here outlined for the general case
+of vector radiative transfer. In this case, the Stokes elements can not be
+treated separately, and matrix-vector notation is required. The final Stokes
+vector obtained through Eq.~\ref{eq:fm_defs:vrte_step} can be expressed as
+\begin{equation}
+  \label{eq:s4J}
+  \StoVec = \StoVec' + \TrnMat' \left[ \aTrnMat{i} \aStoVec{i} +
+         (\IdnMtr-\aTrnMat{i})\bar{\EmsVec}_i \right],
+\end{equation}
+where $\StoVec'$ is the Stokes vector for all emission generated between the
+sensor and point $i+1$, $\TrnMat'$ is the transmission Mueller matrix for the
+same part of the propagation path and \aTrnMat{i} is defined in
+Eq.~\ref{eq:rte:transmat}. The quantities $\StoVec'$, $\TrnMat'$ and
+\aStoVec{i}\ are not function of \aSttElm{i}. This gives
+\begin{equation}
+  \frac{\PartD\StoVec}{\PartD\aSttElm{i}} = \TrnMat'
+  \left[
+    \frac{\PartD\aTrnMat{i}}{\PartD\aSttElm{i}}
+      \left( \aStoVec{i}-\bar{\EmsVec}_i \right) +
+    \left( \IdnMtr-\aTrnMat{i} \right) 
+      \frac{\PartD\bar{\EmsVec}_i}{\PartD\aSttElm{i}}
+  \right].
+  \label{eq:wfuns:dsdxi1}
+\end{equation}
+The terms $\PartD\aTrnMat{i}/\PartD\aSttElm{i}$ and
+$\PartD\bar{\EmsVec}_i/\PartD\aSttElm{i}$ are both calculated in a pure
+numerical manner, for different reasons discussed below.
+
+
+\subsection{Including the surface}
+%
+For scattered down-welling radiation the effective transmission matrix is
+\begin{equation}
+  \TrnMat' = \aTrnMat{2}\MtrStl{R}_i\aTrnMat{1},
+  \label{eq:wfuns:surface}
+\end{equation}
+where \aTrnMat{2}\ is the transmission between the surface and the sensor,
+$\MtrStl{R}_i$ is defined in Eq.~\ref{eq:fm_defs:surfacerefl} and
+\aTrnMat{1}\ is the transmission between the point $i+1$ and the surface.
+
+
+
+\subsection{$\PartD\StoVec/\PartD\aSttElm{i}$, locally unpolarised absorption}
+\label{sec:wfuns:atmvars:unpol}
+%
+Eq.~\ref{eq:wfuns:dsdxi1} can be simplified for some conditions. A first case
+is scalar radiative transfer, i.e. only the first element of the Stokes vector
+is considered and all terms of Eq.~\ref{eq:wfuns:dsdxi1} are scalar quantities.
+For all other cases, in principle vector radiative transfer must be performed,
+as $\TrnMat'$ can always have off-diagonal elements. Even if atmospheric
+absorption is totally unpolarised, $\TrnMat'$ can be non-diagonal due to the
+surface (Eq.~\ref{eq:wfuns:surface}). However, if the absorption locally lacks
+polarisation, the calculations can be handled by analytical expressions in a
+higher degree.
+
+To focus on the analytical expressions dealing with local radiative transfer
+effects, let us write Eq.~\ref{eq:s4J} as
+\begin{equation}
+  \StoVec = \StoVec' + \TrnMat'\aStoVec{s}.
+\end{equation}
+In the nomenclature of Eq.~\ref{eq:fm_defs:vrte_step},
+$\aStoVec{s}=\aStoVec{i+1}$ (but would be confusing to here use \aStoVec{i+1}).
+Hence
+\begin{displaymath}
+  \frac{\PartD\StoVec}{\PartD\aSttElm{i}} = \TrnMat'
+    \frac{\PartD\aStoVec{s}}{\PartD\aSttElm{i}}.
+\end{displaymath}
+The first element of \aStoVec{s}, \StoI, can be written as (cf.\
+Eq.~\ref{eq:fm_defs:rte_step})
+\begin{equation}
+  \label{eq:I4J}
+  \StoI = e^{-\aOth{i}}\aStoI{i} + (1-e^{-\aOth{i}})\bar{\Planck}_i.
+\end{equation}
+By again using the chain rule, the derivative of \StoI\ with respect to
+\aSttElm{i}\ can be written as
+\begin{equation}
+  \frac{\PartD\StoI}{\PartD\aSttElm{i}} =
+  \frac{\PartD\StoI}{\PartD\aOth{i}}\frac{\PartD\aOth{i}}{\PartD\aSttElm{i}} + 
+  \frac{\PartD\StoI}{\PartD\bar{\Planck}_i}
+  \frac{\PartD\bar{\Planck}_i}{\PartD\aSttElm{i}} = 
+   e^{-\aOth{i}}\frac{\PartD\aOth{i}}{\PartD\aSttElm{i}}
+      (\bar{\Planck}_i-\aStoI{i}) +
+  (1-e^{-\aOth{i}})\frac{\PartD\bar{\Planck}_i}{\PartD\aSttElm{i}}.
+  \label{eq:wfuns:dsdxi2}
+\end{equation}
+The two remaining derivatives $\PartD\aOth{i}/\PartD\aSttElm{i}$ and
+$\PartD\bar{\Planck}_i/\PartD\aSttElm{i}$
+depend on the quantity considered, and are discussed further below.
+
+For higher Stokes components of \aStoVec{s}, or in general if emission is
+totally ignored, Eq.~\ref{eq:I4J} is simplified to (here exemplified for the
+second Stokes element, \StoQ)
+\begin{equation}
+  \label{eq:Q4J}
+  \StoQ = e^{-\aOth{i}}\aStoQ{i},
+\end{equation}
+and the chain rule expression is correspondingly shorter:
+\begin{equation}
+  \frac{\PartD\StoQ}{\PartD\aSttElm{i}} =
+   -e^{-\aOth{i}}
+   \frac{\PartD\aOth{i}}{\PartD\aSttElm{i}}\aStoQ{i}.
+  \label{eq:wfuns:dsdxi3}
+\end{equation}
+
+
+\subsection{Limitations}
+\label{sec:wfuns:atmvars:limit}
+%
+A constraint for the analytical expressions above is that the effect of the
+variable must only be local. Main examples on non-local effects should occur
+through hydrostatic equilibrium and refraction. Significant impact of a gas
+through these mechanisms should only be found for water vapour in the lower
+troposphere, but is a general concern for temperature as discussed in
+Sec.~\ref{sec:wfuns:atmtemp}.
+
+
+
+
+
+\section{Absorption species}
+%==============================================================================
+\label{sec:wfuns:absspecies}
+
+\subsection{Common practicalities}
+%
+To obtain the Jacobian for absorption species, use
+\wsmindex{jacobianAddAbsSpecies}. The method handles one species at the time.
+The calculations can either be done in in ``analytical'' or ``perturbation''
+manner. For gases, weighting functions (WFs) can be provided for several units
+of the gas abundance:
+\begin{description}
+\item[vmr] Volume mixing ratio (a value between 0 and 1). The WF divided by
+  $10^6$ corresponds to that 1 ppm of the gas is added to the atmospheric
+  volume of concern.
+\item[nd] Number density. The WF corresponds here to that one molecule is added.
+\item[rel] Relative/fractional change. In a perfectly linear case, the WF
+  corresponds here to that the gas amount is doubled.
+\item[logrel] This option returns the same WFs as ``rel'', but is included to
+  flag that the natural logarithm of the ``rel'' unit is retrieved.
+\end{description}
+For the ``rel'' and ``logrel'' options it is important to note that ARTS
+calculate the WFs with respect to the given state, ARTS does not know anything
+about the actual reference state for which the ``rel'' unit is valid (where
+normally the a priori state is selected). For iterative inversions, a rescaling
+of the WFs provided by ARTS is likely needed, to make the WFs valid with
+respect to the (original) reference state. For the assumption made inside ARTS,
+the WFs for ``rel'' and ``logrel'' are identical.
+
+A second main consideration is to select the retrieval grids. For analytical
+calculations there are no other selections to be made. 
+
+
+\subsection{Perturbation calculations}
+%
+For pure numerical calculations, also the size of the perturbation must be
+specified ($\Delta\SttElm$ in Eq.~\ref{eq:wfuns:perturb}). The perturbation
+shall given following the unit selected. The same value is applied for all WFs
+(which can cause practical problems \dots).
+
+
+\subsection{Analytical expressions}
+%
+If not made clear above, the only term that differs between the Jacobian
+quantities is $\PartD\StoVec/\PartD\aSttElm{i}$.
+
+\subsubsection{Unpolarised absorption}
+%
+
+The term $\PartD\bar{\Planck}_i/\PartD\aSttElm{i}$ of Eq.~\ref{eq:wfuns:dsdxi2}
+is zero and the chain rule expression reduces to
+\begin{equation}
+  \frac{\PartD\StoI}{\PartD\aSttElm{i}} =
+   e^{-\aOth{i}}\frac{\PartD\aOth{i}}{\PartD\aSttElm{i}}
+      (\bar{\Planck}_i-\aStoI{i})  
+\end{equation}
+The absorption coefficient at point $i$, \aAbsCoef{i}, is here written as
+\begin{equation}
+  \label{eq:wfuns:crossec1}
+  \aAbsCoef{i} = \aSttElm{i}\sigma_i + \aAbsCoef{i}^o,
+\end{equation}
+where $\sigma_i$ is the absorption cross-section for the species (at point $i$
+and in a unit matching the unit of \SttElm), and $\aAbsCoef{i}^o$ covers the
+summed absorption of all other atmospheric constituents. Considering
+Eq.~\ref{eq:taustep}, the derivative of \aOth{i}\ with respect to \aSttElm{i}\
+is then 
+\begin{equation}
+  \frac{\PartD\aOth{i}}{\PartD\aSttElm{i}} = 
+  \frac{\PartD\aOth{i}}{\PartD\aAbsCoef{i}} 
+  \frac{\PartD\aAbsCoef{i}}{\PartD\aSttElm{i}} = 
+    \frac{\Delta\aPpathLng{i}}{2}\sigma_i.
+\end{equation}
+
+%For clarity and efficiency reasons, the following nomenclature is used in the
+%source code:
+%\begin{eqnarray}
+%  X &=& \Trn' \aTrn{i}\frac{\Delta\aPpathLng{i}}{2}, \\
+%  Y &=& \frac{\PartD\StoI}{\PartD\aTrn{i}}
+%        \frac{\PartD\aTrn{i}}{\PartD\aOth{i}}
+%       \frac{\PartD\aOth{i}}{\PartD\aAbsCoef{i}}
+%    \qquad \left( = -X(\aStoI{i}-\bar{\Planck}_i) \right).
+%\end{eqnarray}
+%The expressions above are implemented in \wsmindex{iyEmissionStandard}.
+%
+%For higher Stokes elements, Eq.~\ref{eq:chainrule1q} is followed. Calculation
+%time can be saved by reusing the $X$-term derived for the first Stokes element:
+%\begin{equation}
+%  \frac{\PartD\StoQ}{\PartD\aTrn{i}}
+% \frac{\PartD\aTrn{i}}{\PartD\aOth{i}}
+%  \frac{\PartD\aOth{i}}{\PartD\aAbsCoef{i}}
+%    = -X \aStoI{i}.
+%\end{equation}
+%This expression is used for Stokes element 2 to 4 in
+%\wsmindex{iyEmissionStandard} and for all components in
+%\wsmindex{iyTransmissionStandard}.
+
+
+\subsubsection{General case}
+%
+So far, the term $\PartD\aTrnMat{i}/\PartD\aSttElm{i}$ is only estimated by
+performing a small perturbation, of the absorption associated with the species
+to be retrieved.
+
+However, there exists a potential to use an analytical expression, as discussed
+below, but this is left for future consideration. The relationship between
+\aSttElm{i}\ and the propagation matrix of the path step can be written as
+\begin{equation}
+  \bar{\ExtMat}_i = \frac{\aSttElm{i}\MtrStl{C}_i+
+                      \aSttElm{i+1}\MtrStl{C}_{i+1}}{2} + \bar{\ExtMat}_i^o,
+\end{equation}
+where \MtrStl{C}\ can be seen as a matrix absorption cross-section
+(corresponding to $\sigma$ in Eq.~\ref{eq:wfuns:crossec1}) and
+$\bar{\ExtMat}_i^o$ is the propagation matrix summed for all other atmospheric
+constituents. 
+On the condition that Eq.~\ref{eq:expmder} is valid, we have that
+\begin{equation}
+  \frac{\PartD\aTrnMat{i}}{\PartD\aSttElm{i}} = 
+  \frac{\PartD}{\PartD\aSttElm{i}} 
+  e^{-\Delta\aPpathLng{i}\left(\frac{\aSttElm{i}\MtrStl{C}_i+
+            \aSttElm{i+1}\MtrStl{C}_{i+1}}{2} + \bar{\ExtMat}_i^o \right)} =
+  \frac{-\Delta\aPpathLng{i}}{2} \MtrStl{C}_i\aTrnMat{i}.
+  \label{eq:wfuns:vec:dsdxi}
+\end{equation}
+The question is when Eq.~\ref{eq:wfuns:vec:dsdxi} can be applied? We have three
+main cases:
+\begin{itemize}
+\item The equation is valid as long as the species to be retrieved has
+  unpolarised absorption. This as $\MtrStl{C}_i$ and $\MtrStl{C}_{i+1}$ can
+  then both be written as $\sigma_i\IdnMtr$, and
+  $(\aSttElm{i}\MtrStl{C}_i+\aSttElm{i+1}\MtrStl{C}_{i+1})/2$ is commutative
+  with any $\bar{\ExtMat}_i^o$.
+\item Eq.~\ref{eq:wfuns:vec:dsdxi} is not valid when all three matrices
+  involved ($\bar{\ExtMat}_i^o$ and the two \MtrStl{C}-matrices) have
+  off-diagonal elements on the same time. However, this is is unlikely case.
+  The main causes to polarised absorption are free electrons, Zeeman splitting
+  and particles, and these mechanisms are mainly found in the ionosphere,
+  mesosphere and troposphere, respectively.
+\item The remaining case is when $\bar{\ExtMat}_i^o$ is diagonal but the
+  species to be retrieved has polarised absorption. The likely situation is
+  that both $\MtrStl{C}_i$ and $\MtrStl{C}_{i+1}$ are non-diagonal on the same
+  time, and the condition of Eq.~\ref{eq:expmder} is not fulfilled. However, as
+  argued below, Eq.~\ref{eq:wfuns:vec:dsdxi} should still be approximately
+  valid, and this is used as ``working hypothesis'' in ARTS.
+\end{itemize}
+An alternative way to express the propagation matrix is
+\begin{displaymath}
+  \bar{\ExtMat}_i = \frac{\aSttElm{i}+\aSttElm{i+1}}{2}\bar{\MtrStl{C}}_i + 
+   \bar{\ExtMat}_i^o,   
+\end{displaymath}
+with
+\begin{displaymath}
+  \bar{\MtrStl{C}}_i = \frac{\MtrStl{C}_i+\MtrStl{C}_{i+1}}{2}.   
+\end{displaymath}
+With this formulation even the third case above would be handled, as we now
+only have two matrices to consider (and $\bar{\MtrStl{C}}_i$ is commutative
+with a diagonal $\bar{\ExtMat}_i^o$) . We would then have
+\begin{displaymath}
+  \frac{\PartD\aTrnMat{i}}{\PartD\aSttElm{i}} =  
+  \frac{-\Delta\aPpathLng{i}}{2} \bar{\MtrStl{C}}_i \aTrnMat{i}.    
+\end{displaymath}
+As $\MtrStl{C}_i$ and $\MtrStl{C}_{i+1}$ are (very) similar matrices (and then
+also close to $\bar{\MtrStl{C}}_i)$, the practical difference between this
+equation and Eq.~\ref{eq:wfuns:vec:dsdxi} should be small. Or reversely,
+Eq.~\ref{eq:wfuns:vec:dsdxi} should be approximately correct as $\MtrStl{C}_i$
+and $\MtrStl{C}_{i+1}$ are close to identical matrices.
+
+
+
+\section{Winds}
+%==============================================================================
+\label{sec:wfuns:winds}
+%
+Calculation of wind weighting functions are triggered by
+\wsmindex{jacobianAddWind}. Each wind component (see Sec.~\ref{sec:winds:defs})
+is treated as an individual retrieval variable. That is, if you want to
+retrieve all three wind components, \builtindoc{jacobianAddWind} must be called
+three times. Only the analytically inclined calculation approach is at hand
+for winds.
+
+Theoretically, the Doppler shift induced by winds affects the emission source
+term ($\bar{\Planck}_i$, in the scalar case), but this impact is extremely small
+and the related terms are ignored. This gives a case basically identical to the
+one above for absorption species. The only difference is that also the term
+$\PartD\aAbsCoef{i}/\PartD\aSttElm{i}$ is obtained in a pure numerical manner,
+by recalculating the absorption coefficient with the wind perturbed slightly.
+
+
+
+
+
+\section{Atmospheric temperatures}
+%==============================================================================
+\label{sec:wfuns:atmtemp}
+
+\subsection{Common practicalities}
+%
+To obtain WFs for absorption species, use \wsmindex{jacobianAddTemperature}.
+The calculations can either be done in ``analytical'' or ``perturbation''
+manner. Retrieval grids must be specified.
+
+A special consideration for temperature is hydrostatic equilibrium. If effects
+originating in hydrostatic equilibrium shall be included in the WFs, or
+not, is selected by an argument denoted as \verb|hse|. A full account of
+hydrostatic equilibrium is possible for perturbation calculations, while the
+analytical approach only treats the local effect (see further below).
+
+
+\subsection{Perturbation calculations}
+%
+The size of the perturbation must be selected (in K).
+Complete radiative transfer calculations are done after perturbing the
+temperature field. Hence, all possible effects are included, such as changed
+propagation paths through the impact of temperature on the refractive index.
+Please, note that hydrostatic equilibrium comes in during the perturbation. If
+\verb|hse| is set to ``on'', also \builtindoc{z\_field} is recalculated as part
+of the temperature perturbation (Section~\ref{sec:fm_defs:hse}). If set to
+``off'', there is no change of \builtindoc{z\_field}. That is, you must make an
+active choice regarding hydrostatic equilibrium, while others effects are
+included automatically.
+
+
+\subsection{Analytical expressions}
+%
+\subsubsection{Unpolarised absorption}
+%
+Compared to atmospheric species, the expressions become here more complex as
+temperature also affects the propagation path length ($\Delta \aPpathLng{i}$)
+and the emission source term ($\bar{\Planck}_i$). Accordingly, all terms of
+Eq.~\ref{eq:wfuns:dsdxi2} are relevant, and the expansion of
+$\PartD\aOth{i}/\PartD\aSttElm{i}$ generates additional terms
+\begin{equation}
+  \frac{\PartD\StoI}{\PartD\aSttElm{i}} =
+   e^{-\aOth{i}}\left[
+      \frac{\PartD\aOth{i}}{\PartD\aAbsCoef{i}}
+      \frac{\PartD\aAbsCoef{i}}{\PartD\aSttElm{i}} + 
+      \frac{\PartD\aOth{i}}{\PartD\Delta\aPpathLng{i}}
+     \frac{\PartD\Delta\aPpathLng{i}}{\PartD\aSttElm{i}}
+  \right](\bar{\Planck}_i-\aStoI{i})+
+  (1-e^{-\aOth{i}})\frac{\PartD\bar{\Planck}_i}{\PartD\aSttElm{i}}.  
+\end{equation}
+Terms part of expressions found above are not discussed separately here. The
+term, $\PartD\Delta\aPpathLng{i}/\PartD\aSttElm{i}$, originates in the
+constrain of hydrostatic equilibrium, and is set to zero when \verb|hse| 
+is set to ``off''. Otherwise it is set as derived below.
+The term $\PartD\aAbsCoef{i}/\PartD\aSttElm{i}$ is calculated in a pure
+numerical manner, by perturbing the temperature. Eq.~\ref{eq:taustep} gives
+\begin{equation}
+  \frac{\PartD \aOth{i}}{\PartD \Delta \aPpathLng{i}} = 
+  \frac{\aAbsCoef{i}+\aAbsCoef{i+1}}{2}. 
+\end{equation}
+The path length ($\Delta \aPpathLng{i}$), for a given pressure, is linearly
+proportional to the temperature, and if $\bar{\Tmp}$ is the average temperature
+along the path step:
+\begin{equation}
+  \frac{\PartD \Delta \aPpathLng{i}}{\PartD \bar{\Tmp}} =   
+                                    \frac{\Delta \aPpathLng{i}}{\bar{\Tmp}}.
+  \label{eq:wfuns:ddldtbar}
+\end{equation}
+Following the other variables, we set $\bar{\Tmp}=(\aTmp{i}+\aTmp{i+1})/2$, and
+\begin{equation}
+  \frac{\PartD \Delta \aPpathLng{i}}{\PartD\aSttElm{i}} = 
+                                    \frac{\Delta \aPpathLng{i}}{2\aTmp{i}}.
+  \label{eq:wfuns:ddldti}
+\end{equation}
+In summary (assuming \verb|hse| set to ``on''):
+\begin{equation}
+  \frac{\PartD\StoI}{\PartD\aSttElm{i}} =
+   e^{-\aOth{i}}\frac{\Delta \aPpathLng{i}}{2}\left[
+      \frac{\PartD\aAbsCoef{i}}{\PartD\aSttElm{i}} + 
+  \frac{\aAbsCoef{i}+\aAbsCoef{i+1}}{2\aTmp{i}}
+  \right](\bar{\Planck}_i-\aStoI{i})+
+  (1-e^{-\aOth{i}})\frac{\PartD\bar{\Planck}_i}{\PartD\aSttElm{i}}.  
+\end{equation}
+The derivative of the Planck function ($\PartD\Planck/\PartD\aSttElm{i}$) can
+be expressed analytically \citep{eriksson:studi:02}, but as \Planck\ is
+provided by an agenda related terms must anyhow be determined in a pure
+numerical manner. For example, if the Rayleigh-Jeans approximation is for some
+reason applied ($\Planck=\Tmp$) the term is just 1.
+
+The expression for higher Stokes elements, or if emission is totally ignored,
+is obtained by setting $\bar{\Planck}_i$
+(and $\PartD\bar{\Planck}_i/\PartD\aSttElm{i}$) to zero.
+
+
+\subsubsection{General case}
+%
+The term $\PartD\aTrnMat{i}/\PartD\aSttElm{i}$ is calculated in a pure
+numerical manner. This is done in two steps. In the first step, the
+transmission matrix is recalculated for a slightly perturbed temperature. If
+hydrostatic equilibrium is considered, the transmission is also recalculated
+with a disturbed $\Delta \aPpathLng{i}$. To avoid making two identical disturbances of
+the transmission matrix, these calculations are performed as
+\begin{displaymath}
+  \frac{\PartD\aTrnMat{i}}{\PartD\aSttElm{i}} = 
+  \frac{\PartD\aTrnMat{i}}{\PartD\bar{\Tmp}}\frac{\bar{\Tmp}}{2\aTmp{i}},
+\end{displaymath}
+a relationship that follows from Eqs.~\ref{eq:wfuns:ddldtbar} and \ref{eq:wfuns:ddldti}.
+
+
+
+\subsubsection{Hydrostatic equilibrium and limitations}
+%
+A changed temperature has non-local effects, originating from refraction and
+hydrostatic equilibrium. The expressions above ignore totally refraction
+effects. 
+
+As  mentioned,  if \verb|hse|  is  set  to  ``off'',  the term  $\PartD  \Delta
+\aPpathLng{i}/\PartD\aSttElm{i}$  is set  to  zero. That  is,  the path  length
+through the layer is not affected  by a temperature change. With \verb|hse| set
+to ``on'', the complete expressions above are used.
+
+If this treatment of hydrostatic equilibrium is sufficient or not depends on
+the observation geometry. It should be insufficient for limb sounding,
+where changes even at altitudes below the tangent point can have an influence
+as the geometrical altitudes of all higher layers is changed through
+hydrostatic equilibrium.  However, this effect vanishes for
+ground-based observations at zenith and satellite measurements at nadir, giving
+a full account of hydrostatic equilibrium even with the analytical expressions.
+In practise it should be possible to apply the expressions outside zenith and
+nadir, as long as the observations are of ``up'' or ``down-ward'' type. The
+same applies to measurements from inside the atmosphere, (e.g.\ aircraft ones),
+if the reference pressure for hydrostatic equilibrium (\builtindoc{p\_hse}) is
+matched to the pressure of the observation point.
+
+
+
+
+
+\section{Sensor pointing}
+%==============================================================================
+\label{sec:wfuns:sensorpointing}
+
+The term ``sensor pointing'' refers to deviations between nominal and
+actual viewing direction of the sensor. So far, only deviations in zenith angle
+can be considered. The workspace method to initiate such Jacobians is
+\wsmindex{jacobianAddPointingZa}.
+
+The pointing deviation is treated as a time varying variable, then having a
+polynomial variation. hence, the basis functions described in
+Section~\ref{sec:wfuns:basis2} are applied. The time is taken from
+\wsvindex{sensor\_time}. If the pointing error is assumed to be constant with
+time, the polynomial order to select is 0, and so on. As a special case, the
+polynomial order -1 signifies here that the pointing off-set is so highly
+varying that an off-set must be assigned to each spectrum
+(sometime called ``pointing jitter'').
+
+The Jacobian can be calculated in two manners:
+\begin{description}
+\item[recalc] If this option is selected, radiative transfer calculations are
+  performed for a shift of \builtindoc{sensor\_los} (perturbation size selected
+  by \verb|dza|). Only a ``one-sided'' perturbation is applied.
+\item[interp] The Jacobian is derived from existing data, by an interpolation
+  of existing data. This achieved by interpolating pencil beam data to a
+  shifted zenith angle grid. This will involve some extrapolation of the data,
+  and this aspect should be considered when selecting
+  \builtindoc{mblock\_za\_grid}. The average of a positive and negative shift
+  is determined. The shift to apply (\verb|dza|) should be smaller than the
+  minimum spacing of \builtindoc{mblock\_za\_grid} for accurate results. As
+  interpolation is a relative fast operation and a ``double-sided'' disturbance
+  is used, this option should in general be preferred.
+\end{description}
+
+
+
+
+\section{Sensor frequencies}
+%==============================================================================
+\label{sec:wfuns:sensorfreq}
+
+This class of Jacobians treats deviations between nominal and actually recorded
+frequencies. Such differences can originate in several ways, but the exact
+origin can normally be ignored and the effect can be modelled as the backend
+(spectrometer, filter bank \dots) channels are shifted from their nominal
+position. The workspace methods to define such Jacobians are
+\wsmindex{jacobianAddFreqShift} and \wsmindex{jacobianAddFreqStretch}. These
+Jacobians can so far only be determined by applying an interpolation of existing
+monochromatic data, then shifted \verb|df| from the nominal
+values.
+
+The methods treat either the ``shift'' or ``stretch'' effects. This follows
+standard nomenclature. A ``shift'' is an off-set that is of the same size for
+all backend channels. That is, if only a shift is assumed, the nominal
+distances between the channels are assumed to be valid. The ``stretch'' term
+considers the distance between the channels. For a backend with all channels
+equally spaced, a stretch signifies that the spacing deviates from the nominal
+value (but all channels still equally spaced). More generally, a stretch means
+that the deviation from the nominal channel position increases linearly from
+the middle point of the backend. In terms of the basis functions
+Section~\ref{sec:wfuns:basis2}, shift and stretch correspond to polynomial
+order 0 and 1.
+
+Both frequency shift and stretch can be assumed to be time varying, where
+exactly the same polynomial approach as for pointing is applied. This
+including the case of setting the order to -1.
+
+
+
+
+\section{Polynomial baseline fit}
+%==============================================================================
+\label{sec:wfuns:polyfit}
+
+A ``baseline'' is microwave jargon for a disturbance of the spectrum that is
+not covered by the common sensor characteristics. The most common case is that
+the local oscillator signal leaks into the measurement by reflections occurring
+inside the sensor, causing a pattern in the spectrum of standing-wave type.
+Such effects are difficult to model in a physical manner, and a more general
+fitting procedure must be applied. A common option is then to model the
+baseline as a polynomial, of a specified order. That is, assuming a measurement
+giving a single spectrum, the measured spectrum \MsrVct\ is modelled as
+\begin{equation}
+  \label{eq:polyfit}
+  \MsrVct = \MsrVct' + \sum_{i=0}^n \aSttElm{i}\VctStl{z}_i,
+\end{equation}
+where $\MsrVct'$ is the ``baseline free'' spectrum, and \aSttElm{i}\ and
+$\VctStl{z}_i$ are introduced in Section~\ref{sec:wfuns:basis2}.
+
+The Jacobian for such baseline models are obtained by
+\wsmindex{jacobianAddPolyfit}. For single spectra measurements, the only
+consideration is the polynomial order to use. For measurements where several
+spectra are appended to form the measurement vector, the default option is that
+baseline can vary between all spectra. In some cases, it could be assumed that
+the baseline is common between data for different polarisations, viewing
+directions or measurement blocks, and flags can be set to mimic such
+assumptions.
+
+For a given set of retrieved \aSttElm{i}, the simplest way to determine the
+estimated baseline is to perform a multiplication between the relevant parts of
+the Jacobian and the state vector:
+\begin{equation}
+  \aWfnMtr{p}\aSttVct{p},
+  \label{eq:bline:recreate}
+\end{equation}
+where $p$ indicates the $n+1$ columns/elements corresponding to \aSttElm{i}.
+
+
+\section{Sinusoidal baseline fit}
+%==============================================================================
+\label{sec:wfuns:sinefit}
+
+If the baseline has components of sinusoidal character there is also a second
+option, provided the method \wsmindex{jacobianAddSinefit}. The baseline is
+in this method modelled as \citep{kuntz:97}
+\begin{equation}
+  \label{eq:sinefit}
+  \MsrVct = \MsrVct' + \sum_{i=1}^n 
+       a_i\sin\left(\frac{2\pi(\Frq-\aFrq{1})}{l_i}\right)+
+       b_i\cos\left(\frac{2\pi(\Frq-\aFrq{1})}{l_i}\right)
+\end{equation}
+where $a_i$ and $b_i$ are the coefficients to be retrieved, \Frq\ is frequency,
+\aFrq{i} is a reference frequency and $l_i$ is period length. The reference
+frequency (\aFrq{i}) is in practice taken as the first frequency of the
+spectrometer. 
+
+The period lengths ($l_i$) are user input. For each given period length, the
+corresponding sine and cosine terms are included in the Jacobian. As for the
+polynomial fit, there exist options to set the baseline to be common between
+different polarisations, viewing directions or measurement blocks.
+Equation~\ref{eq:bline:recreate} is also applicable for sinusoidal baseline
+fits.
+
+An alternative way to express the expression above is
+\begin{equation}
+  \label{eq:sinefit2}
+  \MsrVct = \MsrVct' + \sum_{i=1}^n A_i
+             \sin\left(\frac{2\pi(\Frq-\aFrq{1})}{l_i} + \phi_i\right)
+\end{equation}
+where
+\begin{equation}
+  A_i = \sqrt{a_i^2+b_i^2}
+\end{equation}
+and
+\begin{equation}
+  \tan{\phi_i} = \frac{a_i}{b_i}.
+\end{equation}
+Equation~\ref{eq:sinefit} is used to define the weighting functions as this
+gives a linear retrieval problem, in contrast to if Equation~\ref{eq:sinefit2}
+would be used, that would require an iterative process to determine $A_i$
+and $\phi_i$.
+
+
+

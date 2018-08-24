@@ -1,0 +1,772 @@
+% For now, this is a seperate document.
+% However, if more components of Atmlab grow documentation in the future, this
+% may become part of a larger body of Atmlab documentation.
+%\documentclass[a4paper,10pt]{memoir}
+\documentclass[a4paper,10pt]{article}
+\usepackage{standalone}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{extsizes} % redundant with memoir
+\usepackage{natbib}
+\setcitestyle{authoryear,round,semicolon}
+\usepackage{paralist}
+\usepackage[colorlinks=true,allcolors=black]{hyperref}
+\usepackage[style=index, acronym]{glossaries}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{textcomp}
+\usepackage{siunitx}
+\sisetup{seperr,repeatunits=false}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.5}
+%\usetikzlibrary{arrows,positioning,backgrounds,fit,shapes,calc}
+%\usepgfplotslibrary{units}
+\hbadness=10000 % don't bother be about underfull hbox
+\vbadness=10000 % idem dito
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[english]{isodate}
+\usepackage{url}
+\usepackage{pgf-umlcd}
+\usepackage{listings}
+\lstset{language=Matlab}
+\makeglossaries
+\input{acronyms.tex}
+\newcommand{\methodused}[1]{{\bfseries #1}}
+\newcommand{\collocs}{Collocations Toolkit}
+
+\title{\collocs\ in Atmlab (version 2-1-273)}
+
+\date{\isodate\today}
+
+\author{Gerrit Holl}
+
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+\begin{document}
+%\pagenumbering{Roman}
+\maketitle
+%\newpage
+\tableofcontents
+%\newpage
+\listoffigures
+%\newpage
+\listoftables
+%\newpage
+\pagenumbering{arabic}
+
+\section{Introduction}
+
+A frequent task in analysis of geophysical data is the collocation in space
+and time between data from different datasets.
+For example, one might wish to collocate geolocated remote sensing measurements from
+spaceborne sensors with model output, or collocate measurements from different
+sensors with each other.
+Usually, someone develops code in his or her favourite programming language
+to tackle the collocation problem at hand.
+Depending on context, the problem can vary considerably in nature and in
+complexity.
+Nevertheless, many sub-problems occur in a wide variety of situations.
+Valuable time may be lost by people re-inventing the wheel over and over
+again.
+
+The \collocs\ is a set of classes and routines to easily
+handle collocations between an arbitrary pair of (satellite) datasets.
+It has been designed for user-friendly processing of long time series of data in a
+wide variety of situations.
+
+The toolkit is currently implemented in Matlab and is fully integrated with
+Atmlab, a package for atmospheric data analysis.
+It is available at a free license and is completely free of charge.
+
+Practical information on how to download the code can be found at
+\url{http://www.sat.ltu.se/projects/collocations/toolkit.php}.
+
+This is a technical document, and does not contain detailed information on
+algorithms used in the process of collocating.
+For information on the algorithms, please refer to the descriptions in the
+refereed articles \citet{holl10:_collocating_amt} and
+\citet{john12:_understanding_jgr}, and in my licentiate thesis
+\citep{holl11:_lic}.
+
+This is an introductory document.
+For full information on all classes and methods, please refer to the online
+documentation in Matlab (best accessed with the help browser, e.g.\
+type \lstinline!doc SatDataset! on the Matlab commandline).
+This also contains more examples than are provided in this document.
+
+\subsection{Overview of features}
+
+This subsection is a work in progress.
+
+\begin{itemize}
+\item Automatically take care of duplicates between subsequent granules
+through a database describing the first scanline not contained in the
+previous granule.
+\item Split collocations between core, fieldcopier, collapsed, where the
+latter can be generated at the same time or later.
+\item Cached function evaluation
+\end{itemize}
+
+\section{Getting started}
+
+To get started with collocations:
+
+\begin{itemize}
+\item Configure your datasets (\autoref{sec:SatDataset}).
+This involves:
+\begin{itemize}
+\item Defining where your data are stored
+\item Creating a reading routine, if this does not already exist
+\item Defining how the data shall be read
+\end{itemize}
+This is not needed if the datasets are already defined.
+\item Define your CollocatedDatasets (\autoref{sec:CollocatedDataset})
+\begin{itemize}
+\item Define what datasets are collocated with each other
+\item Define maximum distance and time to have a collocation
+\item Define where the data shall be stored
+\end{itemize}
+This is not needed if the CollocatedDataset is already defined.
+\item Define what additional data shall be processed.
+\begin{itemize}
+\item The easy way: via predefined-classes such as FieldCopier
+and Collapser (\autoref{sec:simple}).
+FieldCopiers are to copy fields from the original data to a collocated
+dataset, whereas Collapsers can be used e.g.\ for averaging a small-footprint
+over a large-footprint dataset, or perform another task where the data are
+reduced (``collapsed'').
+\item The advanced way: via user-defined subclasses of AssociatedDataset
+(\autoref{sec:advanced}).
+\end{itemize}
+This is not needed if the FieldCopiers and Collapsers are already defined.
+\item Perferm the collocations with
+\lstinline|CollocatedDataset.collocate_and_store_date_range|. 
+This is not needed if the collocations are already done.
+\item Read the collocations with \lstinline|CollocatedDataset.read|.
+\end{itemize}
+
+\autoref{fig:cd} shows the most important classes and methods that together
+form the \collocs.
+
+\section{Defining the base datasets: SatDataset}
+\label{sec:SatDataset}
+
+Before we can start collocating, we need to be able to read data for the
+datasets we want to collocate, and to systematically go through a large number of granules.
+A SatDataset object contains all information needed to find granules on the
+file-system given a particular date and time, to read the granule (while
+removing duplicates) and to return it in a format that a CollocatedDataset object can
+work with.
+See the class diagram in \autoref{fig:cd} for a partial list of attributes and
+methods.
+For a complete list of properties, type \lstinline|properties SatDataset|
+in Matlab.
+For a complete list of methods, type \lstinline|methods SatDataset|.
+
+Perhaps your dataset is already defined in Atmlab.
+To check this, inspect \lstinline|datasets()|:
+
+\begin{lstlisting}
+>> D = datasets(); D.amsub
+
+ans = 
+
+  SatDataset handle
+
+  Properties:
+                    name: 'amsub'
+                 basedir: '/storage3/data/amsu'
+                  subdir: '$SAT_amsub_$YEAR4/$MONTH/$DAY'
+                      re: [1x165 char]
+                filename: []
+                  reader: @common_read_poes_radiometer
+        granule_duration: 6130
+                 satname: []
+                   cache: [1x1 CachedData]
+                 visible: 1
+                    sats: {'noaa15'  'noaa16'  'noaa17'}
+                   tryre: 1
+    needs_starttimesfile: 0
+          starttimesfile: 'granule_start_times.mat'
+              starttimes: []
+                metadata: []
+     collocated_datasets: [1x7 CollocatedDataset]
+     starttimes_fullpath: '/storage3/data/amsu/granule_start_times.mat'
+
+  Methods, Events, Superclasses
+
+\end{lstlisting}
+
+This shows the properties with their associated values.
+Some properties must be defined for any dataset.
+Those include in particular the name, the location where the data are
+stored, and the reading routine.
+If you want to collocate data, you also need to define
+\lstinline|granule_duration|.
+For details on what every property means, check \lstinline|help SatDataset|.
+The dataset \lstinline|amsub| is already defined, as are many others.
+However, you may need to define a new dataset.
+
+\subsection{Defining a new \lstinline|SatDataset|}
+
+If your dataset is already in Atmlab and configured for your system, you
+can skip this step.
+To check this, call the \lstinline|find_granules_by_date| method for a
+date where you expect to have granules.
+If it returns a matrix with start times, you can skip this subsection.
+
+Defining a new \lstinline|SatDataset| is done by calling the constructor,
+i.e.\ calling the class:
+
+\begin{lstlisting}
+  >> spam = SatDataset('name', 'MyDataset', 'granule_duration', '3600', ...
+                       'satname', 'SpamSat', 'reader', @my_reading_routine);
+\end{lstlisting}
+
+Only the name you need to pass when you are creating the dataset.
+When a SatDataset gets created, it registers itself with a global
+structure.
+This has two implications:
+\begin{itemize}
+\item Firstly, each SatDataset must have a unique name
+\item Secondly, a SatDataset is persistent.
+Whether you bind it to a name directly or not at all, exactly one
+SatDataset gets created
+\end{itemize}
+Also note that SatDataset descends from \lstinline|handle|.
+Therefore, it does not pass by value, but passes by reference.
+
+For all other properties, you can define them in two ways:
+
+\begin{itemize}
+\item Immediately upon creation.
+This is done by passing property names and values in pairs to
+\lstinline|SatDataset|, exactly as when you would create a structure.
+\item After creation.
+For this, the syntax is again like for structures:
+\lstinline|spam.basedir = '/path/to/file'|.
+\end{itemize}
+
+Datasets that are built-in in Atmlab define dataset properties in two
+steps.
+In \lstinline|define_datasets|, the universal properties are defined;
+those that are the same no matter what machine one runs on.
+This includes the name, the reading routine, and some other properties.
+In \lstinline|datasets_init|, the site-specific properties are defined;
+those that differ based on the site, such as the path to the data.
+You may wish to follow a similar pattern.
+
+Now suppose we have a new dataset called \lstinline|ssmt2|\footnote{In
+reality, this too comes with Atmlab; but let's pretend it doesn't}.
+This we can do in the following steps:
+
+\begin{enumerate}
+\item Define the dataset:
+
+\begin{lstlisting}
+SatDataset('name', 'ssmt2', ...
+    'needs_starttimesfile', false, ...
+    'reader', @common_read_ssmt2, ...
+    'granule_duration', 7000);
+\end{lstlisting}
+
+For the meaning of each of the properties, please refer to the in-Matlab
+documentation, i.e.\ \lstinline|help SatDataset/granule_duration|.
+For examples, you can look at the source code for
+\lstinline|define_datasets.m|.
+
+\item
+One property however, is of particular importance, and that is the
+\lstinline|reader|.
+This points to a reading routine with a prescribed interface: input and
+output arguments \emph{must} match a particular pattern that is documented
+by \lstinline|help SatDataset/reader|.
+
+If there is no appropriate reading routine, create it.
+Use \lstinline|help SatDataset/reader| and existing
+\lstinline|common_read_*| routines as an example.
+\item
+Define where the data are:
+
+\begin{lstlisting}
+D.ssmt2.basedir = '/storage3/data/ssmt_ngdc';
+D.ssmt2.subdir = '$SAT/$YEAR4/$MONTH/$DAY';
+D.ssmt2.filename = '$SAT$YEAR4$MONTH$DAY$HOUR$MINUTE.T2.gz';
+D.ssmt2.re = '(?<satname>F[0-9]{2})(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})\.T2\.gz';
+\end{lstlisting}
+ 
+It is essential that you define at least \lstinline|basedir|,
+\lstinline|subdir|, and at least one of \lstinline|filename| and
+\lstinline|re|.
+Those properties are used to locate granules in a universal manner.
+Check the respective property documentation for details.
+\end{enumerate}
+
+Now you are reading to use the \lstinline|SatDataset| as documented in
+\autoref{sec:capa_sat}.
+
+\subsection{Capabilities of \lstinline|SatDataset|}
+\label{sec:capa_sat}
+
+\begin{itemize}
+\item Locate granules. The methods \lstinline!find_datadir_by_date!,
+\lstinline|find_granules_by_date|, \lstinline|find_granules_for_period|,
+and \lstinline|find_granule_by_datetime|
+locate granules on the file system for a particular date and time.
+This is done using the attributes \lstinline|basedir|, \lstinline|subdir|,
+\lstinline|re|, and \lstinline|filename|.
+This functionality is essential for finding collocations, but also useful in
+its own right.
+For example, \lstinline|find_granules_for_period| is useful for time series
+analysis.
+An example of the capabilities of \lstinline|find_granules_by_date|:
+\begin{lstlisting}
+>> D.ssmt2.find_granules_by_date([2001, 1, 10], 'F12')
+
+ans =
+
+        2001           1           9          23          19          -1
+        2001           1          10           1           1          -1
+        2001           1          10           2          43          -1
+        2001           1          10           4          25          -1
+        2001           1          10           6           7          -1
+        2001           1          10           7          49          -1
+        2001           1          10           9          31          -1
+        2001           1          10          11          12          -1
+        2001           1          10          12          54          -1
+        2001           1          10          14          36          -1
+        2001           1          10          16          18          -1
+        2001           1          10          18           0          -1
+        2001           1          10          19          42          -1
+        2001           1          10          21          24          -1
+        2001           1          10          23           6          -1
+
+
+paths = 
+
+  Columns 1 through 12
+
+    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]    [1x61 char]
+
+  Columns 13 through 15
+
+    [1x61 char]    [1x61 char]    [1x61 char]
+
+\end{lstlisting}
+\item Collect and find information on duplicates.
+Before you can actually read any data, a database needs to be created that
+documents the number of lines in a particular granule that are repetitions
+of the granule before.
+For many datasets, subsequent granules contain duplicates: a number of
+scanlines are repeated.
+The method \lstinline|find_granule_first_line| creates a hashtable describing
+for each granule what the first scanline is that does not occur in the
+previous scanline, and stores this to a file.
+%Then, \lstinline|granule_first_line| looks this up from the hashtable.
+Reading routines in the \collocs\ use this information by default to guarantee
+no duplicates occur in final products.
+\item Actually read the data.
+This is done with the method \lstinline|read_granule|.
+In order to make this work, a tailor-made reading routine needs to be provided
+via the property \lstinline|reader|, passed as a function handle.
+This routine provides the interface between the data as stored on disc (which
+can be in an arbitrary format) and the data as represented inside the
+\collocs.
+Detailed documentation can be found with \lstinline|help SatDataset/reader|.
+An example:
+\begin{lstlisting}
+>> data = D.ssmt2.read_granule(grans(1, :), 'F12')
+19-Feb-2013 11:57:24.809:SatDataset.read_granule:818:Reading /storage3/data/ssmt_ngdc/F12/2001/01/09/F12200101092319.T2.gz
+19-Feb-2013 11:57:24.864:exec_system_cmd:64:/local/gerrit/python2.7/bin/python2.7 /storage4/home/gerrit/checkouts/atmlab/sensors/ssmt2_reader_netcdf.py /local/ramdisk/gerrit/F12200101092319.T2 /local/ramdisk/gerrit/tp4d2a7ee8_74a4_4070_91e3_9673628956d8.nc
+19-Feb-2013 11:57:25.608:exec_system_cmd:69:Warning: didn't find number of data records directly.
+Using number of records - number of header records (764 - 1) instead
+19-Feb-2013 11:57:25.640:SatDataset.granule_first_line:940:Reading /storage3/data/granules_firstline/firstline_F12_ssmt2.mat. (If this fails, run self.find_granule_first_line (SatDataset.find_granule_first_line)).
+19-Feb-2013 11:57:25.813:CachedData.set_entry:78:Setting cache entry: ssmt2F120109_TueJan231810 (new size: 4 entries, 4.913 MiB)
+
+data = 
+
+                  lat: [763x28 single]
+                  lon: [763x28 single]
+           ancil_data: [763x10 double]
+    global_attributes: [1x1 struct]
+                 time: [763x1 double]
+                epoch: 978998400
+              version: 'v2.1b'
+      scanline_number: [763x28 double]
+    scanline_position: [763x28 double]
+\end{lstlisting}
+\end{itemize}
+
+% Unless you want to re-implement the collocation algorithm, there is no need
+% to subclass SatDataset; all the functionality you will need is contained in
+% the class.
+
+\section{Defining the collocated datasets: CollocatedDataset}
+\label{sec:CollocatedDataset}
+
+When the SatDatasets are defined, you can create the CollocatedDataset.
+As a subclass of SatDataset, a CollocatedDataset contains all
+functionality of the SatDataset, plus more.
+The core properties uniquely essential to CollocatedDataset are:
+
+\begin{description}
+\item[primary] The primary SatDataset to be collocated
+\item[secondary] The SatDataset that the primary is collocated with
+\item[distance] The maximum distance (in km) to be allowed
+\item[interval] The maximum interval (in s) to be allowed
+\end{description}
+
+Again, details in the documentation for the respective property
+(\lstinline|help CollocatedDataset/distance| etc.).
+
+\subsection{Creating a CollocatedDataset}
+
+To create a CollocatedDataset, call the constructor as below.
+The first two arguments refer to the primary and the secondary datasets to
+be collocated, respectively.
+The remaining arguments are as for SatDataset, but you must set the
+\lstinline|distance| and \lstinline|interval| properties.
+Note that there is a decent default value for \lstinline|reader|, so there
+is no need to define this for a CollocatedDataset (but it will anyway only
+be used if you use collocate a CollocatedDataset with another SatDataset).
+
+\begin{lstlisting}
+>> CollocatedDataset(D.ssmt2, D.ssmt2, 'name', 'cd_ssmt2', 'distance', 30, 'interval', 900)
+
+ans = 
+
+  CollocatedDataset handle
+
+  Properties:
+                 primary: [1x1 SatDataset]
+               secondary: [1x1 SatDataset]
+                distance: 30
+                interval: 900
+                gridsize: 2
+                 logfile: 'collocations_log'
+                  marker: '------------------------------------------------------------------------\n'
+              associated: {}
+           members_const: [1x1 struct]
+                    cols: [1x1 struct]
+                 members: [1x1 struct]
+               overwrite: 0
+                     pcd: []
+                 mattype: 'double'
+                    name: 'cd_ssmt2'
+                 basedir: []
+                  subdir: []
+                      re: []
+                filename: []
+                  reader: @(varargin)self.read_homemade_granule(varargin{:})
+        granule_duration: 86400
+                 satname: []
+                   cache: [1x1 CachedData]
+                 visible: 1
+                    sats: []
+                   tryre: 1
+    needs_starttimesfile: 0
+          starttimesfile: 'granule_start_times.mat'
+              starttimes: []
+                metadata: []
+     collocated_datasets: []
+     starttimes_fullpath: 'granule_start_times.mat'
+\end{lstlisting}
+
+Remember that CollocatedDataset is a subclass of SatDataset, so this too
+gets created and permanently registered just by calling the constructor.
+
+A CollocatedDataset consists of two SatDatasets.
+The CollocatedDataset derives from SatDataset.
+That has some implications:
+\begin{itemize}
+\item Anything that works for SatDataset, also works for CollocatedDataset:
+list granules, find duplicates (normally none), actually read the data, etc.
+\item Since a CollocatedDataset consists of two SatDatasets, one or two of
+those may actually be CollocatedDatasets themselves.
+Therefore, you can arbitrarily deeply collocate CollocatedDatasets with
+other CollocatedDatasets or SatDatasets.
+\end{itemize}
+
+\subsection{Using a CollocatedDataset}
+
+Beyond the abilities of a SatDataset, a CollocatedDataset performs the
+following tasks:
+\begin{itemize}
+\item Collocations between granules, as described by
+\citet{holl10:_collocating_amt} and subsequent papers.
+To collocate single granules or days without storing the result, you can
+use \lstinline|collocate_granule| and \lstinline|collocate_date|.
+You will not need the low-level method \lstinline|collocate|, but you
+might want to tweak the value of the property \lstinline|gridsize|; see
+\lstinline|help CollocatedDataset/gridsize| depending on the expected
+number of collocations. As a rule of thumb: if you expect more collocations,
+choose a small gridsize; if you expect few, choose a large one.
+Note that this only affects the speed and not the results as such.
+\item Storing those collocations in an appropiate format\footnote{This is
+actually implemented in the parent-class HomemadeDataset, but as an end-user
+you don't need to worry about this}.
+To collocate a single day, use \lstinline|collocate_and_store_date|.
+To collocate a long range of dates, use
+\lstinline|collocate_and_store_date_range|.
+If you have any AssociatedDatasets (see below), you can pass them along
+either at the same time or at a later date.
+In the latter case, the toolkit will realise the core collocations already
+exist.
+\item Reading those collocations at a later date, possibly along with
+appropiate AssociatedDatasets (FieldCopiers, Collapsers, etc.).
+This is done with the \lstinline|read| method. 
+For example:
+\begin{lstlisting}
+  [M, c] = ...
+        col.read([2007 1 1],[2007 1 10], 'n18', ...
+                 {'LAT1', 'LON1', 'LAT2', 'LON2', 'RO_ice_water_path', 'cld_reff_vis','cld_opd_vis'}, ...
+                  struct('LAT1', [-30 30]), ...
+                  {{@(x, y) x>y, {'LAT1', 'LON1'}}});
+\end{lstlisting}
+For detailed help, please consult the in-Matlab documentation for
+\lstinline|CollocatedDataset/read|.
+\end{itemize}
+
+For full information on how to create a CollocatedDataset object, the
+properties and the methods, use \lstinline|doc CollocatedDataset| on the
+Matlab command-line.
+
+\subsection{Defining additional data}
+
+Core collocations contain only the bare information, that applies always:
+scanline numbers, scanline indices, latitude, longitude, times for both
+instruments, distance, time interval, and a running number.
+For most applications, this is not sufficient: one also wants a subset of the
+data from the original datasets, or even geophysical data calculated from this
+original data.
+To this end, collocation methods (like
+\lstinline|collocate_and_store_date_range|) and reading methods (such as
+\lstinline|read|) take as as argument a collection of additional objects known
+as AssociatedDatasets.
+The AssociatedDataset is an abstract class.
+This means that it defines for a number of methods that the inputs and output
+are, but it does not actually implement the methods.
+It also described what properties the class has.
+Two implementations are provided (see \autoref{sec:simple}).
+Those contain at least all the methods and properties defined in AssociatedDataset,
+and it is in the class AssociatedDataset that those are documented.
+
+Implementations of AssociatedDataset have their objects created in different ways, but used
+similarly.
+When instantiated, the objects are registered with the CollocatedDataset to which
+they belong.
+Then, when e.g.\ \lstinline|collocate_and_store_date_range| is called for this
+dataset, the user can specify what AssociatedDatasets should be generated along
+with it.
+When reading collocations, there is no need to specify the
+AssociatedDatasets, as long as all the fieldnames are unique.
+The reading routine figures out automatically from what dataset (the core, or one
+of the AssociatedDatasets) a particular field originates.
+
+\subsubsection{The simple way: FieldCopier and Collapser}
+\label{sec:simple}
+
+FieldCopier and Collapser are both implementations of AssociatedDataset.
+The usage of most (but not all) methods is identical.
+Therefore, most of the documentation is in AssociatedDataset, and not in
+FieldCopier or Collapser.
+
+\paragraph{Fieldcopier}
+
+With a FieldCopier, one can do exactly what the name says: copy fields exactly
+from the original data to the collocated data.
+Like the CollocatedDataset, the FieldCopier derives from SatDataset%
+\footnote{In an indirect way: as illustrated by \autoref{fig:cd}, FieldCopier
+implements AssociatedDataset, AssociatedDataset derives from HomemadeDataset,
+and HomemadeDataset derives from SatDataset.
+One could say that SatDataset is the great-grandparent of FieldCopier}, so it
+too can list granules, it contains the same properties to define where the data
+will be stored, etc.
+With CollocatedDataset it shares the capability that it can store data (via
+the intermediate class HomemadeDataset).
+
+\subparagraph{FieldCopier features}
+
+The FieldCopier can:
+
+\begin{itemize}
+\item Copy fields from the datasets that were originally collocated.
+For example, one collocates MHS with CPR\_2B\_CWC\_RO, then obtains the
+field ROIWP from the secondary.
+\item Copy fields from \emph{sibling datasets}.
+A sibling dataset is a dataset for the same instrument but in different
+granules.
+For example, the different CPR products all have the same granules, with
+the same number of measurements in each granule.
+To get a field from a different dataset, set the structure member.
+\lstinline|dataset|; see \lstinline|FieldCopier.fieldstruct_primary|.
+\item Copy fields from a different instrument on the same dataset.
+For example, for the aforementioned collocations, one might want to obtain
+AMSU-A data.
+The granules have the same starting times, but the number of measurements
+is the same.
+This is a bit more involved, because the user has to define how to make
+the translation, for example, from MHS coordinates (scanline number,
+scanline position) to AMSU-A coordinates.
+This is implemented in the abstract class
+\lstinline|FieldMultiInstrumentCopier|.
+For example, see its implementation \lstinline|AssociatedPOESPlusCPR|.
+\end{itemize}
+
+For detailed information, consult the online documentation
+(\lstinline|doc FieldCopier| on the Matlab command line).
+
+\subparagraph{Creating a FieldCopier --- defining the members structure}
+
+The actual creation of a FieldCopier is analogous to the creation of
+CollocatedDataset, SatDataset, etc.; see the documentation for
+\lstinline|FieldCopier/FieldCopier| for details.
+
+The most involved part of creating a FieldCopier is to define the
+\lstinline|members| structure.
+See the documentation for the FieldCopier class and examples in
+\lstinline|define_datasets| for details.
+
+\subparagraph{Using a FieldCopier}
+
+Pass it on wherever you can pass an AssociatedDataset
+
+\paragraph{Collapser}
+
+A Collapser can be used for collocations between datasets with different
+footprint sizes.
+For example, it may be used to calculate the mean, the standard deviation, and
+other statistics, for CloudSat \gls{CPR} footprints over larger \gls{MHS}
+footprints.
+For detailed information, see \lstinline|doc Collapser|.
+
+\subparagraph{Creating a Collapser}
+
+When creating a Collapser, you can define processors and limitators.
+See the documentation for the Collapser class and examples in
+\lstinline|define_datasets| for details.
+
+\subparagraph{Using a Collapser}
+
+\paragraph{Others}
+
+Another, specialised implementation is the class
+\lstinline|AssociatedPOESPlusCPR|.
+
+\subsubsection{The advanced way: rolling your own class}
+\label{sec:advanced}
+
+The tasks performed by FieldCopier and Collapser cover many situations, but
+far from all.
+For the greatest flexibility, you can create your own implementation of
+AssociatedDataset.
+This requires to create a subclass from AssociatedDataset, similar to
+FieldCopier and Collapser, and implement at least all attributes and methods
+that are abstract in AssociatedDataset.
+Then, an object of this class can be passed on in the same place as
+FieldCopier, Collapser, or any other implementations.
+
+The best documentation to date is the full class documentation and the source
+code for AssociatedDataset, FieldCopier, Collapser, and other implementations
+for AssociatedDataset.
+
+\section{Class diagram}
+
+\begin{figure}
+\begin{tikzpicture}[every node/.style={font=\scriptsize}]
+ \begin{class}{SatDataset}{0, 0}
+  \attribute{+ name}
+  \attribute{+ basedir}
+  \attribute{+ subdir}
+  \attribute{+ re}
+  \attribute{+ filename}
+  \attribute{+ reader : function\_handle}
+  \attribute{+ granule\_duration : double}
+  \attribute{+ satname}
+  \attribute{+ dataset}
+  %\attribute{+ firstline\_filename}
+  \attribute{\# collocated\_dataset}
+  \operation{+ find\_datadir\_by\_date}
+  \operation{+ find\_info\_from\_granule}
+  \operation{+ \methodused{find\_granules\_by\_date}}
+  \operation{+ find\_granule\_by\_datetime}
+  \operation{+ \methodused{find\_granules\_for\_period}}
+  \operation{+ read\_granule}
+  \operation{+ granule\_first\_line}
+  \operation{+ find\_granule\_first\_line}
+ \end{class}
+
+ \begin{class}{HomemadeDataset}{1, -7}
+  \inherit{SatDataset}
+  \attribute{+ cols}
+  \operation{+ store}
+  \operation{\# read\_single\_day}
+ \end{class}
+
+ \begin{class}{CollocatedDataset}{-5, -10}
+ \inherit{HomemadeDataset}
+ \attribute{+ primary}
+ \attribute{+ secondary}
+ \attribute{+ distance}
+ \attribute{+ interval}
+ \attribute{\# associated}
+ \attribute{\# members}
+ \operation{+ overlap\_granule}
+ \operation{+ collocate}
+ \operation{+ collocate\_granule}
+ \operation{+ \methodused{collocate\_date}}
+ \operation{+ collocate\_and\_store\_date}
+ \operation{+ \methodused{collocate\_and\_store\_date\_range}}
+ \operation{+ process}
+ \operation{+ read}
+ \end{class}
+
+ \begin{abstractclass}{AssociatedDataset}{3, -10}
+ \inherit{HomemadeDataset}
+ \attribute{+ dependencies}
+ \operation{+ members2cols}
+ \operation{+ process\_delayed}
+ \operation{+ merge}
+ \operation{+ get\_mergefields}
+ \operation{+ concatenate}
+ \operation[0]{+ primary\_arguments}
+ \operation[0]{+ secondary\_arguments}
+ \operation[0]{+ needs\_primary\_data}
+ \operation[0]{+ needs\_secondary\_data}
+ \operation[0]{+ process\_granule}
+ \end{abstractclass}
+
+ \begin{class}{FieldCopier}{-3, -15}
+ \implement{AssociatedDataset}
+ \end{class}
+
+ \begin{class}{Collapser}{4, -15}
+ \implement{AssociatedDataset}
+ \end{class}
+
+ \unidirectionalAssociation{Collapser}{collects}{}{FieldCopier}
+ \association{CollocatedDataset}{consists of two}{}{SatDataset}{can have many}{}
+
+
+\end{tikzpicture}
+\caption{Diagram of the most important classes and methods in the toolkit.
+Methods that an end-user will commonly call are shown \methodused{like this}.
+This is a class diagram \citep{wiki:cd}.
+\label{fig:cd}%
+}
+\end{figure}
+
+\clearpage
+\section{Other stuff}
+
+\printglossaries
+
+\bibliographystyle{copernicus}
+\bibliography{bib_all,extra}
+
+\end{document}

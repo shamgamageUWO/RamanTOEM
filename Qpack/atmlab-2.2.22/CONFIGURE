@@ -1,0 +1,80 @@
+--- How to configure Atmlab ---
+
+It is assumed that you have some basic Matlab knowledge. If some of
+the concepts here are unfamiliar to you, please try to find the
+information in the Matlab documentation. The Matlab web site at 
+www.mathworks.com contains a lot of useful information and a good FAQ.
+
+The top folder of Atmlab is below denoted as ATMLAB/.
+
+Atmlab is added to the Matlab search path by calling the function
+atmlab_init, which is found in ATMLAB/atmlab. To view the search path, use
+the Matlab function path. If you will always be using Atmlab, the
+simplest is to include this line in startup.m:
+
+   run( 'ATMLAB/atmlab/atmlab_init' );   
+
+If you have different Matlab environments, and you don't want to add
+all the Matlab stuff that you have to the search path, the file
+ATMLAB/examples/startup_menu.m gives you some hints on how this 
+can be handled.
+
+Matlab looks for startup.m in the folder where it is started. To
+ensure that Matlab always finds your startup.m, the Matlab path must
+be extended already before calling Matlab. How this is done depends on
+the environment (operative system, shell etc.). If you are a bash
+user, a line like this will do the job
+
+   export MATLABPATH=/home/patrick/Configure/Matlab:
+
+Some functionality of Atmlab requires personal settings. Most parts of Atmlab
+will work without a file with personal settings (but not features involving
+arts, most notably qarts and qpack2). There will be an error message if a
+needed personal setting is lacking.
+
+The personal settings are handled by a function with name atmlab.
+Check out existing fields, and their present settings, by executing
+
+   atmlab;
+
+A description of the field is obtained by
+
+   help atmlab
+
+which also gives instructions on how to use the atmlab function.
+
+The function atmlab_init (that you should run at startup) first sets all
+settings fields to be empty and calls then the function atmlab_conf, if
+it exists in the search path. The function atmlab_conf is not part of 
+Atmlab. The purpose of the function is to set personal settings and 
+it shall be placed in a folder outside Atmlab, but inside the Matlab
+search path at the moment of calling atmlab_init.
+
+You can put any Matlab stuff you like in atmlab_conf. The most natural
+choice is to include calls of atmlab, to set the existing fields to our
+preferred choices. For example:
+
+  atmlab( 'SCREEN_WIDTH',  70     );
+  atmlab( 'SITE',         'kiruna');
+  atmlab( 'VERBOSITY',     2      );
+  atmlab( 'WORK_AREA',    '/tmp'  );
+
+One special workspace variable is highly recommended to set in atmlab_conf.
+The workspace variable 'SITE' is used to load site-specific settings, such as
+locations for datafiles. Valid sites are the directories in
+atmlab/site-specific.
+
+If you are configuring atmlab at a site where no site-specific default
+configuration exists yet, some subsystems (such as datasets) will only work
+after you have defined the location of datasets in the way that is done in
+site-specific/kiruna/datasets_init.m.
+
+It is recommended to join the atmlab-dev mailing list. See
+https://www.sat.ltu.se/mailman/listinfo/atmlab-dev for instructions. In case
+of questions, write to atmlab-dev@www.sat.ltu.se.
+
+Good luck!
+
+Patrick Eriksson
+(patrick.eriksson@chalmers.se)
+expanded by Gerrit Holl (gerrit.holl@ltu.se)
