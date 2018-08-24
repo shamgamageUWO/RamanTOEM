@@ -198,7 +198,7 @@ DT_JL
 % OV, OV AVG and OV Uncertainty
 %        Overlap
 figure;
-% subplot(1,2,1)
+subplot(1,2,1)
 plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:2*m+3),Q.Zret./1000,'r')
 grid on;
 xlabel('OV')
@@ -208,11 +208,11 @@ set(gca,'fontsize',20)
 ylim([0 12])
 
 
-% subplot(1,2,2)
-% plot(X.A(m+4:5:2*m+3,m+4:5:2*m+3),Q.Zret(1:5:m)./1000)
-% xlabel('OV Averaging Kernel')
-% ylabel('Altitude ( km )')
-% set(gca,'fontsize',20)
+subplot(1,2,2)
+plot(X.A(m+4:5:2*m+3,m+4:5:2*m+3),Q.Zret(1:5:m)./1000)
+xlabel('OV Averaging Kernel')
+ylabel('Altitude ( km )')
+set(gca,'fontsize',20)
  
                     
                     

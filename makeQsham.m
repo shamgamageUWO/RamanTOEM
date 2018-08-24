@@ -54,8 +54,8 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-Q.alt_d0 = 1000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
-Q.alt_df = 25000; % Digital Channel ending altitude
+Q.alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
+Q.alt_df = 28000; % Digital Channel ending altitude
 Q.alt_a0 = 150;% Analog Channel starting altitude 20110705 150
 Q.alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
@@ -70,8 +70,8 @@ c4 = 2.*c3;
 %  Q.LRpbl = 80; % 50 on 20110705 20110901 2011080223; was 80 on otherwise 
 %  Q.LRtranHeight = 2000; %  800 for 20120228 2000 for 20110901 this is the height to the BL 1500 20110705 2011080223 6000
 % 3 is nominal, not accurate 2.75; 
-Q.AerosolFreeheight = 20000;%2011080223 17000
-Q.ASRcutoffheight = 20000; % 20110909 2000 20110802 day 11km
+Q.AerosolFreeheight = 28000;%2011080223 17000
+Q.ASRcutoffheight = 28000; % 20110909 2000 20110802 day 11km
 % Q.asrsmoothing = 10; % 100 for 20110802 day, 
 % Q.OVCOV_6above = 1e-3; % 1e-4 for clear 1e-2/3 for cloud relax this 
 
@@ -153,7 +153,7 @@ Q.d_alti_Diff = length(Q.Zmes)-length(Q.Zmes2);
 % Z3 = 10000:(Q.Zmes(2)-Q.Zmes(1))*c3:15000;
 % Z4 = 15000:(Q.Zmes(2)-Q.Zmes(1))*c4:28000;
 % Q.Zret =[Z1 Z2 Z3 Z4];
-  Q.Zret= Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:28000;
+  Q.Zret= Q.Zmes(1):(Q.Zmes(2)-Q.Zmes(1))*c1:30000;
 disp('Defined grids ')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -161,9 +161,9 @@ disp('Defined grids ')
 
 [Tsonde,Zsonde,Psonde] = get_sonde_RS92(Q.date_in, Q.time_in);
 Zsonde = Zsonde-491; % altitude correction
-Tsonde = Tsonde(Zsonde<=30000);
-Psonde = Psonde(Zsonde<=30000);
-Zsonde = Zsonde(Zsonde<=30000);
+Tsonde = Tsonde(Zsonde<=32000);
+Psonde = Psonde(Zsonde<=32000);
+Zsonde = Zsonde(Zsonde<=32000);
 
 Q.Tsonde = interp1(Zsonde,Tsonde,Q.Zmes,'linear'); % this goes to Restimation and asr code
 Psonde1 = interp1(Zsonde,log(Psonde),Q.Zmes,'linear'); % this goes asr

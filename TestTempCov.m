@@ -8,12 +8,16 @@ function [S_aT]=TestTempCov(Zj,Ta)
  m = length(Ta);
  n = m;
  
+%  ind = Zj>=10000;
  lengthcT = 2000; % =3000; % only need m of these
-   Tfac = 30;
+   Tfac = 35;
    Tmodvar = (Tfac.*ones(size(Ta))).^2;
 %    Tmodvar = (0.3.*Ta).^2;
  vars2 = Tmodvar;
+ 
  lc = lengthcT.*ones(1,m);
+%  lc(ind) = 4000;
+%  
  S_aT =zeros(n,n);
 
 for i = 1:m
