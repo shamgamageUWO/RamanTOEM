@@ -446,9 +446,23 @@ set(gca,'fontsize',20)
                     ylabel('Altitude (km)')
                     set(gca,'fontsize',20)
 
-                     
-
-                    
+           % Find LR from alpha aerosol 
+           LR = exp(X.x(2*m+9:end))./Q.beta_aero;
+           LR_new = smooth(LR,2); 
+                               ER = X.e(2*m+9:end);
+                    u = real(ER+ X.x(2*m+9:end));
+                    l =  real(X.x(2*m+9:end)-ER);
+           figure;
+           subplot(1,3,1)
+           plot(exp(Q.alpha_aero).*1000,Q.Zret./1000,'g',exp(X.x(2*m+9:end)).*1000,Q.Zret./1000,'r')
+           hold on;
+            jbfilly(Q.Zret./1000,exp(u)'.*1000,exp(l)'.*1000,[0.9 1 1],[0.94 0.87 0.87],0,0.5);
+hold off;
+ subplot(1,3,2)
+ plot(Q.beta_aero.*1000,Q.Zret./1000)    %(per km)    
+           subplot(1,3,3)
+           plot(Q.LR,Q.Zret./1000,'g',LR_new,Q.Zret./1000,'r')
+           
 
  Error = errors(Q,X);  % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %   b parameters and errors

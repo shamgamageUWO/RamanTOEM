@@ -1,5 +1,5 @@
 % this is first get S3 file with asr content
-function [alphaAer,odaer,cutoffOV] = asrSham(Q)
+function [alphaAer,odaer,cutoffOV,LR,beta_aero] = asrSham(Q)
 % first load S3.mat 
  date = Q.date_in;
 [year,month,day] = getYMDFromDate(date);
@@ -163,4 +163,4 @@ alphaAer(znoAer) = 1e-12;
      odnorm = trapz(z0,alpha0);
     odaer = cumtrapz(zN,alphaAer) +odnorm;
 
-
+beta_aero = (beta_mol .* (asrDATAnew-1));

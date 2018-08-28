@@ -198,7 +198,7 @@ DT_JL
 % OV, OV AVG and OV Uncertainty
 %        Overlap
 figure;
-subplot(1,2,1)
+% subplot(1,2,1)
 plot(Q.OVa,Q.Zret./1000,'g',X.x(m+4:2*m+3),Q.Zret./1000,'r')
 grid on;
 xlabel('OV')
@@ -208,11 +208,11 @@ set(gca,'fontsize',20)
 ylim([0 12])
 
 
-subplot(1,2,2)
-plot(X.A(m+4:5:2*m+3,m+4:5:2*m+3),Q.Zret(1:5:m)./1000)
-xlabel('OV Averaging Kernel')
-ylabel('Altitude ( km )')
-set(gca,'fontsize',20)
+% subplot(1,2,2)
+% plot(X.A(m+4:5:2*m+3,m+4:5:2*m+3),Q.Zret(1:5:m)./1000)
+% xlabel('OV Averaging Kernel')
+% ylabel('Altitude ( km )')
+% set(gca,'fontsize',20)
  
                     
                     
@@ -220,7 +220,7 @@ set(gca,'fontsize',20)
                     
                     % Aerosol 
                     figure;
-                    subplot(1,2,1)
+%                     subplot(1,2,1)
                     %     semilogx(exp(Q.alpha_aero),Q.Zret./1000,'g',exp(X.x(2*m+9:end)),Q.Zret./1000,'r')
                     semilogx((Q.alpha_aero),Q.Zret./1000,'g',(X.x(2*m+9:end)),Q.Zret./1000,'r')
                     grid on;
@@ -230,11 +230,11 @@ set(gca,'fontsize',20)
                     set(gca,'fontsize',20)
                     ylim([0 20])
                     
-                    subplot(1,2,2)
-                    plot(X.A(2*m+9:5:end,2*m+9:5:end),Q.Zret(1:5:m)./1000)
-                    xlabel('Aerosol Extinction - Averaging Kernels')
-                    ylabel('Altitude ( km )')
-                    set(gca,'fontsize',20)
+%                     subplot(1,2,2)
+%                     plot(X.A(2*m+9:5:end,2*m+9:5:end),Q.Zret(1:5:m)./1000)
+%                     xlabel('Aerosol Extinction - Averaging Kernels')
+%                     ylabel('Altitude ( km )')
+%                     set(gca,'fontsize',20)
 
                     
 S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
@@ -259,9 +259,9 @@ S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end))%DegF for Aerosol
 % % H = traditionalTraman_combined(Q);
 % T_an = interp1(Q.Zmes1,H.T_an,Q.Zret);
 % %  T_tr = interp1(Q.Zmes,H.T_dg,Q.Zret);
-   load('201109092330.mat');
-%   load('201109101130.mat');
-% load('201107052359.mat');
+%    load('201109092330.mat');
+%    load('201109101130.mat');
+ load('201107052359.mat');
  T_tr = interp1((Temp.z-2*491),Temp.profile,Q.Zret);
  T_reerror=interp1((Temp.z-2*491),Temp.relerr,Q.Zret);
  T_reerror = T_reerror(2:m);
@@ -446,9 +446,23 @@ set(gca,'fontsize',20)
                     ylabel('Altitude (km)')
                     set(gca,'fontsize',20)
 
-                     
-
-                    
+           % Find LR from alpha aerosol 
+           LR = exp(X.x(2*m+9:end))./Q.beta_aero;
+           LR_new = smooth(LR,2); 
+                               ER = X.e(2*m+9:end);
+                    u = real(ER+ X.x(2*m+9:end));
+                    l =  real(X.x(2*m+9:end)-ER);
+           figure;
+           subplot(1,3,1)
+           plot(exp(Q.alpha_aero).*1000,Q.Zret./1000,'g',exp(X.x(2*m+9:end)).*1000,Q.Zret./1000,'r')
+           hold on;
+            jbfilly(Q.Zret./1000,exp(u)'.*1000,exp(l)'.*1000,[0.9 1 1],[0.94 0.87 0.87],0,0.5);
+hold off;
+ subplot(1,3,2)
+ plot(Q.beta_aero.*1000,Q.Zret./1000)    %(per km)    
+           subplot(1,3,3)
+           plot(Q.LR,Q.Zret./1000,'g',LR_new,Q.Zret./1000,'r')
+           
 
  Error = errors(Q,X);  % % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %   b parameters and errors

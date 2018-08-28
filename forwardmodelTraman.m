@@ -33,7 +33,7 @@ kb = 1.38064852*10^-23;
 
 % Total calculation Transmission
 alpha_aero1 = interp1(Q.Zret,alpha_aero,Q.Zmes,'linear');
-% alpha_aero1 = exp(alpha_aero1);% now retrieving log of aerosol extinction
+ alpha_aero1 = exp(alpha_aero1);% now retrieving log of aerosol extinction
 sigma_tot = Q.alpha_mol + alpha_aero1;
 R_tr_i  = exp(-2.*cumtrapz(Q.Zmes,sigma_tot)); % Molecular transmission
 

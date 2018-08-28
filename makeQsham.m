@@ -192,14 +192,15 @@ disp('a priori temperature profile is loaded ')
 
 
 % % Calculate the aerosol attenuation
-[alpha_aero,odaer,cutoffOV] = asrSham(Q);
+[alpha_aero,odaer,cutoffOV,LR,beta_aero] = asrSham(Q);
 alpha_aero = smooth(alpha_aero,5);
- Q.alpha_aero = (alpha_aero');
-%  Q.alpha_aero = log(alpha_aero');%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
+%  Q.alpha_aero = (alpha_aero');
+  Q.alpha_aero = log(alpha_aero');%interp1(Q.Zmes,alphaAer,Q.Zret,'linear'); % this goes to CJL estimation
 Q.cutoffOV = cutoffOV;
 % Q.odaer = odaer;
 % 
-
+Q. LR = LR;
+Q.beta_aero = beta_aero;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
