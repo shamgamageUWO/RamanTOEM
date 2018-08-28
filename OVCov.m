@@ -84,7 +84,7 @@ for i = 1:m
             %          Sa_T(i,j) = Ta(i);
             %         end
          else
-             S_OV(i,i) = 1e-4; % cloud at 6km use 1e-2
+             S_OV(i,i) = 1e-6; % cloud at 6km use 1e-2
          end
     end
 end

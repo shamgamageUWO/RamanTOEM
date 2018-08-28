@@ -54,10 +54,10 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-Q.alt_d0 = 4000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
+Q.alt_d0 = 3000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
 Q.alt_df = 28000; % Digital Channel ending altitude
 Q.alt_a0 = 150;% Analog Channel starting altitude 20110705 150
-Q.alt_af = 6000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
+Q.alt_af =4000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
 % Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 4; % retrieval bin size
@@ -220,11 +220,11 @@ Q.alpha_mol = alpha_mol;
 
 %% Estimating background and lidar constant wrt a priori 
 
-    C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
-    Q.CL = C.CJL;
-    Q.CLa =C.CJLa;
-% % Q.CL = 3.8362e+19 ;
-% % Q.CLa= 4.6099e+15;
+%     C = estimations(Q);% Q.OVa = ones(1,length(Q.Ta));
+%     Q.CL = C.CJL;
+%     Q.CLa =C.CJLa;
+Q.CL = 4.5362e+19 ;
+Q.CLa= 1.6099e+16;
 Q.CovCL = (1 .* (Q.CL)).^2;%sqrt(Q.CL);
 Q.CovCLa = (1 .* (Q.CLa)).^2;%sqrt(Q.CL);
 
@@ -334,8 +334,8 @@ end
 
 % Q.YYa = 0.01.*ones(1,length(Q.JLnewa)); 
 % Q.YYYa = 0.01.*ones(1,length(Q.JHnewa));
-                YYa(JL_an_alt_20MHz) = Y.YYa(JL_an_alt_20MHz);
-                YYYa(JH_an_alt_20MHz) = Y.YYYa(JH_an_alt_20MHz);
+                YYa(JL_an_alt_20MHz) = Y.YYa(JL_an_alt_20MHz).*.1;
+                YYYa(JH_an_alt_20MHz) = Y.YYYa(JH_an_alt_20MHz).*.1;
 
                 Q.YYa = YYa(ANalt>=Q.alt_a0 & ANalt <=Q.alt_af);
                 Q.YYYa = YYYa(ANalt>=Q.alt_a0 & ANalt <=Q.alt_af);

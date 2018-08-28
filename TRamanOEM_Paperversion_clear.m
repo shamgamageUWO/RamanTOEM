@@ -220,7 +220,7 @@ ylim([0 12])
                     
                     % Aerosol 
                     figure;
-                    subplot(1,2,1)
+%                     subplot(1,2,1)
                     %     semilogx(exp(Q.alpha_aero),Q.Zret./1000,'g',exp(X.x(2*m+9:end)),Q.Zret./1000,'r')
                     semilogx((Q.alpha_aero),Q.Zret./1000,'g',(X.x(2*m+9:end)),Q.Zret./1000,'r')
                     grid on;
@@ -230,11 +230,11 @@ ylim([0 12])
                     set(gca,'fontsize',20)
                     ylim([0 20])
                     
-                    subplot(1,2,2)
-                    plot(X.A(2*m+9:5:end,2*m+9:5:end),Q.Zret(1:5:m)./1000)
-                    xlabel('Aerosol Extinction - Averaging Kernels')
-                    ylabel('Altitude ( km )')
-                    set(gca,'fontsize',20)
+%                     subplot(1,2,2)
+%                     plot(X.A(2*m+9:5:end,2*m+9:5:end),Q.Zret(1:5:m)./1000)
+%                     xlabel('Aerosol Extinction - Averaging Kernels')
+%                     ylabel('Altitude ( km )')
+%                     set(gca,'fontsize',20)
 
                     
 S_b.degF1 = trace(X.A(1:m,1:m)); %DegF for Temperature 
@@ -260,8 +260,8 @@ S_b.degF3 = trace(X.A(2*m+9:end,2*m+9:end))%DegF for Aerosol
 % T_an = interp1(Q.Zmes1,H.T_an,Q.Zret);
 % %  T_tr = interp1(Q.Zmes,H.T_dg,Q.Zret);
 %    load('201109092330.mat');
-   load('201109101130.mat');
-% load('201107052359.mat');
+%    load('201109101130.mat');
+ load('201107052359.mat');
  T_tr = interp1((Temp.z-2*491),Temp.profile,Q.Zret);
  T_reerror=interp1((Temp.z-2*491),Temp.relerr,Q.Zret);
  T_reerror = T_reerror(2:m);
