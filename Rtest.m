@@ -4,8 +4,8 @@ dT = [-10,-5,-2,0,2,5,10];
 R_esti=[];
 % R_real=[];
 dR =[];
-date_in = 20130904;
-time_in = 11;
+date_in = 20110909;
+time_in = 23;
 Zi= 1000:100:40000;
 ind = Zi>=4000 & Zi<=8000;
 
@@ -17,9 +17,9 @@ SJH = (JHwithoutBG);% background removed
 SJL = (JLwithoutBG);
 SSJL = interp1(alt,SJL,Zi,'linear');
 SSJH = interp1(alt,SJH,Zi,'linear');
-y = SJH./SJL;
-y = interp1(alt,y,Zi,'linear');
-y = y(ind);
+% y = SJH./SJL;
+% y = interp1(alt,y,Zi,'linear');
+% y = y(ind);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % US model
@@ -35,6 +35,9 @@ CJL = mean(CJL(ind));
 CJH = mean(CJH(ind));
 % figure;plot(CJL,Zi(ind),CJH,Zi(ind))
 R_real = (CJH/CJL);
+
+y = (CJH.*Diff_JH_i)./(CJL.*Diff_JL_i);
+ 
 for i = 1:length(dT)
  T = temp+dT(i);
 % Synthetic
@@ -43,7 +46,7 @@ for i = 1:length(dT)
 % 
 % Estimation of R 
 x = (Diff_JH_i)./(Diff_JL_i);
-x=x(ind);
+% x=x(ind);
 f = fittype({'x'});
 fit3 = fit(x',y',f,'Robust','on');
 R_esti(i) = fit3(1);

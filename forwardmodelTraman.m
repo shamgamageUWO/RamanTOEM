@@ -3,10 +3,13 @@
 function [JL,JH,A_Zi,B_Zi,Diff_JL_i,Diff_JH_i,Ti]=forwardmodelTraman(Q,x)
 
  m = length(Q.Zret);
+ % temperature
  x_a = x(1:m);
-%  Ti = interp1(Q.Zret,x(1:m),Q.Zmes,'linear'); % T on data grid (digital)
+ % defining OV Q.OVlength  
+ OV = x(end+1-(Q.OVlength):end);
+% Ti = interp1(Q.Zret,x(1:m),Q.Zmes,'linear'); % T on data grid (digital)
 Ti = interp1(Q.Zret,x_a,Q.Zmes,'linear'); % T on data grid (digital)
-
+ OV_Zi = interp1(Q.Zret,OV,Q.Zmes,'linear');
 % R = 0.7957; % Im chaning this here inorder to change the forward model
 % % CL = 1.2e+22;
 % % CH = 9.4e+21;
@@ -44,20 +47,22 @@ Tr = exp(-cumtrapz(Q.Zmes,Nmol*sigmaNicolet));
 
 R_tr_i = Tr.^2;
 
-% Overlap
+% % Overlap
 % dz = Q.Zmes(2)-Q.Zmes(1);
-[epsi,z] = Overlap(Q.Zmes);
-dis = length(Q.Zmes )-length(z);
-NN = ones(1,dis);
-KK = (epsi);
-NK= [KK NN];
-OV_Zi = NK;
-% OV_Zi=1;
+% [epsi,z] = Overlap(Q.Zmes);
+% dis = length(Q.Zmes )-length(z);
+% NN = ones(1,dis);
+% KK = (epsi);
+% NK= [KK NN];
+% OV_Zi = NK;
+
+
+
 
 % Define the first part of the equation 
 
 A_Zi = (area .* OV_Zi .*R_tr_i .*Q.Pressi)./(kb * Q.Zmes .^2);
-B_Zi = (area .* OV_Zi .*R_tr_i .*Q.Pressi)./(kb * Q.Zmes .^2);
+B_Zi = (area .*R_tr_i .*Q.Pressi)./(kb * Q.Zmes .^2); % No overlap
 
 % % Differential cross section term 
 
@@ -88,14 +93,15 @@ Diff_JH_i =  Diff_JHO2 + Diff_JHN2;
 % CH=nanmean(CH);
 
 % Syntheic data for JL using US standard data
-CH = (Q.R).* x(end);
-JL = (x(end).*A_Zi .* Diff_JL_i)./(Ti);
+ CJL = x(end-Q.OVlength);
+% bgJL =x();
+% bgJH = x();
+CH = (Q.R).* CJL;
+JL = (CJL.*A_Zi .* Diff_JL_i)./(Ti);
 JH = (CH.* A_Zi .* Diff_JH_i)./(Ti);
 
-% Add background to the counts 
-JL = JL  + x(end-1);
-JH = JH  + x(end-2);
 
+% figure;semilogx(JL,Q.Zmes./1000,JH,Q.Zmes./1000)
 
 % apply the new cutoff
 % JH = JH(Q.Ind);
@@ -107,11 +113,17 @@ JH = JH  + x(end-2);
 % 
         %% Saturation correction
         % 1. Convert counts to Hz
-        JHnw = (JH.*Q.ScaleFactor)./Q.shots;
-        JLnw = (JL.*Q.ScaleFactor)./Q.shots;
+        JHnw = (JH.*Q.f);
+        JLnw = (JL.*Q.f);
  JL = JL ./ (1 + JLnw.*(Q.deadtime)); % non-paralyzable
 % JL = JL .* exp(-JLnw.*(4e-9)); % paralyzable %units is counts
  JH = JH ./ (1 + JHnw.*(Q.deadtime));
+ 
+ % Add background to the counts 
+JL = JL  + x(end-Q.OVlength-1);
+JH = JH  + x(end-Q.OVlength-2);
+ 
+ 
         % 2. Apply the correction
 
 %         JH = JH .* exp(-JHnw.*(Q.deadtime)); % paralyzable %units is counts
@@ -119,7 +131,7 @@ JH = JH  + x(end-2);
 %         JL = JL .* exp(-JLnw.*(Q.deadtime)); % paralyzable %units is counts
         % newY2 = JL ./ (1 + JLnw.*(4e-9));% non-paralyzable
         
-
+% figure;semilogx(JH,Q.Zmes,'r',JL,Q.Zmes,'b')
 
 %% Here apply the cutoff altitude to JH channel
 % JH = JH(Q.ind);

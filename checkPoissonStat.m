@@ -13,7 +13,7 @@ function checkPoissonStat(r,x_ph)
 % x - counts
 
 % bin size
-N = 25;
+N = 8;
 
 % reshape vectors
 ind = 1:length(r)-mod(length(r),N);
@@ -28,9 +28,10 @@ end
 
 
 % plot
-plot(r,xm,'r')
+figure;
+plot(r,xm)
 hold
-plot(r,xs,'b')
+plot(r,xs)
 % plot(r,xm./xs)
 grid on, hold
 xlim([0 30])
