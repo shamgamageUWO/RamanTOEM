@@ -54,10 +54,10 @@ disp('All the constants are ready')
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Inputs
-Q.alt_d0 = 3000; % Digital Channel starting altitude 20110705 2000 2011080223 3000
+Q.alt_d0 = 1500; % Digital Channel starting altitude 20110705 2000 2011080223 3000
 Q.alt_df = 28000; % Digital Channel ending altitude
 Q.alt_a0 = 150;% Analog Channel starting altitude 20110705 150
-Q.alt_af =4000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
+Q.alt_af = 4000;% Analog Channel ending altitude 20110705 2000, 2011080223 6000
 b1 = 8; % Bin size for piecewise cov for digital 20110705 2011080223 8
 % Q.b2 = 20; % Bin size for piecewise cov for analog 20110705  2011080223 24
 c1 = 4; % retrieval bin size
@@ -335,8 +335,8 @@ end
 
 % Q.YYa = 0.01.*ones(1,length(Q.JLnewa)); 
 % Q.YYYa = 0.01.*ones(1,length(Q.JHnewa));
-                YYa(JL_an_alt_20MHz) = Y.YYa(JL_an_alt_20MHz).*.1;
-                YYYa(JH_an_alt_20MHz) = Y.YYYa(JH_an_alt_20MHz).*.1;
+                YYa(JL_an_alt_20MHz) = Y.YYa(JL_an_alt_20MHz);
+                YYYa(JH_an_alt_20MHz) = Y.YYYa(JH_an_alt_20MHz);
 
                 Q.YYa = YYa(ANalt>=Q.alt_a0 & ANalt <=Q.alt_af);
                 Q.YYYa = YYYa(ANalt>=Q.alt_a0 & ANalt <=Q.alt_af);
